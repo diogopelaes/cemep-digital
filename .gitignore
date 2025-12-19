@@ -1,0 +1,11 @@
+# Instaladores e binários grandes
+Documentation/Frameworks/
+*.exe
+*.msi
+*.msix
+
+# Pastas de dependências (comum em projetos Node/Python)
+node_modules/
+__pycache__/
+.env
+
