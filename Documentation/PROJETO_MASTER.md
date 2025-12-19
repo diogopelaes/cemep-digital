@@ -34,3 +34,6 @@ Para entender detalhadamente cada aspecto, consulte os arquivos abaixo na pasta 
 
 ---
 **Inicie qualquer tarefa lendo este arquivo e os arquivos linkados relevantes para a solicitação do usuário.**
+
+## Identidade Visual
+- **Logo Oficial:** `Documentation/img/CEMEP.jpeg`

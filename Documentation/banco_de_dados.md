@@ -109,14 +109,13 @@ Abaixo a estrutura sugerida para o `models.py` (pode ser dividido em apps como `
 - `autor`: FK -> Funcionario.
 - `data`: DateTime.
 - `descricao`: Text.
-- `gravidade`: Enum.
 
 ### Model `OcorrenciaPedagogica`
 - `estudante`: FK -> Estudante.
 - `autor`: FK -> Funcionario.
 - `tipo`: FK -> `TipoOcorrencia` (Opções cadastradas pelo gestor).
 - `data`: DateTime.
-- `ciente_responsavel`: Boolean.
+- `ciente_estudante`: Boolean.
 
 ### Model `Avaliacao`
 - `professor`: FK -> Funcionario.

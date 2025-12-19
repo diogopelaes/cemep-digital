@@ -19,7 +19,7 @@
     - Evitar classes utilitárias repetitivas soltas no código; encapsular em componentes.
 
 ## Estrutura de Pastas Sugerida (src/)
-- `/assets`: Imagens, fontes.
+- `/assets`: Imagens, fontes. (Logo em `Documentation/img/CEMEP.jpeg`)
 - `/components`: Componentes reutilizáveis (UI Kit).
 - `/contexts`: Contextos globais (Auth, Theme).
 - `/hooks`: Custom hooks (ex: `useAuth`, `useFetch`).
