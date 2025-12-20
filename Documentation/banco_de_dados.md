@@ -18,6 +18,7 @@ class User(AbstractUser):
         RESPONSAVEL = 'RESPONSAVEL', 'Responsável'
 
     tipo_usuario = models.CharField(max_length=20, choices=TipoUsuario.choices)
+    telefone = models.CharField(max_length=15, blank=True)
     foto = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     dark_mode = models.BooleanField(default=False)
 ```
@@ -25,6 +26,16 @@ class User(AbstractUser):
 ## 2. App `core` (Cadastros Base)
 
 ```python
+# Classe compartilhada para parentesco (usada em academic e permanent)
+class Parentesco(models.TextChoices):
+    PAI = 'PAI', 'Pai'
+    MAE = 'MAE', 'Mãe'
+    AVO_M = 'AVO_M', 'Avô(a) Materno'
+    AVO_P = 'AVO_P', 'Avô(a) Paterno'
+    TIO = 'TIO', 'Tio(a)'
+    IRMAO = 'IRMAO', 'Irmão(ã)'
+    OUTRO = 'OUTRO', 'Outro'
+
 class Funcionario(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     funcao = models.CharField(max_length=100)
@@ -87,6 +98,7 @@ class Estudante(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     cpf = models.CharField(max_length=14, unique=True)
     cin = models.CharField(max_length=20, verbose_name="CIN")
+    nome_social = models.CharField(max_length=255, blank=True)
     data_nascimento = models.DateField()
     data_entrada = models.DateField()
     bolsa_familia = models.BooleanField(default=False)
@@ -105,17 +117,9 @@ class Estudante(models.Model):
     complemento = models.CharField(max_length=100, blank=True)
 
 class Responsavel(models.Model):
-    class Parentesco(models.TextChoices):
-        PAI = 'PAI', 'Pai'
-        MAE = 'MAE', 'Mãe'
-        AVO_M = 'AVO_M', 'Avô(a) Materno'
-        AVO_P = 'AVO_P', 'Avô(a) Paterno'
-        OUTRO = 'OUTRO', 'Outro'
-
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     estudantes = models.ManyToManyField(Estudante, related_name='responsaveis')
-    parentesco = models.CharField(max_length=20, choices=Parentesco.choices)
-    telefone = models.CharField(max_length=15)
+    parentesco = models.CharField(max_length=20, choices=Parentesco.choices)  # usa classe do core
 
 class MatriculaCEMEP(models.Model):
     class Status(models.TextChoices):
@@ -127,7 +131,7 @@ class MatriculaCEMEP(models.Model):
 
     numero_matricula = models.CharField(max_length=20, primary_key=True)
     estudante = models.ForeignKey(Estudante, on_delete=models.CASCADE)
-    curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
+    curso = models.ForeignKey(Curso, on_delete=models.PROTECT)
     data_entrada = models.DateField()
     data_saida = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.MATRICULADO)
@@ -158,7 +162,7 @@ class Atestado(models.Model):
 ```python
 class PlanoAula(models.Model):
     professor = models.ForeignKey(Funcionario, on_delete=models.CASCADE)
-    disciplina = models.ForeignKey(Disciplina, on_delete=models.CASCADE)
+    disciplina = models.ForeignKey(Disciplina, on_delete=models.PROTECT)
     turmas = models.ManyToManyField(Turma)
     data_inicio = models.DateField()
     data_fim = models.DateField()
@@ -200,14 +204,14 @@ class NotaBimestral(models.Model):
     nota = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
 
 class Recuperacao(models.Model):
-    estudantes = models.ManyToManyField(Estudante)
-    disciplina = models.ForeignKey(Disciplina, on_delete=models.CASCADE)
+    matriculas_turma = models.ManyToManyField(MatriculaTurma)
+    disciplina = models.ForeignKey(Disciplina, on_delete=models.PROTECT)
     professor = models.ForeignKey(Funcionario, on_delete=models.CASCADE)
     bimestre = models.PositiveSmallIntegerField()
     
 class NotificacaoRecuperacao(models.Model):
     recuperacao = models.ForeignKey(Recuperacao, on_delete=models.CASCADE)
-    funcionario = models.ForeignKey(Funcionario, on_delete=models.CASCADE)
+    estudante = models.ForeignKey(Estudante, on_delete=models.CASCADE)
     visualizado = models.BooleanField(default=False)
 ```
 
@@ -226,7 +230,7 @@ class Tarefa(models.Model):
 class NotificacaoTarefa(models.Model):
     tarefa = models.ForeignKey(Tarefa, on_delete=models.CASCADE)
     funcionario = models.ForeignKey(Funcionario, on_delete=models.CASCADE)
-    visualisado = models.BooleanField(default=False)
+    visualizado = models.BooleanField(default=False)
 
 class ReuniaoHTPC(models.Model):
     data_reuniao = models.DateTimeField()
@@ -239,7 +243,7 @@ class ReuniaoHTPC(models.Model):
 class NotificacaoHTPC(models.Model):
     reuniao = models.ForeignKey(ReuniaoHTPC, on_delete=models.CASCADE)
     funcionario = models.ForeignKey(Funcionario, on_delete=models.CASCADE)
-    visualisado = models.BooleanField(default=False)
+    visualizado = models.BooleanField(default=False)
 
 class Aviso(models.Model):
     titulo = models.CharField(max_length=200)
@@ -254,9 +258,24 @@ class Aviso(models.Model):
 *Nota: Estes modelos usam CPF como PK para garantir a sobrevivência dos dados após o expurgo de usuários do banco principal.*
 
 ```python
+class DadosPermanenteEstudante(models.Model):
+    cpf = models.CharField(max_length=14, primary_key=True)
+    nome = models.CharField(max_length=255)
+    data_nascimento = models.DateField(null=True, blank=True)
+    telefone = models.CharField(max_length=15, blank=True)
+    email = models.EmailField(blank=True)
+    endereco_completo = models.TextField(blank=True)
+
+class DadosPermanenteResponsavel(models.Model):
+    estudante = models.ForeignKey(DadosPermanenteEstudante, on_delete=models.CASCADE, related_name='responsaveis')
+    cpf = models.CharField(max_length=14, primary_key=True)
+    nome = models.CharField(max_length=255)
+    telefone = models.CharField(max_length=15)
+    email = models.EmailField(blank=True)
+    parentesco = models.CharField(max_length=20, choices=Parentesco.choices, blank=True)  # usa classe do core
+
 class HistoricoEscolar(models.Model):
-    estudante_cpf = models.CharField(max_length=14, primary_key=True)
-    nome_estudante = models.CharField(max_length=255)
+    estudante = models.OneToOneField(DadosPermanenteEstudante, on_delete=models.CASCADE)
     numero_matricula = models.CharField(max_length=20)
     nome_curso = models.CharField(max_length=100)
     data_entrada_cemep = models.DateField()
@@ -280,16 +299,8 @@ class HistoricoEscolarNotas(models.Model):
     nota_final = models.DecimalField(max_digits=4, decimal_places=2)
     frequencia_total = models.PositiveSmallIntegerField()
 
-class OcorrenciaDisciplinarEstudante(models.Model):
-    cpf = models.CharField(max_length=14, primary_key=True)
-    nome = models.CharField(max_length=255)
-    responsavel_nome = models.CharField(max_length=255)
-    telefone = models.CharField(max_length=15)
-    email = models.EmailField(blank=True)
-    endereco_completo = models.TextField()
-
 class OcorrenciaDisciplinar(models.Model):
-    estudante = models.ForeignKey(OcorrenciaDisciplinarEstudante, on_delete=models.CASCADE)
+    cpf = models.CharField(max_length=14)
     pai_ocorrencia = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
     autor_nome = models.CharField(max_length=255)
     data_ocorrido = models.DateTimeField()
