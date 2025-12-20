@@ -1,0 +1,300 @@
+"""
+App Pedagogical - Diário de Classe, Notas, Faltas, Ocorrências, Recuperação
+"""
+from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+from decimal import Decimal
+from apps.core.models import Funcionario, Disciplina, DisciplinaTurma, Turma, Habilidade
+from apps.academic.models import Estudante, MatriculaTurma, Responsavel
+
+
+class PlanoAula(models.Model):
+    """Plano de aula do professor para uma ou mais turmas."""
+    
+    professor = models.ForeignKey(
+        Funcionario,
+        on_delete=models.CASCADE,
+        related_name='planos_aula'
+    )
+    disciplina = models.ForeignKey(
+        Disciplina,
+        on_delete=models.PROTECT,
+        related_name='planos_aula'
+    )
+    turmas = models.ManyToManyField(
+        Turma,
+        related_name='planos_aula'
+    )
+    data_inicio = models.DateField(verbose_name='Data Início')
+    data_fim = models.DateField(verbose_name='Data Fim')
+    conteudo = models.TextField(verbose_name='Conteúdo')
+    habilidades = models.ManyToManyField(
+        Habilidade,
+        related_name='planos_aula',
+        blank=True
+    )
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Plano de Aula'
+        verbose_name_plural = 'Planos de Aula'
+        ordering = ['-data_inicio']
+    
+    def __str__(self):
+        return f"{self.professor} - {self.disciplina} ({self.data_inicio} a {self.data_fim})"
+
+
+class Aula(models.Model):
+    """Registro de aula (diário de classe)."""
+    
+    professor = models.ForeignKey(
+        Funcionario,
+        on_delete=models.CASCADE,
+        related_name='aulas'
+    )
+    disciplina_turma = models.ForeignKey(
+        DisciplinaTurma,
+        on_delete=models.CASCADE,
+        related_name='aulas'
+    )
+    data = models.DateField(verbose_name='Data')
+    conteudo = models.TextField(verbose_name='Conteúdo Ministrado')
+    numero_aulas = models.PositiveSmallIntegerField(
+        default=1,
+        validators=[MinValueValidator(1), MaxValueValidator(4)],
+        verbose_name='Número de Aulas (Geminadas)'
+    )
+    criado_em = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Aula'
+        verbose_name_plural = 'Aulas'
+        ordering = ['-data']
+        unique_together = ['professor', 'disciplina_turma', 'data']
+    
+    def __str__(self):
+        return f"{self.disciplina_turma} - {self.data.strftime('%d/%m/%Y')}"
+
+
+class Faltas(models.Model):
+    """Registro de falta individual de um estudante em uma aula."""
+    
+    aula = models.ForeignKey(
+        Aula,
+        on_delete=models.CASCADE,
+        related_name='faltas'
+    )
+    estudante = models.ForeignKey(
+        Estudante,
+        on_delete=models.CASCADE,
+        related_name='faltas'
+    )
+    aula_numero = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(4)],
+        help_text='Número da aula no dia (1, 2, 3 ou 4)',
+        verbose_name='Aula Nº'
+    )
+    
+    class Meta:
+        verbose_name = 'Falta'
+        verbose_name_plural = 'Faltas'
+        unique_together = ['aula', 'estudante', 'aula_numero']
+    
+    def __str__(self):
+        return f"{self.estudante} - Falta na aula {self.aula_numero} ({self.aula.data})"
+
+
+class TipoOcorrencia(models.Model):
+    """Tipos de ocorrências pedagógicas cadastradas pelo gestor."""
+    
+    gestor = models.ForeignKey(
+        Funcionario,
+        on_delete=models.CASCADE,
+        related_name='tipos_ocorrencia_criados'
+    )
+    texto = models.CharField(max_length=100, verbose_name='Descrição do Tipo')
+    ativo = models.BooleanField(default=True)
+    
+    class Meta:
+        verbose_name = 'Tipo de Ocorrência'
+        verbose_name_plural = 'Tipos de Ocorrências'
+        ordering = ['texto']
+    
+    def __str__(self):
+        return self.texto
+
+
+class OcorrenciaPedagogica(models.Model):
+    """Ocorrência pedagógica de um estudante (não permanente)."""
+    
+    estudante = models.ForeignKey(
+        Estudante,
+        on_delete=models.CASCADE,
+        related_name='ocorrencias_pedagogicas'
+    )
+    autor = models.ForeignKey(
+        Funcionario,
+        on_delete=models.CASCADE,
+        related_name='ocorrencias_criadas'
+    )
+    tipo = models.ForeignKey(
+        TipoOcorrencia,
+        on_delete=models.PROTECT,
+        related_name='ocorrencias'
+    )
+    data = models.DateTimeField(auto_now_add=True)
+    texto = models.TextField(verbose_name='Descrição')
+    
+    class Meta:
+        verbose_name = 'Ocorrência Pedagógica'
+        verbose_name_plural = 'Ocorrências Pedagógicas'
+        ordering = ['-data']
+    
+    def __str__(self):
+        return f"{self.estudante} - {self.tipo} ({self.data.strftime('%d/%m/%Y')})"
+
+
+class OcorrenciaResponsavelCiente(models.Model):
+    """Registro de ciência do responsável sobre uma ocorrência."""
+    
+    responsavel = models.ForeignKey(
+        Responsavel,
+        on_delete=models.CASCADE,
+        related_name='ciencias_ocorrencias'
+    )
+    ocorrencia = models.ForeignKey(
+        OcorrenciaPedagogica,
+        on_delete=models.CASCADE,
+        related_name='ciencias'
+    )
+    ciente = models.BooleanField(default=False)
+    data_ciencia = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        verbose_name = 'Ciência de Ocorrência'
+        verbose_name_plural = 'Ciências de Ocorrências'
+        unique_together = ['responsavel', 'ocorrencia']
+    
+    def __str__(self):
+        status = 'Ciente' if self.ciente else 'Pendente'
+        return f"{self.responsavel} - {self.ocorrencia} ({status})"
+
+
+class NotaBimestral(models.Model):
+    """Nota bimestral de um estudante em uma disciplina."""
+    
+    BIMESTRE_CHOICES = [
+        (1, '1º Bimestre'),
+        (2, '2º Bimestre'),
+        (3, '3º Bimestre'),
+        (4, '4º Bimestre'),
+        (5, '5º Conceito (Conselho)'),
+    ]
+    
+    matricula_turma = models.ForeignKey(
+        MatriculaTurma,
+        on_delete=models.CASCADE,
+        related_name='notas'
+    )
+    disciplina_turma = models.ForeignKey(
+        DisciplinaTurma,
+        on_delete=models.CASCADE,
+        related_name='notas'
+    )
+    bimestre = models.PositiveSmallIntegerField(
+        choices=BIMESTRE_CHOICES,
+        verbose_name='Bimestre'
+    )
+    nota = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('10.00'))],
+        verbose_name='Nota'
+    )
+    nota_recuperacao = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('10.00'))],
+        verbose_name='Nota de Recuperação'
+    )
+    
+    class Meta:
+        verbose_name = 'Nota Bimestral'
+        verbose_name_plural = 'Notas Bimestrais'
+        unique_together = ['matricula_turma', 'disciplina_turma', 'bimestre']
+    
+    @property
+    def nota_final(self):
+        """A nota de recuperação substitui a nota se for maior."""
+        if self.nota is None:
+            return None
+        if self.nota_recuperacao is not None and self.nota_recuperacao > self.nota:
+            return self.nota_recuperacao
+        return self.nota
+    
+    def __str__(self):
+        return f"{self.matricula_turma.estudante} - {self.disciplina_turma.disciplina} - {self.get_bimestre_display()}"
+
+
+class Recuperacao(models.Model):
+    """Registro de recuperação para estudantes."""
+    
+    matriculas_turma = models.ManyToManyField(
+        MatriculaTurma,
+        related_name='recuperacoes'
+    )
+    disciplina = models.ForeignKey(
+        Disciplina,
+        on_delete=models.PROTECT,
+        related_name='recuperacoes'
+    )
+    professor = models.ForeignKey(
+        Funcionario,
+        on_delete=models.CASCADE,
+        related_name='recuperacoes'
+    )
+    bimestre = models.PositiveSmallIntegerField(
+        choices=NotaBimestral.BIMESTRE_CHOICES[:4],  # Apenas bimestres 1-4
+        verbose_name='Bimestre'
+    )
+    data_prova = models.DateField(null=True, blank=True, verbose_name='Data da Prova')
+    criado_em = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Recuperação'
+        verbose_name_plural = 'Recuperações'
+        ordering = ['-criado_em']
+    
+    def __str__(self):
+        return f"Recuperação {self.disciplina} - {self.get_bimestre_display()}"
+
+
+class NotificacaoRecuperacao(models.Model):
+    """Notificação de recuperação para estudante/responsável."""
+    
+    recuperacao = models.ForeignKey(
+        Recuperacao,
+        on_delete=models.CASCADE,
+        related_name='notificacoes'
+    )
+    estudante = models.ForeignKey(
+        Estudante,
+        on_delete=models.CASCADE,
+        related_name='notificacoes_recuperacao'
+    )
+    visualizado = models.BooleanField(default=False)
+    data_visualizacao = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        verbose_name = 'Notificação de Recuperação'
+        verbose_name_plural = 'Notificações de Recuperação'
+        unique_together = ['recuperacao', 'estudante']
+    
+    def __str__(self):
+        return f"{self.estudante} - {self.recuperacao}"
+
