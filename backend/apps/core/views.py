@@ -65,7 +65,8 @@ class FuncionarioViewSet(viewsets.ModelViewSet):
         funcionario = Funcionario.objects.create(
             usuario=user,
             matricula=data['matricula'],
-            funcao=data['funcao'],
+            area_atuacao=data.get('area_atuacao') or None,
+            apelido=data.get('apelido') or None,
             ativo=True,
         )
         
@@ -101,11 +102,13 @@ class FuncionarioViewSet(viewsets.ModelViewSet):
         user.first_name = data['nome']
         user.email = data.get('email', '')
         user.telefone = data.get('telefone', '')
+        user.tipo_usuario = data['tipo_usuario']
         user.save()
         
         # Atualizar funcionário
         funcionario.matricula = data['matricula']
-        funcionario.funcao = data['funcao']
+        funcionario.area_atuacao = data.get('area_atuacao') or None
+        funcionario.apelido = data.get('apelido') or None
         funcionario.save()
         
         # Atualizar ou criar período de trabalho

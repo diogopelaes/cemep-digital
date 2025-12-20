@@ -16,7 +16,7 @@ class FuncionarioSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Funcionario
-        fields = ['id', 'usuario', 'nome_completo', 'matricula', 'funcao', 'ativo', 'data_entrada']
+        fields = ['id', 'usuario', 'nome_completo', 'matricula', 'area_atuacao', 'apelido', 'ativo', 'data_entrada']
     
     def get_data_entrada(self, obj):
         """Retorna a data de entrada do primeiro período de trabalho."""
@@ -27,7 +27,7 @@ class FuncionarioSerializer(serializers.ModelSerializer):
 class FuncionarioCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Funcionario
-        fields = ['usuario', 'matricula', 'funcao', 'ativo']
+        fields = ['usuario', 'matricula', 'area_atuacao', 'apelido', 'ativo']
 
 
 class FuncionarioCompletoSerializer(serializers.Serializer):
@@ -48,7 +48,8 @@ class FuncionarioCompletoSerializer(serializers.Serializer):
     
     # Dados do funcionário
     matricula = serializers.IntegerField(min_value=1)
-    funcao = serializers.CharField(max_length=100)
+    area_atuacao = serializers.CharField(max_length=100, required=False, allow_blank=True, allow_null=True)
+    apelido = serializers.CharField(max_length=50, required=False, allow_blank=True, allow_null=True)
     data_entrada = serializers.DateField()
     
     def validate_username(self, value):
@@ -76,10 +77,17 @@ class FuncionarioUpdateSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True)
     nome = serializers.CharField(max_length=150)
     telefone = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    tipo_usuario = serializers.ChoiceField(choices=[
+        ('GESTAO', 'Gestão'),
+        ('SECRETARIA', 'Secretaria'),
+        ('PROFESSOR', 'Professor'),
+        ('MONITOR', 'Monitor'),
+    ])
     
     # Dados do funcionário
     matricula = serializers.IntegerField(min_value=1)
-    funcao = serializers.CharField(max_length=100)
+    area_atuacao = serializers.CharField(max_length=100, required=False, allow_blank=True, allow_null=True)
+    apelido = serializers.CharField(max_length=50, required=False, allow_blank=True, allow_null=True)
     data_entrada = serializers.DateField()
     
     def validate_matricula(self, value):

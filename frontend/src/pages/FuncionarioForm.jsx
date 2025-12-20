@@ -56,7 +56,8 @@ export default function FuncionarioForm() {
     tipo_usuario: 'PROFESSOR',
     data_entrada: getDataAtual(),
     matricula: '',
-    funcao: '',
+    area_atuacao: '',
+    apelido: '',
   })
 
   useEffect(() => {
@@ -94,7 +95,8 @@ export default function FuncionarioForm() {
         telefone: func.usuario?.telefone || '',
         tipo_usuario: func.usuario?.tipo_usuario || 'PROFESSOR',
         matricula: func.matricula?.toString() || '',
-        funcao: func.funcao || '',
+        area_atuacao: func.area_atuacao || '',
+        apelido: func.apelido || '',
         data_entrada: func.data_entrada || '',
       })
     } catch (error) {
@@ -114,7 +116,7 @@ export default function FuncionarioForm() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!formData.nome.trim() || !formData.funcao.trim() || !formData.matricula) {
+    if (!formData.nome.trim() || !formData.matricula) {
       toast.error('Preencha os campos obrigatórios')
       return
     }
@@ -138,8 +140,10 @@ export default function FuncionarioForm() {
           nome: formData.nome,
           email: formData.email || '',
           telefone: formData.telefone || '',
+          tipo_usuario: formData.tipo_usuario,
           matricula: matriculaNum,
-          funcao: formData.funcao,
+          area_atuacao: formData.area_atuacao || null,
+          apelido: formData.apelido || null,
           data_entrada: formData.data_entrada,
         })
         toast.success('Funcionário atualizado com sucesso!')
@@ -154,7 +158,8 @@ export default function FuncionarioForm() {
           telefone: formData.telefone || '',
           tipo_usuario: formData.tipo_usuario,
           matricula: matriculaNum,
-          funcao: formData.funcao,
+          area_atuacao: formData.area_atuacao || null,
+          apelido: formData.apelido || null,
           data_entrada: formData.data_entrada,
         })
         
@@ -168,7 +173,7 @@ export default function FuncionarioForm() {
               username: formData.username,
               email: formData.email,
               password: formData.password,
-              funcao: formData.funcao,
+              area_atuacao: formData.area_atuacao || null,
               tipo_usuario: formData.tipo_usuario,
               data_entrada: formData.data_entrada,
             }
@@ -184,7 +189,7 @@ export default function FuncionarioForm() {
                   data?.password?.[0] ||
                   data?.matricula?.[0] ||
                   data?.usuario?.[0] ||
-                  data?.funcao?.[0] ||
+                  data?.area_atuacao?.[0] ||
                   (typeof data === 'object' ? Object.values(data).flat()[0] : null) ||
                   'Erro ao salvar funcionário'
       toast.error(msg)
@@ -236,6 +241,13 @@ export default function FuncionarioForm() {
                 onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                 autoComplete="off"
                 required
+              />
+              <Input
+                label="Apelido"
+                placeholder="Joãozinho"
+                value={formData.apelido}
+                onChange={(e) => setFormData({ ...formData, apelido: e.target.value })}
+                autoComplete="off"
               />
               <Input
                 label="E-mail"
@@ -303,15 +315,13 @@ export default function FuncionarioForm() {
                 value={formData.tipo_usuario}
                 onChange={(e) => setFormData({ ...formData, tipo_usuario: e.target.value })}
                 options={TIPOS_USUARIO}
-                disabled={isEditing}
               />
               <Input
-                label="Função/Cargo *"
-                placeholder="Professor de Matemática"
-                value={formData.funcao}
-                onChange={(e) => setFormData({ ...formData, funcao: e.target.value })}
+                label="Área de Atuação"
+                placeholder="Matemática"
+                value={formData.area_atuacao}
+                onChange={(e) => setFormData({ ...formData, area_atuacao: e.target.value })}
                 autoComplete="off"
-                required
               />
               <DateInput
                 label="Data de Entrada *"

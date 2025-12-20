@@ -189,9 +189,11 @@ export default function Funcionarios() {
                         Mat. {func.matricula}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-500">
-                      {func.funcao}
-                    </p>
+                    {func.area_atuacao && (
+                      <p className="text-sm text-slate-500">
+                        {func.area_atuacao}
+                      </p>
+                    )}
                     <p className="text-xs text-slate-400">
                       {func.usuario?.email}
                     </p>

@@ -30,7 +30,20 @@ class Funcionario(models.Model):
         verbose_name='Nº Matrícula',
         help_text='Número de matrícula do funcionário'
     )
-    funcao = models.CharField(max_length=100, verbose_name='Função')
+    area_atuacao = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name='Área de Atuação'
+    )
+    apelido = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name='Apelido'
+    )
     ativo = models.BooleanField(default=True, verbose_name='Ativo')
     
     class Meta:
@@ -39,7 +52,9 @@ class Funcionario(models.Model):
         ordering = ['usuario__first_name']
     
     def __str__(self):
-        return f"{self.usuario.get_full_name()} - {self.funcao}"
+        if self.area_atuacao:
+            return f"{self.usuario.get_full_name()} - {self.area_atuacao}"
+        return self.usuario.get_full_name()
 
 
 class PeriodoTrabalho(models.Model):

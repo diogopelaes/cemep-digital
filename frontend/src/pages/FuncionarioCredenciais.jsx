@@ -149,10 +149,12 @@ export default function FuncionarioCredenciais() {
               <span class="info-label">Matrícula:</span>
               <span class="info-value">${funcionario.matricula}</span>
             </div>
+            ${funcionario.area_atuacao ? `
             <div class="info-row">
-              <span class="info-label">Função:</span>
-              <span class="info-value">${funcionario.funcao}</span>
+              <span class="info-label">Área de Atuação:</span>
+              <span class="info-value">${funcionario.area_atuacao}</span>
             </div>
+            ` : ''}
             <div class="info-row">
               <span class="info-label">Tipo de Acesso:</span>
               <span class="info-value">${funcionario.tipo_usuario}</span>
@@ -260,10 +262,12 @@ export default function FuncionarioCredenciais() {
             <p className="text-xs text-slate-400 mb-1">Matrícula</p>
             <p className="font-medium text-slate-800 dark:text-white">{funcionario.matricula}</p>
           </div>
-          <div>
-            <p className="text-xs text-slate-400 mb-1">Função</p>
-            <p className="font-medium text-slate-800 dark:text-white">{funcionario.funcao}</p>
-          </div>
+          {funcionario.area_atuacao && (
+            <div>
+              <p className="text-xs text-slate-400 mb-1">Área de Atuação</p>
+              <p className="font-medium text-slate-800 dark:text-white">{funcionario.area_atuacao}</p>
+            </div>
+          )}
           <div>
             <p className="text-xs text-slate-400 mb-1">Tipo</p>
             <p className="font-medium text-slate-800 dark:text-white">{funcionario.tipo_usuario}</p>
