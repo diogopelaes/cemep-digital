@@ -68,3 +68,6 @@ Documentation/Frameworks/*.msix
 # Secrets
 *.pem
 *.key
+
+# Legacy System
+sistema_aontigo/
