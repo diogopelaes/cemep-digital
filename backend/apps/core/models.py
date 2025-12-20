@@ -50,6 +50,11 @@ class Funcionario(models.Model):
         verbose_name = 'Funcionário'
         verbose_name_plural = 'Funcionários'
         ordering = ['usuario__first_name']
+
+    def get_apelido(self):
+        if self.apelido:
+            return f"({self.apelido})"
+        return self.usuario.get_full_name().split(' ')[0]
     
     def __str__(self):
         if self.area_atuacao:
