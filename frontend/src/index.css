@@ -82,8 +82,9 @@
   /* Inputs */
   .input {
     @apply w-full px-4 py-3 rounded-xl;
-    @apply bg-white/50 dark:bg-slate-700/50;
+    @apply bg-white dark:bg-slate-800;
     @apply border border-slate-200 dark:border-slate-600;
+    @apply text-slate-800 dark:text-slate-100;
     @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
     @apply transition-all duration-200;
     @apply placeholder:text-slate-400 dark:placeholder:text-slate-500;
@@ -91,6 +92,28 @@
 
   .input-error {
     @apply border-danger-500 focus:ring-danger-500;
+  }
+
+  /* Fix autocomplete styling for dark mode */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: #1e293b !important;
+  }
+
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover,
+  .dark input:-webkit-autofill:focus,
+  .dark input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #1e293b inset !important;
+    -webkit-text-fill-color: #f1f5f9 !important;
+  }
+
+  /* Disable autocomplete background */
+  input:-webkit-autofill {
+    transition: background-color 5000s ease-in-out 0s;
   }
 
   /* Labels */

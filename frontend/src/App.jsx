@@ -9,6 +9,11 @@ import Dashboard from './pages/Dashboard'
 import Estudantes from './pages/Estudantes'
 import Turmas from './pages/Turmas'
 import Avisos from './pages/Avisos'
+import Cursos from './pages/Cursos'
+import Disciplinas from './pages/Disciplinas'
+import Funcionarios from './pages/Funcionarios'
+import FuncionarioForm from './pages/FuncionarioForm'
+import FuncionarioCredenciais from './pages/FuncionarioCredenciais'
 import NotFound from './pages/NotFound'
 
 function App() {
@@ -27,9 +32,15 @@ function App() {
         <Route path="/turmas" element={<Turmas />} />
         <Route path="/avisos" element={<Avisos />} />
         
+        {/* Fase 1 - Cadastros Base */}
+        <Route path="/cursos" element={<Cursos />} />
+        <Route path="/disciplinas" element={<Disciplinas />} />
+        <Route path="/funcionarios" element={<Funcionarios />} />
+        <Route path="/funcionarios/novo" element={<FuncionarioForm />} />
+        <Route path="/funcionarios/:id/editar" element={<FuncionarioForm />} />
+        <Route path="/funcionarios/credenciais" element={<FuncionarioCredenciais />} />
+        
         {/* Placeholders para outras páginas */}
-        <Route path="/funcionarios" element={<PlaceholderPage title="Funcionários" />} />
-        <Route path="/disciplinas" element={<PlaceholderPage title="Disciplinas" />} />
         <Route path="/calendario" element={<PlaceholderPage title="Calendário" />} />
         <Route path="/tarefas" element={<PlaceholderPage title="Tarefas" />} />
         <Route path="/relatorios" element={<PlaceholderPage title="Relatórios" />} />

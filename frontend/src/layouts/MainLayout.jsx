@@ -15,6 +15,7 @@ const menuItems = {
     { path: '/funcionarios', label: 'Funcionários', icon: HiUserGroup },
     { path: '/estudantes', label: 'Estudantes', icon: HiAcademicCap },
     { path: '/turmas', label: 'Turmas', icon: HiUsers },
+    { path: '/cursos', label: 'Cursos', icon: HiAcademicCap },
     { path: '/disciplinas', label: 'Disciplinas', icon: HiBookOpen },
     { path: '/calendario', label: 'Calendário', icon: HiCalendar },
     { path: '/tarefas', label: 'Tarefas', icon: HiClipboardList },

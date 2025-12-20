@@ -70,6 +70,7 @@ export const usersAPI = {
   create: (data) => api.post('/users/', data),
   update: (id, data) => api.patch(`/users/${id}/`, data),
   delete: (id) => api.delete(`/users/${id}/`),
+  sendCredentials: (data) => api.post('/users/send-credentials/', data),
 }
 
 export const coreAPI = {
@@ -112,6 +113,22 @@ export const coreAPI = {
     create: (data) => api.post('/core/calendario/', data),
     update: (id, data) => api.patch(`/core/calendario/${id}/`, data),
     delete: (id) => api.delete(`/core/calendario/${id}/`),
+  },
+  // Habilidades
+  habilidades: {
+    list: (params) => api.get('/core/habilidades/', { params }),
+    get: (id) => api.get(`/core/habilidades/${id}/`),
+    create: (data) => api.post('/core/habilidades/', data),
+    update: (id, data) => api.patch(`/core/habilidades/${id}/`, data),
+    delete: (id) => api.delete(`/core/habilidades/${id}/`),
+  },
+  // Períodos de Trabalho
+  periodosTrabalho: {
+    list: (params) => api.get('/core/periodos-trabalho/', { params }),
+    get: (id) => api.get(`/core/periodos-trabalho/${id}/`),
+    create: (data) => api.post('/core/periodos-trabalho/', data),
+    update: (id, data) => api.patch(`/core/periodos-trabalho/${id}/`, data),
+    delete: (id) => api.delete(`/core/periodos-trabalho/${id}/`),
   },
 }
 
