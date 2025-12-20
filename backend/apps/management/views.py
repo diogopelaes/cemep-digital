@@ -56,7 +56,7 @@ class TarefaViewSet(viewsets.ModelViewSet):
     def minhas_tarefas(self, request):
         """Retorna as tarefas do funcionário logado."""
         if not hasattr(request.user, 'funcionario'):
-            return Response({'error': 'Usuário não é funcionário'}, status=400)
+            return Response([])  # Retorna lista vazia se não é funcionário
         
         tarefas = self.queryset.filter(funcionarios=request.user.funcionario)
         serializer = self.get_serializer(tarefas, many=True)
@@ -97,7 +97,7 @@ class NotificacaoTarefaViewSet(viewsets.ModelViewSet):
     def minhas_notificacoes(self, request):
         """Retorna as notificações do funcionário logado."""
         if not hasattr(request.user, 'funcionario'):
-            return Response({'error': 'Usuário não é funcionário'}, status=400)
+            return Response([])  # Retorna lista vazia se não é funcionário
         
         notificacoes = self.queryset.filter(
             funcionario=request.user.funcionario,

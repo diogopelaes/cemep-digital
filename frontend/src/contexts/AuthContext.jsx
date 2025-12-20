@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import api from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -30,7 +31,8 @@ export function AuthProvider({ children }) {
 
   const login = async (username, password) => {
     try {
-      const response = await api.post('/token/', { username, password })
+      // O endpoint JWT está em /api/token/, não em /api/v1/
+      const response = await axios.post('/api/token/', { username, password })
       const { access, refresh } = response.data
       
       localStorage.setItem('access_token', access)

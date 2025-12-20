@@ -15,7 +15,7 @@ Guia rápido para rodar o projeto localmente no Windows.
 
 ## 🗄️ 1. Configurar Banco de Dados (PostgreSQL)
 
-### Abrir o pgAdmin ou psql e executar:
+### Abrir o pgAdmin ou psql (psql -U postgres) e executar:
 
 ```sql
 CREATE DATABASE cemep_digital;
@@ -34,7 +34,7 @@ CREATE DATABASE cemep_digital;
 cd C:\Projects\cemep-digital\backend
 
 # Criar ambiente virtual (apenas na primeira vez)
-python -m venv .venv
+py -m venv .venv
 
 # Ativar ambiente virtual
 .\.venv\Scripts\Activate.ps1
@@ -42,15 +42,18 @@ python -m venv .venv
 # Instalar dependências (apenas na primeira vez ou quando atualizar)
 pip install -r requirements.txt
 
+# Gerar arquivos de migração (sempre que houver mudanças nos models)
+py manage.py makemigrations
+
 # Executar migrações do banco de dados
-python manage.py migrate
+py manage.py migrate
 
 # Criar superusuário (apenas na primeira vez)
-python manage.py createsuperuser
+py manage.py createsuperuser
 # Siga as instruções: username, email, senha
 
 # Rodar o servidor
-python manage.py runserver
+py manage.py runserver
 ```
 
 ### ✅ Backend rodando em: http://localhost:8000
@@ -86,7 +89,7 @@ npm run dev
 ```powershell
 cd C:\Projects\cemep-digital\backend
 .\.venv\Scripts\Activate.ps1
-python manage.py runserver
+py manage.py runserver
 ```
 
 ### Terminal 2 - Frontend:
@@ -106,22 +109,22 @@ npm run dev
 .\.venv\Scripts\Activate.ps1
 
 # Criar nova migração após alterar models
-python manage.py makemigrations
+py manage.py makemigrations
 
 # Aplicar migrações
-python manage.py migrate
+py manage.py migrate
 
 # Criar superusuário
-python manage.py createsuperuser
+py manage.py createsuperuser
 
 # Rodar servidor em porta específica
-python manage.py runserver 8080
+py manage.py runserver 8080
 
 # Abrir shell do Django
-python manage.py shell
+py manage.py shell
 
 # Testar limpeza de dados (modo simulação)
-python manage.py limpar_dados_expirados --dry-run
+py manage.py limpar_dados_expirados --dry-run
 ```
 
 ### Frontend
@@ -196,7 +199,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ```powershell
 # Use outra porta
-python manage.py runserver 8080
+py manage.py runserver 8080
 ```
 
 ### "Erro de CORS"
@@ -208,7 +211,7 @@ Certifique-se de que o frontend está rodando em http://localhost:5173 (configur
 ## 📝 Checklist Diário
 
 - [ ] PostgreSQL rodando
-- [ ] Terminal 1: Backend ativo (`python manage.py runserver`)
+- [ ] Terminal 1: Backend ativo (`py manage.py runserver`)
 - [ ] Terminal 2: Frontend ativo (`npm run dev`)
 - [ ] Acessar http://localhost:5173
 

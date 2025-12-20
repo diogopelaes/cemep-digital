@@ -21,27 +21,41 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     try {
       if (isGestao) {
-        const [tarefasRes, estudantesRes, turmasRes] = await Promise.all([
-          managementAPI.tarefas.relatorio(),
-          academicAPI.estudantes.list({ page_size: 1 }),
-          coreAPI.turmas.list({ page_size: 1 }),
-        ])
-        
-        setStats({
-          ...tarefasRes.data,
-          totalEstudantes: estudantesRes.data.count || 0,
-          totalTurmas: turmasRes.data.count || 0,
-        })
+        // Carrega estatísticas - cada uma individualmente para não falhar tudo
+        try {
+          const [tarefasRes, estudantesRes, turmasRes] = await Promise.all([
+            managementAPI.tarefas.relatorio(),
+            academicAPI.estudantes.list({ page_size: 1 }),
+            coreAPI.turmas.list({ page_size: 1 }),
+          ])
+          
+          setStats({
+            ...tarefasRes.data,
+            totalEstudantes: estudantesRes.data.count || 0,
+            totalTurmas: turmasRes.data.count || 0,
+          })
+        } catch (e) {
+          console.warn('Erro ao carregar estatísticas:', e)
+          setStats({ total: 0, pendentes: 0, concluidas: 0, totalEstudantes: 0, totalTurmas: 0 })
+        }
       }
       
       // Avisos para todos
-      const avisosRes = await managementAPI.avisos.meus()
-      setAvisos(avisosRes.data.results?.slice(0, 5) || [])
+      try {
+        const avisosRes = await managementAPI.avisos.meus()
+        setAvisos(avisosRes.data.results?.slice(0, 5) || avisosRes.data?.slice?.(0, 5) || [])
+      } catch (e) {
+        console.warn('Erro ao carregar avisos:', e)
+      }
       
       // Tarefas para funcionários
       if (isFuncionario) {
-        const tarefasRes = await managementAPI.tarefas.minhas()
-        setTarefas(tarefasRes.data.results?.slice(0, 5) || [])
+        try {
+          const tarefasRes = await managementAPI.tarefas.minhas()
+          setTarefas(tarefasRes.data.results?.slice(0, 5) || tarefasRes.data?.slice?.(0, 5) || [])
+        } catch (e) {
+          console.warn('Erro ao carregar tarefas (usuário pode não ter perfil de funcionário):', e)
+        }
       }
     } catch (error) {
       console.error('Erro ao carregar dashboard:', error)
