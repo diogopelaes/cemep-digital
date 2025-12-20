@@ -1,12 +1,28 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { 
-  Card, Button, Input, Select, Loading
+  Card, Button, Input, DateInput, Select, Loading
 } from '../components/ui'
 import { HiArrowLeft, HiRefresh, HiSave, HiEye, HiEyeOff } from 'react-icons/hi'
-import { coreAPI, usersAPI } from '../services/api'
-import { generatePassword, generateUsername } from '../utils/password'
+import { coreAPI } from '../services/api'
+import { generatePassword } from '../utils/password'
 import toast from 'react-hot-toast'
+
+// Máscara de telefone: (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
+const formatTelefone = (value) => {
+  const numbers = value.replace(/\D/g, '').slice(0, 11)
+  
+  if (numbers.length <= 2) {
+    return numbers.length ? `(${numbers}` : ''
+  }
+  if (numbers.length <= 6) {
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`
+  }
+  if (numbers.length <= 10) {
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`
+  }
+  return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`
+}
 
 const TIPOS_USUARIO = [
   { value: 'GESTAO', label: 'Gestão' },
@@ -14,6 +30,12 @@ const TIPOS_USUARIO = [
   { value: 'PROFESSOR', label: 'Professor' },
   { value: 'MONITOR', label: 'Monitor' },
 ]
+
+// Função para obter a data atual no formato YYYY-MM-DD
+const getDataAtual = () => {
+  const hoje = new Date()
+  return hoje.toISOString().split('T')[0]
+}
 
 export default function FuncionarioForm() {
   const navigate = useNavigate()
@@ -32,6 +54,8 @@ export default function FuncionarioForm() {
     nome: '',
     telefone: '',
     tipo_usuario: 'PROFESSOR',
+    data_entrada: getDataAtual(),
+    matricula: '',
     funcao: '',
   })
 
@@ -48,17 +72,14 @@ export default function FuncionarioForm() {
   }, [id])
 
   useEffect(() => {
-    // Auto-gerar username quando nome muda (apenas para novo)
-    if (!isEditing && formData.nome) {
-      const partes = formData.nome.trim().split(' ')
-      const primeiro = partes[0] || ''
-      const ultimo = partes.length > 1 ? partes[partes.length - 1] : ''
+    // Auto-gerar username com o número de matrícula (apenas para novo)
+    if (!isEditing && formData.matricula) {
       setFormData(prev => ({
         ...prev,
-        username: generateUsername(primeiro, ultimo)
+        username: formData.matricula
       }))
     }
-  }, [formData.nome, isEditing])
+  }, [formData.matricula, isEditing])
 
   const loadFuncionario = async () => {
     try {
@@ -72,7 +93,9 @@ export default function FuncionarioForm() {
         nome: func.usuario?.first_name || '',
         telefone: func.usuario?.telefone || '',
         tipo_usuario: func.usuario?.tipo_usuario || 'PROFESSOR',
+        matricula: func.matricula?.toString() || '',
         funcao: func.funcao || '',
+        data_entrada: func.data_entrada || '',
       })
     } catch (error) {
       toast.error('Erro ao carregar funcionário')
@@ -91,8 +114,14 @@ export default function FuncionarioForm() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!formData.nome.trim() || !formData.funcao.trim()) {
+    if (!formData.nome.trim() || !formData.funcao.trim() || !formData.matricula) {
       toast.error('Preencha os campos obrigatórios')
+      return
+    }
+
+    const matriculaNum = parseInt(formData.matricula)
+    if (isNaN(matriculaNum) || matriculaNum <= 0) {
+      toast.error('Número de matrícula inválido')
       return
     }
 
@@ -104,56 +133,59 @@ export default function FuncionarioForm() {
     setSaving(true)
     try {
       if (isEditing) {
-        // Atualizar usuário
-        await usersAPI.update(funcionario.usuario.id, {
-          first_name: formData.nome,
-          email: formData.email,
-          telefone: formData.telefone,
-        })
-        // Atualizar funcionário
-        await coreAPI.funcionarios.update(id, {
+        // Atualizar funcionário, usuário e período de trabalho em uma única transação atômica
+        await coreAPI.funcionarios.atualizarCompleto(id, {
+          nome: formData.nome,
+          email: formData.email || '',
+          telefone: formData.telefone || '',
+          matricula: matriculaNum,
           funcao: formData.funcao,
+          data_entrada: formData.data_entrada,
         })
         toast.success('Funcionário atualizado com sucesso!')
         navigate('/funcionarios')
       } else {
-        // Criar usuário
-        const userRes = await usersAPI.create({
+        // Criar usuário e funcionário em uma única transação atômica
+        const response = await coreAPI.funcionarios.criarCompleto({
           username: formData.username,
-          email: formData.email,
           password: formData.password,
-          password_confirm: formData.password,
-          first_name: formData.nome,
-          telefone: formData.telefone,
+          email: formData.email || '',
+          nome: formData.nome,
+          telefone: formData.telefone || '',
           tipo_usuario: formData.tipo_usuario,
-        })
-        // Criar funcionário
-        await coreAPI.funcionarios.create({
-          usuario: userRes.data.id,
+          matricula: matriculaNum,
           funcao: formData.funcao,
-          ativo: true,
+          data_entrada: formData.data_entrada,
         })
         
         // Redirecionar para página de credenciais
         navigate('/funcionarios/credenciais', { 
           state: { 
             funcionario: {
+              id: response.data.id,
               nome: formData.nome,
+              matricula: formData.matricula,
               username: formData.username,
               email: formData.email,
               password: formData.password,
               funcao: formData.funcao,
               tipo_usuario: formData.tipo_usuario,
+              data_entrada: formData.data_entrada,
             }
           }
         })
       }
     } catch (error) {
-      console.error(error.response?.data)
-      const msg = error.response?.data?.detail ||
-                  error.response?.data?.username?.[0] ||
-                  error.response?.data?.email?.[0] ||
-                  error.response?.data?.password?.[0] ||
+      console.error('Erro completo:', error.response?.data)
+      const data = error.response?.data
+      const msg = data?.detail ||
+                  data?.username?.[0] ||
+                  data?.email?.[0] ||
+                  data?.password?.[0] ||
+                  data?.matricula?.[0] ||
+                  data?.usuario?.[0] ||
+                  data?.funcao?.[0] ||
+                  (typeof data === 'object' ? Object.values(data).flat()[0] : null) ||
                   'Erro ao salvar funcionário'
       toast.error(msg)
     }
@@ -217,7 +249,15 @@ export default function FuncionarioForm() {
                 label="Telefone"
                 placeholder="(19) 99999-9999"
                 value={formData.telefone}
-                onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, telefone: formatTelefone(e.target.value) })}
+                onKeyDown={(e) => {
+                  const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End']
+                  if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
+                inputMode="tel"
+                maxLength={15}
                 autoComplete="off"
               />
             </div>
@@ -228,7 +268,36 @@ export default function FuncionarioForm() {
             <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">
               Dados Profissionais
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Input
+                label="Nº Matrícula *"
+                type="text"
+                placeholder="123456"
+                value={formData.matricula}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '') // Remove tudo que não é dígito
+                  if (val.length <= 6) {
+                    setFormData({ ...formData, matricula: val })
+                  }
+                }}
+                onKeyDown={(e) => {
+                  // Permite apenas: números, backspace, delete, tab, arrows, home, end
+                  const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End']
+                  if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
+                onPaste={(e) => {
+                  // Ao colar, filtra apenas números
+                  e.preventDefault()
+                  const paste = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
+                  setFormData({ ...formData, matricula: paste })
+                }}
+                inputMode="numeric"
+                maxLength={6}
+                autoComplete="off"
+                required
+              />
               <Select
                 label="Tipo de Usuário *"
                 value={formData.tipo_usuario}
@@ -244,40 +313,75 @@ export default function FuncionarioForm() {
                 autoComplete="off"
                 required
               />
+              <DateInput
+                label="Data de Entrada *"
+                value={formData.data_entrada}
+                onChange={(e) => setFormData({ ...formData, data_entrada: e.target.value })}
+                required
+              />
             </div>
           </div>
 
-          {/* Credenciais de Acesso */}
+          {/* Credenciais de Acesso do Funcionário */}
           {!isEditing && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">
-                Credenciais de Acesso
-              </h2>
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-lg font-semibold text-slate-800 dark:text-white">
+                  Credenciais de Acesso
+                </h2>
+                <span className="text-xs px-2 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
+                  Do funcionário
+                </span>
+              </div>
+              
+              {/* Campos ocultos para confundir o autocomplete do navegador */}
+              <input type="text" name="fakeuser" autoComplete="username" style={{ display: 'none' }} />
+              <input type="password" name="fakepass" autoComplete="current-password" style={{ display: 'none' }} />
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  label="Nome de Usuário *"
-                  placeholder="joao.silva"
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/\s+/g, '.') })}
-                  autoComplete="off"
-                  required
-                />
                 <div>
-                  <label className="label">Senha *</label>
+                  <label className="label">Login do Funcionário *</label>
+                  <input
+                    type="text"
+                    name="func_login"
+                    placeholder="123456"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/\s+/g, '.') })}
+                    className="input"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck="false"
+                    data-form-type="other"
+                    data-lpignore="true"
+                    required
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    Preenchido automaticamente com o nº de matrícula
+                  </p>
+                </div>
+                <div>
+                  <label className="label">Senha do Funcionário *</label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <input
                         type={showPassword ? 'text' : 'password'}
+                        name="func_senha"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         className="input pr-10"
-                        autoComplete="new-password"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        spellCheck="false"
+                        data-form-type="other"
+                        data-lpignore="true"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                       >
                         {showPassword ? <HiEyeOff className="h-5 w-5" /> : <HiEye className="h-5 w-5" />}
                       </button>
@@ -292,7 +396,7 @@ export default function FuncionarioForm() {
                     </button>
                   </div>
                   <p className="text-xs text-slate-500 mt-1">
-                    Senha gerada automaticamente. Clique no ícone para gerar outra.
+                    Gerada automaticamente. Clique em <HiRefresh className="inline h-3 w-3" /> para outra.
                   </p>
                 </div>
               </div>

@@ -3,6 +3,7 @@ import { Outlet, Navigate, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
 import { PageLoading } from '../components/ui/Loading'
+import { LOGO_PATH, SYSTEM_NAME } from '../config/constants'
 import { 
   HiHome, HiUserGroup, HiAcademicCap, HiClipboardList,
   HiCalendar, HiCog, HiLogout, HiMenu, HiX, HiSun, HiMoon,
@@ -94,9 +95,11 @@ export default function MainLayout() {
           {/* Logo */}
           <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-xl">C</span>
-              </div>
+              <img 
+                src={LOGO_PATH} 
+                alt={SYSTEM_NAME}
+                className="w-12 h-12 rounded-xl object-cover shadow-lg"
+              />
               <div>
                 <h1 className="font-bold text-xl text-slate-800 dark:text-white">CEMEP</h1>
                 <p className="text-xs text-slate-500">Digital</p>

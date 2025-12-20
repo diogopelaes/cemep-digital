@@ -25,6 +25,11 @@ class Funcionario(models.Model):
         on_delete=models.CASCADE,
         related_name='funcionario'
     )
+    matricula = models.PositiveIntegerField(
+        unique=True,
+        verbose_name='Nº Matrícula',
+        help_text='Número de matrícula do funcionário'
+    )
     funcao = models.CharField(max_length=100, verbose_name='Função')
     ativo = models.BooleanField(default=True, verbose_name='Ativo')
     
@@ -87,13 +92,28 @@ class PeriodoTrabalho(models.Model):
 class Disciplina(models.Model):
     """Disciplina do currículo escolar."""
     
+    class AreaConhecimento(models.TextChoices):
+        LINGUAGENS = 'LINGUAGENS', 'Linguagens e suas Tecnologias'
+        MATEMATICA = 'MATEMATICA', 'Matemática e suas Tecnologias'
+        CIENCIAS_NATUREZA = 'CIENCIAS_NATUREZA', 'Ciências da Natureza e suas Tecnologias'
+        CIENCIAS_HUMANAS = 'CIENCIAS_HUMANAS', 'Ciências Humanas e Sociais Aplicadas'
+        TEC_INFORMATICA = 'TEC_INFORMATICA', 'Técnico em Informática'
+        TEC_QUIMICA = 'TEC_QUIMICA', 'Técnico em Química'
+        TEC_ENFERMAGEM = 'TEC_ENFERMAGEM', 'Técnico em Enfermagem'
+    
     nome = models.CharField(max_length=100, verbose_name='Nome')
     sigla = models.CharField(max_length=10, verbose_name='Sigla')
+    area_conhecimento = models.CharField(
+        max_length=20,
+        choices=AreaConhecimento.choices,
+        default=AreaConhecimento.LINGUAGENS,
+        verbose_name='Área de Conhecimento'
+    )
     
     class Meta:
         verbose_name = 'Disciplina'
         verbose_name_plural = 'Disciplinas'
-        ordering = ['nome']
+        ordering = ['area_conhecimento', 'nome']
     
     def __str__(self):
         return f"{self.nome} ({self.sigla})"
@@ -165,7 +185,7 @@ class DisciplinaTurma(models.Model):
         on_delete=models.CASCADE,
         related_name='disciplinas_vinculadas'
     )
-    carga_horaria = models.PositiveSmallIntegerField(verbose_name='Carga Horária (horas)')
+    aulas_semanais = models.PositiveSmallIntegerField(verbose_name='Aulas Semanais')
     
     class Meta:
         verbose_name = 'Disciplina da Turma'
@@ -173,7 +193,7 @@ class DisciplinaTurma(models.Model):
         unique_together = ['disciplina', 'turma']
     
     def __str__(self):
-        return f"{self.disciplina.sigla} - {self.turma} ({self.carga_horaria}h)"
+        return f"{self.disciplina.sigla} - {self.turma} ({self.aulas_semanais} aulas/sem)"
 
 
 class ProfessorDisciplinaTurma(models.Model):

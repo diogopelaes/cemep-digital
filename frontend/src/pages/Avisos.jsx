@@ -5,6 +5,7 @@ import {
 import { HiPlus, HiBell, HiPaperClip } from 'react-icons/hi'
 import { managementAPI } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
+import { formatDateBR } from '../utils/date'
 import toast from 'react-hot-toast'
 
 export default function Avisos() {
@@ -70,7 +71,7 @@ export default function Avisos() {
                         {aviso.titulo}
                       </h3>
                       <p className="text-sm text-slate-500 mt-1">
-                        Por: {aviso.criador?.usuario?.first_name || 'Sistema'} • {new Date(aviso.data_aviso).toLocaleDateString('pt-BR', {
+                        Por: {aviso.criador?.usuario?.first_name || 'Sistema'} • {formatDateBR(aviso.data_aviso, {
                           day: '2-digit',
                           month: 'long',
                           year: 'numeric',

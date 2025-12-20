@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Button, Input, Card } from '../components/ui'
+import { LOGO_PATH, SYSTEM_NAME } from '../config/constants'
 import { HiMail, HiLockClosed } from 'react-icons/hi'
 
 export default function Login() {
@@ -23,11 +24,13 @@ export default function Login() {
     <div className="animate-fade-in">
       {/* Logo e Título */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500 via-primary-600 to-accent-500 shadow-2xl shadow-primary-500/30 mb-6">
-          <span className="text-white font-bold text-3xl">C</span>
-        </div>
+        <img 
+          src={LOGO_PATH} 
+          alt={SYSTEM_NAME}
+          className="w-24 h-24 rounded-2xl object-cover shadow-2xl shadow-primary-500/30 mx-auto mb-6"
+        />
         <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">
-          CEMEP Digital
+          {SYSTEM_NAME}
         </h1>
         <p className="text-slate-500 dark:text-slate-400">
           Sistema de Gestão Escolar

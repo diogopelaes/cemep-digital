@@ -94,6 +94,35 @@
     @apply border-danger-500 focus:ring-danger-500;
   }
 
+  /* Date picker hidden (usado apenas para abrir o calendário nativo) */
+  .date-picker-hidden {
+    @apply absolute opacity-0 pointer-events-none;
+    @apply w-0 h-0;
+    position: absolute;
+    right: 0;
+    top: 50%;
+  }
+
+  /* Estilização do input date nativo para tema escuro */
+  input[type="date"] {
+    @apply text-slate-800 dark:text-slate-100;
+    color-scheme: light;
+  }
+
+  .dark input[type="date"] {
+    color-scheme: dark;
+  }
+
+  /* Calendar icon color (navegadores que suportam) */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    @apply cursor-pointer;
+    filter: none;
+  }
+
+  .dark input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+
   /* Fix autocomplete styling for dark mode */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,

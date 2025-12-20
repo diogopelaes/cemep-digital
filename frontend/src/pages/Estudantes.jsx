@@ -6,6 +6,7 @@ import {
 } from '../components/ui'
 import { HiPlus, HiSearch, HiPencil, HiEye, HiTrash } from 'react-icons/hi'
 import { academicAPI } from '../services/api'
+import { formatDateBR } from '../utils/date'
 import toast from 'react-hot-toast'
 
 export default function Estudantes() {
@@ -173,7 +174,7 @@ export default function Estudantes() {
                 <div>
                   <p className="text-slate-500">Data de Nascimento</p>
                   <p className="font-medium">
-                    {new Date(selectedEstudante.estudante?.data_nascimento).toLocaleDateString('pt-BR')}
+                    {formatDateBR(selectedEstudante.estudante?.data_nascimento)}
                   </p>
                 </div>
                 <div>

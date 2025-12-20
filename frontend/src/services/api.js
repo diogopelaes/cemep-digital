@@ -79,6 +79,8 @@ export const coreAPI = {
     list: (params) => api.get('/core/funcionarios/', { params }),
     get: (id) => api.get(`/core/funcionarios/${id}/`),
     create: (data) => api.post('/core/funcionarios/', data),
+    criarCompleto: (data) => api.post('/core/funcionarios/criar-completo/', data),
+    atualizarCompleto: (id, data) => api.put(`/core/funcionarios/${id}/atualizar-completo/`, data),
     update: (id, data) => api.patch(`/core/funcionarios/${id}/`, data),
     delete: (id) => api.delete(`/core/funcionarios/${id}/`),
   },
@@ -129,6 +131,22 @@ export const coreAPI = {
     create: (data) => api.post('/core/periodos-trabalho/', data),
     update: (id, data) => api.patch(`/core/periodos-trabalho/${id}/`, data),
     delete: (id) => api.delete(`/core/periodos-trabalho/${id}/`),
+  },
+  // Disciplinas da Turma (vínculo)
+  disciplinasTurma: {
+    list: (params) => api.get('/core/disciplinas-turma/', { params }),
+    get: (id) => api.get(`/core/disciplinas-turma/${id}/`),
+    create: (data) => api.post('/core/disciplinas-turma/', data),
+    update: (id, data) => api.patch(`/core/disciplinas-turma/${id}/`, data),
+    delete: (id) => api.delete(`/core/disciplinas-turma/${id}/`),
+  },
+  // Atribuição de Aulas (Professor -> Disciplina/Turma)
+  atribuicoes: {
+    list: (params) => api.get('/core/atribuicoes/', { params }),
+    get: (id) => api.get(`/core/atribuicoes/${id}/`),
+    create: (data) => api.post('/core/atribuicoes/', data),
+    update: (id, data) => api.patch(`/core/atribuicoes/${id}/`, data),
+    delete: (id) => api.delete(`/core/atribuicoes/${id}/`),
   },
 }
 

@@ -1,0 +1,319 @@
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { Card, Button, Input, Select, Loading } from '../components/ui'
+import { HiArrowLeft, HiSave } from 'react-icons/hi'
+import { coreAPI } from '../services/api'
+import toast from 'react-hot-toast'
+
+const NOMENCLATURAS = [
+  { value: 'ANO', label: 'Ano' },
+  { value: 'SERIE', label: 'Série' },
+  { value: 'MODULO', label: 'Módulo' },
+]
+
+export default function TurmaForm() {
+  const navigate = useNavigate()
+  const { id } = useParams()
+  const isEditing = !!id
+
+  const [loading, setLoading] = useState(isEditing)
+  const [saving, setSaving] = useState(false)
+  const [cursos, setCursos] = useState([])
+  const [formData, setFormData] = useState({
+    numero: '',
+    letra: '',
+    ano_letivo: new Date().getFullYear().toString(),
+    nomenclatura: 'SERIE',
+    curso_id: '',
+  })
+
+  useEffect(() => {
+    loadCursos()
+    if (isEditing) {
+      loadTurma()
+    }
+  }, [id])
+
+  const loadCursos = async () => {
+    try {
+      const response = await coreAPI.cursos.list()
+      const cursosData = response.data.results || response.data
+      setCursos(cursosData)
+      
+      // Se houver apenas um curso e não estiver editando, seleciona automaticamente
+      if (cursosData.length === 1 && !isEditing) {
+        setFormData(prev => ({ ...prev, curso_id: cursosData[0].id.toString() }))
+      }
+    } catch (error) {
+      toast.error('Erro ao carregar cursos')
+    }
+  }
+
+  const loadTurma = async () => {
+    try {
+      const response = await coreAPI.turmas.get(id)
+      const turma = response.data
+      setFormData({
+        numero: turma.numero?.toString() || '',
+        letra: turma.letra || '',
+        ano_letivo: turma.ano_letivo?.toString() || new Date().getFullYear().toString(),
+        nomenclatura: turma.nomenclatura || 'SERIE',
+        curso_id: turma.curso?.id?.toString() || '',
+      })
+    } catch (error) {
+      toast.error('Erro ao carregar turma')
+      navigate('/turmas')
+    }
+    setLoading(false)
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    
+    // Validações
+    const numero = parseInt(formData.numero)
+    const anoLetivo = parseInt(formData.ano_letivo)
+    const cursoId = parseInt(formData.curso_id)
+    
+    if (!numero || isNaN(numero)) {
+      toast.error('Informe o número da turma')
+      return
+    }
+    
+    if (!formData.letra.trim()) {
+      toast.error('Informe a letra da turma')
+      return
+    }
+    
+    if (!anoLetivo || isNaN(anoLetivo) || anoLetivo < 2020 || anoLetivo > 2099) {
+      toast.error('Informe um ano letivo válido (ex: 2025)')
+      return
+    }
+    
+    if (!cursoId || isNaN(cursoId)) {
+      toast.error('Selecione um curso')
+      return
+    }
+
+    const letra = formData.letra.toUpperCase().trim()
+
+    setSaving(true)
+    try {
+      // Verifica se já existe turma com mesma combinação (apenas ao criar)
+      if (!isEditing) {
+        const existentes = await coreAPI.turmas.list({
+          numero: numero,
+          letra: letra,
+          ano_letivo: anoLetivo,
+          curso: cursoId,
+        })
+        const turmasExistentes = existentes.data.results || existentes.data
+        
+        if (turmasExistentes.length > 0) {
+          const turmaExistente = turmasExistentes[0]
+          setSaving(false)
+          
+          // Pergunta se quer editar a existente
+          const confirmar = window.confirm(
+            `Já existe a turma "${turmaExistente.numero}º ${turmaExistente.letra}" para este curso e ano.\n\nDeseja abrir a turma existente?`
+          )
+          
+          if (confirmar) {
+            navigate(`/turmas/${turmaExistente.id}`)
+          }
+          return
+        }
+      }
+
+      const payload = {
+        numero: numero,
+        letra: letra,
+        ano_letivo: anoLetivo,
+        nomenclatura: formData.nomenclatura,
+        curso_id: cursoId,
+      }
+
+      if (isEditing) {
+        await coreAPI.turmas.update(id, payload)
+        toast.success('Turma atualizada com sucesso!')
+      } else {
+        const response = await coreAPI.turmas.create(payload)
+        toast.success('Turma criada com sucesso!')
+        // Redireciona para a página de detalhes da turma criada
+        navigate(`/turmas/${response.data.id}`)
+        return
+      }
+      navigate('/turmas')
+    } catch (error) {
+      console.error('Erro ao salvar turma:', error.response?.data)
+      const data = error.response?.data
+      let msg = 'Erro ao salvar turma'
+      
+      if (data) {
+        if (data.detail) {
+          msg = data.detail
+        } else if (data.non_field_errors) {
+          // Traduz mensagem comum de unicidade
+          const errorMsg = data.non_field_errors[0]
+          if (errorMsg.includes('unique') || errorMsg.includes('already exists') || errorMsg.includes('must make a unique set')) {
+            msg = 'Já existe uma turma com este número, letra, ano e curso.'
+          } else {
+            msg = errorMsg
+          }
+        } else if (data.numero) {
+          msg = `Número: ${data.numero[0]}`
+        } else if (data.letra) {
+          msg = `Letra: ${data.letra[0]}`
+        } else if (data.ano_letivo) {
+          msg = `Ano Letivo: ${data.ano_letivo[0]}`
+        } else if (data.curso_id) {
+          msg = `Curso: ${data.curso_id[0]}`
+        } else if (typeof data === 'object') {
+          const firstKey = Object.keys(data)[0]
+          const firstError = Array.isArray(data[firstKey]) ? data[firstKey][0] : data[firstKey]
+          if (firstError) msg = firstError
+        }
+      }
+      toast.error(msg)
+    }
+    setSaving(false)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loading size="lg" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={() => navigate('/turmas')}
+          className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+        >
+          <HiArrowLeft className="h-6 w-6" />
+        </button>
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
+            {isEditing ? 'Editar Turma' : 'Nova Turma'}
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            {isEditing ? 'Atualize os dados da turma' : 'Preencha os dados para criar uma nova turma'}
+          </p>
+        </div>
+      </div>
+
+      {/* Formulário */}
+      <Card hover={false}>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Número *"
+              type="text"
+              placeholder="1"
+              maxLength={1}
+              value={formData.numero}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '')
+                if (val === '' || (parseInt(val) >= 1 && parseInt(val) <= 9)) {
+                  setFormData({ ...formData, numero: val })
+                }
+              }}
+              onKeyDown={(e) => {
+                const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End']
+                if (!allowed.includes(e.key) && !/^[1-9]$/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
+              onPaste={(e) => {
+                e.preventDefault()
+                const paste = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 1)
+                if (paste && parseInt(paste) >= 1 && parseInt(paste) <= 99) {
+                  setFormData({ ...formData, numero: paste })
+                }
+              }}
+              inputMode="numeric"
+              autoComplete="off"
+              required
+            />
+            <Input
+              label="Letra *"
+              placeholder="A"
+              maxLength={1}
+              value={formData.letra}
+              onChange={(e) => setFormData({ ...formData, letra: e.target.value.toUpperCase() })}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Select
+              label="Nomenclatura *"
+              value={formData.nomenclatura}
+              onChange={(e) => setFormData({ ...formData, nomenclatura: e.target.value })}
+              options={NOMENCLATURAS}
+            />
+            <Input
+              label="Ano Letivo *"
+              type="text"
+              placeholder={new Date().getFullYear().toString()}
+              maxLength={4}
+              value={formData.ano_letivo}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '').slice(0, 4)
+                setFormData({ ...formData, ano_letivo: val })
+              }}
+              onKeyDown={(e) => {
+                const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End']
+                if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
+              onPaste={(e) => {
+                e.preventDefault()
+                const paste = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4)
+                setFormData({ ...formData, ano_letivo: paste })
+              }}
+              inputMode="numeric"
+              autoComplete="off"
+              required
+            />
+          </div>
+
+          <Select
+            label="Curso *"
+            value={formData.curso_id}
+            onChange={(e) => setFormData({ ...formData, curso_id: e.target.value })}
+            placeholder="Selecione um curso..."
+            options={cursos.map(c => ({ value: c.id, label: `${c.nome} (${c.sigla})` }))}
+          />
+
+          {/* Preview */}
+          {formData.numero && formData.letra && formData.curso_id && formData.ano_letivo.length === 4 && (
+            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Prévia da turma:</p>
+              <p className="text-lg font-semibold text-slate-800 dark:text-white">
+                {formData.numero}º {NOMENCLATURAS.find(n => n.value === formData.nomenclatura)?.label} {formData.letra} - {cursos.find(c => String(c.id) === String(formData.curso_id))?.sigla || '?'} ({formData.ano_letivo})
+              </p>
+            </div>
+          )}
+
+          {/* Botões */}
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+            <Button type="button" variant="secondary" onClick={() => navigate('/turmas')}>
+              Cancelar
+            </Button>
+            <Button type="submit" icon={HiSave} loading={saving}>
+              {isEditing ? 'Salvar Alterações' : 'Criar Turma'}
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </div>
+  )
+}
+

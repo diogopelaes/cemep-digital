@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { 
-  Card, Button, Input, Select, Table, TableHead, TableBody, TableRow, 
+  Card, Button, Input, DateInput, Select, Table, TableHead, TableBody, TableRow, 
   TableHeader, TableCell, TableEmpty, Loading, Badge
 } from '../components/ui'
 import { HiPlus, HiPencil, HiCalendar, HiCheck, HiX, HiEye } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
+import { formatDateBR } from '../utils/date'
 import toast from 'react-hot-toast'
 
 const TIPOS_USUARIO = [
@@ -180,9 +181,14 @@ export default function Funcionarios() {
                     </span>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg text-slate-800 dark:text-white">
-                      {func.nome_completo || func.usuario?.first_name}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-lg text-slate-800 dark:text-white">
+                        {func.nome_completo || func.usuario?.first_name}
+                      </h3>
+                      <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-xs font-mono text-slate-600 dark:text-slate-300">
+                        Mat. {func.matricula}
+                      </span>
+                    </div>
                     <p className="text-sm text-slate-500">
                       {func.funcao}
                     </p>
@@ -249,18 +255,16 @@ export default function Funcionarios() {
 
                   {/* Formulário Novo Período */}
                   <form onSubmit={handleAddPeriodo} className="flex flex-wrap gap-3 mb-4">
-                    <div className="w-44">
-                      <Input
+                    <div className="w-48">
+                      <DateInput
                         label="Data de Entrada"
-                        type="date"
                         value={novoPeriodo.data_entrada}
                         onChange={(e) => setNovoPeriodo({ ...novoPeriodo, data_entrada: e.target.value })}
                       />
                     </div>
-                    <div className="w-44">
-                      <Input
+                    <div className="w-48">
+                      <DateInput
                         label="Data de Saída"
-                        type="date"
                         value={novoPeriodo.data_saida}
                         onChange={(e) => setNovoPeriodo({ ...novoPeriodo, data_saida: e.target.value })}
                       />
@@ -289,11 +293,11 @@ export default function Funcionarios() {
                             <HiCalendar className="h-5 w-5 text-primary-500" />
                             <div>
                               <p className="font-medium text-slate-800 dark:text-white">
-                                {new Date(periodo.data_entrada).toLocaleDateString('pt-BR')}
+                                {formatDateBR(periodo.data_entrada)}
                               </p>
                               <p className="text-sm text-slate-500">
                                 até {periodo.data_saida 
-                                  ? new Date(periodo.data_saida).toLocaleDateString('pt-BR')
+                                  ? formatDateBR(periodo.data_saida)
                                   : <span className="text-success-600">Atual</span>
                                 }
                               </p>

@@ -138,7 +138,7 @@ class Command(BaseCommand):
                             disc_nome = nota.disciplina_turma.disciplina.nome
                             if disc_nome not in disciplinas_notas:
                                 disciplinas_notas[disc_nome] = {
-                                    'carga_horaria': nota.disciplina_turma.carga_horaria,
+                                    'aulas_semanais': nota.disciplina_turma.aulas_semanais,
                                     'notas': []
                                 }
                             if nota.nota_final is not None:
@@ -165,7 +165,7 @@ class Command(BaseCommand):
                                     ano_letivo_ref=ano_letivo_obj,
                                     nome_disciplina=disc_nome,
                                     defaults={
-                                        'carga_horaria': dados['carga_horaria'],
+                                        'aulas_semanais': dados['aulas_semanais'],
                                         'nota_final': Decimal(str(round(media, 2))),
                                         'frequencia_total': max(0, min(100, frequencia)),
                                     }

@@ -6,6 +6,7 @@ import {
   HiCheckCircle, HiClock, HiExclamationCircle
 } from 'react-icons/hi'
 import { managementAPI, academicAPI, coreAPI } from '../services/api'
+import { formatDateBR } from '../utils/date'
 
 export default function Dashboard() {
   const { user, isGestao, isFuncionario, isEstudante, isResponsavel } = useAuth()
@@ -136,7 +137,7 @@ export default function Dashboard() {
                           {tarefa.titulo}
                         </p>
                         <p className="text-sm text-slate-500">
-                          Prazo: {new Date(tarefa.prazo).toLocaleDateString('pt-BR')}
+                          Prazo: {formatDateBR(tarefa.prazo)}
                         </p>
                       </div>
                       <Badge variant={tarefa.concluido ? 'success' : 'warning'}>
@@ -177,7 +178,7 @@ export default function Dashboard() {
                       {aviso.texto}
                     </p>
                     <p className="text-xs text-slate-400 mt-2">
-                      {new Date(aviso.data_aviso).toLocaleDateString('pt-BR')}
+                      {formatDateBR(aviso.data_aviso)}
                     </p>
                   </li>
                 ))}

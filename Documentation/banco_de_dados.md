@@ -72,7 +72,7 @@ class Turma(models.Model):
 class DisciplinaTurma(models.Model):
     disciplina = models.ForeignKey(Disciplina, on_delete=models.CASCADE)
     turma = models.ForeignKey(Turma, on_delete=models.CASCADE)
-    carga_horaria = models.PositiveSmallIntegerField()
+    aulas_semanais = models.PositiveSmallIntegerField()
 
 class ProfessorDisciplinaTurma(models.Model):
     professor = models.ForeignKey(Funcionario, on_delete=models.CASCADE)
@@ -295,7 +295,7 @@ class HistoricoEscolarAnoLetivo(models.Model):
 class HistoricoEscolarNotas(models.Model):
     ano_letivo_ref = models.ForeignKey(HistoricoEscolarAnoLetivo, on_delete=models.CASCADE)
     nome_disciplina = models.CharField(max_length=100)
-    carga_horaria = models.PositiveSmallIntegerField()
+    aulas_semanais = models.PositiveSmallIntegerField()
     nota_final = models.DecimalField(max_digits=4, decimal_places=2)
     frequencia_total = models.PositiveSmallIntegerField()
 

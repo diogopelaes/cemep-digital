@@ -12,7 +12,7 @@ from .models import (
 class HistoricoEscolarNotasSerializer(serializers.ModelSerializer):
     class Meta:
         model = HistoricoEscolarNotas
-        fields = ['id', 'nome_disciplina', 'carga_horaria', 'nota_final', 'frequencia_total']
+        fields = ['id', 'nome_disciplina', 'aulas_semanais', 'nota_final', 'frequencia_total']
 
 
 class HistoricoEscolarAnoLetivoSerializer(serializers.ModelSerializer):

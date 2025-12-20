@@ -8,9 +8,13 @@ import RecuperarSenha from './pages/RecuperarSenha'
 import Dashboard from './pages/Dashboard'
 import Estudantes from './pages/Estudantes'
 import Turmas from './pages/Turmas'
+import TurmaForm from './pages/TurmaForm'
+import TurmaDetalhes from './pages/TurmaDetalhes'
 import Avisos from './pages/Avisos'
 import Cursos from './pages/Cursos'
+import CursoForm from './pages/CursoForm'
 import Disciplinas from './pages/Disciplinas'
+import DisciplinaForm from './pages/DisciplinaForm'
 import Funcionarios from './pages/Funcionarios'
 import FuncionarioForm from './pages/FuncionarioForm'
 import FuncionarioCredenciais from './pages/FuncionarioCredenciais'
@@ -29,12 +33,21 @@ function App() {
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/estudantes" element={<Estudantes />} />
-        <Route path="/turmas" element={<Turmas />} />
         <Route path="/avisos" element={<Avisos />} />
         
         {/* Fase 1 - Cadastros Base */}
+        
+        {/* Fase 2 - Estrutura Escolar */}
+        <Route path="/turmas" element={<Turmas />} />
+        <Route path="/turmas/novo" element={<TurmaForm />} />
+        <Route path="/turmas/:id" element={<TurmaDetalhes />} />
+        <Route path="/turmas/:id/editar" element={<TurmaForm />} />
         <Route path="/cursos" element={<Cursos />} />
+        <Route path="/cursos/novo" element={<CursoForm />} />
+        <Route path="/cursos/:id/editar" element={<CursoForm />} />
         <Route path="/disciplinas" element={<Disciplinas />} />
+        <Route path="/disciplinas/novo" element={<DisciplinaForm />} />
+        <Route path="/disciplinas/:id/editar" element={<DisciplinaForm />} />
         <Route path="/funcionarios" element={<Funcionarios />} />
         <Route path="/funcionarios/novo" element={<FuncionarioForm />} />
         <Route path="/funcionarios/:id/editar" element={<FuncionarioForm />} />

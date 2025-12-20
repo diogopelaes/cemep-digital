@@ -32,3 +32,6 @@ build/
 Thumbs.db
 
 sistema_aontigo/
+
+backend/db.sqlite3
+backend/desenvolvimento/

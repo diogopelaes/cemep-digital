@@ -1,14 +1,16 @@
-import { useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Card, Button } from '../components/ui'
-import { HiPrinter, HiMail, HiArrowLeft, HiCheckCircle } from 'react-icons/hi'
+import { HiPrinter, HiMail, HiArrowLeft, HiCheckCircle, HiUserCircle, HiKey, HiClipboardCopy, HiPencil } from 'react-icons/hi'
 import { usersAPI } from '../services/api'
+import { formatDateBR } from '../utils/date'
 import toast from 'react-hot-toast'
 
 export default function FuncionarioCredenciais() {
   const navigate = useNavigate()
   const location = useLocation()
   const printRef = useRef(null)
+  const [sendingEmail, setSendingEmail] = useState(false)
   
   const funcionario = location.state?.funcionario
 
@@ -18,8 +20,12 @@ export default function FuncionarioCredenciais() {
     }
   }, [funcionario, navigate])
 
+  const copyToClipboard = (text, label) => {
+    navigator.clipboard.writeText(text)
+    toast.success(`${label} copiado!`)
+  }
+
   const handlePrint = () => {
-    const printContent = printRef.current
     const printWindow = window.open('', '', 'width=800,height=600')
     
     printWindow.document.write(`
@@ -128,7 +134,64 @@ export default function FuncionarioCredenciais() {
           </style>
         </head>
         <body>
-          ${printContent.innerHTML}
+          <div class="header">
+            <h1>CEMEP Digital</h1>
+            <p>Credenciais de Acesso ao Sistema</p>
+          </div>
+
+          <div class="section">
+            <h2>Dados do Funcionário</h2>
+            <div class="info-row">
+              <span class="info-label">Nome:</span>
+              <span class="info-value">${funcionario.nome}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Matrícula:</span>
+              <span class="info-value">${funcionario.matricula}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Função:</span>
+              <span class="info-value">${funcionario.funcao}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Tipo de Acesso:</span>
+              <span class="info-value">${funcionario.tipo_usuario}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Data de Entrada:</span>
+              <span class="info-value">${formatDateBR(funcionario.data_entrada) || 'Não informada'}</span>
+            </div>
+            ${funcionario.email ? `
+            <div class="info-row">
+              <span class="info-label">E-mail:</span>
+              <span class="info-value">${funcionario.email}</span>
+            </div>
+            ` : ''}
+          </div>
+
+          <div class="section">
+            <h2>Credenciais de Acesso</h2>
+            <div class="credentials">
+              <div class="credential-item">
+                <span class="credential-label">Usuário:</span>
+                <span class="credential-value">${funcionario.username}</span>
+              </div>
+              <div class="credential-item">
+                <span class="credential-label">Senha:</span>
+                <span class="credential-value">${funcionario.password}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="warning">
+            <strong>⚠️ Importante:</strong> Por segurança, recomendamos que o funcionário altere 
+            sua senha no primeiro acesso. Estas credenciais são pessoais e intransferíveis.
+          </div>
+
+          <div class="footer">
+            <p>Documento gerado em ${new Date().toLocaleString('pt-BR')}</p>
+            <p>CEMEP Digital - Sistema de Gestão Escolar</p>
+          </div>
         </body>
       </html>
     `)
@@ -148,6 +211,7 @@ export default function FuncionarioCredenciais() {
       return
     }
 
+    setSendingEmail(true)
     try {
       await usersAPI.sendCredentials({
         email: funcionario.email,
@@ -158,6 +222,8 @@ export default function FuncionarioCredenciais() {
       toast.success('E-mail enviado com sucesso!')
     } catch (error) {
       toast.error('Erro ao enviar e-mail. Verifique as configurações de SMTP.')
+    } finally {
+      setSendingEmail(false)
     }
   }
 
@@ -168,94 +234,145 @@ export default function FuncionarioCredenciais() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
       {/* Sucesso */}
-      <Card hover={false} className="text-center">
-        <div className="w-16 h-16 rounded-full bg-success-500/10 flex items-center justify-center mx-auto mb-4">
-          <HiCheckCircle className="h-10 w-10 text-success-500" />
+      <Card hover={false} className="text-center py-8">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-success-400 to-success-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-success-500/30">
+          <HiCheckCircle className="h-12 w-12 text-white" />
         </div>
         <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">
-          Funcionário Criado com Sucesso!
+          Funcionário Criado!
         </h1>
-        <p className="text-slate-500 dark:text-slate-400">
-          Imprima ou envie as credenciais de acesso para o funcionário.
+        <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+          Imprima as credenciais para entregar ao funcionário ou envie por e-mail.
         </p>
       </Card>
 
-      {/* Credenciais para Impressão */}
+      {/* Dados do Funcionário */}
       <Card hover={false}>
-        <div ref={printRef}>
-          <div className="header">
-            <h1>CEMEP Digital</h1>
-            <p>Credenciais de Acesso ao Sistema</p>
+        <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
+          Dados do Funcionário
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div>
+            <p className="text-xs text-slate-400 mb-1">Nome</p>
+            <p className="font-medium text-slate-800 dark:text-white">{funcionario.nome}</p>
           </div>
-
-          <div className="section">
-            <h2>Dados do Funcionário</h2>
-            <div className="info-row">
-              <span className="info-label">Nome:</span>
-              <span className="info-value">{funcionario.nome}</span>
-            </div>
-            <div className="info-row">
-              <span className="info-label">Função:</span>
-              <span className="info-value">{funcionario.funcao}</span>
-            </div>
-            <div className="info-row">
-              <span className="info-label">Tipo de Acesso:</span>
-              <span className="info-value">{funcionario.tipo_usuario}</span>
-            </div>
-            {funcionario.email && (
-              <div className="info-row">
-                <span className="info-label">E-mail:</span>
-                <span className="info-value">{funcionario.email}</span>
-              </div>
-            )}
+          <div>
+            <p className="text-xs text-slate-400 mb-1">Matrícula</p>
+            <p className="font-medium text-slate-800 dark:text-white">{funcionario.matricula}</p>
           </div>
-
-          <div className="section">
-            <h2>Credenciais de Acesso</h2>
-            <div className="credentials">
-              <div className="credential-item">
-                <span className="credential-label">Usuário:</span>
-                <span className="credential-value">{funcionario.username}</span>
-              </div>
-              <div className="credential-item">
-                <span className="credential-label">Senha:</span>
-                <span className="credential-value">{funcionario.password}</span>
-              </div>
-            </div>
+          <div>
+            <p className="text-xs text-slate-400 mb-1">Função</p>
+            <p className="font-medium text-slate-800 dark:text-white">{funcionario.funcao}</p>
           </div>
-
-          <div className="warning">
-            <strong>⚠️ Importante:</strong> Por segurança, recomendamos que o funcionário altere 
-            sua senha no primeiro acesso. Estas credenciais são pessoais e intransferíveis.
+          <div>
+            <p className="text-xs text-slate-400 mb-1">Tipo</p>
+            <p className="font-medium text-slate-800 dark:text-white">{funcionario.tipo_usuario}</p>
           </div>
-
-          <div className="footer">
-            <p>Documento gerado em {new Date().toLocaleString('pt-BR')}</p>
-            <p>CEMEP Digital - Sistema de Gestão Escolar</p>
+          <div>
+            <p className="text-xs text-slate-400 mb-1">Data de Entrada</p>
+            <p className="font-medium text-slate-800 dark:text-white">
+              {formatDateBR(funcionario.data_entrada) || <span className="text-slate-400 italic">Não informada</span>}
+            </p>
+          </div>
+          <div className="col-span-2 md:col-span-5">
+            <p className="text-xs text-slate-400 mb-1">E-mail</p>
+            <p className="font-medium text-slate-800 dark:text-white">
+              {funcionario.email || <span className="text-slate-400 italic">Não informado</span>}
+            </p>
           </div>
         </div>
       </Card>
 
+      {/* Credenciais */}
+      <div className="bg-gradient-to-br from-primary-500 to-accent-600 rounded-2xl p-6 shadow-xl shadow-primary-500/20">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <HiKey className="h-5 w-5 text-white/80" />
+            <h2 className="text-sm font-semibold text-white/80 uppercase tracking-wider">
+              Credenciais de Acesso
+            </h2>
+          </div>
+          {funcionario.id && (
+            <button
+              onClick={() => navigate(`/funcionarios/${funcionario.id}/editar`)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors"
+            >
+              <HiPencil className="h-4 w-4" />
+              Editar
+            </button>
+          )}
+        </div>
+        
+        <div className="space-y-4">
+          {/* Login */}
+          <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-white/60 mb-1">Login</p>
+                <p className="text-xl font-mono font-bold text-white">{funcionario.username}</p>
+              </div>
+              <button
+                onClick={() => copyToClipboard(funcionario.username, 'Login')}
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+                title="Copiar"
+              >
+                <HiClipboardCopy className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+          
+          {/* Senha */}
+          <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-white/60 mb-1">Senha</p>
+                <p className="text-xl font-mono font-bold text-white">{funcionario.password}</p>
+              </div>
+              <button
+                onClick={() => copyToClipboard(funcionario.password, 'Senha')}
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+                title="Copiar"
+              >
+                <HiClipboardCopy className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Aviso */}
+      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
+        <p className="text-sm text-amber-800 dark:text-amber-200">
+          <strong className="font-semibold">⚠️ Importante:</strong> Recomende ao funcionário alterar a senha no primeiro acesso. 
+          Estas credenciais são pessoais e intransferíveis.
+        </p>
+      </div>
+
       {/* Ações */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Button 
           onClick={handlePrint}
           icon={HiPrinter}
-          className="flex-1"
+          size="lg"
         >
           Imprimir Credenciais
         </Button>
         
-        {funcionario.email && (
-          <Button 
-            onClick={handleSendEmail}
-            variant="secondary"
-            icon={HiMail}
-            className="flex-1"
-          >
-            Enviar por E-mail
-          </Button>
-        )}
+        <Button 
+          onClick={handleSendEmail}
+          variant={funcionario.email ? 'secondary' : 'ghost'}
+          icon={sendingEmail ? null : HiMail}
+          size="lg"
+          disabled={!funcionario.email || sendingEmail}
+          loading={sendingEmail}
+        >
+          {sendingEmail 
+            ? 'Enviando...' 
+            : funcionario.email 
+              ? 'Enviar por E-mail' 
+              : 'Sem e-mail cadastrado'
+          }
+        </Button>
       </div>
 
       <Button 
@@ -269,4 +386,3 @@ export default function FuncionarioCredenciais() {
     </div>
   )
 }
-

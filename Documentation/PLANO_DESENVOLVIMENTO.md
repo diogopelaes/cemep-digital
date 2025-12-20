@@ -4,6 +4,23 @@ Este documento estabelece a ordem lógica de desenvolvimento baseada em **depend
 
 ---
 
+## 📅 Cronograma Sugerido
+
+| Fases         | Entregas                             | Status       |
+|---------------|--------------------------------------|--------------|
+| 1 | Fase 1    | Cursos, Disciplinas, Funcionários    | Concluido    |
+| 2 | Fase 2    | Turmas completo, Vínculos            | Concluido    |
+| 3 | Fase 3    | Estudantes, Responsáveis, Matrículas | Pendente     |
+| 4 | Fase 4a   | Calendário, Diário, Faltas           | Pendente     |
+| 5 | Fase 4b   | Notas, Recuperação                   | Pendente     |
+| 6 | Fase 5    | Ocorrências, Tarefas, Avisos         | Pendente     |
+| 7 | Fase 6    | Boletim, Prontuário, Relatórios      | Pendente     |
+| 8 | Fase 8    | Conselho de classe                   | Pendente     |
+| 9 | Fase 9    | Configurações                        | Pendente     |
+| 9 | Polimento | Testes, Ajustes, Deploy              | Pendente     |
+
+---
+
 ## 📐 Princípios de Desenvolvimento
 
 ### 1. Regras de Ouro
@@ -559,21 +576,6 @@ Antes de marcar como concluído, verificar:
 | Relatórios | R | R | R (próprio) | - | - | - |
 
 **Legenda:** C=Create, R=Read, U=Update, D=Delete
-
----
-
-## 📅 Cronograma Sugerido
-
-| Semana | Fase | Entregas |
-|--------|------|----------|
-| 1 | Fase 1 | Cursos, Disciplinas, Funcionários |
-| 2 | Fase 2 | Turmas completo, Vínculos |
-| 3 | Fase 3 | Estudantes, Responsáveis, Matrículas |
-| 4 | Fase 4a | Calendário, Diário, Faltas |
-| 5 | Fase 4b | Notas, Recuperação |
-| 6 | Fase 5 | Ocorrências, Tarefas, Avisos |
-| 7 | Fase 6 | Boletim, Prontuário, Relatórios |
-| 8 | Polimento | Testes, Ajustes, Deploy |
 
 ---
 

@@ -43,7 +43,7 @@ class TurmaAdmin(admin.ModelAdmin):
 
 @admin.register(DisciplinaTurma)
 class DisciplinaTurmaAdmin(admin.ModelAdmin):
-    list_display = ['disciplina', 'turma', 'carga_horaria']
+    list_display = ['disciplina', 'turma', 'aulas_semanais']
     list_filter = ['turma__ano_letivo', 'disciplina']
 
 

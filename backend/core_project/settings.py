@@ -76,6 +76,8 @@ WSGI_APPLICATION = 'core_project.wsgi.application'
 ASGI_APPLICATION = 'core_project.asgi.application'
 
 # Database - PostgreSQL
+# ATOMIC_REQUESTS: Cada requisição HTTP é uma transação atômica
+# Se qualquer parte falhar, tudo é revertido automaticamente
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -84,6 +86,7 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD', 'f&0(iO1F,15w'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5432'),
+        'ATOMIC_REQUESTS': True,  # Transações atômicas por padrão
     }
 }
 
@@ -156,6 +159,11 @@ EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'studytask@etep.com.br')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'qfxy dvhs cvvu rofx')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'CEMEP Digital <studytask@etep.com.br>')
+
+# URL do site (centralizado - altere aqui para refletir em todo o sistema)
+SITE_URL = os.getenv('SITE_URL', 'https://cemep.digital')
+SITE_NAME = 'CEMEP Digital'
+INSTITUTION_NAME = 'CEMEP - Centro Municipal de Educação Profissionalizante'
 
 # Create necessary directories
 os.makedirs(STATIC_ROOT, exist_ok=True)

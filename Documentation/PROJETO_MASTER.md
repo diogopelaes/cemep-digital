@@ -6,7 +6,7 @@ Este arquivo serve como ponto central de verdade para orientação de LLMs (Assi
 O **CEMEP Digital** é um sistema de gestão escolar desenvolvido sob medida para as necessidades específicas da instituição. O sistema visa modernizar o controle de notas, frequências, ocorrências e comunicação.
 
 ## Mapa da Documentação Técnica
-Para entender detalhadamente cada aspecto, consulte os arquivos abaixo na pasta `Documentação/`:
+Para entender detalhadamente cada aspecto, consulte os arquivos abaixo na pasta `Documentation/`:
 
 1. **[Requisitos Funcionais](requisitos_funcionais.md)**: O QUE o sistema faz. Regras de negócio de Gestão, Professores, Avaliações (Recuperação, Vistos) e Conselho de Classe.
 2. **[Banco de Dados](banco_de_dados.md)**: COMO os dados são salvos. Estrutura completa dos Models Django.
@@ -14,6 +14,8 @@ Para entender detalhadamente cada aspecto, consulte os arquivos abaixo na pasta 
 4. **[Backend](requisitos_backend.md)**: Stack Django REST + JWT + Email SMTP.
 5. **[Infraestrutura](requisitos_sistema.md)**: VPS Hostinger, Ubuntu 25.10, Deploy direto (Sem Docker) com Caddy e Uvicorn.
 6. **[Requisitos Não Funcionais](requisitos_nao_funcionais.md)**: Segurança, Política de Retenção de Dados (1 ano), Performance.
+7. **[Padrões de Desenvolvimento](PADROES_DESENVOLVIMENTO.md)**: ⚠️ **LEITURA OBRIGATÓRIA** - Regras de UI/UX (sem modais, inputs numéricos, selects, datas).
+8. **[Plano de Desenvolvimento](PLANO_DESENVOLVIMENTO.md)**: Cronograma e ordem de implementação por fases.
 
 ## Regras de Ouro para o Desenvolvimento (LLM Instructions)
 

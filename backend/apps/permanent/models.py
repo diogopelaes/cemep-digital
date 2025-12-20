@@ -121,7 +121,7 @@ class HistoricoEscolarNotas(models.Model):
         related_name='notas'
     )
     nome_disciplina = models.CharField(max_length=100, verbose_name='Nome da Disciplina')
-    carga_horaria = models.PositiveSmallIntegerField(verbose_name='Carga Horária')
+    aulas_semanais = models.PositiveSmallIntegerField(verbose_name='Aulas Semanais')
     nota_final = models.DecimalField(max_digits=4, decimal_places=2, verbose_name='Nota Final')
     frequencia_total = models.PositiveSmallIntegerField(
         verbose_name='Frequência Total (%)',

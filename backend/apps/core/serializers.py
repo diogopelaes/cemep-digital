@@ -12,16 +12,89 @@ from apps.users.serializers import UserSerializer
 class FuncionarioSerializer(serializers.ModelSerializer):
     usuario = UserSerializer(read_only=True)
     nome_completo = serializers.CharField(source='usuario.get_full_name', read_only=True)
+    data_entrada = serializers.SerializerMethodField()
     
     class Meta:
         model = Funcionario
-        fields = ['id', 'usuario', 'nome_completo', 'funcao', 'ativo']
+        fields = ['id', 'usuario', 'nome_completo', 'matricula', 'funcao', 'ativo', 'data_entrada']
+    
+    def get_data_entrada(self, obj):
+        """Retorna a data de entrada do primeiro período de trabalho."""
+        periodo = obj.periodos_trabalho.order_by('data_entrada').first()
+        return periodo.data_entrada if periodo else None
 
 
 class FuncionarioCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Funcionario
-        fields = ['usuario', 'funcao', 'ativo']
+        fields = ['usuario', 'matricula', 'funcao', 'ativo']
+
+
+class FuncionarioCompletoSerializer(serializers.Serializer):
+    """Serializer para criar usuário e funcionário em uma única operação."""
+    
+    # Dados do usuário
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    nome = serializers.CharField(max_length=150)
+    telefone = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    tipo_usuario = serializers.ChoiceField(choices=[
+        ('GESTAO', 'Gestão'),
+        ('SECRETARIA', 'Secretaria'),
+        ('PROFESSOR', 'Professor'),
+        ('MONITOR', 'Monitor'),
+    ])
+    
+    # Dados do funcionário
+    matricula = serializers.IntegerField(min_value=1)
+    funcao = serializers.CharField(max_length=100)
+    data_entrada = serializers.DateField()
+    
+    def validate_username(self, value):
+        from apps.users.models import User
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError('Este nome de usuário já está em uso.')
+        return value
+    
+    def validate_matricula(self, value):
+        if Funcionario.objects.filter(matricula=value).exists():
+            raise serializers.ValidationError('Este número de matrícula já está em uso.')
+        return value
+    
+    def validate_email(self, value):
+        from apps.users.models import User
+        if value and User.objects.filter(email=value).exists():
+            raise serializers.ValidationError('Este e-mail já está em uso.')
+        return value
+
+
+class FuncionarioUpdateSerializer(serializers.Serializer):
+    """Serializer para atualizar funcionário e dados relacionados."""
+    
+    # Dados do usuário
+    email = serializers.EmailField(required=False, allow_blank=True)
+    nome = serializers.CharField(max_length=150)
+    telefone = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    
+    # Dados do funcionário
+    matricula = serializers.IntegerField(min_value=1)
+    funcao = serializers.CharField(max_length=100)
+    data_entrada = serializers.DateField()
+    
+    def validate_matricula(self, value):
+        funcionario = self.context.get('funcionario')
+        if funcionario and Funcionario.objects.filter(matricula=value).exclude(id=funcionario.id).exists():
+            raise serializers.ValidationError('Este número de matrícula já está em uso.')
+        return value
+    
+    def validate_email(self, value):
+        from apps.users.models import User
+        funcionario = self.context.get('funcionario')
+        if value and funcionario:
+            if User.objects.filter(email=value).exclude(id=funcionario.usuario.id).exists():
+                raise serializers.ValidationError('Este e-mail já está em uso.')
+        return value
 
 
 class PeriodoTrabalhoSerializer(serializers.ModelSerializer):
@@ -31,9 +104,14 @@ class PeriodoTrabalhoSerializer(serializers.ModelSerializer):
 
 
 class DisciplinaSerializer(serializers.ModelSerializer):
+    area_conhecimento_display = serializers.CharField(
+        source='get_area_conhecimento_display', 
+        read_only=True
+    )
+    
     class Meta:
         model = Disciplina
-        fields = ['id', 'nome', 'sigla']
+        fields = ['id', 'nome', 'sigla', 'area_conhecimento', 'area_conhecimento_display']
 
 
 class CursoSerializer(serializers.ModelSerializer):
@@ -50,13 +128,17 @@ class TurmaSerializer(serializers.ModelSerializer):
         write_only=True
     )
     nome_completo = serializers.CharField(read_only=True)
+    disciplinas_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Turma
         fields = [
             'id', 'numero', 'letra', 'ano_letivo', 'nomenclatura',
-            'curso', 'curso_id', 'nome_completo'
+            'curso', 'curso_id', 'nome_completo', 'disciplinas_count'
         ]
+    
+    def get_disciplinas_count(self, obj):
+        return obj.disciplinas_vinculadas.count()
 
 
 class DisciplinaTurmaSerializer(serializers.ModelSerializer):
@@ -75,7 +157,7 @@ class DisciplinaTurmaSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = DisciplinaTurma
-        fields = ['id', 'disciplina', 'turma', 'disciplina_id', 'turma_id', 'carga_horaria']
+        fields = ['id', 'disciplina', 'turma', 'disciplina_id', 'turma_id', 'aulas_semanais']
 
 
 class ProfessorDisciplinaTurmaSerializer(serializers.ModelSerializer):
@@ -95,6 +177,18 @@ class ProfessorDisciplinaTurmaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfessorDisciplinaTurma
         fields = ['id', 'professor', 'disciplina_turma', 'professor_id', 'disciplina_turma_id']
+    
+    def validate_professor_id(self, value):
+        """Valida que o funcionário é do tipo PROFESSOR."""
+        if value.usuario.tipo_usuario != 'PROFESSOR':
+            raise serializers.ValidationError(
+                'Apenas funcionários do tipo PROFESSOR podem ser atribuídos.'
+            )
+        if not value.ativo:
+            raise serializers.ValidationError(
+                'O professor precisa estar ativo para receber atribuições.'
+            )
+        return value
 
 
 class CalendarioEscolarSerializer(serializers.ModelSerializer):
