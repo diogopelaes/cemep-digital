@@ -1,6 +1,17 @@
 # Requisitos do Sistema (Ambiente VPS)
 
-## Especificações da Máquina (Hostinger)
+## Ambiente de Desenvolvimento Local (Windows)
+Para garantir a paridade com o servidor, o ambiente local utiliza:
+
+1. **PostgreSQL 18.1**
+   - **Path:** `C:\Program Files\PostgreSQL\18\bin`
+   - **Binários:** `psql`, `pg_dump`, etc.
+2. **Node.js v24.12.0**
+3. **NPM 11.6.2**
+4. **Python 3.14 (Ambiente Virtual)**
+   - **Ativação (PowerShell):** `C:\Projects\cemep-digital\.venv\Scripts\Activate.ps1`
+
+## Especificações da Máquina VPS (Hostinger)
 - **Hostname:** srv1175442.hstgr.cloud
 - **IP:** 72.61.223.71
 - **OS:** Ubuntu 25.10
