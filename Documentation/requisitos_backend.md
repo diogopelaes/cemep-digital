@@ -33,9 +33,11 @@
 - **Proteção:** Arquivos enviados (Media) não devem estar na pasta `public` do servidor web diretamente se forem sensíveis.
 - **Implementação:**
     - Criar uma View no Django: `get_media_file(request, path)`.
-    - Esta view verifica `request.user.has_perm...`.
-    - Retorna o arquivo usando `FileResponse` ou header `X-Accel-Redirect` (Nginx) / `X-Sendfile` (Apache/Caddy via módulo interno) para performance.
-    - No Caddy, configurar rota `/media/` como `internal` se usar o método de redirecionamento, ou servir via Python para simplicidade inicial (com cache controlado).
+    - Esta view verifica permissões do usuário.
+    - Retorna o arquivo usando `FileResponse`.
+    - Arquivos permanentes (do App `permanent`) também devem seguir esta regra de proteção.
 
 ## Scripts e Comandos
-- Necessidade de criar um **Management Command** customizado para o expurgo de dados: `python manage.py limpar_dados_antigos`. Este script checa alunos com `data_saida < (hoje - 1 ano)` e limpa tabelas relacionadas.
+- **Management Command** para expurgo de dados: `python manage.py limpar_dados_antigos`. 
+- **Lógica:** Checa alunos com `data_saida < (hoje - 1 ano)` no modelo `MatriculaCEMEP`. 
+- **Ação:** Garante que o `HistoricoEscolar` e `OcorrenciaDisciplinar` estejam preenchidos no App `permanent` (usando CPF) e então deleta o `User` e `Estudante` do banco principal, disparando o `on_delete=CASCADE` nas tabelas transitórias.

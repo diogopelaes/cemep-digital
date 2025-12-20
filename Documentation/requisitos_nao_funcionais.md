@@ -14,13 +14,13 @@
 
 ## 3. Armazenamento e Retenção de Dados
 - **RNF009 - Storage:** Armazenamento local (filesystem da VPS).
-- **RNF010 - Política de Dados Mínimos:**
-    - Tabelas vitais permantentes: `HistoricoEscolar`, `OcorrenciaDisciplinar`, `DadosPessoaisAluno`.
-    - Tabelas transitórias: Notas diárias, Frequência detalhada, Planejamentos, etc.
+- **RNF010 - Política de Dados Mínimos (Arquivo Permanente):**
+    - Tabelas vitais permanentes (App `permanent`): `HistoricoEscolar`, `HistoricoEscolarAnoLetivo`, `HistoricoEscolarNotas`, `OcorrenciaDisciplinarEstudante`, `OcorrenciaDisciplinar`.
+    - Estas tabelas utilizam o **CPF** como identificador para sobreviver à exclusão do usuário do banco principal.
 - **RNF011 - Expurgo de Dados (Data Retention):**
     - Trigger ou Job Cron programado.
-    - Critério: `Data Saída do Aluno` + 1 Ano.
-    - Ação: Apagar todos os dados transitórios vinculados ao aluno, mantendo apenas o registro vital (Histórico e Disciplinar).
+    - Critério: `Data Saída do Aluno` na `MatriculaCEMEP` + 1 Ano.
+    - Ação: Migrar dados finais para o App `permanent` e apagar todos os dados transitórios (notas diárias, faltas detalhadas, planejamentos) e o usuário (`User`) do banco principal.
 
 ## 4. Comunicação
 - **RNF012 - E-mail:** Envio via SMTP Google.

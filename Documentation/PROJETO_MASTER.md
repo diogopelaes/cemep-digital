@@ -25,8 +25,9 @@ Para entender detalhadamente cada aspecto, consulte os arquivos abaixo na pasta 
 
 ### 2. Atenção aos Detalhes Críticos
 - **Regra da Recuperação:** A nota de recuperação SUBSTITUI a nota final se for maior. Isso deve estar hardcoded na lógica de cálculo (property ou signal no Django).
-- **Frequência:** O sistema deve lidar com múltiplas aulas no mesmo dia, permitindo checkbox individual.
+- **Faltas:** O sistema registra apenas as faltas. A frequência é calculada com base nos dias letivos do calendário. Se houver múltiplas aulas no dia, o registro da falta é por aula individual.
 - **Design:** Sempre que gerar código frontend, foque na **estética**. Use sombras, `rounded-lg` ou `xl`, espaçamentos generosos (`p-6`, `gap-4`) e cores harmoniosas. Interface feia é considerada erro.
+- **Banco Permanente:** Dados vitais (Histórico e Ocorrências Disciplinares) nunca são excluídos. Ao "expurgar" um aluno, os dados são migrados ou mantidos no App `permanent` identificados pelo CPF.
 
 ### 3. Segurança e Privacidade
 - Dados médicos e documentos anexados são privados. Nunca exponha URLs de `media/` publicamente sem verificação de token/sessão.

@@ -1,11 +1,32 @@
-# Instaladores e binários grandes
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Project Specific
 Documentation/Frameworks/
-*.exe
-*.msi
-*.msix
 
-# Pastas de dependências (comum em projetos Node/Python)
-node_modules/
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
 .env
+.pytest_cache/
 
+# Node
+node_modules/
+dist/
+build/
+.npm
+.eslintcache
+
+# IDE
+.vscode/
+.idea/
+.cursor/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

@@ -31,5 +31,6 @@
 ## Features Específicas do Frontend
 1. **Router:** `react-router-dom`. Rotas protegidas por verificação de Role (ex: Rota `/gestao` só acessível para admin/gestor).
 2. **Feedback Visual:** Uso de "Toasts" (notificações flutuantes) para sucesso/erro de operações.
-3. **Modal de Conselho de Classe:** Interface rica, carregando dados dinamicamente ao navegar entre alunos ("Salvar e Próximo").
-4. **Login:** Tela visualmente impactante.
+3. **Modal de Conselho de Classe:** Interface rica, carregando dados dinamicamente ao navegar entre alunos ("Salvar e Próximo"). Permite edição do 5º Conceito.
+4. **Diário de Classe:** Registro de faltas simplificado por aula (1 ou 2) e conteúdo.
+5. **Login:** Tela visualmente impactante.
