@@ -3,7 +3,7 @@ App Permanent - Histórico e Registros Imutáveis
 Usa CPF como PK para garantir sobrevivência dos dados após expurgo.
 """
 from django.db import models
-from apps.core.models import Parentesco
+from apps.core.models import Parentesco, Bimestre
 from apps.core.validators import validate_cpf, clean_digits
 from ckeditor.fields import RichTextField
 
@@ -229,12 +229,10 @@ class OcorrenciaDisciplinar(models.Model):
     data_ocorrido = models.DateTimeField(verbose_name='Data do Ocorrido')
     data_registro = models.DateTimeField(auto_now_add=True, verbose_name='Data do Registro')
     descricao = RichTextField(verbose_name='Descrição')
-    anexos = models.FileField(
-        upload_to='ocorrencias_permanentes/',
-        null=True,
-        blank=True,
-        verbose_name='Anexos'
-    )
+    
+    # Snapshot fields (auto-populated)
+    ano_letivo = models.PositiveSmallIntegerField(verbose_name='Ano Letivo', null=True, blank=True)
+    bimestre = models.PositiveSmallIntegerField(verbose_name='Bimestre', null=True, blank=True)
     
     class Meta:
         verbose_name = 'Ocorrência Disciplinar'
@@ -247,6 +245,25 @@ class OcorrenciaDisciplinar(models.Model):
     def save(self, *args, **kwargs):
         if self.cpf:
             self.cpf = clean_digits(self.cpf)
+        
+        # Tenta preencher ano_letivo e bimestre automaticamente se não informados
+        if self.data_ocorrido and (not self.ano_letivo or not self.bimestre):
+            try:
+                # Busca o bimestre correspondente à data do ocorrido
+                bimestre_ativo = Bimestre.objects.filter(
+                    data_inicio__lte=self.data_ocorrido.date(),
+                    data_fim__gte=self.data_ocorrido.date()
+                ).first()
+                
+                if bimestre_ativo:
+                    if not self.ano_letivo:
+                        self.ano_letivo = bimestre_ativo.ano_letivo
+                    if not self.bimestre:
+                        self.bimestre = bimestre_ativo.numero
+            except Exception:
+                # Se não conseguir buscar (tabela vazia ou erro), apenas segue sem preencher
+                pass
+                
         super().save(*args, **kwargs)
 
     @property
@@ -255,5 +272,32 @@ class OcorrenciaDisciplinar(models.Model):
         if not self.cpf or len(self.cpf) != 11:
             return self.cpf
         return f"{self.cpf[:3]}.{self.cpf[3:6]}.{self.cpf[6:9]}-{self.cpf[9:]}"
+
+
+class OcorrenciaDisciplinarAnexo(models.Model):
+    """Anexos para ocorrência disciplinar permanente."""
+    
+    ocorrencia = models.ForeignKey(
+        OcorrenciaDisciplinar,
+        on_delete=models.CASCADE,
+        related_name='anexos'
+    )
+    arquivo = models.FileField(
+        upload_to='ocorrencias_permanentes/',
+        verbose_name='Arquivo'
+    )
+    descricao = models.CharField(
+        max_length=255, 
+        blank=True, 
+        verbose_name='Descrição do Anexo'
+    )
+    criado_em = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Anexo de Ocorrência'
+        verbose_name_plural = 'Anexos de Ocorrência'
+    
+    def __str__(self):
+        return f"Anexo de {self.ocorrencia} ({self.descricao or 'Sem descrição'})"
 
 

@@ -266,6 +266,36 @@ class ProfessorDisciplinaTurma(models.Model):
             return False
         return usuario.is_gestao or usuario.is_secretaria
 
+class Bimestre(models.Model):
+    """Bimestre escolar."""
+    numero = models.PositiveSmallIntegerField(verbose_name='Número')
+    data_inicio = models.DateField(verbose_name='Data de Início')
+    data_fim = models.DateField(verbose_name='Data de Fim')
+    ano_letivo = models.PositiveSmallIntegerField(verbose_name='Ano Letivo')
+    
+    class Meta:
+        verbose_name = 'Bimestre'
+        verbose_name_plural = 'Bimestres'
+        ordering = ['numero']
+    
+    def __str__(self):
+        return f"{self.numero}º Bimestre"
+
+    def clean(self):
+        """Valida consistência das datas e ano letivo."""
+        if self.data_inicio and self.data_fim:
+            if self.data_inicio > self.data_fim:
+                raise ValidationError('A data de início não pode ser posterior à data de fim.')
+            
+            if self.data_inicio.year != self.ano_letivo or self.data_fim.year != self.ano_letivo:
+                raise ValidationError('As datas de início e fim devem pertencer ao ano letivo informado.')
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao or usuario.is_secretaria   
+
 
 class CalendarioEscolar(models.Model):
     """Calendário escolar com dias letivos e não letivos."""
@@ -305,6 +335,14 @@ class CalendarioEscolar(models.Model):
     def __str__(self):
         status = 'Letivo' if self.letivo else self.get_tipo_display()
         return f"{self.data.strftime('%d/%m/%Y')} - {status}: {self.descricao}"
+
+    def get_bimestre(self):
+        """Retorna o bimestre correspondente à data."""
+        return Bimestre.objects.filter(
+            ano_letivo=self.ano_letivo,
+            data_inicio__lte=self.data,
+            data_fim__gte=self.data
+        ).first()
 
     def pode_alterar(self, usuario):
         """Verifica se o usuário tem permissão para alterar este registro."""

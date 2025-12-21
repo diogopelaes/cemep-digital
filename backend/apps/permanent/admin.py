@@ -5,7 +5,7 @@ from django.contrib import admin
 from .models import (
     DadosPermanenteEstudante, DadosPermanenteResponsavel,
     HistoricoEscolar, HistoricoEscolarAnoLetivo, HistoricoEscolarNotas,
-    OcorrenciaDisciplinar
+    OcorrenciaDisciplinar, OcorrenciaDisciplinarAnexo
 )
 
 
@@ -64,10 +64,16 @@ class HistoricoEscolarNotasAdmin(admin.ModelAdmin):
     list_filter = ['ano_letivo_ref__ano_letivo']
 
 
+class OcorrenciaDisciplinarAnexoInline(admin.TabularInline):
+    model = OcorrenciaDisciplinarAnexo
+    extra = 1
+
+
 @admin.register(OcorrenciaDisciplinar)
 class OcorrenciaDisciplinarAdmin(admin.ModelAdmin):
-    list_display = ['nome_estudante', 'cpf', 'autor_nome', 'data_ocorrido']
+    list_display = ['nome_estudante', 'cpf', 'ano_letivo', 'bimestre', 'autor_nome', 'data_ocorrido']
     search_fields = ['nome_estudante', 'cpf', 'descricao']
-    list_filter = ['data_ocorrido']
+    list_filter = ['ano_letivo', 'bimestre', 'data_ocorrido']
     date_hierarchy = 'data_ocorrido'
+    inlines = [OcorrenciaDisciplinarAnexoInline]
 

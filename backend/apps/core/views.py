@@ -15,13 +15,14 @@ import secrets
 
 from .models import (
     Funcionario, PeriodoTrabalho, Disciplina, Curso, Turma,
-    DisciplinaTurma, ProfessorDisciplinaTurma, CalendarioEscolar, Habilidade
+    DisciplinaTurma, ProfessorDisciplinaTurma, CalendarioEscolar, Habilidade, Bimestre
 )
 from .serializers import (
     FuncionarioSerializer, FuncionarioCreateSerializer, FuncionarioCompletoSerializer,
     FuncionarioUpdateSerializer, PeriodoTrabalhoSerializer, DisciplinaSerializer, 
     CursoSerializer, TurmaSerializer, DisciplinaTurmaSerializer, 
-    ProfessorDisciplinaTurmaSerializer, CalendarioEscolarSerializer, HabilidadeSerializer
+    ProfessorDisciplinaTurmaSerializer, CalendarioEscolarSerializer, HabilidadeSerializer,
+    BimestreSerializer
 )
 from apps.users.permissions import IsGestao, IsGestaoOrSecretaria, IsFuncionario
 from apps.users.models import User
@@ -274,6 +275,19 @@ class ProfessorDisciplinaTurmaViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
         return [IsFuncionario()]
+
+
+class BimestreViewSet(viewsets.ModelViewSet):
+    queryset = Bimestre.objects.all()
+    serializer_class = BimestreSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['ano_letivo']
+    
+    # controle_de_permissao
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsGestaoOrSecretaria()]
+        return [IsAuthenticated()]
 
 
 class CalendarioEscolarViewSet(viewsets.ModelViewSet):

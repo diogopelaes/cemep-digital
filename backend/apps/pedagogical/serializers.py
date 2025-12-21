@@ -3,12 +3,12 @@ Serializers para o App Pedagogical
 """
 from rest_framework import serializers
 from .models import (
-    PlanoAula, Aula, Faltas, TipoOcorrencia, OcorrenciaPedagogica,
+    PlanoAula, Aula, Faltas, DescritorOcorrenciaPedagogica, OcorrenciaPedagogica,
     OcorrenciaResponsavelCiente, NotaBimestral, NotificacaoRecuperacao
 )
 from apps.core.serializers import (
     FuncionarioSerializer, DisciplinaSerializer, TurmaSerializer,
-    DisciplinaTurmaSerializer, HabilidadeSerializer
+    DisciplinaTurmaSerializer, HabilidadeSerializer, BimestreSerializer
 )
 from apps.academic.serializers import EstudanteSerializer, MatriculaTurmaSerializer
 
@@ -18,6 +18,7 @@ class PlanoAulaSerializer(serializers.ModelSerializer):
     disciplina = DisciplinaSerializer(read_only=True)
     turmas = TurmaSerializer(many=True, read_only=True)
     habilidades = HabilidadeSerializer(many=True, read_only=True)
+    bimestre = BimestreSerializer(read_only=True)
     
     professor_id = serializers.PrimaryKeyRelatedField(
         queryset=__import__('apps.core.models', fromlist=['Funcionario']).Funcionario.objects.all(),
@@ -48,9 +49,9 @@ class PlanoAulaSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'professor', 'professor_id', 'disciplina', 'disciplina_id',
             'turmas', 'turmas_ids', 'data_inicio', 'data_fim', 'conteudo',
-            'habilidades', 'habilidades_ids', 'criado_em', 'atualizado_em'
+            'habilidades', 'habilidades_ids', 'bimestre', 'criado_em', 'atualizado_em'
         ]
-        read_only_fields = ['criado_em', 'atualizado_em']
+        read_only_fields = ['criado_em', 'atualizado_em', 'bimestre']
 
 
 class AulaSerializer(serializers.ModelSerializer):
@@ -60,14 +61,15 @@ class AulaSerializer(serializers.ModelSerializer):
     )
     professor_disciplina_turma_detail = serializers.SerializerMethodField(read_only=True)
     total_faltas = serializers.SerializerMethodField()
+    bimestre = BimestreSerializer(read_only=True)
     
     class Meta:
         model = Aula
         fields = [
             'id', 'professor_disciplina_turma', 'professor_disciplina_turma_detail',
-            'data', 'conteudo', 'numero_aulas', 'total_faltas', 'criado_em'
+            'data', 'conteudo', 'numero_aulas', 'total_faltas', 'bimestre', 'criado_em'
         ]
-        read_only_fields = ['criado_em']
+        read_only_fields = ['criado_em', 'bimestre']
     
     def get_professor_disciplina_turma_detail(self, obj):
         from apps.core.serializers import ProfessorDisciplinaTurmaSerializer
@@ -104,18 +106,19 @@ class FaltasRegistroSerializer(serializers.Serializer):
     aula_numero = serializers.IntegerField(min_value=1, max_value=4)
 
 
-class TipoOcorrenciaSerializer(serializers.ModelSerializer):
+class DescritorOcorrenciaPedagogicaSerializer(serializers.ModelSerializer):
     gestor = FuncionarioSerializer(read_only=True)
     
     class Meta:
-        model = TipoOcorrencia
+        model = DescritorOcorrenciaPedagogica
         fields = ['id', 'gestor', 'texto', 'ativo']
 
 
 class OcorrenciaPedagogicaSerializer(serializers.ModelSerializer):
     estudante = EstudanteSerializer(read_only=True)
     autor = FuncionarioSerializer(read_only=True)
-    tipo = TipoOcorrenciaSerializer(read_only=True)
+    tipo = DescritorOcorrenciaPedagogicaSerializer(read_only=True)
+    bimestre = BimestreSerializer(read_only=True)
     
     estudante_id = serializers.PrimaryKeyRelatedField(
         queryset=__import__('apps.academic.models', fromlist=['Estudante']).Estudante.objects.all(),
@@ -123,7 +126,7 @@ class OcorrenciaPedagogicaSerializer(serializers.ModelSerializer):
         write_only=True
     )
     tipo_id = serializers.PrimaryKeyRelatedField(
-        queryset=TipoOcorrencia.objects.all(),
+        queryset=DescritorOcorrenciaPedagogica.objects.all(),
         source='tipo',
         write_only=True
     )
@@ -132,9 +135,9 @@ class OcorrenciaPedagogicaSerializer(serializers.ModelSerializer):
         model = OcorrenciaPedagogica
         fields = [
             'id', 'estudante', 'estudante_id', 'autor',
-            'tipo', 'tipo_id', 'data', 'texto'
+            'tipo', 'tipo_id', 'data', 'texto', 'bimestre'
         ]
-        read_only_fields = ['data', 'autor']
+        read_only_fields = ['data', 'autor', 'bimestre']
 
 
 class OcorrenciaResponsavelCienteSerializer(serializers.ModelSerializer):
@@ -151,11 +154,16 @@ class NotaBimestralSerializer(serializers.ModelSerializer):
         write_only=True
     )
     professor_disciplina_turma_detail = serializers.SerializerMethodField(read_only=True)
-    bimestre_display = serializers.CharField(source='get_bimestre_display', read_only=True)
+    bimestre = BimestreSerializer(read_only=True)
     
     matricula_turma_id = serializers.PrimaryKeyRelatedField(
         queryset=__import__('apps.academic.models', fromlist=['MatriculaTurma']).MatriculaTurma.objects.all(),
         source='matricula_turma',
+        write_only=True
+    )
+    bimestre_id = serializers.PrimaryKeyRelatedField(
+        queryset=__import__('apps.core.models', fromlist=['Bimestre']).Bimestre.objects.all(),
+        source='bimestre',
         write_only=True
     )
     
@@ -164,7 +172,7 @@ class NotaBimestralSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'matricula_turma', 'matricula_turma_id',
             'professor_disciplina_turma', 'professor_disciplina_turma_detail',
-            'bimestre', 'bimestre_display', 'nota'
+            'bimestre', 'bimestre_id', 'nota'
         ]
 
     def get_professor_disciplina_turma_detail(self, obj):

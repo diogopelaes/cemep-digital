@@ -4,7 +4,7 @@ Serializers para o App Core
 from rest_framework import serializers
 from .models import (
     Funcionario, PeriodoTrabalho, Disciplina, Curso, Turma,
-    DisciplinaTurma, ProfessorDisciplinaTurma, CalendarioEscolar, Habilidade
+    DisciplinaTurma, ProfessorDisciplinaTurma, CalendarioEscolar, Habilidade, Bimestre
 )
 from apps.users.serializers import UserSerializer
 
@@ -197,6 +197,12 @@ class ProfessorDisciplinaTurmaSerializer(serializers.ModelSerializer):
                 'O professor precisa estar ativo para receber atribuições.'
             )
         return value
+
+
+class BimestreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bimestre
+        fields = ['id', 'numero', 'data_inicio', 'data_fim', 'ano_letivo']
 
 
 class CalendarioEscolarSerializer(serializers.ModelSerializer):

@@ -6,7 +6,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     FuncionarioViewSet, PeriodoTrabalhoViewSet, DisciplinaViewSet,
     CursoViewSet, TurmaViewSet, DisciplinaTurmaViewSet,
-    ProfessorDisciplinaTurmaViewSet, CalendarioEscolarViewSet, HabilidadeViewSet
+    ProfessorDisciplinaTurmaViewSet, CalendarioEscolarViewSet, HabilidadeViewSet,
+    BimestreViewSet
 )
 
 router = DefaultRouter()
@@ -19,6 +20,7 @@ router.register('disciplinas-turma', DisciplinaTurmaViewSet)
 router.register('atribuicoes', ProfessorDisciplinaTurmaViewSet)
 router.register('calendario', CalendarioEscolarViewSet)
 router.register('habilidades', HabilidadeViewSet)
+router.register('bimestres', BimestreViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

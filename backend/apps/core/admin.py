@@ -4,7 +4,7 @@ Admin para o App Core
 from django.contrib import admin
 from .models import (
     Funcionario, PeriodoTrabalho, Disciplina, Curso, Turma,
-    DisciplinaTurma, ProfessorDisciplinaTurma, CalendarioEscolar, Habilidade
+    DisciplinaTurma, ProfessorDisciplinaTurma, CalendarioEscolar, Habilidade, Bimestre
 )
 
 
@@ -51,6 +51,13 @@ class DisciplinaTurmaAdmin(admin.ModelAdmin):
 class ProfessorDisciplinaTurmaAdmin(admin.ModelAdmin):
     list_display = ['professor', 'disciplina_turma']
     list_filter = ['disciplina_turma__turma__ano_letivo']
+
+
+@admin.register(Bimestre)
+class BimestreAdmin(admin.ModelAdmin):
+    list_display = ['numero', 'ano_letivo', 'data_inicio', 'data_fim']
+    list_filter = ['ano_letivo']
+    ordering = ['ano_letivo', 'numero']
 
 
 @admin.register(CalendarioEscolar)

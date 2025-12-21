@@ -10,12 +10,12 @@ from django.utils import timezone
 from django.db.models import Sum, Count
 
 from .models import (
-    PlanoAula, Aula, Faltas, TipoOcorrencia, OcorrenciaPedagogica,
+    PlanoAula, Aula, Faltas, DescritorOcorrenciaPedagogica, OcorrenciaPedagogica,
     OcorrenciaResponsavelCiente, NotaBimestral, NotificacaoRecuperacao
 )
 from .serializers import (
     PlanoAulaSerializer, AulaSerializer, FaltasSerializer, FaltasRegistroSerializer,
-    TipoOcorrenciaSerializer, OcorrenciaPedagogicaSerializer,
+    DescritorOcorrenciaPedagogicaSerializer, OcorrenciaPedagogicaSerializer,
     OcorrenciaResponsavelCienteSerializer, NotaBimestralSerializer,
     NotificacaoRecuperacaoSerializer
 )
@@ -118,9 +118,9 @@ class FaltasViewSet(viewsets.ModelViewSet):
         return Response({'message': f'{len(faltas)} faltas registradas.'})
 
 
-class TipoOcorrenciaViewSet(viewsets.ModelViewSet):
-    queryset = TipoOcorrencia.objects.select_related('gestor__usuario')
-    serializer_class = TipoOcorrenciaSerializer
+class DescritorOcorrenciaPedagogicaViewSet(viewsets.ModelViewSet):
+    queryset = DescritorOcorrenciaPedagogica.objects.select_related('gestor__usuario')
+    serializer_class = DescritorOcorrenciaPedagogicaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['ativo']
     
