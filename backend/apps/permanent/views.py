@@ -28,6 +28,7 @@ class DadosPermanenteEstudanteViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     search_fields = ['nome', 'cpf']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -53,6 +54,7 @@ class DadosPermanenteResponsavelViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['estudante']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -65,6 +67,7 @@ class HistoricoEscolarViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     search_fields = ['estudante__nome', 'estudante__cpf', 'numero_matricula']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -77,6 +80,7 @@ class HistoricoEscolarAnoLetivoViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['historico', 'ano_letivo', 'status_final']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -89,6 +93,7 @@ class HistoricoEscolarNotasViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['ano_letivo_ref']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -102,6 +107,7 @@ class OcorrenciaDisciplinarViewSet(viewsets.ModelViewSet):
     filterset_fields = ['cpf']
     search_fields = ['nome_estudante', 'cpf', 'descricao']
     
+    # controle_de_permissao
     def get_permissions(self):
         return [IsGestao()]
     

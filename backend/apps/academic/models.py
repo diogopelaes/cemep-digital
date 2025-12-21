@@ -3,7 +3,9 @@ App Academic - Vida Escolar (Estudantes, Matrículas, Responsáveis)
 """
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from apps.core.models import Parentesco, Curso, Turma
+from apps.core.validators import validate_cpf, clean_digits
 
 
 class Estudante(models.Model):
@@ -14,11 +16,16 @@ class Estudante(models.Model):
         on_delete=models.CASCADE,
         related_name='estudante'
     )
-    cpf = models.CharField(max_length=14, unique=True, verbose_name='CPF')
+    cpf = models.CharField(
+        max_length=14, 
+        primary_key=True, 
+        verbose_name='CPF',
+        validators=[validate_cpf]
+    )
     cin = models.CharField(max_length=20, verbose_name='CIN')
     nome_social = models.CharField(max_length=255, blank=True, verbose_name='Nome Social')
     data_nascimento = models.DateField(verbose_name='Data de Nascimento')
-    data_entrada = models.DateField(verbose_name='Data de Entrada')
+    # data_entrada removed as requested
     
     # Benefícios e Transporte
     bolsa_familia = models.BooleanField(default=False, verbose_name='Bolsa Família')
@@ -33,8 +40,9 @@ class Estudante(models.Model):
     bairro = models.CharField(max_length=100, verbose_name='Bairro')
     cidade = models.CharField(max_length=100, default='Mogi Guaçu', verbose_name='Cidade')
     estado = models.CharField(max_length=2, default='SP', verbose_name='Estado')
-    cep = models.CharField(max_length=9, verbose_name='CEP')
+    cep = models.CharField(max_length=8, verbose_name='CEP')
     complemento = models.CharField(max_length=100, blank=True, verbose_name='Complemento')
+    telefone = models.CharField(max_length=15, blank=True, verbose_name='Telefone')
     
     class Meta:
         verbose_name = 'Estudante'
@@ -45,6 +53,21 @@ class Estudante(models.Model):
         nome = self.nome_social or self.usuario.get_full_name()
         return f"{nome} ({self.cpf})"
     
+    def save(self, *args, **kwargs):
+        if self.cpf:
+            self.cpf = clean_digits(self.cpf)
+        if self.cep:
+            self.cep = clean_digits(self.cep)
+        if self.telefone:
+            self.telefone = clean_digits(self.telefone)
+        super().save(*args, **kwargs)
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao or usuario.is_secretaria
+
     @property
     def endereco_completo(self):
         partes = [self.logradouro, self.numero]
@@ -52,6 +75,35 @@ class Estudante(models.Model):
             partes.append(self.complemento)
         partes.extend([self.bairro, f"{self.cidade}/{self.estado}", self.cep])
         return ', '.join(partes)
+
+    @property
+    def cpf_formatado(self):
+        """Retorna o CPF formatado: XXX.XXX.XXX-XX"""
+        if not self.cpf or len(self.cpf) != 11:
+            return self.cpf
+        return f"{self.cpf[:3]}.{self.cpf[3:6]}.{self.cpf[6:9]}-{self.cpf[9:]}"
+
+    @property
+    def cep_formatado(self):
+        """Retorna o CEP formatado: XX.XXX-XXX"""
+        if not self.cep or len(self.cep) != 8:
+            return self.cep
+        return f"{self.cep[:2]}.{self.cep[2:5]}-{self.cep[5:]}"
+
+    @property
+    def telefone_formatado(self):
+        """Retorna o telefone formatado: (XX) XXXXX-XXXX ou (XX) XXXX-XXXX"""
+        if not self.telefone:
+            return ""
+        
+        # Garante que trabalha apenas com números
+        fone = clean_digits(self.telefone)
+        
+        if len(fone) == 11:
+            return f"({fone[:2]}) {fone[2:7]}-{fone[7:]}"
+        elif len(fone) == 10:
+            return f"({fone[:2]}) {fone[2:6]}-{fone[6:]}"
+        return self.telefone
 
 
 class Responsavel(models.Model):
@@ -62,11 +114,19 @@ class Responsavel(models.Model):
         on_delete=models.CASCADE,
         related_name='responsavel'
     )
+    cpf = models.CharField(
+        max_length=14, 
+        primary_key=True, 
+        verbose_name='CPF',
+        validators=[validate_cpf]
+    )
     estudantes = models.ManyToManyField(
         Estudante,
         related_name='responsaveis',
         through='ResponsavelEstudante'
     )
+
+    telefone = models.CharField(max_length=15, blank=True, verbose_name='Telefone')
     
     class Meta:
         verbose_name = 'Responsável'
@@ -74,6 +134,41 @@ class Responsavel(models.Model):
     
     def __str__(self):
         return self.usuario.get_full_name()
+
+    def save(self, *args, **kwargs):
+        if self.cpf:
+            self.cpf = clean_digits(self.cpf)
+        if self.telefone:
+            self.telefone = clean_digits(self.telefone)
+        super().save(*args, **kwargs)
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao or usuario.is_secretaria
+
+    @property
+    def cpf_formatado(self):
+        """Retorna o CPF formatado: XXX.XXX.XXX-XX"""
+        if not self.cpf or len(self.cpf) != 11:
+            return self.cpf
+        return f"{self.cpf[:3]}.{self.cpf[3:6]}.{self.cpf[6:9]}-{self.cpf[9:]}"
+
+    @property
+    def telefone_formatado(self):
+        """Retorna o telefone formatado: (XX) XXXXX-XXXX ou (XX) XXXX-XXXX"""
+        if not self.telefone:
+            return ""
+        
+        # Garante que trabalha apenas com números
+        fone = clean_digits(self.telefone)
+        
+        if len(fone) == 11:
+            return f"({fone[:2]}) {fone[2:7]}-{fone[7:]}"
+        elif len(fone) == 10:
+            return f"({fone[:2]}) {fone[2:6]}-{fone[6:]}"
+        return self.telefone
 
 
 class ResponsavelEstudante(models.Model):
@@ -86,6 +181,7 @@ class ResponsavelEstudante(models.Model):
         choices=Parentesco.choices,
         verbose_name='Parentesco'
     )
+    telefone = models.CharField(max_length=15, blank=True, verbose_name='Telefone de Contato')
     
     class Meta:
         verbose_name = 'Vínculo Responsável-Estudante'
@@ -94,6 +190,32 @@ class ResponsavelEstudante(models.Model):
     
     def __str__(self):
         return f"{self.responsavel} - {self.estudante} ({self.get_parentesco_display()})"
+
+    def save(self, *args, **kwargs):
+        if self.telefone:
+            self.telefone = clean_digits(self.telefone)
+        super().save(*args, **kwargs)
+
+    @property
+    def telefone_formatado(self):
+        """Retorna o telefone formatado: (XX) XXXXX-XXXX ou (XX) XXXX-XXXX"""
+        if not self.telefone:
+            return ""
+        
+        # Garante que trabalha apenas com números
+        fone = clean_digits(self.telefone)
+        
+        if len(fone) == 11:
+            return f"({fone[:2]}) {fone[2:7]}-{fone[7:]}"
+        elif len(fone) == 10:
+            return f"({fone[:2]}) {fone[2:6]}-{fone[6:]}"
+        return self.telefone
+
+
+def validate_matricula_digits(value):
+    clean_value = clean_digits(value)
+    if len(clean_value) != 10:
+        raise ValidationError('A matrícula deve ter exatamente 10 dígitos.')
 
 
 class MatriculaCEMEP(models.Model):
@@ -107,9 +229,11 @@ class MatriculaCEMEP(models.Model):
         OUTRO = 'OUTRO', 'Outro'
     
     numero_matricula = models.CharField(
-        max_length=20,
+        max_length=10,
         primary_key=True,
-        verbose_name='Número da Matrícula'
+        verbose_name='Número da Matrícula',
+        validators=[validate_matricula_digits],
+        help_text='Deve conter exatamente 10 dígitos numéricos. Só pode ser inserido por Gestão ou Secretaria.'
     )
     estudante = models.ForeignKey(
         Estudante,
@@ -121,8 +245,8 @@ class MatriculaCEMEP(models.Model):
         on_delete=models.PROTECT,
         related_name='matriculas'
     )
-    data_entrada = models.DateField(verbose_name='Data de Entrada')
-    data_saida = models.DateField(null=True, blank=True, verbose_name='Data de Saída')
+    data_entrada = models.DateField(verbose_name='Data de Entrada no Curso')
+    data_saida = models.DateField(null=True, blank=True, verbose_name='Data de Saída do Curso')
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
@@ -138,6 +262,24 @@ class MatriculaCEMEP(models.Model):
     def __str__(self):
         return f"{self.numero_matricula} - {self.estudante} ({self.curso.sigla})"
 
+    def save(self, *args, **kwargs):
+        if self.numero_matricula:
+            self.numero_matricula = clean_digits(self.numero_matricula)
+        super().save(*args, **kwargs)
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao or usuario.is_secretaria
+
+    @property
+    def numero_matricula_formatado(self):
+        """Retorna a matrícula formatada: XXX.XXX.XXX-X"""
+        if not self.numero_matricula or len(self.numero_matricula) != 10:
+            return self.numero_matricula
+        return f"{self.numero_matricula[:3]}.{self.numero_matricula[3:6]}.{self.numero_matricula[6:9]}-{self.numero_matricula[9:]}"
+
 
 class MatriculaTurma(models.Model):
     """Enturmação - vínculo do estudante com uma turma específica."""
@@ -148,18 +290,19 @@ class MatriculaTurma(models.Model):
         RETIDO = 'RETIDO', 'Retido'
         PROMOVIDO = 'PROMOVIDO', 'Promovido'
     
-    estudante = models.ForeignKey(
-        Estudante,
+    matricula_cemep = models.ForeignKey(
+        MatriculaCEMEP,
         on_delete=models.CASCADE,
-        related_name='matriculas_turma'
+        related_name='matriculas_turma',
+        verbose_name='Matrícula CEMEP'
     )
     turma = models.ForeignKey(
         Turma,
         on_delete=models.CASCADE,
         related_name='matriculas'
     )
-    data_entrada = models.DateField(verbose_name='Data de Entrada')
-    data_saida = models.DateField(null=True, blank=True, verbose_name='Data de Saída')
+    data_entrada = models.DateField(verbose_name='Data de Entrada na Turma')
+    data_saida = models.DateField(null=True, blank=True, verbose_name='Data de Saída da Turma')
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
@@ -170,7 +313,7 @@ class MatriculaTurma(models.Model):
     class Meta:
         verbose_name = 'Matrícula na Turma'
         verbose_name_plural = 'Matrículas nas Turmas'
-        ordering = ['-turma__ano_letivo', 'estudante__usuario__first_name']
+        ordering = ['-turma__ano_letivo', 'matricula_cemep__estudante__usuario__first_name']
     
     def save(self, *args, **kwargs):
         # Status automático: CURSANDO se data_saida vazia
@@ -179,7 +322,13 @@ class MatriculaTurma(models.Model):
         super().save(*args, **kwargs)
     
     def __str__(self):
-        return f"{self.estudante} - {self.turma}"
+        return f"{self.matricula_cemep.estudante} - {self.turma}"
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao or usuario.is_secretaria
 
 
 class Atestado(models.Model):
@@ -213,4 +362,10 @@ class Atestado(models.Model):
     
     def __str__(self):
         return f"Atestado - {self.usuario_alvo} ({self.data_inicio.strftime('%d/%m/%Y')})"
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao or usuario.is_secretaria
 

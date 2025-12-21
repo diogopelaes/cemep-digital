@@ -4,8 +4,9 @@ App Pedagogical - Diário de Classe, Notas, Faltas, Ocorrências, Recuperação
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
-from apps.core.models import Funcionario, Disciplina, DisciplinaTurma, Turma, Habilidade
+from apps.core.models import Funcionario, Disciplina, DisciplinaTurma, Turma, Habilidade, ProfessorDisciplinaTurma
 from apps.academic.models import Estudante, MatriculaTurma, Responsavel
+from ckeditor.fields import RichTextField
 
 
 class PlanoAula(models.Model):
@@ -27,7 +28,7 @@ class PlanoAula(models.Model):
     )
     data_inicio = models.DateField(verbose_name='Data Início')
     data_fim = models.DateField(verbose_name='Data Fim')
-    conteudo = models.TextField(verbose_name='Conteúdo')
+    conteudo = RichTextField(verbose_name='Conteúdo')
     habilidades = models.ManyToManyField(
         Habilidade,
         related_name='planos_aula',
@@ -44,22 +45,24 @@ class PlanoAula(models.Model):
     def __str__(self):
         return f"{self.professor} - {self.disciplina} ({self.data_inicio} a {self.data_fim})"
 
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        # Professor pode alterar seus próprios planos
+        return self.professor.usuario == usuario
+
 
 class Aula(models.Model):
     """Registro de aula (diário de classe)."""
     
-    professor = models.ForeignKey(
-        Funcionario,
-        on_delete=models.CASCADE,
-        related_name='aulas'
-    )
-    disciplina_turma = models.ForeignKey(
-        DisciplinaTurma,
+    professor_disciplina_turma = models.ForeignKey(
+        ProfessorDisciplinaTurma,
         on_delete=models.CASCADE,
         related_name='aulas'
     )
     data = models.DateField(verbose_name='Data')
-    conteudo = models.TextField(verbose_name='Conteúdo Ministrado')
+    conteudo = RichTextField(verbose_name='Conteúdo Ministrado')
     numero_aulas = models.PositiveSmallIntegerField(
         default=1,
         validators=[MinValueValidator(1), MaxValueValidator(4)],
@@ -71,10 +74,17 @@ class Aula(models.Model):
         verbose_name = 'Aula'
         verbose_name_plural = 'Aulas'
         ordering = ['-data']
-        unique_together = ['professor', 'disciplina_turma', 'data']
+        unique_together = ['professor_disciplina_turma', 'data']
     
     def __str__(self):
-        return f"{self.disciplina_turma} - {self.data.strftime('%d/%m/%Y')}"
+        return f"{self.professor_disciplina_turma} - {self.data.strftime('%d/%m/%Y')}"
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        # Professor pode alterar suas próprias aulas
+        return self.professor_disciplina_turma.professor.usuario == usuario
 
 
 class Faltas(models.Model):
@@ -104,6 +114,13 @@ class Faltas(models.Model):
     def __str__(self):
         return f"{self.estudante} - Falta na aula {self.aula_numero} ({self.aula.data})"
 
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        # Professor dono da aula pode alterar as faltas
+        return self.aula.professor_disciplina_turma.professor.usuario == usuario
+
 
 class TipoOcorrencia(models.Model):
     """Tipos de ocorrências pedagógicas cadastradas pelo gestor."""
@@ -123,6 +140,12 @@ class TipoOcorrencia(models.Model):
     
     def __str__(self):
         return self.texto
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao
 
 
 class OcorrenciaPedagogica(models.Model):
@@ -144,15 +167,23 @@ class OcorrenciaPedagogica(models.Model):
         related_name='ocorrencias'
     )
     data = models.DateTimeField(auto_now_add=True)
-    texto = models.TextField(verbose_name='Descrição')
     
     class Meta:
         verbose_name = 'Ocorrência Pedagógica'
         verbose_name_plural = 'Ocorrências Pedagógicas'
-        ordering = ['-data']
+        ordering = ['-data', 'estudante']
     
     def __str__(self):
         return f"{self.estudante} - {self.tipo} ({self.data.strftime('%d/%m/%Y')})"
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        if usuario.is_gestao:
+            return True
+        # Autor pode editar sua ocorrência
+        return self.autor.usuario == usuario
 
 
 class OcorrenciaResponsavelCiente(models.Model):
@@ -180,6 +211,16 @@ class OcorrenciaResponsavelCiente(models.Model):
         status = 'Ciente' if self.ciente else 'Pendente'
         return f"{self.responsavel} - {self.ocorrencia} ({status})"
 
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        if usuario.is_gestao:
+            return True
+        # Não permitimos que responsável edite diretamente via API padrão,
+        # geralmente isso é feito via endpoint específico de "dar ciência"
+        return False
+
 
 class NotaBimestral(models.Model):
     """Nota bimestral de um estudante em uma disciplina."""
@@ -189,7 +230,7 @@ class NotaBimestral(models.Model):
         (2, '2º Bimestre'),
         (3, '3º Bimestre'),
         (4, '4º Bimestre'),
-        (5, '5º Conceito (Conselho)'),
+        (5, '5º Conceito'),
     ]
     
     matricula_turma = models.ForeignKey(
@@ -197,11 +238,12 @@ class NotaBimestral(models.Model):
         on_delete=models.CASCADE,
         related_name='notas'
     )
-    disciplina_turma = models.ForeignKey(
-        DisciplinaTurma,
+    professor_disciplina_turma = models.ForeignKey(
+        ProfessorDisciplinaTurma,
         on_delete=models.CASCADE,
         related_name='notas'
     )
+
     bimestre = models.PositiveSmallIntegerField(
         choices=BIMESTRE_CHOICES,
         verbose_name='Bimestre'
@@ -214,65 +256,27 @@ class NotaBimestral(models.Model):
         validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('10.00'))],
         verbose_name='Nota'
     )
-    nota_recuperacao = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('10.00'))],
-        verbose_name='Nota de Recuperação'
-    )
     
     class Meta:
         verbose_name = 'Nota Bimestral'
         verbose_name_plural = 'Notas Bimestrais'
-        unique_together = ['matricula_turma', 'disciplina_turma', 'bimestre']
-    
-    @property
-    def nota_final(self):
-        """A nota de recuperação substitui a nota se for maior."""
-        if self.nota is None:
-            return None
-        if self.nota_recuperacao is not None and self.nota_recuperacao > self.nota:
-            return self.nota_recuperacao
-        return self.nota
+        unique_together = ['matricula_turma', 'professor_disciplina_turma', 'bimestre']
     
     def __str__(self):
-        return f"{self.matricula_turma.estudante} - {self.disciplina_turma.disciplina} - {self.get_bimestre_display()}"
+        return f"{self.matricula_turma.matricula_cemep.estudante} - {self.professor_disciplina_turma.disciplina} - {self.get_bimestre_display()}"
 
-
-class Recuperacao(models.Model):
-    """Registro de recuperação para estudantes."""
-    
-    matriculas_turma = models.ManyToManyField(
-        MatriculaTurma,
-        related_name='recuperacoes'
-    )
-    disciplina = models.ForeignKey(
-        Disciplina,
-        on_delete=models.PROTECT,
-        related_name='recuperacoes'
-    )
-    professor = models.ForeignKey(
-        Funcionario,
-        on_delete=models.CASCADE,
-        related_name='recuperacoes'
-    )
-    bimestre = models.PositiveSmallIntegerField(
-        choices=NotaBimestral.BIMESTRE_CHOICES[:4],  # Apenas bimestres 1-4
-        verbose_name='Bimestre'
-    )
-    data_prova = models.DateField(null=True, blank=True, verbose_name='Data da Prova')
-    criado_em = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        verbose_name = 'Recuperação'
-        verbose_name_plural = 'Recuperações'
-        ordering = ['-criado_em']
-    
-    def __str__(self):
-        return f"Recuperação {self.disciplina} - {self.get_bimestre_display()}"
-
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        if usuario.is_gestao or usuario.is_secretaria:
+            return True
+        
+        # Se for professor, verifica se ele dá aula nessa disciplina_turma
+        if usuario.is_professor:
+            return self.professor_disciplina_turma.professor.usuario == usuario
+        
+        return False
 
 class NotificacaoRecuperacao(models.Model):
     """Notificação de recuperação para estudante/responsável."""
@@ -297,4 +301,13 @@ class NotificacaoRecuperacao(models.Model):
     
     def __str__(self):
         return f"{self.estudante} - {self.recuperacao}"
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        if usuario.is_gestao:
+            return True
+        # Apenas visualização, alteração de estado 'visualizado' pode ser feita pelo dono
+        return self.estudante.usuario == usuario
 

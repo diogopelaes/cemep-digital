@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'apps.pedagogical',
     'apps.management',
     'apps.permanent',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -169,4 +170,18 @@ INSTITUTION_NAME = 'CEMEP - Centro Municipal de Educação Profissionalizante'
 os.makedirs(STATIC_ROOT, exist_ok=True)
 os.makedirs(MEDIA_ROOT, exist_ok=True)
 os.makedirs(BASE_DIR / 'static', exist_ok=True)
+
+# CKEditor Configuration
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
+            ['Link', 'Unlink'],
+            ['RemoveFormat', 'Source']
+        ],
+        'width': 'auto',
+    },
+}
 

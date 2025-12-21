@@ -4,13 +4,42 @@ App Management - Tarefas, HTPC, Avisos
 from django.db import models
 from django.conf import settings
 from apps.core.models import Funcionario
+from ckeditor.fields import RichTextField
+
+
+from datetime import datetime
+
+def get_anexo_path(instance, filename):
+    """
+    Gera o caminho do arquivo baseado no tipo de anexo, usuário criador e data.
+    Estrutura: {tipo}/{username}/{ano}/{mes}/{dia}/{filename}
+    """
+    model_type = type(instance).__name__
+    date_path = datetime.now().strftime('%Y/%m/%d')
+    base_folder = 'outros'
+    username = 'anonimo'
+
+    if model_type == 'TarefaAnexo':
+        base_folder = 'tarefas'
+        username = instance.tarefa.criador.username
+    elif model_type == 'TarefaRespostaAnexo':
+        base_folder = 'tarefas/respostas'
+        username = instance.resposta.funcionario.usuario.username
+    elif model_type == 'ReuniaoHTPCAnexo':
+        base_folder = 'htpc'
+        username = instance.reuniao.quem_registrou.username
+    elif model_type == 'AvisoAnexo':
+        base_folder = 'avisos'
+        username = instance.aviso.criador.usuario.username
+
+    return f"{base_folder}/{username}/{date_path}/{filename}"
 
 
 class Tarefa(models.Model):
     """Tarefa atribuída a funcionários."""
     
     titulo = models.CharField(max_length=200, verbose_name='Título')
-    descricao = models.TextField(blank=True, verbose_name='Descrição')
+    descricao = RichTextField(blank=True, verbose_name='Descrição')
     prazo = models.DateTimeField(verbose_name='Prazo')
     funcionarios = models.ManyToManyField(
         Funcionario,
@@ -25,12 +54,7 @@ class Tarefa(models.Model):
         on_delete=models.CASCADE,
         related_name='tarefas_criadas'
     )
-    documento = models.FileField(
-        upload_to='tarefas/',
-        null=True,
-        blank=True,
-        verbose_name='Documento Anexo'
-    )
+    # documento removed (moved to TarefaAnexo)
     
     class Meta:
         verbose_name = 'Tarefa'
@@ -39,6 +63,91 @@ class Tarefa(models.Model):
     
     def __str__(self):
         return f"{self.titulo} (Prazo: {self.prazo.strftime('%d/%m/%Y')})"
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        if usuario.is_gestao or usuario.is_secretaria:
+            return True
+        return self.criador == usuario
+
+
+class TarefaAnexo(models.Model):
+    """Anexo de uma tarefa (arquivo)."""
+    
+    tarefa = models.ForeignKey(
+        Tarefa,
+        on_delete=models.CASCADE,
+        related_name='anexos'
+    )
+    arquivo = models.FileField(upload_to=get_anexo_path, verbose_name='Arquivo')
+    descricao = models.CharField(max_length=100, blank=True, verbose_name='Descrição')
+    
+    class Meta:
+        verbose_name = 'Anexo da Tarefa'
+        verbose_name_plural = 'Anexos da Tarefa'
+    
+    def __str__(self):
+        return self.descricao or self.arquivo.name
+
+    def pode_alterar(self, usuario):
+        return self.tarefa.pode_alterar(usuario)
+
+
+class TarefaResposta(models.Model):
+    """Resposta de um funcionário a uma tarefa."""
+    
+    tarefa = models.ForeignKey(
+        Tarefa,
+        on_delete=models.CASCADE,
+        related_name='respostas'
+    )
+    funcionario = models.ForeignKey(
+        Funcionario,
+        on_delete=models.CASCADE,
+        related_name='respostas_tarefa'
+    )
+    texto = RichTextField(blank=True, verbose_name='Mensagem/Resposta')
+    data_envio = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Resposta da Tarefa'
+        verbose_name_plural = 'Respostas da Tarefa'
+        ordering = ['-data_envio']
+    
+    def __str__(self):
+        return f"Resposta de {self.funcionario} em {self.tarefa}"
+
+    def pode_alterar(self, usuario):
+        if not usuario.is_authenticated:
+            return False
+        if usuario.is_gestao:
+            return True
+        # Dono da resposta pode editar
+        return self.funcionario.usuario == usuario
+
+
+class TarefaRespostaAnexo(models.Model):
+    """Anexo da resposta da tarefa."""
+    
+    resposta = models.ForeignKey(
+        TarefaResposta,
+        on_delete=models.CASCADE,
+        related_name='anexos'
+    )
+    arquivo = models.FileField(upload_to=get_anexo_path, verbose_name='Arquivo')
+    descricao = models.CharField(max_length=100, blank=True, verbose_name='Descrição')
+    
+    class Meta:
+        verbose_name = 'Anexo da Resposta'
+        verbose_name_plural = 'Anexos da Resposta'
+    
+    def __str__(self):
+        return self.descricao or self.arquivo.name
+
+    def pode_alterar(self, usuario):
+        return self.resposta.pode_alterar(usuario)
 
 
 class NotificacaoTarefa(models.Model):
@@ -70,8 +179,8 @@ class ReuniaoHTPC(models.Model):
     """Reunião de HTPC (Hora de Trabalho Pedagógico Coletivo)."""
     
     data_reuniao = models.DateTimeField(verbose_name='Data da Reunião')
-    pauta = models.TextField(verbose_name='Pauta')
-    ata = models.TextField(blank=True, verbose_name='Ata')
+    pauta = RichTextField(verbose_name='Pauta')
+    ata = RichTextField(blank=True, verbose_name='Ata')
     presentes = models.ManyToManyField(
         Funcionario,
         related_name='htpcs_presentes',
@@ -92,6 +201,34 @@ class ReuniaoHTPC(models.Model):
     
     def __str__(self):
         return f"HTPC - {self.data_reuniao.strftime('%d/%m/%Y %H:%M')}"
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao
+
+
+class ReuniaoHTPCAnexo(models.Model):
+    """Anexos da reunião de HTPC (lista de presença, slides, etc)."""
+    
+    reuniao = models.ForeignKey(
+        ReuniaoHTPC,
+        on_delete=models.CASCADE,
+        related_name='anexos'
+    )
+    arquivo = models.FileField(upload_to=get_anexo_path, verbose_name='Arquivo')
+    descricao = models.CharField(max_length=100, blank=True, verbose_name='Descrição')
+    
+    class Meta:
+        verbose_name = 'Anexo de HTPC'
+        verbose_name_plural = 'Anexos de HTPC'
+    
+    def __str__(self):
+        return self.descricao or self.arquivo.name
+
+    def pode_alterar(self, usuario):
+        return self.reuniao.pode_alterar(usuario)
 
 
 class NotificacaoHTPC(models.Model):
@@ -123,13 +260,8 @@ class Aviso(models.Model):
     """Aviso/comunicado para usuários."""
     
     titulo = models.CharField(max_length=200, verbose_name='Título')
-    texto = models.TextField(verbose_name='Texto')
-    documento = models.FileField(
-        upload_to='avisos/',
-        null=True,
-        blank=True,
-        verbose_name='Documento Anexo'
-    )
+    texto = RichTextField(verbose_name='Texto')
+    # documento removed (moved to AvisoAnexo)
     data_aviso = models.DateTimeField(auto_now_add=True)
     criador = models.ForeignKey(
         Funcionario,
@@ -149,6 +281,36 @@ class Aviso(models.Model):
     
     def __str__(self):
         return f"{self.titulo} ({self.data_aviso.strftime('%d/%m/%Y')})"
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        if usuario.is_gestao or usuario.is_secretaria:
+            return True
+        return self.criador.usuario == usuario
+
+
+class AvisoAnexo(models.Model):
+    """Anexo de um aviso."""
+    
+    aviso = models.ForeignKey(
+        Aviso,
+        on_delete=models.CASCADE,
+        related_name='anexos'
+    )
+    arquivo = models.FileField(upload_to=get_anexo_path, verbose_name='Arquivo')
+    descricao = models.CharField(max_length=100, blank=True, verbose_name='Descrição')
+    
+    class Meta:
+        verbose_name = 'Anexo do Aviso'
+        verbose_name_plural = 'Anexos do Aviso'
+    
+    def __str__(self):
+        return self.descricao or self.arquivo.name
+
+    def pode_alterar(self, usuario):
+        return self.aviso.pode_alterar(usuario)
 
 
 class AvisoVisualizacao(models.Model):

@@ -28,6 +28,7 @@ class TarefaViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['concluido', 'funcionarios']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -113,6 +114,7 @@ class ReuniaoHTPCViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['data_reuniao']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -163,6 +165,7 @@ class AvisoViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['criador']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsFuncionario()]

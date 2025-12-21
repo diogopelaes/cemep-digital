@@ -83,6 +83,7 @@ export const coreAPI = {
     atualizarCompleto: (id, data) => api.put(`/core/funcionarios/${id}/atualizar-completo/`, data),
     update: (id, data) => api.patch(`/core/funcionarios/${id}/`, data),
     delete: (id) => api.delete(`/core/funcionarios/${id}/`),
+    resetarSenha: (id) => api.post(`/core/funcionarios/${id}/resetar-senha/`),
   },
   // Disciplinas
   disciplinas: {

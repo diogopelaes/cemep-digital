@@ -33,6 +33,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return UserUpdateSerializer
         return UserSerializer
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'destroy']:
             return [IsGestao()]

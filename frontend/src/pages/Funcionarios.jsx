@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { 
   Card, Button, Input, DateInput, Select, Table, TableHead, TableBody, TableRow, 
-  TableHeader, TableCell, TableEmpty, Loading, Badge
+  TableHeader, TableCell, TableEmpty, Loading, Badge, Modal, ModalFooter
 } from '../components/ui'
-import { HiPlus, HiPencil, HiCalendar, HiCheck, HiX, HiEye } from 'react-icons/hi'
+import { HiPlus, HiPencil, HiCalendar, HiCheck, HiX, HiRefresh } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import { formatDateBR } from '../utils/date'
 import toast from 'react-hot-toast'
@@ -15,6 +15,14 @@ const TIPOS_USUARIO = [
   { value: 'PROFESSOR', label: 'Professor' },
   { value: 'MONITOR', label: 'Monitor' },
 ]
+
+// Configuração de cores por tipo de usuário
+const TIPO_COLORS = {
+  GESTAO: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+  SECRETARIA: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+  PROFESSOR: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+  MONITOR: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+}
 
 export default function Funcionarios() {
   const navigate = useNavigate()
@@ -28,6 +36,10 @@ export default function Funcionarios() {
   const [periodos, setPeriodos] = useState([])
   const [loadingPeriodos, setLoadingPeriodos] = useState(false)
   const [novoPeriodo, setNovoPeriodo] = useState({ data_entrada: '', data_saida: '' })
+
+  // Modal de Reset de Senha
+  const [modalReset, setModalReset] = useState({ open: false, funcionario: null })
+  const [loadingReset, setLoadingReset] = useState(false)
 
   useEffect(() => {
     loadFuncionarios()
@@ -57,6 +69,30 @@ export default function Funcionarios() {
     } catch (error) {
       toast.error('Erro ao alterar status')
     }
+  }
+
+  // Reset de Senha
+  const handleOpenResetModal = (funcionario) => {
+    setModalReset({ open: true, funcionario })
+  }
+
+  const handleCloseResetModal = () => {
+    setModalReset({ open: false, funcionario: null })
+  }
+
+  const handleResetSenha = async () => {
+    if (!modalReset.funcionario) return
+
+    setLoadingReset(true)
+    try {
+      const response = await coreAPI.funcionarios.resetarSenha(modalReset.funcionario.id)
+      toast.success(response.data.message)
+      handleCloseResetModal()
+    } catch (error) {
+      const msg = error.response?.data?.detail || 'Erro ao resetar senha'
+      toast.error(msg)
+    }
+    setLoadingReset(false)
   }
 
   // Períodos de Trabalho
@@ -175,13 +211,13 @@ export default function Funcionarios() {
               {/* Info Principal */}
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold text-lg">
                       {func.usuario?.first_name?.[0] || 'F'}
                     </span>
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-semibold text-lg text-slate-800 dark:text-white">
                         {func.nome_completo || func.usuario?.first_name}
                       </h3>
@@ -200,17 +236,20 @@ export default function Funcionarios() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <Badge variant="primary">
+                {/* Ações - Layout Uniforme */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Badge de Tipo - Tamanho fixo */}
+                  <span className={`inline-flex items-center justify-center min-w-[100px] px-3 py-2 rounded-lg text-sm font-medium ${TIPO_COLORS[func.usuario?.tipo_usuario] || 'bg-slate-100 text-slate-600'}`}>
                     {func.usuario?.tipo_usuario}
-                  </Badge>
+                  </span>
                   
+                  {/* Botão Ativo/Inativo - Tamanho fixo */}
                   <button
                     onClick={() => handleToggleAtivo(func)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    className={`inline-flex items-center justify-center gap-1.5 min-w-[100px] px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       func.ativo 
-                        ? 'bg-success-500/10 text-success-600 hover:bg-success-500/20' 
-                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-700'
+                        ? 'bg-success-500/10 text-success-600 hover:bg-success-500/20 dark:text-success-400' 
+                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400'
                     }`}
                   >
                     {func.ativo ? (
@@ -226,21 +265,33 @@ export default function Funcionarios() {
                     )}
                   </button>
 
+                  {/* Botão Períodos - Tamanho fixo */}
                   <button
                     onClick={() => togglePeriodos(func)}
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl transition-colors ${
+                    className={`inline-flex items-center justify-center gap-1.5 min-w-[100px] px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       periodosExpandido === func.id
                         ? 'bg-primary-500 text-white'
-                        : 'bg-primary-500/10 text-primary-600 hover:bg-primary-500/20'
+                        : 'bg-primary-500/10 text-primary-600 hover:bg-primary-500/20 dark:text-primary-400'
                     }`}
                   >
-                    <HiCalendar className="h-5 w-5" />
+                    <HiCalendar className="h-4 w-4" />
                     Períodos
                   </button>
 
+                  {/* Botão Resetar Senha */}
+                  <button
+                    onClick={() => handleOpenResetModal(func)}
+                    className="inline-flex items-center justify-center gap-1.5 min-w-[100px] px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400"
+                    title="Resetar Senha"
+                  >
+                    <HiRefresh className="h-4 w-4" />
+                    Senha
+                  </button>
+
+                  {/* Botão Editar */}
                   <button
                     onClick={() => navigate(`/funcionarios/${func.id}/editar`)}
-                    className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-primary-600 transition-colors"
+                    className="inline-flex items-center justify-center p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-primary-600 dark:text-primary-400 transition-colors"
                     title="Editar"
                   >
                     <HiPencil className="h-5 w-5" />
@@ -331,6 +382,65 @@ export default function Funcionarios() {
           </Card>
         )}
       </div>
+
+      {/* Modal de Confirmação de Reset de Senha */}
+      <Modal
+        isOpen={modalReset.open}
+        onClose={handleCloseResetModal}
+        title="Resetar Senha"
+        size="md"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center">
+              <HiRefresh className="h-8 w-8 text-amber-500" />
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <p className="text-slate-600 dark:text-slate-300">
+              Você está prestes a resetar a senha de:
+            </p>
+            <p className="text-xl font-semibold text-slate-800 dark:text-white mt-2">
+              {modalReset.funcionario?.nome_completo || modalReset.funcionario?.usuario?.first_name}
+            </p>
+            <p className="text-sm text-slate-500 mt-1">
+              {modalReset.funcionario?.usuario?.email}
+            </p>
+          </div>
+
+          <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+            <p className="text-sm text-amber-800 dark:text-amber-200 text-center">
+              <strong>Atenção:</strong> Uma nova senha será gerada automaticamente e enviada 
+              para o e-mail cadastrado do funcionário.
+            </p>
+          </div>
+        </div>
+
+        <ModalFooter>
+          <Button variant="secondary" onClick={handleCloseResetModal}>
+            Cancelar
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={handleResetSenha}
+            disabled={loadingReset}
+            className="bg-amber-500 hover:bg-amber-600 focus:ring-amber-500"
+          >
+            {loadingReset ? (
+              <>
+                <Loading size="sm" />
+                Resetando...
+              </>
+            ) : (
+              <>
+                <HiRefresh className="h-5 w-5" />
+                Confirmar Reset
+              </>
+            )}
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   )
 }

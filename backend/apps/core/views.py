@@ -7,6 +7,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import transaction
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+import secrets
 
 from .models import (
     Funcionario, PeriodoTrabalho, Disciplina, Curso, Turma,
@@ -34,6 +39,7 @@ class FuncionarioViewSet(viewsets.ModelViewSet):
             return FuncionarioCreateSerializer
         return FuncionarioSerializer
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy', 'criar_completo', 'atualizar_completo']:
             return [IsGestao()]
@@ -124,6 +130,63 @@ class FuncionarioViewSet(viewsets.ModelViewSet):
             )
         
         return Response(FuncionarioSerializer(funcionario).data)
+    
+    @action(detail=True, methods=['post'], url_path='resetar-senha')
+    def resetar_senha(self, request, pk=None):
+        """
+        Reseta a senha do funcionário e envia a nova senha por e-mail.
+        """
+        funcionario = self.get_object()
+        user = funcionario.usuario
+        
+        # Verifica se o usuário tem e-mail cadastrado
+        if not user.email:
+            return Response(
+                {'detail': 'Este funcionário não possui e-mail cadastrado.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Gera uma nova senha aleatória (12 caracteres)
+        nova_senha = secrets.token_urlsafe(9)  # Gera ~12 caracteres
+        
+        # Atualiza a senha do usuário
+        user.set_password(nova_senha)
+        user.save()
+        
+        # Contexto para o template de e-mail
+        context = {
+            'nome': user.first_name or funcionario.apelido or 'Usuário',
+            'username': user.username,
+            'password': nova_senha,
+            'site_url': settings.SITE_URL,
+            'site_name': settings.SITE_NAME,
+            'institution_name': settings.INSTITUTION_NAME,
+            'logo_url': f"{settings.SITE_URL}/static/img/logo.jpeg",
+        }
+        
+        try:
+            # Renderiza o template HTML
+            html_message = render_to_string('emails/password_reset_email.html', context)
+            plain_message = strip_tags(html_message)
+            
+            send_mail(
+                subject=f'{settings.SITE_NAME} - Sua Senha Foi Redefinida',
+                message=plain_message,
+                html_message=html_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+            
+            return Response({
+                'message': f'Senha redefinida com sucesso! Um e-mail foi enviado para {user.email}.'
+            })
+        except Exception as e:
+            # Se falhar o envio do email, reverte a senha (melhor não deixar sem notificar)
+            return Response(
+                {'detail': f'Erro ao enviar e-mail: {str(e)}. A senha não foi alterada.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class PeriodoTrabalhoViewSet(viewsets.ModelViewSet):
@@ -132,6 +195,7 @@ class PeriodoTrabalhoViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['funcionario']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -143,6 +207,7 @@ class DisciplinaViewSet(viewsets.ModelViewSet):
     serializer_class = DisciplinaSerializer
     search_fields = ['nome', 'sigla']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -154,6 +219,7 @@ class CursoViewSet(viewsets.ModelViewSet):
     serializer_class = CursoSerializer
     search_fields = ['nome', 'sigla']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -167,6 +233,7 @@ class TurmaViewSet(viewsets.ModelViewSet):
     filterset_fields = ['numero', 'letra', 'ano_letivo', 'curso', 'nomenclatura']
     search_fields = ['numero', 'letra']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -179,6 +246,7 @@ class DisciplinaTurmaViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['disciplina', 'turma', 'turma__ano_letivo']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -201,6 +269,7 @@ class ProfessorDisciplinaTurmaViewSet(viewsets.ModelViewSet):
             qs = qs.filter(disciplina_turma__turma_id=turma)
         return qs
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -213,6 +282,7 @@ class CalendarioEscolarViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['letivo', 'tipo']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -226,6 +296,7 @@ class HabilidadeViewSet(viewsets.ModelViewSet):
     filterset_fields = ['disciplina']
     search_fields = ['codigo', 'descricao']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]

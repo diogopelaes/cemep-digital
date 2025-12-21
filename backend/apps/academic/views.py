@@ -34,6 +34,7 @@ class EstudanteViewSet(viewsets.ModelViewSet):
             return EstudanteCreateSerializer
         return EstudanteSerializer
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestaoOrSecretaria()]
@@ -79,6 +80,7 @@ class ResponsavelViewSet(viewsets.ModelViewSet):
             return ResponsavelCreateSerializer
         return ResponsavelSerializer
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestaoOrSecretaria()]
@@ -119,6 +121,7 @@ class MatriculaCEMEPViewSet(viewsets.ModelViewSet):
     filterset_fields = ['status', 'curso', 'estudante']
     search_fields = ['numero_matricula', 'estudante__usuario__first_name']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestaoOrSecretaria()]
@@ -134,6 +137,7 @@ class MatriculaTurmaViewSet(viewsets.ModelViewSet):
     filterset_fields = ['status', 'turma', 'estudante', 'turma__ano_letivo']
     search_fields = ['estudante__usuario__first_name', 'estudante__cpf']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestaoOrSecretaria()]
@@ -146,6 +150,7 @@ class AtestadoViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['usuario_alvo']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestaoOrSecretaria()]

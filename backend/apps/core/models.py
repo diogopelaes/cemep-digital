@@ -4,6 +4,7 @@ App Core - Cadastros Base (Funcionários, Cursos, Turmas, Disciplinas, Calendár
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from ckeditor.fields import RichTextField
 
 
 class Parentesco(models.TextChoices):
@@ -26,7 +27,7 @@ class Funcionario(models.Model):
         related_name='funcionario'
     )
     matricula = models.PositiveIntegerField(
-        unique=True,
+        unique=False,
         verbose_name='Nº Matrícula',
         help_text='Número de matrícula do funcionário'
     )
@@ -60,6 +61,12 @@ class Funcionario(models.Model):
         if self.area_atuacao:
             return f"{self.usuario.get_full_name()} - {self.area_atuacao}"
         return self.usuario.get_full_name()
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao
 
 
 class PeriodoTrabalho(models.Model):
@@ -108,35 +115,32 @@ class PeriodoTrabalho(models.Model):
         saida = self.data_saida.strftime('%d/%m/%Y') if self.data_saida else 'Atual'
         return f"{self.funcionario} ({self.data_entrada.strftime('%d/%m/%Y')} - {saida})"
 
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao
+
 
 class Disciplina(models.Model):
     """Disciplina do currículo escolar."""
     
-    class AreaConhecimento(models.TextChoices):
-        LINGUAGENS = 'LINGUAGENS', 'Linguagens e suas Tecnologias'
-        MATEMATICA = 'MATEMATICA', 'Matemática e suas Tecnologias'
-        CIENCIAS_NATUREZA = 'CIENCIAS_NATUREZA', 'Ciências da Natureza e suas Tecnologias'
-        CIENCIAS_HUMANAS = 'CIENCIAS_HUMANAS', 'Ciências Humanas e Sociais Aplicadas'
-        TEC_INFORMATICA = 'TEC_INFORMATICA', 'Técnico em Informática'
-        TEC_QUIMICA = 'TEC_QUIMICA', 'Técnico em Química'
-        TEC_ENFERMAGEM = 'TEC_ENFERMAGEM', 'Técnico em Enfermagem'
-    
     nome = models.CharField(max_length=100, verbose_name='Nome')
     sigla = models.CharField(max_length=10, verbose_name='Sigla')
-    area_conhecimento = models.CharField(
-        max_length=20,
-        choices=AreaConhecimento.choices,
-        default=AreaConhecimento.LINGUAGENS,
-        verbose_name='Área de Conhecimento'
-    )
     
     class Meta:
         verbose_name = 'Disciplina'
         verbose_name_plural = 'Disciplinas'
-        ordering = ['area_conhecimento', 'nome']
+        ordering = ['nome']
     
     def __str__(self):
         return f"{self.nome} ({self.sigla})"
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao
 
 
 class Curso(models.Model):
@@ -152,6 +156,12 @@ class Curso(models.Model):
     
     def __str__(self):
         return f"{self.nome} ({self.sigla})"
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao
 
 
 class Turma(models.Model):
@@ -191,6 +201,12 @@ class Turma(models.Model):
     def nome_completo(self):
         return f"{self.numero}º {self.get_nomenclatura_display()} {self.letra} - {self.curso.sigla} ({self.ano_letivo})"
 
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao
+
 
 class DisciplinaTurma(models.Model):
     """Vínculo entre Disciplina e Turma com carga horária."""
@@ -215,6 +231,12 @@ class DisciplinaTurma(models.Model):
     def __str__(self):
         return f"{self.disciplina.sigla} - {self.turma} ({self.aulas_semanais} aulas/sem)"
 
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao
+
 
 class ProfessorDisciplinaTurma(models.Model):
     """Vínculo entre Professor e Disciplina/Turma (atribuição de aulas)."""
@@ -238,6 +260,12 @@ class ProfessorDisciplinaTurma(models.Model):
     def __str__(self):
         return f"{self.professor.usuario.get_full_name()} - {self.disciplina_turma}"
 
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao
+
 
 class CalendarioEscolar(models.Model):
     """Calendário escolar com dias letivos e não letivos."""
@@ -249,6 +277,7 @@ class CalendarioEscolar(models.Model):
         FERIAS = 'FERIAS', 'Férias'
     
     data = models.DateField(unique=True, verbose_name='Data')
+    ano_letivo = models.PositiveSmallIntegerField(db_index=True, verbose_name='Ano Letivo')
     letivo = models.BooleanField(default=True, verbose_name='Dia Letivo')
     tipo = models.CharField(
         max_length=20,
@@ -267,17 +296,28 @@ class CalendarioEscolar(models.Model):
     def clean(self):
         if not self.letivo and not self.tipo:
             raise ValidationError('Dias não letivos devem ter um tipo definido.')
+
+    def save(self, *args, **kwargs):
+        if self.data:
+            self.ano_letivo = self.data.year
+        super().save(*args, **kwargs)
     
     def __str__(self):
         status = 'Letivo' if self.letivo else self.get_tipo_display()
         return f"{self.data.strftime('%d/%m/%Y')} - {status}: {self.descricao}"
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao or usuario.is_secretaria
 
 
 class Habilidade(models.Model):
     """Habilidades BNCC ou internas por disciplina."""
     
     codigo = models.CharField(max_length=20, unique=True, verbose_name='Código')
-    descricao = models.TextField(verbose_name='Descrição')
+    descricao = RichTextField(verbose_name='Descrição')
     disciplina = models.ForeignKey(
         Disciplina,
         on_delete=models.CASCADE,
@@ -289,8 +329,14 @@ class Habilidade(models.Model):
     class Meta:
         verbose_name = 'Habilidade'
         verbose_name_plural = 'Habilidades'
-        ordering = ['codigo']
+        ordering = ['disciplina', 'codigo']
     
     def __str__(self):
         return f"{self.codigo} - {self.descricao[:50]}..."
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+        return usuario.is_gestao or usuario.is_professor
 

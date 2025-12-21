@@ -28,6 +28,7 @@ class PlanoAulaViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['professor', 'disciplina', 'turmas']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsProfessor()]
@@ -42,6 +43,7 @@ class AulaViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['professor', 'disciplina_turma', 'disciplina_turma__turma', 'data']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsProfessor()]
@@ -83,6 +85,7 @@ class FaltasViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['aula', 'estudante', 'aula__disciplina_turma__turma']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy', 'registrar_lote']:
             return [IsProfessor()]
@@ -119,6 +122,7 @@ class TipoOcorrenciaViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['ativo']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestao()]
@@ -136,6 +140,7 @@ class OcorrenciaPedagogicaViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['estudante', 'tipo', 'autor']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsFuncionario()]
@@ -163,6 +168,7 @@ class OcorrenciaResponsavelCienteViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['responsavel', 'ciente']
     
+    # controle_de_permissao
     def get_permissions(self):
         return [IsAuthenticated()]
     
@@ -199,6 +205,7 @@ class NotaBimestralViewSet(viewsets.ModelViewSet):
         'matricula_turma__turma', 'disciplina_turma__turma__ano_letivo'
     ]
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsProfessor()]
@@ -259,6 +266,7 @@ class RecuperacaoViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['disciplina', 'professor', 'bimestre']
     
+    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsProfessor()]

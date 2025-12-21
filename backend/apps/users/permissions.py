@@ -1,9 +1,11 @@
 """
 Permissões customizadas do sistema CEMEP Digital
+controle_de_permissao - Este módulo define todas as classes de permissão do sistema.
 """
 from rest_framework.permissions import BasePermission
 
 
+# controle_de_permissao
 class IsGestao(BasePermission):
     """Permite acesso apenas para usuários do tipo Gestão."""
     
@@ -11,6 +13,7 @@ class IsGestao(BasePermission):
         return request.user.is_authenticated and request.user.tipo_usuario == 'GESTAO'
 
 
+# controle_de_permissao
 class IsSecretaria(BasePermission):
     """Permite acesso para Gestão ou Secretaria."""
     
@@ -18,6 +21,7 @@ class IsSecretaria(BasePermission):
         return request.user.is_authenticated and request.user.tipo_usuario in ['GESTAO', 'SECRETARIA']
 
 
+# controle_de_permissao
 class IsProfessor(BasePermission):
     """Permite acesso para Gestão ou Professor."""
     
@@ -25,6 +29,7 @@ class IsProfessor(BasePermission):
         return request.user.is_authenticated and request.user.tipo_usuario in ['GESTAO', 'PROFESSOR']
 
 
+# controle_de_permissao
 class IsGestaoOrSecretaria(BasePermission):
     """Permite acesso para Gestão ou Secretaria."""
     
@@ -32,6 +37,7 @@ class IsGestaoOrSecretaria(BasePermission):
         return request.user.is_authenticated and request.user.tipo_usuario in ['GESTAO', 'SECRETARIA']
 
 
+# controle_de_permissao
 class IsFuncionario(BasePermission):
     """Permite acesso para funcionários (Gestão, Secretaria, Professor, Monitor)."""
     
@@ -41,6 +47,7 @@ class IsFuncionario(BasePermission):
         ]
 
 
+# controle_de_permissao
 class IsEstudanteOrResponsavel(BasePermission):
     """Permite acesso para Estudante ou Responsável."""
     
@@ -48,6 +55,7 @@ class IsEstudanteOrResponsavel(BasePermission):
         return request.user.is_authenticated and request.user.tipo_usuario in ['ESTUDANTE', 'RESPONSAVEL']
 
 
+# controle_de_permissao
 class IsOwnerOrGestao(BasePermission):
     """Permite acesso ao próprio objeto ou Gestão."""
     
@@ -59,4 +67,5 @@ class IsOwnerOrGestao(BasePermission):
             return obj.usuario == request.user
         # Para objetos que são o próprio User
         return obj == request.user
+
 
