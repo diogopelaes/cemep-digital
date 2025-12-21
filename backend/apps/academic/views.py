@@ -52,8 +52,12 @@ class EstudanteViewSet(viewsets.ModelViewSet):
         matriculas_cemep = MatriculaCEMEPSerializer(
             estudante.matriculas_cemep.all(), many=True
         ).data
+        
+        # Buscar matrículas turma através do caminho correto
         matriculas_turma = MatriculaTurmaSerializer(
-            estudante.matriculas_turma.select_related('turma__curso').all(), many=True
+            MatriculaTurma.objects.filter(
+                matricula_cemep__estudante=estudante
+            ).select_related('turma__curso'), many=True
         ).data
         
         # Responsáveis

@@ -135,7 +135,7 @@ class OcorrenciaPedagogicaSerializer(serializers.ModelSerializer):
         model = OcorrenciaPedagogica
         fields = [
             'id', 'estudante', 'estudante_id', 'autor',
-            'tipo', 'tipo_id', 'data', 'texto', 'bimestre'
+            'tipo', 'tipo_id', 'data', 'bimestre'
         ]
         read_only_fields = ['data', 'autor', 'bimestre']
 

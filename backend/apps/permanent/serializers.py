@@ -59,13 +59,18 @@ class DadosPermanenteEstudanteSerializer(serializers.ModelSerializer):
 
 
 class OcorrenciaDisciplinarSerializer(serializers.ModelSerializer):
+    anexos = serializers.SerializerMethodField()
+    
     class Meta:
         model = OcorrenciaDisciplinar
         fields = [
-            'id', 'cpf', 'nome_estudante', 'pai_ocorrencia', 'autor_nome',
-            'data_ocorrido', 'data_registro', 'descricao', 'anexos'
+            'id', 'cpf', 'cpf_formatado', 'nome_estudante', 'pai_ocorrencia', 'autor_nome',
+            'data_ocorrido', 'data_registro', 'descricao', 'ano_letivo', 'bimestre', 'anexos'
         ]
-        read_only_fields = ['data_registro']
+        read_only_fields = ['data_registro', 'cpf_formatado']
+    
+    def get_anexos(self, obj):
+        return [{'id': a.id, 'arquivo': a.arquivo.url if a.arquivo else None, 'descricao': a.descricao} for a in obj.anexos.all()]
 
 
 class HistoricoCompletoSerializer(serializers.Serializer):

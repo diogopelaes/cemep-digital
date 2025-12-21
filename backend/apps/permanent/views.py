@@ -113,18 +113,29 @@ class OcorrenciaDisciplinarViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def download_anexo(self, request, pk=None):
-        """Download protegido do anexo da ocorrência."""
-        ocorrencia = self.get_object()
+        """Download protegido de um anexo específico da ocorrência."""
+        from .models import OcorrenciaDisciplinarAnexo
         
-        if not ocorrencia.anexos:
+        ocorrencia = self.get_object()
+        anexo_id = request.query_params.get('anexo_id')
+        
+        if not anexo_id:
             return Response(
-                {'error': 'Nenhum anexo disponível'},
+                {'error': 'anexo_id é obrigatório'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            anexo = ocorrencia.anexos.get(id=anexo_id)
+        except OcorrenciaDisciplinarAnexo.DoesNotExist:
+            return Response(
+                {'error': 'Anexo não encontrado'},
                 status=status.HTTP_404_NOT_FOUND
             )
         
         return FileResponse(
-            ocorrencia.anexos.open('rb'),
+            anexo.arquivo.open('rb'),
             as_attachment=True,
-            filename=ocorrencia.anexos.name.split('/')[-1]
+            filename=anexo.arquivo.name.split('/')[-1]
         )
 
