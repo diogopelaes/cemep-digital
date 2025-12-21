@@ -251,6 +251,12 @@ class TurmaViewSet(viewsets.ModelViewSet):
             return [IsGestao()]
         return [IsAuthenticated()]
 
+    @action(detail=False, methods=['get'], url_path='anos-disponiveis')
+    def anos_disponiveis(self, request):
+        """Retorna a lista de anos letivos disponíveis nas turmas."""
+        anos = Turma.objects.values_list('ano_letivo', flat=True).distinct().order_by('-ano_letivo')
+        return Response(list(anos))
+
 
 class DisciplinaTurmaViewSet(viewsets.ModelViewSet):
     queryset = DisciplinaTurma.objects.select_related('disciplina', 'turma').all()

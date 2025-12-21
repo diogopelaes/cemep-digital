@@ -109,6 +109,7 @@ export const coreAPI = {
     create: (data) => api.post('/core/turmas/', data),
     update: (id, data) => api.patch(`/core/turmas/${id}/`, data),
     delete: (id) => api.delete(`/core/turmas/${id}/`),
+    anosDisponiveis: () => api.get('/core/turmas/anos-disponiveis/'),
   },
   // Calendário
   calendario: {

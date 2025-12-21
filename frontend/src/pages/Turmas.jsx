@@ -30,14 +30,11 @@ export default function Turmas() {
 
   const loadAnosDisponiveis = async () => {
     try {
-      // Busca todas as turmas para extrair os anos únicos
-      const response = await coreAPI.turmas.list()
-      const todasTurmas = response.data.results || response.data
+      // Busca anos disponíveis diretamente do backend
+      const response = await coreAPI.turmas.anosDisponiveis()
+      const anos = response.data
 
-      // Extrai anos únicos e ordena decrescente
-      const anos = [...new Set(todasTurmas.map(t => t.ano_letivo))].sort((a, b) => b - a)
-
-      if (anos.length > 0) {
+      if (anos && anos.length > 0) {
         setAnosDisponiveis(anos)
         setAnoLetivo(anos[0]) // Seleciona o ano mais recente
       } else {
@@ -48,6 +45,7 @@ export default function Turmas() {
         setLoading(false)
       }
     } catch (error) {
+      console.error(error)
       toast.error('Erro ao carregar anos letivos')
       setLoading(false)
     }
