@@ -267,13 +267,8 @@ class OcorrenciaResponsavelCiente(models.Model):
 
 
 class Avaliacao(models.Model):
-    """Avaliação de um estudante em uma disciplina."""
-    
-    matricula_turma = models.ForeignKey(
-        MatriculaTurma,
-        on_delete=models.CASCADE,
-        related_name='avaliacoes'
-    )
+    """Avaliação de uma disciplina em uma turma para um bimestre."""
+
     professor_disciplina_turma = models.ForeignKey(
         ProfessorDisciplinaTurma,
         on_delete=models.CASCADE,
@@ -289,10 +284,8 @@ class Avaliacao(models.Model):
     valor = models.DecimalField(
         max_digits=4,
         decimal_places=2,
-        null=True,
-        blank=True,
         validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('10.00'))],
-        verbose_name='Valor da Avaliação'
+        verbose_name='Valor Máximo da Avaliação'
     )
 
     tipo = models.CharField(
@@ -314,22 +307,368 @@ class Avaliacao(models.Model):
         ],
         default='SOMA',
         verbose_name='Tipo de Cálculo de Instrumentos'
-    )   
+    )
     
     class Meta:
         verbose_name = 'Avaliação'
         verbose_name_plural = 'Avaliações'
-        unique_together = ['matricula_turma', 'professor_disciplina_turma']
+        unique_together = ['professor_disciplina_turma', 'bimestre', 'tipo']
     
     def __str__(self):
-        return f"{self.matricula_turma.matricula_cemep.estudante} - {self.professor_disciplina_turma.disciplina_turma.disciplina}"
+        return f"{self.professor_disciplina_turma.disciplina_turma.disciplina} - {self.bimestre} ({self.get_tipo_display()})"
+
+    def clean(self):
+        """Validações de regras de negócio."""
+        from django.core.exceptions import ValidationError
+        
+        disciplina_turma = self.professor_disciplina_turma.disciplina_turma
+        
+        # Validação: soma dos valores das avaliações regulares por disciplina/turma/bimestre deve ser <= 10
+        if self.tipo == 'AVALIACAO_REGULAR':
+            qs = Avaliacao.objects.filter(
+                professor_disciplina_turma__disciplina_turma=disciplina_turma,
+                bimestre=self.bimestre,
+                tipo='AVALIACAO_REGULAR'
+            )
+            if self.pk:
+                qs = qs.exclude(pk=self.pk)
+            soma_avaliacoes = qs.aggregate(total=models.Sum('valor'))['total'] or Decimal('0.00')
+            
+            if soma_avaliacoes + self.valor > Decimal('10.00'):
+                raise ValidationError(
+                    f'A soma das avaliações regulares ({soma_avaliacoes} + {self.valor}) '
+                    f'ultrapassa 10 pontos para esta disciplina/turma/bimestre.'
+                )
+        
+        # Validação: só pode existir UMA avaliação de recuperação por disciplina/turma/bimestre
+        if self.tipo == 'AVALIACAO_RECUPERACAO':
+            qs = Avaliacao.objects.filter(
+                professor_disciplina_turma__disciplina_turma=disciplina_turma,
+                bimestre=self.bimestre,
+                tipo='AVALIACAO_RECUPERACAO'
+            )
+            if self.pk:
+                qs = qs.exclude(pk=self.pk)
+            if qs.exists():
+                raise ValidationError(
+                    'Já existe uma avaliação de recuperação para esta disciplina/turma/bimestre.'
+                )
+            
+            # Validação: valor da avaliação de recuperação deve ser sempre 10
+            if self.valor != Decimal('10.00'):
+                raise ValidationError(
+                    'O valor da avaliação de recuperação deve ser sempre 10.'
+                )
 
     def pode_alterar(self, usuario):
         """Verifica se o usuário tem permissão para alterar este registro."""
         if not usuario.is_authenticated:
             return False
-        # Professor dono da avaliação pode alterar
-        return self.professor_disciplina_turma.professor.usuario == usuario 
+            
+        if hasattr(usuario, 'funcionario'):
+            return ProfessorDisciplinaTurma.objects.filter(
+                disciplina_turma=self.professor_disciplina_turma.disciplina_turma,
+                professor__usuario=usuario
+            ).exists()
+            
+        return False
+
+
+class InstrumentoAvaliativo(models.Model):
+    """Instrumento avaliativo pertencente a uma avaliação."""
+
+    avaliacao = models.ForeignKey(
+        Avaliacao,
+        on_delete=models.CASCADE,
+        related_name='instrumentos'
+    )
+    
+    titulo = models.CharField(
+        max_length=100, 
+        verbose_name='Título do Instrumento',
+        help_text='Ex: Prova 1, Trabalho, Participação'
+    )
+
+    data_inicio = models.DateField(
+        verbose_name='Data de Início'
+    )
+    
+    data_fim = models.DateField(
+        verbose_name='Data de Fim'
+    )
+    
+    usa_vistos = models.BooleanField(
+        default=False,
+        verbose_name='Usa Vistos',
+        help_text='Se marcado, a nota é calculada automaticamente pela porcentagem de vistos'
+    )
+
+    peso = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01')), MaxValueValidator(Decimal('10.00'))],
+        verbose_name='Peso',
+        default=Decimal('1.00')
+    )  
+
+    valor = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('10.00'))],
+        verbose_name='Valor Máximo'
+    )   
+    
+    class Meta:
+        verbose_name = 'Instrumento Avaliativo'
+        verbose_name_plural = 'Instrumentos Avaliativos'
+        ordering = ['data_inicio']
+    
+    def __str__(self):
+        return f"{self.titulo} - {self.avaliacao}"
+
+    def clean(self):
+        """Validações de regras de negócio."""
+        from django.core.exceptions import ValidationError
+        
+        if self.avaliacao_id:
+            # Se MEDIA_PONDERADA, valor deve ser 10
+            if self.avaliacao.tipo_calculo_instrumentos == 'MEDIA_PONDERADA' and self.valor != Decimal('10.00'):
+                raise ValidationError('Para média ponderada, o valor de cada instrumento deve ser 10.')
+            
+            # Se SOMA, verificar que soma dos instrumentos não ultrapassa valor da avaliação
+            if self.avaliacao.tipo_calculo_instrumentos == 'SOMA':
+                soma_instrumentos = InstrumentoAvaliativo.objects.filter(
+                    avaliacao=self.avaliacao
+                ).exclude(pk=self.pk).aggregate(total=models.Sum('valor'))['total'] or Decimal('0.00')
+                
+                if soma_instrumentos + self.valor > self.avaliacao.valor:
+                    raise ValidationError(
+                        f'A soma dos instrumentos ({soma_instrumentos} + {self.valor}) '
+                        f'ultrapassa o valor da avaliação ({self.avaliacao.valor}).'
+                    )
+    
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+            
+        if hasattr(usuario, 'funcionario'):
+            return ProfessorDisciplinaTurma.objects.filter(
+                disciplina_turma=self.avaliacao.professor_disciplina_turma.disciplina_turma,
+                professor__usuario=usuario
+            ).exists()
+            
+        return False
+
+
+class ControleVisto(models.Model):
+    """Registro de visto de um estudante, opcionalmente vinculado a um instrumento."""
+    
+    matricula_turma = models.ForeignKey(
+        MatriculaTurma,
+        on_delete=models.CASCADE,
+        related_name='vistos'
+    )
+    professor_disciplina_turma = models.ForeignKey(
+        ProfessorDisciplinaTurma,
+        on_delete=models.CASCADE,
+        related_name='vistos'
+    )
+    instrumento_avaliativo = models.ForeignKey(
+        InstrumentoAvaliativo,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='vistos',
+        verbose_name='Instrumento Avaliativo',
+        help_text='Deixe vazio se o visto não está vinculado a nenhum instrumento'
+    )
+    titulo = models.CharField(max_length=100, verbose_name='Título')
+    data_visto = models.DateTimeField(auto_now_add=True)
+    visto = models.BooleanField(
+        null=True, 
+        blank=True, 
+        default=None,
+        verbose_name='Visto',
+        help_text='True=Feito, False=Não Feito, Vazio=Não Avaliado'
+    )
+    
+    class Meta:
+        verbose_name = 'Visto'
+        verbose_name_plural = 'Vistos'
+        unique_together = ['matricula_turma', 'professor_disciplina_turma', 'titulo']
+    
+    def __str__(self):
+        status = 'Sim' if self.visto is True else ('Não' if self.visto is False else 'N/A')
+        return f"{self.titulo} - {status}"
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+            
+        if hasattr(usuario, 'funcionario'):
+            return ProfessorDisciplinaTurma.objects.filter(
+                disciplina_turma=self.professor_disciplina_turma.disciplina_turma,
+                professor__usuario=usuario
+            ).exists()
+            
+        return False
+
+
+class NotaInstrumentoAvaliativo(models.Model):
+    """Nota de um estudante em um instrumento avaliativo."""
+    
+    instrumento_avaliativo = models.ForeignKey(
+        InstrumentoAvaliativo,
+        on_delete=models.CASCADE,
+        related_name='notas'
+    )
+    matricula_turma = models.ForeignKey(
+        MatriculaTurma,
+        on_delete=models.CASCADE,
+        related_name='notas_instrumentos'
+    )
+    
+    valor = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('10.00'))],
+        verbose_name='Nota'
+    )
+    
+    class Meta:
+        verbose_name = 'Nota de Instrumento Avaliativo'
+        verbose_name_plural = 'Notas de Instrumentos Avaliativos'
+        unique_together = ['instrumento_avaliativo', 'matricula_turma']
+    
+    def __str__(self):
+        return f"{self.instrumento_avaliativo.titulo} - {self.matricula_turma}"
+
+    def clean(self):
+        """Validações de regras de negócio."""
+        from django.core.exceptions import ValidationError
+        
+        # Nota não pode ultrapassar o valor máximo do instrumento
+        if self.valor and self.instrumento_avaliativo_id:
+            if self.valor > self.instrumento_avaliativo.valor:
+                raise ValidationError(
+                    f'A nota ({self.valor}) não pode ser maior que o valor máximo '
+                    f'do instrumento ({self.instrumento_avaliativo.valor}).'
+                )
+
+    def calcular_nota_por_vistos(self):
+        """Calcula a nota com base nos vistos, se o instrumento usa vistos."""
+        if not self.instrumento_avaliativo.usa_vistos:
+            return None
+            
+        vistos = ControleVisto.objects.filter(
+            instrumento_avaliativo=self.instrumento_avaliativo,
+            matricula_turma=self.matricula_turma,
+            visto__isnull=False  # Ignora None
+        )
+        
+        total = vistos.count()
+        if total == 0:
+            return Decimal('0.00')
+        
+        feitos = vistos.filter(visto=True).count()
+        porcentagem = Decimal(feitos) / Decimal(total)
+        
+        return (porcentagem * self.instrumento_avaliativo.valor).quantize(Decimal('0.01'))
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+            
+        if hasattr(usuario, 'funcionario'):
+            return ProfessorDisciplinaTurma.objects.filter(
+                disciplina_turma=self.instrumento_avaliativo.avaliacao.professor_disciplina_turma.disciplina_turma,
+                professor__usuario=usuario
+            ).exists()
+            
+        return False
+
+
+class NotaAvaliacao(models.Model):
+    """Nota de um estudante em uma avaliação (calculada a partir dos instrumentos)."""
+    
+    avaliacao = models.ForeignKey(
+        Avaliacao,
+        on_delete=models.CASCADE,
+        related_name='notas'
+    )
+    matricula_turma = models.ForeignKey(
+        MatriculaTurma,
+        on_delete=models.CASCADE,
+        related_name='notas_avaliacoes'
+    )
+    
+    valor = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('10.00'))],
+        verbose_name='Nota'
+    )
+    
+    class Meta:
+        verbose_name = 'Nota de Avaliação'
+        verbose_name_plural = 'Notas de Avaliações'
+        unique_together = ['avaliacao', 'matricula_turma']
+    
+    def __str__(self):
+        return f"{self.avaliacao} - {self.matricula_turma}"
+
+    def calcular_nota(self):
+        """
+        Calcula a nota da avaliação com base nas notas dos instrumentos.
+        
+        SOMA: nota = soma das notas dos instrumentos
+        MEDIA_PONDERADA: nota = valor_avaliacao * 0.1 * Σ(peso×nota) / Σ(peso)
+        """
+        notas_instrumentos = NotaInstrumentoAvaliativo.objects.filter(
+            instrumento_avaliativo__avaliacao=self.avaliacao,
+            matricula_turma=self.matricula_turma,
+            valor__isnull=False
+        ).select_related('instrumento_avaliativo')
+        
+        if not notas_instrumentos.exists():
+            return None
+        
+        if self.avaliacao.tipo_calculo_instrumentos == 'SOMA':
+            total = sum(n.valor for n in notas_instrumentos)
+            return min(total, self.avaliacao.valor)  # Limita ao valor máximo da avaliação
+        
+        elif self.avaliacao.tipo_calculo_instrumentos == 'MEDIA_PONDERADA':
+            soma_ponderada = sum(n.instrumento_avaliativo.peso * n.valor for n in notas_instrumentos)
+            soma_pesos = sum(n.instrumento_avaliativo.peso for n in notas_instrumentos)
+            
+            if soma_pesos == 0:
+                return Decimal('0.00')
+            
+            # Fórmula: x * 0.1 * Σ(peso*nota) / Σ(peso)
+            nota = self.avaliacao.valor * Decimal('0.1') * soma_ponderada / soma_pesos
+            return nota.quantize(Decimal('0.01'))
+        
+        return None
+
+    def pode_alterar(self, usuario):
+        """Verifica se o usuário tem permissão para alterar este registro."""
+        if not usuario.is_authenticated:
+            return False
+            
+        if hasattr(usuario, 'funcionario'):
+            return ProfessorDisciplinaTurma.objects.filter(
+                disciplina_turma=self.avaliacao.professor_disciplina_turma.disciplina_turma,
+                professor__usuario=usuario
+            ).exists()
+            
+        return False
 
 
 class NotaBimestral(models.Model):
@@ -338,12 +677,12 @@ class NotaBimestral(models.Model):
     matricula_turma = models.ForeignKey(
         MatriculaTurma,
         on_delete=models.CASCADE,
-        related_name='notas'
+        related_name='notas_bimestrais'
     )
     professor_disciplina_turma = models.ForeignKey(
         ProfessorDisciplinaTurma,
         on_delete=models.CASCADE,
-        related_name='notas'
+        related_name='notas_bimestrais'
     )
 
     bimestre = models.ForeignKey(
@@ -366,14 +705,21 @@ class NotaBimestral(models.Model):
         ordering = ['matricula_turma', 'bimestre']
     
     def __str__(self):
-        return f"{self.matricula_turma.estudante} - {self.professor_disciplina_turma.disciplina_turma.disciplina} ({self.bimestre})"
+        return f"{self.matricula_turma} - {self.professor_disciplina_turma.disciplina_turma.disciplina} ({self.bimestre})"
+
 
     def pode_alterar(self, usuario):
         """Verifica se o usuário tem permissão para alterar este registro."""
         if not usuario.is_authenticated:
             return False
-        # Professor dono da nota pode alterar
-        return self.professor_disciplina_turma.professor.usuario == usuario
+            
+        if hasattr(usuario, 'funcionario'):
+            return ProfessorDisciplinaTurma.objects.filter(
+                disciplina_turma=self.professor_disciplina_turma.disciplina_turma,
+                professor__usuario=usuario
+            ).exists()
+            
+        return False
         
 
 class NotificacaoRecuperacao(models.Model):
