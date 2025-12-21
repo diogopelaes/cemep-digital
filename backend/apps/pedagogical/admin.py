@@ -4,7 +4,7 @@ Admin para o App Pedagogical
 from django.contrib import admin
 from .models import (
     PlanoAula, Aula, Faltas, TipoOcorrencia, OcorrenciaPedagogica,
-    OcorrenciaResponsavelCiente, NotaBimestral, Recuperacao, NotificacaoRecuperacao
+    OcorrenciaResponsavelCiente, NotaBimestral, NotificacaoRecuperacao
 )
 
 
@@ -17,8 +17,8 @@ class PlanoAulaAdmin(admin.ModelAdmin):
 
 @admin.register(Aula)
 class AulaAdmin(admin.ModelAdmin):
-    list_display = ['disciplina_turma', 'professor', 'data', 'numero_aulas']
-    list_filter = ['data', 'disciplina_turma__turma__ano_letivo']
+    list_display = ['professor_disciplina_turma', 'data', 'numero_aulas']
+    list_filter = ['data', 'professor_disciplina_turma__disciplina_turma__turma__ano_letivo']
     date_hierarchy = 'data'
 
 
@@ -49,19 +49,12 @@ class OcorrenciaResponsavelCienteAdmin(admin.ModelAdmin):
 
 @admin.register(NotaBimestral)
 class NotaBimestralAdmin(admin.ModelAdmin):
-    list_display = ['matricula_turma', 'disciplina_turma', 'bimestre', 'nota', 'nota_recuperacao']
-    list_filter = ['bimestre', 'disciplina_turma__turma__ano_letivo']
-
-
-@admin.register(Recuperacao)
-class RecuperacaoAdmin(admin.ModelAdmin):
-    list_display = ['disciplina', 'professor', 'bimestre', 'data_prova']
-    list_filter = ['bimestre', 'disciplina']
-    filter_horizontal = ['matriculas_turma']
+    list_display = ['matricula_turma', 'professor_disciplina_turma', 'bimestre', 'nota']
+    list_filter = ['bimestre', 'professor_disciplina_turma__disciplina_turma__turma__ano_letivo']
 
 
 @admin.register(NotificacaoRecuperacao)
 class NotificacaoRecuperacaoAdmin(admin.ModelAdmin):
-    list_display = ['estudante', 'recuperacao', 'visualizado']
+    list_display = ['estudante', 'professor_disciplina_turma', 'visualizado']
     list_filter = ['visualizado']
 

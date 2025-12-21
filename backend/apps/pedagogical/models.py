@@ -180,8 +180,6 @@ class OcorrenciaPedagogica(models.Model):
         """Verifica se o usuário tem permissão para alterar este registro."""
         if not usuario.is_authenticated:
             return False
-        if usuario.is_gestao:
-            return True
         # Autor pode editar sua ocorrência
         return self.autor.usuario == usuario
 
@@ -210,16 +208,6 @@ class OcorrenciaResponsavelCiente(models.Model):
     def __str__(self):
         status = 'Ciente' if self.ciente else 'Pendente'
         return f"{self.responsavel} - {self.ocorrencia} ({status})"
-
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        if usuario.is_gestao:
-            return True
-        # Não permitimos que responsável edite diretamente via API padrão,
-        # geralmente isso é feito via endpoint específico de "dar ciência"
-        return False
 
 
 class NotaBimestral(models.Model):
@@ -263,16 +251,12 @@ class NotaBimestral(models.Model):
         unique_together = ['matricula_turma', 'professor_disciplina_turma', 'bimestre']
     
     def __str__(self):
-        return f"{self.matricula_turma.matricula_cemep.estudante} - {self.professor_disciplina_turma.disciplina} - {self.get_bimestre_display()}"
+        return f"{self.matricula_turma.matricula_cemep.estudante} - {self.professor_disciplina_turma.disciplina_turma.disciplina} - {self.get_bimestre_display()}"
 
     def pode_alterar(self, usuario):
         """Verifica se o usuário tem permissão para alterar este registro."""
         if not usuario.is_authenticated:
             return False
-        if usuario.is_gestao or usuario.is_secretaria:
-            return True
-        
-        # Se for professor, verifica se ele dá aula nessa disciplina_turma
         if usuario.is_professor:
             return self.professor_disciplina_turma.professor.usuario == usuario
         
@@ -280,14 +264,13 @@ class NotaBimestral(models.Model):
 
 class NotificacaoRecuperacao(models.Model):
     """Notificação de recuperação para estudante/responsável."""
-    
-    recuperacao = models.ForeignKey(
-        Recuperacao,
-        on_delete=models.CASCADE,
-        related_name='notificacoes'
-    )
     estudante = models.ForeignKey(
         Estudante,
+        on_delete=models.CASCADE,
+        related_name='notificacoes_recuperacao'
+    )
+    professor_disciplina_turma = models.ForeignKey(
+        ProfessorDisciplinaTurma,
         on_delete=models.CASCADE,
         related_name='notificacoes_recuperacao'
     )
@@ -297,10 +280,9 @@ class NotificacaoRecuperacao(models.Model):
     class Meta:
         verbose_name = 'Notificação de Recuperação'
         verbose_name_plural = 'Notificações de Recuperação'
-        unique_together = ['recuperacao', 'estudante']
     
     def __str__(self):
-        return f"{self.estudante} - {self.recuperacao}"
+        return f"{self.estudante} - {self.professor_disciplina_turma}"
 
     def pode_alterar(self, usuario):
         """Verifica se o usuário tem permissão para alterar este registro."""
@@ -308,6 +290,7 @@ class NotificacaoRecuperacao(models.Model):
             return False
         if usuario.is_gestao:
             return True
-        # Apenas visualização, alteração de estado 'visualizado' pode ser feita pelo dono
-        return self.estudante.usuario == usuario
+        if usuario.is_professor:
+            return self.professor_disciplina_turma.professor.usuario == usuario
+        return False
 

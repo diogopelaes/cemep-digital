@@ -7,7 +7,7 @@ from .views import (
     PlanoAulaViewSet, AulaViewSet, FaltasViewSet,
     TipoOcorrenciaViewSet, OcorrenciaPedagogicaViewSet,
     OcorrenciaResponsavelCienteViewSet, NotaBimestralViewSet,
-    RecuperacaoViewSet, NotificacaoRecuperacaoViewSet
+    NotificacaoRecuperacaoViewSet
 )
 
 router = DefaultRouter()
@@ -18,7 +18,6 @@ router.register('tipos-ocorrencia', TipoOcorrenciaViewSet)
 router.register('ocorrencias', OcorrenciaPedagogicaViewSet)
 router.register('ciencias-ocorrencias', OcorrenciaResponsavelCienteViewSet)
 router.register('notas', NotaBimestralViewSet)
-router.register('recuperacoes', RecuperacaoViewSet)
 router.register('notificacoes-recuperacao', NotificacaoRecuperacaoViewSet)
 
 urlpatterns = [

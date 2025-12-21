@@ -25,7 +25,7 @@ class TarefaSerializer(serializers.ModelSerializer):
         model = Tarefa
         fields = [
             'id', 'titulo', 'descricao', 'prazo', 'funcionarios', 'funcionarios_ids',
-            'concluido', 'data_conclusao', 'data_cadastro', 'criador', 'documento'
+            'concluido', 'data_conclusao', 'data_cadastro', 'criador'
         ]
         read_only_fields = ['data_cadastro', 'criador', 'data_conclusao']
 
@@ -85,7 +85,7 @@ class AvisoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Aviso
         fields = [
-            'id', 'titulo', 'texto', 'documento', 'data_aviso',
+            'id', 'titulo', 'texto', 'data_aviso',
             'criador', 'destinatarios', 'destinatarios_ids'
         ]
         read_only_fields = ['data_aviso', 'criador']

@@ -130,12 +130,12 @@ class MatriculaCEMEPViewSet(viewsets.ModelViewSet):
 
 class MatriculaTurmaViewSet(viewsets.ModelViewSet):
     queryset = MatriculaTurma.objects.select_related(
-        'estudante__usuario', 'turma__curso'
+        'matricula_cemep__estudante__usuario', 'turma__curso'
     ).all()
     serializer_class = MatriculaTurmaSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['status', 'turma', 'estudante', 'turma__ano_letivo']
-    search_fields = ['estudante__usuario__first_name', 'estudante__cpf']
+    filterset_fields = ['status', 'turma', 'matricula_cemep', 'turma__ano_letivo']
+    search_fields = ['matricula_cemep__estudante__usuario__first_name', 'matricula_cemep__numero_matricula']
     
     # controle_de_permissao
     def get_permissions(self):

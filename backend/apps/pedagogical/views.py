@@ -11,13 +11,13 @@ from django.db.models import Sum, Count
 
 from .models import (
     PlanoAula, Aula, Faltas, TipoOcorrencia, OcorrenciaPedagogica,
-    OcorrenciaResponsavelCiente, NotaBimestral, Recuperacao, NotificacaoRecuperacao
+    OcorrenciaResponsavelCiente, NotaBimestral, NotificacaoRecuperacao
 )
 from .serializers import (
     PlanoAulaSerializer, AulaSerializer, FaltasSerializer, FaltasRegistroSerializer,
     TipoOcorrenciaSerializer, OcorrenciaPedagogicaSerializer,
     OcorrenciaResponsavelCienteSerializer, NotaBimestralSerializer,
-    RecuperacaoSerializer, NotificacaoRecuperacaoSerializer
+    NotificacaoRecuperacaoSerializer
 )
 from apps.users.permissions import IsGestao, IsProfessor, IsFuncionario, IsEstudanteOrResponsavel
 
@@ -37,11 +37,13 @@ class PlanoAulaViewSet(viewsets.ModelViewSet):
 
 class AulaViewSet(viewsets.ModelViewSet):
     queryset = Aula.objects.select_related(
-        'professor__usuario', 'disciplina_turma__disciplina', 'disciplina_turma__turma'
+        'professor_disciplina_turma__professor__usuario',
+        'professor_disciplina_turma__disciplina_turma__disciplina',
+        'professor_disciplina_turma__disciplina_turma__turma'
     )
     serializer_class = AulaSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['professor', 'disciplina_turma', 'disciplina_turma__turma', 'data']
+    filterset_fields = ['professor_disciplina_turma', 'professor_disciplina_turma__disciplina_turma__turma', 'data']
     
     # controle_de_permissao
     def get_permissions(self):
@@ -53,7 +55,7 @@ class AulaViewSet(viewsets.ModelViewSet):
     def lista_chamada(self, request, pk=None):
         """Retorna a lista de estudantes da turma com status de presença."""
         aula = self.get_object()
-        turma = aula.disciplina_turma.turma
+        turma = aula.professor_disciplina_turma.disciplina_turma.turma
         
         from apps.academic.models import MatriculaTurma
         matriculas = MatriculaTurma.objects.filter(
@@ -68,10 +70,10 @@ class AulaViewSet(viewsets.ModelViewSet):
             estudante = matricula.estudante
             faltas_estudante = [
                 aula_num for est_id, aula_num in faltas_ids 
-                if est_id == estudante.id
+                if est_id == estudante.cpf
             ]
             lista.append({
-                'estudante_id': estudante.id,
+                'estudante_id': estudante.cpf,
                 'nome': estudante.nome_social or estudante.usuario.get_full_name(),
                 'faltas_aulas': faltas_estudante
             })
@@ -83,7 +85,7 @@ class FaltasViewSet(viewsets.ModelViewSet):
     queryset = Faltas.objects.select_related('aula', 'estudante__usuario')
     serializer_class = FaltasSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['aula', 'estudante', 'aula__disciplina_turma__turma']
+    filterset_fields = ['aula', 'estudante', 'aula__professor_disciplina_turma__disciplina_turma__turma']
     
     # controle_de_permissao
     def get_permissions(self):
@@ -195,14 +197,14 @@ class OcorrenciaResponsavelCienteViewSet(viewsets.ModelViewSet):
 class NotaBimestralViewSet(viewsets.ModelViewSet):
     queryset = NotaBimestral.objects.select_related(
         'matricula_turma__estudante__usuario',
-        'disciplina_turma__disciplina',
-        'disciplina_turma__turma'
+        'professor_disciplina_turma__disciplina_turma__disciplina',
+        'professor_disciplina_turma__disciplina_turma__turma'
     )
     serializer_class = NotaBimestralSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = [
-        'matricula_turma', 'disciplina_turma', 'bimestre',
-        'matricula_turma__turma', 'disciplina_turma__turma__ano_letivo'
+        'matricula_turma', 'professor_disciplina_turma', 'bimestre',
+        'matricula_turma__turma', 'professor_disciplina_turma__disciplina_turma__turma__ano_letivo'
     ]
     
     # controle_de_permissao
@@ -233,20 +235,18 @@ class NotaBimestralViewSet(viewsets.ModelViewSet):
         for matricula in queryset.select_related('turma'):
             notas = NotaBimestral.objects.filter(
                 matricula_turma=matricula
-            ).select_related('disciplina_turma__disciplina')
+            ).select_related('professor_disciplina_turma__disciplina_turma__disciplina')
             
             disciplinas = {}
             for nota in notas:
-                disc_nome = nota.disciplina_turma.disciplina.nome
+                disc_nome = nota.professor_disciplina_turma.disciplina_turma.disciplina.nome
                 if disc_nome not in disciplinas:
                     disciplinas[disc_nome] = {
                         'disciplina': disc_nome,
                         'notas': {}
                     }
                 disciplinas[disc_nome]['notas'][nota.bimestre] = {
-                    'nota': str(nota.nota) if nota.nota else None,
-                    'recuperacao': str(nota.nota_recuperacao) if nota.nota_recuperacao else None,
-                    'final': str(nota.nota_final) if nota.nota_final else None
+                    'nota': str(nota.nota) if nota.nota else None
                 }
             
             boletim.append({
@@ -258,34 +258,9 @@ class NotaBimestralViewSet(viewsets.ModelViewSet):
         return Response(boletim)
 
 
-class RecuperacaoViewSet(viewsets.ModelViewSet):
-    queryset = Recuperacao.objects.select_related(
-        'disciplina', 'professor__usuario'
-    ).prefetch_related('matriculas_turma')
-    serializer_class = RecuperacaoSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['disciplina', 'professor', 'bimestre']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsProfessor()]
-        return [IsFuncionario()]
-    
-    def perform_create(self, serializer):
-        recuperacao = serializer.save()
-        
-        # Cria notificações para os estudantes
-        for matricula in recuperacao.matriculas_turma.all():
-            NotificacaoRecuperacao.objects.create(
-                recuperacao=recuperacao,
-                estudante=matricula.estudante
-            )
-
-
 class NotificacaoRecuperacaoViewSet(viewsets.ModelViewSet):
     queryset = NotificacaoRecuperacao.objects.select_related(
-        'recuperacao__disciplina', 'estudante__usuario'
+        'professor_disciplina_turma__disciplina_turma__disciplina', 'estudante__usuario'
     )
     serializer_class = NotificacaoRecuperacaoSerializer
     filter_backends = [DjangoFilterBackend]

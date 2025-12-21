@@ -68,8 +68,6 @@ class Tarefa(models.Model):
         """Verifica se o usuário tem permissão para alterar este registro."""
         if not usuario.is_authenticated:
             return False
-        if usuario.is_gestao or usuario.is_secretaria:
-            return True
         return self.criador == usuario
 
 
@@ -122,8 +120,6 @@ class TarefaResposta(models.Model):
     def pode_alterar(self, usuario):
         if not usuario.is_authenticated:
             return False
-        if usuario.is_gestao:
-            return True
         # Dono da resposta pode editar
         return self.funcionario.usuario == usuario
 

@@ -18,12 +18,12 @@ class EstudanteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Estudante
         fields = [
-            'id', 'usuario', 'cpf', 'cin', 'nome_social', 'nome_exibicao',
-            'data_nascimento', 'data_entrada',
+            'cpf', 'usuario', 'cpf_formatado', 'cin', 'nome_social', 'nome_exibicao',
+            'data_nascimento',
             'bolsa_familia', 'pe_de_meia', 'usa_onibus', 'linha_onibus',
             'permissao_sair_sozinho',
             'logradouro', 'numero', 'bairro', 'cidade', 'estado', 'cep', 'complemento',
-            'endereco_completo'
+            'telefone', 'telefone_formatado', 'endereco_completo'
         ]
     
     def get_nome_exibicao(self, obj):
@@ -43,7 +43,7 @@ class EstudanteCreateSerializer(serializers.ModelSerializer):
         model = Estudante
         fields = [
             'username', 'email', 'password', 'first_name', 'last_name', 'telefone',
-            'cpf', 'cin', 'nome_social', 'data_nascimento', 'data_entrada',
+            'cpf', 'cin', 'nome_social', 'data_nascimento',
             'bolsa_familia', 'pe_de_meia', 'usa_onibus', 'linha_onibus',
             'permissao_sair_sozinho',
             'logradouro', 'numero', 'bairro', 'cidade', 'estado', 'cep', 'complemento'
@@ -93,7 +93,7 @@ class ResponsavelSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Responsavel
-        fields = ['id', 'usuario', 'estudantes_vinculados']
+        fields = ['cpf', 'usuario', 'cpf_formatado', 'telefone', 'telefone_formatado', 'estudantes_vinculados']
 
 
 class ResponsavelCreateSerializer(serializers.ModelSerializer):
@@ -177,11 +177,11 @@ class MatriculaCEMEPSerializer(serializers.ModelSerializer):
 
 
 class MatriculaTurmaSerializer(serializers.ModelSerializer):
-    estudante = EstudanteSerializer(read_only=True)
+    matricula_cemep = MatriculaCEMEPSerializer(read_only=True)
     turma = TurmaSerializer(read_only=True)
-    estudante_id = serializers.PrimaryKeyRelatedField(
-        queryset=Estudante.objects.all(),
-        source='estudante',
+    matricula_cemep_id = serializers.PrimaryKeyRelatedField(
+        queryset=MatriculaCEMEP.objects.all(),
+        source='matricula_cemep',
         write_only=True
     )
     turma_id = serializers.PrimaryKeyRelatedField(
@@ -194,7 +194,7 @@ class MatriculaTurmaSerializer(serializers.ModelSerializer):
     class Meta:
         model = MatriculaTurma
         fields = [
-            'id', 'estudante', 'estudante_id', 'turma', 'turma_id',
+            'id', 'matricula_cemep', 'matricula_cemep_id', 'turma', 'turma_id',
             'data_entrada', 'data_saida', 'status', 'status_display'
         ]
 

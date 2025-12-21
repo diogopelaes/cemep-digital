@@ -140,7 +140,7 @@ class Disciplina(models.Model):
         """Verifica se o usuário tem permissão para alterar este registro."""
         if not usuario.is_authenticated:
             return False
-        return usuario.is_gestao
+        return usuario.is_gestao or usuario.is_secretaria
 
 
 class Curso(models.Model):
@@ -161,7 +161,7 @@ class Curso(models.Model):
         """Verifica se o usuário tem permissão para alterar este registro."""
         if not usuario.is_authenticated:
             return False
-        return usuario.is_gestao
+        return usuario.is_gestao or usuario.is_secretaria
 
 
 class Turma(models.Model):
@@ -205,7 +205,7 @@ class Turma(models.Model):
         """Verifica se o usuário tem permissão para alterar este registro."""
         if not usuario.is_authenticated:
             return False
-        return usuario.is_gestao
+        return usuario.is_gestao or usuario.is_secretaria
 
 
 class DisciplinaTurma(models.Model):
@@ -235,7 +235,7 @@ class DisciplinaTurma(models.Model):
         """Verifica se o usuário tem permissão para alterar este registro."""
         if not usuario.is_authenticated:
             return False
-        return usuario.is_gestao
+        return usuario.is_gestao or usuario.is_secretaria
 
 
 class ProfessorDisciplinaTurma(models.Model):
@@ -264,7 +264,7 @@ class ProfessorDisciplinaTurma(models.Model):
         """Verifica se o usuário tem permissão para alterar este registro."""
         if not usuario.is_authenticated:
             return False
-        return usuario.is_gestao
+        return usuario.is_gestao or usuario.is_secretaria
 
 
 class CalendarioEscolar(models.Model):
@@ -338,5 +338,5 @@ class Habilidade(models.Model):
         """Verifica se o usuário tem permissão para alterar este registro."""
         if not usuario.is_authenticated:
             return False
-        return usuario.is_gestao or usuario.is_professor
+        return usuario.is_gestao or usuario.is_professor or usuario.is_secretaria
 
