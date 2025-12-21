@@ -31,7 +31,7 @@ from apps.users.models import User
 class FuncionarioViewSet(viewsets.ModelViewSet):
     queryset = Funcionario.objects.select_related('usuario').all()
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['ativo', 'usuario__tipo_usuario']
+    filterset_fields = ['usuario__tipo_usuario', 'usuario__is_active']
     
     def get_serializer_class(self):
         if self.action == 'criar_completo':
@@ -42,9 +42,21 @@ class FuncionarioViewSet(viewsets.ModelViewSet):
     
     # controle_de_permissao
     def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy', 'criar_completo', 'atualizar_completo']:
+        if self.action in ['create', 'update', 'partial_update', 'destroy', 'criar_completo', 'atualizar_completo', 'toggle_ativo']:
             return [IsGestao()]
         return [IsFuncionario()]
+    
+    @action(detail=True, methods=['post'], url_path='toggle-ativo')
+    def toggle_ativo(self, request, pk=None):
+        """Alterna o status is_active do usuário associado ao funcionário."""
+        funcionario = self.get_object()
+        user = funcionario.usuario
+        user.is_active = not user.is_active
+        user.save()
+        return Response({
+            'is_active': user.is_active,
+            'message': 'Funcionário ativado' if user.is_active else 'Funcionário desativado'
+        })
     
     @action(detail=False, methods=['post'], url_path='criar-completo')
     @transaction.atomic
@@ -74,7 +86,6 @@ class FuncionarioViewSet(viewsets.ModelViewSet):
             matricula=data['matricula'],
             area_atuacao=data.get('area_atuacao') or None,
             apelido=data.get('apelido') or None,
-            ativo=True,
         )
         
         # Criar período de trabalho inicial

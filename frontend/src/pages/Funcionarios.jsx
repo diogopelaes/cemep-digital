@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { 
-  Card, Button, Input, DateInput, Select, Table, TableHead, TableBody, TableRow, 
+import {
+  Card, Button, Input, DateInput, Select, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading, Badge, Modal, ModalFooter
 } from '../components/ui'
 import { HiPlus, HiPencil, HiCalendar, HiCheck, HiX, HiRefresh } from 'react-icons/hi'
@@ -49,8 +49,8 @@ export default function Funcionarios() {
     try {
       const params = {}
       if (filtroTipo) params['usuario__tipo_usuario'] = filtroTipo
-      if (filtroAtivo !== '') params.ativo = filtroAtivo
-      
+      if (filtroAtivo !== '') params['usuario__is_active'] = filtroAtivo
+
       const response = await coreAPI.funcionarios.list(params)
       setFuncionarios(response.data.results || response.data)
     } catch (error) {
@@ -61,10 +61,8 @@ export default function Funcionarios() {
 
   const handleToggleAtivo = async (funcionario) => {
     try {
-      await coreAPI.funcionarios.update(funcionario.id, {
-        ativo: !funcionario.ativo,
-      })
-      toast.success(funcionario.ativo ? 'Funcionário desativado' : 'Funcionário ativado')
+      await coreAPI.funcionarios.toggleAtivo(funcionario.id)
+      toast.success(funcionario.usuario?.is_active ? 'Funcionário desativado' : 'Funcionário ativado')
       loadFuncionarios()
     } catch (error) {
       toast.error('Erro ao alterar status')
@@ -116,7 +114,7 @@ export default function Funcionarios() {
 
   const handleAddPeriodo = async (e) => {
     e.preventDefault()
-    
+
     if (!novoPeriodo.data_entrada) {
       toast.error('Data de entrada é obrigatória')
       return
@@ -133,9 +131,9 @@ export default function Funcionarios() {
       const response = await coreAPI.periodosTrabalho.list({ funcionario: periodosExpandido })
       setPeriodos(response.data.results || response.data)
     } catch (error) {
-      const msg = error.response?.data?.non_field_errors?.[0] || 
-                  error.response?.data?.detail ||
-                  'Erro ao adicionar período'
+      const msg = error.response?.data?.non_field_errors?.[0] ||
+        error.response?.data?.detail ||
+        'Erro ao adicionar período'
       toast.error(msg)
     }
   }
@@ -242,17 +240,16 @@ export default function Funcionarios() {
                   <span className={`inline-flex items-center justify-center min-w-[100px] px-3 py-2 rounded-lg text-sm font-medium ${TIPO_COLORS[func.usuario?.tipo_usuario] || 'bg-slate-100 text-slate-600'}`}>
                     {func.usuario?.tipo_usuario}
                   </span>
-                  
+
                   {/* Botão Ativo/Inativo - Tamanho fixo */}
                   <button
                     onClick={() => handleToggleAtivo(func)}
-                    className={`inline-flex items-center justify-center gap-1.5 min-w-[100px] px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      func.ativo 
-                        ? 'bg-success-500/10 text-success-600 hover:bg-success-500/20 dark:text-success-400' 
+                    className={`inline-flex items-center justify-center gap-1.5 min-w-[100px] px-3 py-2 rounded-lg text-sm font-medium transition-colors ${func.usuario?.is_active
+                        ? 'bg-success-500/10 text-success-600 hover:bg-success-500/20 dark:text-success-400'
                         : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400'
-                    }`}
+                      }`}
                   >
-                    {func.ativo ? (
+                    {func.usuario?.is_active ? (
                       <>
                         <HiCheck className="h-4 w-4" />
                         Ativo
@@ -268,11 +265,10 @@ export default function Funcionarios() {
                   {/* Botão Períodos - Tamanho fixo */}
                   <button
                     onClick={() => togglePeriodos(func)}
-                    className={`inline-flex items-center justify-center gap-1.5 min-w-[100px] px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      periodosExpandido === func.id
-                        ? 'bg-primary-500 text-white'
-                        : 'bg-primary-500/10 text-primary-600 hover:bg-primary-500/20 dark:text-primary-400'
-                    }`}
+                    className={`inline-flex items-center justify-center gap-1.5 min-w-[100px] px-3 py-2 rounded-lg text-sm font-medium transition-colors ${periodosExpandido === func.id
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-primary-500/10 text-primary-600 hover:bg-primary-500/20 dark:text-primary-400'
+                      }`}
                   >
                     <HiCalendar className="h-4 w-4" />
                     Períodos
@@ -338,7 +334,7 @@ export default function Funcionarios() {
                   ) : periodos.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {periodos.map((periodo) => (
-                        <div 
+                        <div
                           key={periodo.id}
                           className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50"
                         >
@@ -349,7 +345,7 @@ export default function Funcionarios() {
                                 {formatDateBR(periodo.data_entrada)}
                               </p>
                               <p className="text-sm text-slate-500">
-                                até {periodo.data_saida 
+                                até {periodo.data_saida
                                   ? formatDateBR(periodo.data_saida)
                                   : <span className="text-success-600">Atual</span>
                                 }
@@ -396,7 +392,7 @@ export default function Funcionarios() {
               <HiRefresh className="h-8 w-8 text-amber-500" />
             </div>
           </div>
-          
+
           <div className="text-center">
             <p className="text-slate-600 dark:text-slate-300">
               Você está prestes a resetar a senha de:
@@ -411,7 +407,7 @@ export default function Funcionarios() {
 
           <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
             <p className="text-sm text-amber-800 dark:text-amber-200 text-center">
-              <strong>Atenção:</strong> Uma nova senha será gerada automaticamente e enviada 
+              <strong>Atenção:</strong> Uma nova senha será gerada automaticamente e enviada
               para o e-mail cadastrado do funcionário.
             </p>
           </div>
@@ -421,8 +417,8 @@ export default function Funcionarios() {
           <Button variant="secondary" onClick={handleCloseResetModal}>
             Cancelar
           </Button>
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={handleResetSenha}
             disabled={loadingReset}
             className="bg-amber-500 hover:bg-amber-600 focus:ring-amber-500"

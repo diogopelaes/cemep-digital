@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Card, Button, Select, Loading } from '../components/ui'
-import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen } from 'react-icons/hi'
+import {
+  Card, Button, Select, Table, TableHead, TableBody, TableRow,
+  TableHeader, TableCell, TableEmpty, Loading
+} from '../components/ui'
+import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -30,10 +33,10 @@ export default function Turmas() {
       // Busca todas as turmas para extrair os anos únicos
       const response = await coreAPI.turmas.list()
       const todasTurmas = response.data.results || response.data
-      
+
       // Extrai anos únicos e ordena decrescente
       const anos = [...new Set(todasTurmas.map(t => t.ano_letivo))].sort((a, b) => b - a)
-      
+
       if (anos.length > 0) {
         setAnosDisponiveis(anos)
         setAnoLetivo(anos[0]) // Seleciona o ano mais recente
@@ -73,6 +76,12 @@ export default function Turmas() {
       const msg = error.response?.data?.detail || 'Erro ao excluir turma. Verifique se não há alunos ou disciplinas vinculadas.'
       toast.error(msg)
     }
+  }
+
+  // Formata o nome da turma
+  const formatTurmaNome = (turma) => {
+    const nomenclatura = turma.nomenclatura === 'SERIE' ? 'Série' : turma.nomenclatura === 'ANO' ? 'Ano' : 'Módulo'
+    return `${turma.numero}º ${nomenclatura} ${turma.letra}`
   }
 
   if (loading) {
@@ -121,93 +130,115 @@ export default function Turmas() {
         </Card>
       )}
 
-      {/* Cards de Turmas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {turmas.length > 0 ? (
-          turmas.map((turma) => (
-            <Card key={turma.id} hover={false}>
-              {confirmDelete?.id === turma.id ? (
-                <div className="text-center py-4">
-                  <p className="text-danger-600 dark:text-danger-400 font-medium mb-4">
-                    Excluir "{turma.numero}º {turma.letra}"?
-                  </p>
-                  <div className="flex justify-center gap-2">
-                    <button
-                      onClick={() => handleDelete(turma)}
-                      className="p-2 rounded-lg bg-danger-500/10 hover:bg-danger-500/20 text-danger-600 transition-colors"
-                    >
-                      <HiCheck className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => setConfirmDelete(null)}
-                      className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition-colors"
-                    >
-                      <HiX className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-start justify-between">
-                    <div 
-                      className="flex items-center gap-4 cursor-pointer flex-1"
-                      onClick={() => navigate(`/turmas/${turma.id}`)}
-                    >
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-lg">
-                        <span className="text-white font-bold text-xl">
-                          {turma.numero}{turma.letra}
+      {/* Tabela de Turmas */}
+      <Card hover={false}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableHeader>Turma</TableHeader>
+              <TableHeader>Curso</TableHeader>
+              <TableHeader>Estudantes</TableHeader>
+              <TableHeader>Disciplinas</TableHeader>
+              <TableHeader className="w-32 text-right">Ações</TableHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {turmas.length > 0 ? (
+              turmas.map((turma) => (
+                <TableRow key={turma.id}>
+                  {confirmDelete?.id === turma.id ? (
+                    // Linha em modo de confirmação de exclusão
+                    <>
+                      <TableCell colSpan={4}>
+                        <span className="text-danger-600 dark:text-danger-400 font-medium">
+                          Confirma exclusão de "{turma.numero}º {turma.letra}"?
                         </span>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg text-slate-800 dark:text-white">
-                          {turma.numero}º {turma.nomenclatura === 'SERIE' ? 'Série' : turma.nomenclatura === 'ANO' ? 'Ano' : 'Módulo'} {turma.letra}
-                        </h3>
-                        <p className="text-sm text-slate-500">
-                          {turma.curso?.nome || 'Curso não definido'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm text-slate-500">
-                        <div className="flex items-center gap-1" title="Estudantes">
-                          <HiUserGroup className="h-4 w-4" />
-                          <span>0</span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleDelete(turma)}
+                            className="p-2 rounded-lg bg-danger-500/10 hover:bg-danger-500/20 text-danger-600 transition-colors"
+                            title="Confirmar exclusão"
+                          >
+                            <HiCheck className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={() => setConfirmDelete(null)}
+                            className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition-colors"
+                            title="Cancelar"
+                          >
+                            <HiX className="h-5 w-5" />
+                          </button>
                         </div>
-                        <div className="flex items-center gap-1" title="Disciplinas">
+                      </TableCell>
+                    </>
+                  ) : (
+                    // Linha normal
+                    <>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
+                            <span className="text-white font-bold text-sm">
+                              {turma.numero}{turma.letra}
+                            </span>
+                          </div>
+                          <span className="font-medium text-slate-800 dark:text-white">
+                            {formatTurmaNome(turma)}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-slate-600 dark:text-slate-400">
+                          {turma.curso?.nome || 'Curso não definido'}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 text-sm text-slate-500">
+                          <HiUserGroup className="h-4 w-4" />
+                          <span>{turma.estudantes_count || 0}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 text-sm text-slate-500">
                           <HiBookOpen className="h-4 w-4" />
                           <span>{turma.disciplinas_count || 0}</span>
                         </div>
-                      </div>
-                      <button 
-                        onClick={() => setConfirmDelete(turma)}
-                        className="p-2 rounded-lg hover:bg-danger-500/10 text-danger-600 transition-colors"
-                        title="Excluir"
-                      >
-                        <HiTrash className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </Card>
-          ))
-        ) : (
-          <Card className="col-span-full text-center py-12" hover={false}>
-            <HiUserGroup className="h-12 w-12 mx-auto mb-3 text-slate-300 dark:text-slate-600" />
-            <p className="text-slate-500 mb-4">
-              {anosDisponiveis.length > 0 
-                ? `Nenhuma turma encontrada para ${anoLetivo}`
-                : 'Nenhuma turma cadastrada'}
-            </p>
-            <Button icon={HiPlus} onClick={() => navigate('/turmas/novo')}>
-              Criar Primeira Turma
-            </Button>
-          </Card>
-        )}
-      </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => navigate(`/turmas/${turma.id}`)}
+                            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-primary-600 transition-colors"
+                            title="Ver detalhes"
+                          >
+                            <HiPencil className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={() => setConfirmDelete(turma)}
+                            className="p-2 rounded-lg hover:bg-danger-500/10 text-danger-600 transition-colors"
+                            title="Excluir"
+                          >
+                            <HiTrash className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </>
+                  )}
+                </TableRow>
+              ))
+            ) : (
+              <TableEmpty
+                colSpan={5}
+                message={anosDisponiveis.length > 0
+                  ? `Nenhuma turma encontrada para ${anoLetivo}`
+                  : 'Nenhuma turma cadastrada'
+                }
+              />
+            )}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   )
 }

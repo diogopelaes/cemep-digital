@@ -16,7 +16,7 @@ class FuncionarioSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Funcionario
-        fields = ['id', 'usuario', 'nome_completo', 'matricula', 'area_atuacao', 'apelido', 'ativo', 'data_entrada']
+        fields = ['id', 'usuario', 'nome_completo', 'matricula', 'area_atuacao', 'apelido', 'data_entrada']
     
     def get_data_entrada(self, obj):
         """Retorna a data de entrada do primeiro período de trabalho."""
@@ -27,7 +27,7 @@ class FuncionarioSerializer(serializers.ModelSerializer):
 class FuncionarioCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Funcionario
-        fields = ['usuario', 'matricula', 'area_atuacao', 'apelido', 'ativo']
+        fields = ['usuario', 'matricula', 'area_atuacao', 'apelido']
 
 
 class FuncionarioCompletoSerializer(serializers.Serializer):
@@ -132,16 +132,21 @@ class TurmaSerializer(serializers.ModelSerializer):
     )
     nome_completo = serializers.CharField(read_only=True)
     disciplinas_count = serializers.SerializerMethodField()
+    estudantes_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Turma
         fields = [
             'id', 'numero', 'letra', 'ano_letivo', 'nomenclatura',
-            'curso', 'curso_id', 'nome_completo', 'disciplinas_count'
+            'curso', 'curso_id', 'nome_completo', 'disciplinas_count', 'estudantes_count'
         ]
     
     def get_disciplinas_count(self, obj):
         return obj.disciplinas_vinculadas.count()
+    
+    def get_estudantes_count(self, obj):
+        """Conta apenas estudantes com matrícula status CURSANDO."""
+        return obj.matriculas.filter(status='CURSANDO').count()
 
 
 class DisciplinaTurmaSerializer(serializers.ModelSerializer):
@@ -186,10 +191,6 @@ class ProfessorDisciplinaTurmaSerializer(serializers.ModelSerializer):
         if value.usuario.tipo_usuario != 'PROFESSOR':
             raise serializers.ValidationError(
                 'Apenas funcionários do tipo PROFESSOR podem ser atribuídos.'
-            )
-        if not value.ativo:
-            raise serializers.ValidationError(
-                'O professor precisa estar ativo para receber atribuições.'
             )
         return value
 

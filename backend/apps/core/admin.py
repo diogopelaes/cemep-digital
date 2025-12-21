@@ -10,8 +10,8 @@ from .models import (
 
 @admin.register(Funcionario)
 class FuncionarioAdmin(admin.ModelAdmin):
-    list_display = ['usuario', 'matricula', 'area_atuacao', 'ativo']
-    list_filter = ['ativo', 'usuario__tipo_usuario']
+    list_display = ['usuario', 'matricula', 'area_atuacao']
+    list_filter = ['usuario__tipo_usuario']
     search_fields = ['usuario__first_name', 'usuario__last_name', 'area_atuacao', 'matricula']
 
 

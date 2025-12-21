@@ -45,7 +45,6 @@ class Funcionario(models.Model):
         default=None,
         verbose_name='Apelido'
     )
-    ativo = models.BooleanField(default=True, verbose_name='Ativo')
     
     class Meta:
         verbose_name = 'Funcionário'
