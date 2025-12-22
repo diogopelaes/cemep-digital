@@ -61,11 +61,6 @@ class Funcionario(models.Model):
             return f"{self.usuario.get_full_name()} - {self.area_atuacao}"
         return self.usuario.get_full_name()
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao
 
 
 class PeriodoTrabalho(models.Model):
@@ -114,11 +109,6 @@ class PeriodoTrabalho(models.Model):
         saida = self.data_saida.strftime('%d/%m/%Y') if self.data_saida else 'Atual'
         return f"{self.funcionario} ({self.data_entrada.strftime('%d/%m/%Y')} - {saida})"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao
 
 
 class Disciplina(models.Model):
@@ -135,11 +125,6 @@ class Disciplina(models.Model):
     def __str__(self):
         return f"{self.nome} ({self.sigla})"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_secretaria
 
 
 class Curso(models.Model):
@@ -156,13 +141,6 @@ class Curso(models.Model):
     def __str__(self):
         return f"{self.nome} ({self.sigla})"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_secretaria
-
-
 class Turma(models.Model):
     """Turma de estudantes."""
     
@@ -174,6 +152,11 @@ class Turma(models.Model):
     numero = models.PositiveSmallIntegerField(verbose_name='Número')
     letra = models.CharField(max_length=1, verbose_name='Letra')
     ano_letivo = models.PositiveSmallIntegerField(verbose_name='Ano Letivo')
+    professores_representantes = models.ManyToManyField(
+        Funcionario,
+        related_name='turmas_representantes',
+        verbose_name='Professores Representantes'
+    )
     nomenclatura = models.CharField(
         max_length=10,
         choices=Nomenclatura.choices,
@@ -200,11 +183,6 @@ class Turma(models.Model):
     def nome_completo(self):
         return f"{self.numero}º {self.get_nomenclatura_display()} {self.letra} - {self.curso.sigla} ({self.ano_letivo})"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_secretaria
 
 
 class DisciplinaTurma(models.Model):
@@ -230,11 +208,6 @@ class DisciplinaTurma(models.Model):
     def __str__(self):
         return f"{self.disciplina.sigla} - {self.turma} ({self.aulas_semanais} aulas/sem)"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_secretaria
 
 
 class ProfessorDisciplinaTurma(models.Model):
@@ -259,11 +232,6 @@ class ProfessorDisciplinaTurma(models.Model):
     def __str__(self):
         return f"{self.professor.usuario.get_full_name()} - {self.disciplina_turma}"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_secretaria
 
 class Bimestre(models.Model):
     """Bimestre escolar."""
@@ -289,11 +257,6 @@ class Bimestre(models.Model):
             if self.data_inicio.year != self.ano_letivo or self.data_fim.year != self.ano_letivo:
                 raise ValidationError('As datas de início e fim devem pertencer ao ano letivo informado.')
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_secretaria   
 
 
 class CalendarioEscolar(models.Model):
@@ -343,11 +306,6 @@ class CalendarioEscolar(models.Model):
             data_fim__gte=self.data
         ).first()
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_secretaria
 
 
 class Habilidade(models.Model):
@@ -371,9 +329,4 @@ class Habilidade(models.Model):
     def __str__(self):
         return f"{self.codigo} - {self.descricao[:50]}..."
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_professor or usuario.is_secretaria
 

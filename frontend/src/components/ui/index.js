@@ -7,4 +7,4 @@ export { default as Modal, ModalFooter } from './Modal'
 export { default as Table, TableHead, TableBody, TableRow, TableHeader, TableCell, TableEmpty } from './Table'
 export { default as Badge } from './Badge'
 export { default as Loading, PageLoading, Skeleton } from './Loading'
-
+export { default as MultiCombobox } from './MultiCombobox'

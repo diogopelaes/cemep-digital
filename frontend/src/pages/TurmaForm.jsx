@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Input, Select, Loading } from '../components/ui'
+import { Card, Button, Input, Select, Loading, MultiCombobox } from '../components/ui'
 import { HiArrowLeft, HiSave } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
@@ -19,16 +19,19 @@ export default function TurmaForm() {
   const [loading, setLoading] = useState(isEditing)
   const [saving, setSaving] = useState(false)
   const [cursos, setCursos] = useState([])
+  const [professores, setProfessores] = useState([])
   const [formData, setFormData] = useState({
     numero: '',
     letra: '',
     ano_letivo: new Date().getFullYear().toString(),
     nomenclatura: 'SERIE',
     curso_id: '',
+    professores_representantes: [],
   })
 
   useEffect(() => {
     loadCursos()
+    loadProfessores()
     if (isEditing) {
       loadTurma()
     }
@@ -39,13 +42,23 @@ export default function TurmaForm() {
       const response = await coreAPI.cursos.list()
       const cursosData = response.data.results || response.data
       setCursos(cursosData)
-      
+
       // Se houver apenas um curso e não estiver editando, seleciona automaticamente
       if (cursosData.length === 1 && !isEditing) {
         setFormData(prev => ({ ...prev, curso_id: cursosData[0].id.toString() }))
       }
     } catch (error) {
       toast.error('Erro ao carregar cursos')
+    }
+  }
+
+  const loadProfessores = async () => {
+    try {
+      const response = await coreAPI.funcionarios.list({ usuario__tipo_usuario: 'PROFESSOR', page_size: 100 })
+      const professoresData = response.data.results || response.data
+      setProfessores(professoresData)
+    } catch (error) {
+      console.error('Erro ao carregar professores')
     }
   }
 
@@ -59,6 +72,7 @@ export default function TurmaForm() {
         ano_letivo: turma.ano_letivo?.toString() || new Date().getFullYear().toString(),
         nomenclatura: turma.nomenclatura || 'SERIE',
         curso_id: turma.curso?.id?.toString() || '',
+        professores_representantes: turma.professores_representantes || [],
       })
     } catch (error) {
       toast.error('Erro ao carregar turma')
@@ -69,27 +83,27 @@ export default function TurmaForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     // Validações
     const numero = parseInt(formData.numero)
     const anoLetivo = parseInt(formData.ano_letivo)
     const cursoId = parseInt(formData.curso_id)
-    
+
     if (!numero || isNaN(numero)) {
       toast.error('Informe o número da turma')
       return
     }
-    
+
     if (!formData.letra.trim()) {
       toast.error('Informe a letra da turma')
       return
     }
-    
+
     if (!anoLetivo || isNaN(anoLetivo) || anoLetivo < 2020 || anoLetivo > 2099) {
       toast.error('Informe um ano letivo válido (ex: 2025)')
       return
     }
-    
+
     if (!cursoId || isNaN(cursoId)) {
       toast.error('Selecione um curso')
       return
@@ -108,16 +122,16 @@ export default function TurmaForm() {
           curso: cursoId,
         })
         const turmasExistentes = existentes.data.results || existentes.data
-        
+
         if (turmasExistentes.length > 0) {
           const turmaExistente = turmasExistentes[0]
           setSaving(false)
-          
+
           // Pergunta se quer editar a existente
           const confirmar = window.confirm(
             `Já existe a turma "${turmaExistente.numero}º ${turmaExistente.letra}" para este curso e ano.\n\nDeseja abrir a turma existente?`
           )
-          
+
           if (confirmar) {
             navigate(`/turmas/${turmaExistente.id}`)
           }
@@ -131,6 +145,7 @@ export default function TurmaForm() {
         ano_letivo: anoLetivo,
         nomenclatura: formData.nomenclatura,
         curso_id: cursoId,
+        professores_representantes: formData.professores_representantes,
       }
 
       if (isEditing) {
@@ -148,7 +163,7 @@ export default function TurmaForm() {
       console.error('Erro ao salvar turma:', error.response?.data)
       const data = error.response?.data
       let msg = 'Erro ao salvar turma'
-      
+
       if (data) {
         if (data.detail) {
           msg = data.detail
@@ -290,6 +305,18 @@ export default function TurmaForm() {
             onChange={(e) => setFormData({ ...formData, curso_id: e.target.value })}
             placeholder="Selecione um curso..."
             options={cursos.map(c => ({ value: c.id, label: `${c.nome} (${c.sigla})` }))}
+          />
+
+          <MultiCombobox
+            label="Professores Representantes"
+            value={formData.professores_representantes}
+            onChange={(val) => setFormData({ ...formData, professores_representantes: val })}
+            options={professores.map(p => ({
+              value: p.id,
+              label: p.nome_completo,
+              subLabel: p.apelido
+            }))}
+            placeholder="Pesquise por nome ou apelido..."
           />
 
           {/* Preview */}

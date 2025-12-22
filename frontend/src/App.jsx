@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import AuthLayout from './layouts/AuthLayout'
 import MainLayout from './layouts/MainLayout'
+import ProtectedRoute from './components/ProtectedRoute'
 
 // Pages
 import Login from './pages/Login'
@@ -20,6 +21,11 @@ import FuncionarioForm from './pages/FuncionarioForm'
 import FuncionarioCredenciais from './pages/FuncionarioCredenciais'
 import NotFound from './pages/NotFound'
 
+// Constantes de perfis para evitar repetição
+const GESTAO_ONLY = ['GESTAO']
+const GESTAO_SECRETARIA = ['GESTAO', 'SECRETARIA']
+const FUNCIONARIOS = ['GESTAO', 'SECRETARIA', 'PROFESSOR', 'MONITOR']
+
 function App() {
   return (
     <Routes>
@@ -32,32 +38,68 @@ function App() {
       {/* Protected Routes */}
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/estudantes" element={<Estudantes />} />
         <Route path="/avisos" element={<Avisos />} />
-        
-        {/* Fase 1 - Cadastros Base */}
-        
-        {/* Fase 2 - Estrutura Escolar */}
-        <Route path="/turmas" element={<Turmas />} />
-        <Route path="/turmas/novo" element={<TurmaForm />} />
-        <Route path="/turmas/:id" element={<TurmaDetalhes />} />
-        <Route path="/turmas/:id/editar" element={<TurmaForm />} />
-        <Route path="/cursos" element={<Cursos />} />
-        <Route path="/cursos/novo" element={<CursoForm />} />
-        <Route path="/cursos/:id/editar" element={<CursoForm />} />
-        <Route path="/disciplinas" element={<Disciplinas />} />
-        <Route path="/disciplinas/novo" element={<DisciplinaForm />} />
-        <Route path="/disciplinas/:id/editar" element={<DisciplinaForm />} />
-        <Route path="/funcionarios" element={<Funcionarios />} />
-        <Route path="/funcionarios/novo" element={<FuncionarioForm />} />
-        <Route path="/funcionarios/:id/editar" element={<FuncionarioForm />} />
-        <Route path="/funcionarios/credenciais" element={<FuncionarioCredenciais />} />
-        
+
+        {/* Rotas de Gestão/Secretaria */}
+        <Route path="/turmas" element={
+          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><Turmas /></ProtectedRoute>
+        } />
+        <Route path="/turmas/novo" element={
+          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><TurmaForm /></ProtectedRoute>
+        } />
+        <Route path="/turmas/:id" element={
+          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><TurmaDetalhes /></ProtectedRoute>
+        } />
+        <Route path="/turmas/:id/editar" element={
+          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><TurmaForm /></ProtectedRoute>
+        } />
+        <Route path="/cursos" element={
+          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><Cursos /></ProtectedRoute>
+        } />
+        <Route path="/cursos/novo" element={
+          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><CursoForm /></ProtectedRoute>
+        } />
+        <Route path="/cursos/:id/editar" element={
+          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><CursoForm /></ProtectedRoute>
+        } />
+        <Route path="/estudantes" element={
+          <ProtectedRoute allowedRoles={FUNCIONARIOS}><Estudantes /></ProtectedRoute>
+        } />
+        <Route path="/disciplinas" element={
+          <ProtectedRoute allowedRoles={FUNCIONARIOS}><Disciplinas /></ProtectedRoute>
+        } />
+        <Route path="/disciplinas/novo" element={
+          <ProtectedRoute allowedRoles={GESTAO_ONLY}><DisciplinaForm /></ProtectedRoute>
+        } />
+        <Route path="/disciplinas/:id/editar" element={
+          <ProtectedRoute allowedRoles={GESTAO_ONLY}><DisciplinaForm /></ProtectedRoute>
+        } />
+
+        {/* Rotas exclusivas de Gestão */}
+        <Route path="/funcionarios" element={
+          <ProtectedRoute allowedRoles={GESTAO_ONLY}><Funcionarios /></ProtectedRoute>
+        } />
+        <Route path="/funcionarios/novo" element={
+          <ProtectedRoute allowedRoles={GESTAO_ONLY}><FuncionarioForm /></ProtectedRoute>
+        } />
+        <Route path="/funcionarios/:id/editar" element={
+          <ProtectedRoute allowedRoles={GESTAO_ONLY}><FuncionarioForm /></ProtectedRoute>
+        } />
+        <Route path="/funcionarios/credenciais" element={
+          <ProtectedRoute allowedRoles={GESTAO_ONLY}><FuncionarioCredenciais /></ProtectedRoute>
+        } />
+
         {/* Placeholders para outras páginas */}
         <Route path="/calendario" element={<PlaceholderPage title="Calendário" />} />
-        <Route path="/tarefas" element={<PlaceholderPage title="Tarefas" />} />
-        <Route path="/relatorios" element={<PlaceholderPage title="Relatórios" />} />
-        <Route path="/configuracoes" element={<PlaceholderPage title="Configurações" />} />
+        <Route path="/tarefas" element={
+          <ProtectedRoute allowedRoles={FUNCIONARIOS}><PlaceholderPage title="Tarefas" /></ProtectedRoute>
+        } />
+        <Route path="/relatorios" element={
+          <ProtectedRoute allowedRoles={GESTAO_ONLY}><PlaceholderPage title="Relatórios" /></ProtectedRoute>
+        } />
+        <Route path="/configuracoes" element={
+          <ProtectedRoute allowedRoles={GESTAO_ONLY}><PlaceholderPage title="Configurações" /></ProtectedRoute>
+        } />
         <Route path="/minhas-turmas" element={<PlaceholderPage title="Minhas Turmas" />} />
         <Route path="/diario" element={<PlaceholderPage title="Diário de Classe" />} />
         <Route path="/notas" element={<PlaceholderPage title="Notas" />} />
@@ -67,7 +109,7 @@ function App() {
 
       {/* Redirects */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      
+
       {/* 404 */}
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -91,4 +133,3 @@ function PlaceholderPage({ title }) {
 }
 
 export default App
-

@@ -176,14 +176,20 @@ export default function Turmas() {
                     <>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
+                          <button
+                            onClick={() => navigate(`/turmas/${turma.id}`)}
+                            className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center hover:scale-105 hover:shadow-lg transition-all"
+                          >
                             <span className="text-white font-bold text-sm">
                               {turma.numero}{turma.letra}
                             </span>
-                          </div>
-                          <span className="font-medium text-slate-800 dark:text-white">
+                          </button>
+                          <button
+                            onClick={() => navigate(`/turmas/${turma.id}`)}
+                            className="font-medium text-link-subtle text-left"
+                          >
                             {formatTurmaNome(turma)}
-                          </span>
+                          </button>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -205,13 +211,6 @@ export default function Turmas() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => navigate(`/turmas/${turma.id}`)}
-                            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-primary-600 transition-colors"
-                            title="Ver detalhes"
-                          >
-                            <HiPencil className="h-5 w-5" />
-                          </button>
                           <button
                             onClick={() => setConfirmDelete(turma)}
                             className="p-2 rounded-lg hover:bg-danger-500/10 text-danger-600 transition-colors"

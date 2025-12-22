@@ -20,10 +20,11 @@ from .serializers import (
     MatriculaCEMEPSerializer, MatriculaTurmaSerializer,
     AtestadoSerializer
 )
-from apps.users.permissions import IsGestao, IsGestaoOrSecretaria, IsFuncionario, IsOwnerOrGestao
+from apps.users.permissions import GestaoSecretariaWriteFuncionarioReadMixin
 
 
-class EstudanteViewSet(viewsets.ModelViewSet):
+class EstudanteViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Estudantes. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
     queryset = Estudante.objects.select_related('usuario').all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['bolsa_familia', 'pe_de_meia', 'usa_onibus']
@@ -33,12 +34,6 @@ class EstudanteViewSet(viewsets.ModelViewSet):
         if self.action in ['create']:
             return EstudanteCreateSerializer
         return EstudanteSerializer
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestaoOrSecretaria()]
-        return [IsFuncionario()]
     
     @action(detail=True, methods=['get'])
     def prontuario(self, request, pk=None):
@@ -74,7 +69,8 @@ class EstudanteViewSet(viewsets.ModelViewSet):
         })
 
 
-class ResponsavelViewSet(viewsets.ModelViewSet):
+class ResponsavelViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Responsáveis. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
     queryset = Responsavel.objects.select_related('usuario').all()
     filter_backends = [DjangoFilterBackend]
     search_fields = ['usuario__first_name', 'usuario__last_name', 'usuario__email']
@@ -83,12 +79,6 @@ class ResponsavelViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return ResponsavelCreateSerializer
         return ResponsavelSerializer
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestaoOrSecretaria()]
-        return [IsFuncionario()]
     
     @action(detail=True, methods=['post'])
     def vincular_estudante(self, request, pk=None):
@@ -118,21 +108,17 @@ class ResponsavelViewSet(viewsets.ModelViewSet):
         return Response(ResponsavelSerializer(responsavel).data)
 
 
-class MatriculaCEMEPViewSet(viewsets.ModelViewSet):
+class MatriculaCEMEPViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Matrículas CEMEP. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
     queryset = MatriculaCEMEP.objects.select_related('estudante__usuario', 'curso').all()
     serializer_class = MatriculaCEMEPSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['status', 'curso', 'estudante']
     search_fields = ['numero_matricula', 'estudante__usuario__first_name']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestaoOrSecretaria()]
-        return [IsFuncionario()]
 
 
-class MatriculaTurmaViewSet(viewsets.ModelViewSet):
+class MatriculaTurmaViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Matrículas Turma. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
     queryset = MatriculaTurma.objects.select_related(
         'matricula_cemep__estudante__usuario', 'turma__curso'
     ).all()
@@ -140,25 +126,14 @@ class MatriculaTurmaViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['status', 'turma', 'matricula_cemep', 'turma__ano_letivo']
     search_fields = ['matricula_cemep__estudante__usuario__first_name', 'matricula_cemep__numero_matricula']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestaoOrSecretaria()]
-        return [IsFuncionario()]
 
 
-class AtestadoViewSet(viewsets.ModelViewSet):
+class AtestadoViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Atestados. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
     queryset = Atestado.objects.select_related('usuario_alvo', 'criado_por').all()
     serializer_class = AtestadoSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['usuario_alvo']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestaoOrSecretaria()]
-        return [IsFuncionario()]
     
     @action(detail=True, methods=['get'])
     def download(self, request, pk=None):

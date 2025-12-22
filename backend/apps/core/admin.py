@@ -39,6 +39,7 @@ class TurmaAdmin(admin.ModelAdmin):
     list_display = ['numero', 'letra', 'ano_letivo', 'nomenclatura', 'curso']
     list_filter = ['ano_letivo', 'curso', 'nomenclatura']
     search_fields = ['numero', 'letra']
+    filter_horizontal = ['professores_representantes']
 
 
 @admin.register(DisciplinaTurma)

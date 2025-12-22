@@ -64,11 +64,6 @@ class Tarefa(models.Model):
     def __str__(self):
         return f"{self.titulo} (Prazo: {self.prazo.strftime('%d/%m/%Y')})"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return self.criador == usuario
 
 
 class TarefaAnexo(models.Model):
@@ -89,8 +84,6 @@ class TarefaAnexo(models.Model):
     def __str__(self):
         return self.descricao or self.arquivo.name
 
-    def pode_alterar(self, usuario):
-        return self.tarefa.pode_alterar(usuario)
 
 
 class TarefaResposta(models.Model):
@@ -117,11 +110,6 @@ class TarefaResposta(models.Model):
     def __str__(self):
         return f"Resposta de {self.funcionario} em {self.tarefa}"
 
-    def pode_alterar(self, usuario):
-        if not usuario.is_authenticated:
-            return False
-        # Dono da resposta pode editar
-        return self.funcionario.usuario == usuario
 
 
 class TarefaRespostaAnexo(models.Model):
@@ -142,8 +130,6 @@ class TarefaRespostaAnexo(models.Model):
     def __str__(self):
         return self.descricao or self.arquivo.name
 
-    def pode_alterar(self, usuario):
-        return self.resposta.pode_alterar(usuario)
 
 
 class NotificacaoTarefa(models.Model):
@@ -198,11 +184,6 @@ class ReuniaoHTPC(models.Model):
     def __str__(self):
         return f"HTPC - {self.data_reuniao.strftime('%d/%m/%Y %H:%M')}"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao
 
 
 class ReuniaoHTPCAnexo(models.Model):
@@ -223,8 +204,6 @@ class ReuniaoHTPCAnexo(models.Model):
     def __str__(self):
         return self.descricao or self.arquivo.name
 
-    def pode_alterar(self, usuario):
-        return self.reuniao.pode_alterar(usuario)
 
 
 class NotificacaoHTPC(models.Model):
@@ -278,13 +257,6 @@ class Aviso(models.Model):
     def __str__(self):
         return f"{self.titulo} ({self.data_aviso.strftime('%d/%m/%Y')})"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        if usuario.is_gestao or usuario.is_secretaria:
-            return True
-        return self.criador.usuario == usuario
 
 
 class AvisoAnexo(models.Model):
@@ -305,8 +277,6 @@ class AvisoAnexo(models.Model):
     def __str__(self):
         return self.descricao or self.arquivo.name
 
-    def pode_alterar(self, usuario):
-        return self.aviso.pode_alterar(usuario)
 
 
 class AvisoVisualizacao(models.Model):

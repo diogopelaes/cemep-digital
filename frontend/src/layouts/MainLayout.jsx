@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
 import { PageLoading } from '../components/ui/Loading'
 import { LOGO_PATH, SYSTEM_NAME } from '../config/constants'
-import { 
+import {
   HiHome, HiUserGroup, HiAcademicCap, HiClipboardList,
   HiCalendar, HiCog, HiLogout, HiMenu, HiX, HiSun, HiMoon,
   HiBell, HiUsers, HiDocumentText, HiChartBar, HiBookOpen
@@ -77,7 +77,7 @@ export default function MainLayout() {
     <div className="min-h-screen flex">
       {/* Overlay Mobile */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -95,8 +95,8 @@ export default function MainLayout() {
           {/* Logo */}
           <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
             <div className="flex items-center gap-3">
-              <img 
-                src={LOGO_PATH} 
+              <img
+                src={LOGO_PATH}
                 alt={SYSTEM_NAME}
                 className="w-12 h-12 rounded-xl object-cover shadow-lg"
               />

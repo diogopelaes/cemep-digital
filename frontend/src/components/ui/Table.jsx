@@ -18,7 +18,7 @@ export function TableBody({ children }) {
 
 export function TableRow({ children, onClick, className = '' }) {
   return (
-    <tr 
+    <tr
       className={`${onClick ? 'cursor-pointer' : ''} ${className}`}
       onClick={onClick}
     >

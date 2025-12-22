@@ -24,11 +24,16 @@ from .serializers import (
     ProfessorDisciplinaTurmaSerializer, CalendarioEscolarSerializer, HabilidadeSerializer,
     BimestreSerializer
 )
-from apps.users.permissions import IsGestao, IsGestaoOrSecretaria, IsFuncionario
+from apps.users.permissions import (
+    IsGestao, GestaoOnlyMixin, GestaoWriteFuncionarioReadMixin, 
+    GestaoSecretariaMixin, GestaoWritePublicReadMixin, 
+    GestaoSecretariaWritePublicReadMixin
+)
 from apps.users.models import User
 
 
-class FuncionarioViewSet(viewsets.ModelViewSet):
+class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Funcionários. Leitura: Funcionários | Escrita: Gestão"""
     queryset = Funcionario.objects.select_related('usuario').all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['usuario__tipo_usuario', 'usuario__is_active']
@@ -39,12 +44,6 @@ class FuncionarioViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update']:
             return FuncionarioCreateSerializer
         return FuncionarioSerializer
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy', 'criar_completo', 'atualizar_completo', 'toggle_ativo']:
-            return [IsGestao()]
-        return [IsFuncionario()]
     
     @action(detail=True, methods=['post'], url_path='toggle-ativo')
     def toggle_ativo(self, request, pk=None):
@@ -201,55 +200,35 @@ class FuncionarioViewSet(viewsets.ModelViewSet):
             )
 
 
-class PeriodoTrabalhoViewSet(viewsets.ModelViewSet):
+class PeriodoTrabalhoViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Períodos de Trabalho. Leitura: Funcionários | Escrita: Gestão"""
     queryset = PeriodoTrabalho.objects.select_related('funcionario').all()
     serializer_class = PeriodoTrabalhoSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['funcionario']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsFuncionario()]
 
 
-class DisciplinaViewSet(viewsets.ModelViewSet):
+class DisciplinaViewSet(GestaoWritePublicReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Disciplinas. Leitura: Todos autenticados | Escrita: Gestão"""
     queryset = Disciplina.objects.all()
     serializer_class = DisciplinaSerializer
     search_fields = ['nome', 'sigla']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsAuthenticated()]
 
 
-class CursoViewSet(viewsets.ModelViewSet):
+class CursoViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
+    """ViewSet de Cursos. Leitura: Gestão/Secretaria | Escrita: Gestão/Secretaria"""
     queryset = Curso.objects.all()
     serializer_class = CursoSerializer
     search_fields = ['nome', 'sigla']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsAuthenticated()]
 
 
-class TurmaViewSet(viewsets.ModelViewSet):
-    queryset = Turma.objects.select_related('curso').all()
+class TurmaViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
+    """ViewSet de Turmas. Leitura: Gestão/Secretaria | Escrita: Gestão/Secretaria"""
+    queryset = Turma.objects.select_related('curso').prefetch_related('professores_representantes__usuario').all()
     serializer_class = TurmaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['numero', 'letra', 'ano_letivo', 'curso', 'nomenclatura']
     search_fields = ['numero', 'letra']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsAuthenticated()]
 
     @action(detail=False, methods=['get'], url_path='anos-disponiveis')
     def anos_disponiveis(self, request):
@@ -258,20 +237,16 @@ class TurmaViewSet(viewsets.ModelViewSet):
         return Response(list(anos))
 
 
-class DisciplinaTurmaViewSet(viewsets.ModelViewSet):
+class DisciplinaTurmaViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
+    """ViewSet de Disciplinas por Turma. Leitura: Gestão/Secretaria | Escrita: Gestão/Secretaria"""
     queryset = DisciplinaTurma.objects.select_related('disciplina', 'turma').all()
     serializer_class = DisciplinaTurmaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['disciplina', 'turma', 'turma__ano_letivo']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsAuthenticated()]
 
 
-class ProfessorDisciplinaTurmaViewSet(viewsets.ModelViewSet):
+class ProfessorDisciplinaTurmaViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Professor-Disciplina-Turma. Leitura: Funcionários | Escrita: Gestão"""
     queryset = ProfessorDisciplinaTurma.objects.select_related(
         'professor__usuario', 'disciplina_turma__disciplina', 'disciplina_turma__turma'
     ).all()
@@ -286,50 +261,29 @@ class ProfessorDisciplinaTurmaViewSet(viewsets.ModelViewSet):
         if turma:
             qs = qs.filter(disciplina_turma__turma_id=turma)
         return qs
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsFuncionario()]
 
 
-class BimestreViewSet(viewsets.ModelViewSet):
+class BimestreViewSet(GestaoSecretariaWritePublicReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Bimestres. Leitura: Todos autenticados | Escrita: Gestão/Secretaria"""
     queryset = Bimestre.objects.all()
     serializer_class = BimestreSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['ano_letivo']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestaoOrSecretaria()]
-        return [IsAuthenticated()]
 
 
-class CalendarioEscolarViewSet(viewsets.ModelViewSet):
+class CalendarioEscolarViewSet(GestaoWritePublicReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Calendário Escolar. Leitura: Todos autenticados | Escrita: Gestão"""
     queryset = CalendarioEscolar.objects.all()
     serializer_class = CalendarioEscolarSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['letivo', 'tipo']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsAuthenticated()]
 
 
-class HabilidadeViewSet(viewsets.ModelViewSet):
+class HabilidadeViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Habilidades. Leitura: Funcionários | Escrita: Gestão"""
     queryset = Habilidade.objects.select_related('disciplina').all()
     serializer_class = HabilidadeSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['disciplina']
     search_fields = ['codigo', 'descricao']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsFuncionario()]
 

@@ -19,12 +19,13 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
-// Interceptor para refresh token
+// Interceptor para refresh token e tratamento de erros de permissão
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
 
+    // Erro 401: Token expirado - tenta refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
@@ -46,6 +47,21 @@ api.interceptors.response.use(
           window.location.href = '/login'
         }
       }
+    }
+
+    // Erro 403: Sem permissão - redireciona para página inicial
+    if (error.response?.status === 403) {
+      // Importação dinâmica para evitar dependência circular
+      import('react-hot-toast').then(({ default: toast }) => {
+        toast.error('Você não tem permissão para acessar este recurso.')
+      })
+
+      // Redireciona para dashboard após pequeno delay para mostrar o toast
+      setTimeout(() => {
+        if (window.location.pathname !== '/dashboard') {
+          window.location.href = '/dashboard'
+        }
+      }, 500)
     }
 
     return Promise.reject(error)

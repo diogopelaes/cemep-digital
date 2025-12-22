@@ -19,20 +19,17 @@ from .serializers import (
     HistoricoEscolarNotasSerializer, RegistroProntuarioSerializer,
     HistoricoCompletoSerializer
 )
-from apps.users.permissions import IsGestao, IsGestaoOrSecretaria
+from apps.users.permissions import (
+    GestaoOnlyMixin, GestaoWriteSecretariaReadMixin, IsGestao
+)
 
 
-class DadosPermanenteEstudanteViewSet(viewsets.ModelViewSet):
+class DadosPermanenteEstudanteViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Dados Permanentes (Estudante). Leitura: Gestão/Secretaria | Escrita: Gestão"""
     queryset = DadosPermanenteEstudante.objects.prefetch_related('responsaveis')
     serializer_class = DadosPermanenteEstudanteSerializer
     filter_backends = [DjangoFilterBackend]
     search_fields = ['nome', 'cpf']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsGestaoOrSecretaria()]
     
     @action(detail=True, methods=['get'])
     def historico_completo(self, request, pk=None):
@@ -48,68 +45,45 @@ class DadosPermanenteEstudanteViewSet(viewsets.ModelViewSet):
         return Response(data)
 
 
-class DadosPermanenteResponsavelViewSet(viewsets.ModelViewSet):
+class DadosPermanenteResponsavelViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Dados Permanentes (Responsável). Leitura: Gestão/Secretaria | Escrita: Gestão"""
     queryset = DadosPermanenteResponsavel.objects.select_related('estudante')
     serializer_class = DadosPermanenteResponsavelSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['estudante']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsGestaoOrSecretaria()]
 
 
-class HistoricoEscolarViewSet(viewsets.ModelViewSet):
+class HistoricoEscolarViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Histórico Escolar. Leitura: Gestão/Secretaria | Escrita: Gestão"""
     queryset = HistoricoEscolar.objects.select_related('estudante').prefetch_related('anos_letivos__notas')
     serializer_class = HistoricoEscolarSerializer
     filter_backends = [DjangoFilterBackend]
     search_fields = ['estudante__nome', 'estudante__cpf', 'numero_matricula']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsGestaoOrSecretaria()]
 
 
-class HistoricoEscolarAnoLetivoViewSet(viewsets.ModelViewSet):
+class HistoricoEscolarAnoLetivoViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Histórico por Ano Letivo. Leitura: Gestão/Secretaria | Escrita: Gestão"""
     queryset = HistoricoEscolarAnoLetivo.objects.select_related('historico__estudante').prefetch_related('notas')
     serializer_class = HistoricoEscolarAnoLetivoSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['historico', 'ano_letivo', 'status_final']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsGestaoOrSecretaria()]
 
 
-class HistoricoEscolarNotasViewSet(viewsets.ModelViewSet):
+class HistoricoEscolarNotasViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Histórico de Notas. Leitura: Gestão/Secretaria | Escrita: Gestão"""
     queryset = HistoricoEscolarNotas.objects.select_related('ano_letivo_ref')
     serializer_class = HistoricoEscolarNotasSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['ano_letivo_ref']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsGestaoOrSecretaria()]
 
 
-class RegistroProntuarioViewSet(viewsets.ModelViewSet):
+class RegistroProntuarioViewSet(GestaoOnlyMixin, viewsets.ModelViewSet):
+    """ViewSet de Prontuário. Leitura e Escrita: Gestão"""
     queryset = RegistroProntuario.objects.all()
     serializer_class = RegistroProntuarioSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['cpf']
     search_fields = ['nome_estudante', 'cpf', 'descricao']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        return [IsGestao()]
     
     @action(detail=True, methods=['get'])
     def download_anexo(self, request, pk=None):

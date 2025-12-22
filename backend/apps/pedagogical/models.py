@@ -61,12 +61,6 @@ class PlanoAula(models.Model):
     def __str__(self):
         return f"{self.professor} - {self.disciplina} ({self.data_inicio} a {self.data_fim})"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        # Professor pode alterar seus próprios planos
-        return self.professor.usuario == usuario
 
 
 class Aula(models.Model):
@@ -111,12 +105,6 @@ class Aula(models.Model):
     def __str__(self):
         return f"{self.professor_disciplina_turma} - {self.data.strftime('%d/%m/%Y')}"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        # Professor pode alterar suas próprias aulas
-        return self.professor_disciplina_turma.professor.usuario == usuario
 
 
 class Faltas(models.Model):
@@ -149,12 +137,6 @@ class Faltas(models.Model):
     def get_bimestre(self):
         return self.aula.bimestre
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        # Professor dono da aula pode alterar as faltas
-        return self.aula.professor_disciplina_turma.professor.usuario == usuario
 
 
 class DescritorOcorrenciaPedagogica(models.Model):
@@ -176,11 +158,6 @@ class DescritorOcorrenciaPedagogica(models.Model):
     def __str__(self):
         return self.texto
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao
 
 
 class OcorrenciaPedagogica(models.Model):
@@ -232,12 +209,6 @@ class OcorrenciaPedagogica(models.Model):
     def __str__(self):
         return f"{self.estudante} - {self.tipo} ({self.data.strftime('%d/%m/%Y')})"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        # Autor pode editar sua ocorrência
-        return self.autor.usuario == usuario
 
 
 class OcorrenciaResponsavelCiente(models.Model):
@@ -360,18 +331,6 @@ class Avaliacao(models.Model):
                     'O valor da avaliação de recuperação deve ser sempre 10.'
                 )
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-            
-        if hasattr(usuario, 'funcionario'):
-            return ProfessorDisciplinaTurma.objects.filter(
-                disciplina_turma=self.professor_disciplina_turma.disciplina_turma,
-                professor__usuario=usuario
-            ).exists()
-            
-        return False
 
 
 class InstrumentoAvaliativo(models.Model):
@@ -447,18 +406,6 @@ class InstrumentoAvaliativo(models.Model):
                         f'ultrapassa o valor da avaliação ({self.avaliacao.valor}).'
                     )
     
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-            
-        if hasattr(usuario, 'funcionario'):
-            return ProfessorDisciplinaTurma.objects.filter(
-                disciplina_turma=self.avaliacao.professor_disciplina_turma.disciplina_turma,
-                professor__usuario=usuario
-            ).exists()
-            
-        return False
 
 
 class ControleVisto(models.Model):
@@ -502,18 +449,6 @@ class ControleVisto(models.Model):
         status = 'Sim' if self.visto is True else ('Não' if self.visto is False else 'N/A')
         return f"{self.titulo} - {status}"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-            
-        if hasattr(usuario, 'funcionario'):
-            return ProfessorDisciplinaTurma.objects.filter(
-                disciplina_turma=self.professor_disciplina_turma.disciplina_turma,
-                professor__usuario=usuario
-            ).exists()
-            
-        return False
 
 
 class NotaInstrumentoAvaliativo(models.Model):
@@ -579,18 +514,6 @@ class NotaInstrumentoAvaliativo(models.Model):
         
         return (porcentagem * self.instrumento_avaliativo.valor).quantize(Decimal('0.01'))
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-            
-        if hasattr(usuario, 'funcionario'):
-            return ProfessorDisciplinaTurma.objects.filter(
-                disciplina_turma=self.instrumento_avaliativo.avaliacao.professor_disciplina_turma.disciplina_turma,
-                professor__usuario=usuario
-            ).exists()
-            
-        return False
 
 
 class NotaAvaliacao(models.Model):
@@ -657,18 +580,6 @@ class NotaAvaliacao(models.Model):
         
         return None
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-            
-        if hasattr(usuario, 'funcionario'):
-            return ProfessorDisciplinaTurma.objects.filter(
-                disciplina_turma=self.avaliacao.professor_disciplina_turma.disciplina_turma,
-                professor__usuario=usuario
-            ).exists()
-            
-        return False
 
 
 class NotaBimestral(models.Model):
@@ -708,18 +619,6 @@ class NotaBimestral(models.Model):
         return f"{self.matricula_turma} - {self.professor_disciplina_turma.disciplina_turma.disciplina} ({self.bimestre})"
 
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-            
-        if hasattr(usuario, 'funcionario'):
-            return ProfessorDisciplinaTurma.objects.filter(
-                disciplina_turma=self.professor_disciplina_turma.disciplina_turma,
-                professor__usuario=usuario
-            ).exists()
-            
-        return False
         
 
 class NotificacaoRecuperacao(models.Model):
@@ -744,13 +643,4 @@ class NotificacaoRecuperacao(models.Model):
     def __str__(self):
         return f"{self.estudante} - {self.professor_disciplina_turma}"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        if usuario.is_gestao:
-            return True
-        if usuario.is_professor:
-            return self.professor_disciplina_turma.professor.usuario == usuario
-        return False
 

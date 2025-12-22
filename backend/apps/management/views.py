@@ -18,21 +18,19 @@ from .serializers import (
     ReuniaoHTPCSerializer, NotificacaoHTPCSerializer,
     AvisoSerializer, AvisoVisualizacaoSerializer
 )
-from apps.users.permissions import IsGestao, IsFuncionario
+from apps.users.permissions import (
+    GestaoWriteFuncionarioReadMixin, FuncionarioMixin, GestaoOnlyMixin,
+    GestaoSecretariaWritePublicReadMixin
+)
 from apps.core.models import Funcionario
 
 
-class TarefaViewSet(viewsets.ModelViewSet):
+class TarefaViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Tarefas. Leitura: Funcionários | Escrita: Gestão"""
     queryset = Tarefa.objects.select_related('criador').prefetch_related('funcionarios__usuario')
     serializer_class = TarefaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['concluido', 'funcionarios']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsFuncionario()]
     
     def perform_create(self, serializer):
         tarefa = serializer.save(criador=self.request.user)
@@ -108,17 +106,12 @@ class NotificacaoTarefaViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class ReuniaoHTPCViewSet(viewsets.ModelViewSet):
+class ReuniaoHTPCViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de HTPC. Leitura: Funcionários | Escrita: Gestão"""
     queryset = ReuniaoHTPC.objects.select_related('quem_registrou').prefetch_related('presentes__usuario')
     serializer_class = ReuniaoHTPCSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['data_reuniao']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsFuncionario()]
     
     def perform_create(self, serializer):
         reuniao = serializer.save(quem_registrou=self.request.user)
@@ -159,17 +152,12 @@ class NotificacaoHTPCViewSet(viewsets.ModelViewSet):
         return Response(NotificacaoHTPCSerializer(obj).data)
 
 
-class AvisoViewSet(viewsets.ModelViewSet):
+class AvisoViewSet(GestaoSecretariaWritePublicReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Avisos. Leitura: Todos autenticados | Escrita: Gestão/Secretaria"""
     queryset = Aviso.objects.select_related('criador__usuario').prefetch_related('destinatarios')
     serializer_class = AvisoSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['criador']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsFuncionario()]
-        return [IsAuthenticated()]
     
     def perform_create(self, serializer):
         aviso = serializer.save(criador=self.request.user.funcionario)

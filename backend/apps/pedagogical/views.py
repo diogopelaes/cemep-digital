@@ -19,23 +19,22 @@ from .serializers import (
     OcorrenciaResponsavelCienteSerializer, NotaBimestralSerializer,
     NotificacaoRecuperacaoSerializer
 )
-from apps.users.permissions import IsGestao, IsProfessor, IsFuncionario, IsEstudanteOrResponsavel
+from apps.users.permissions import (
+    ProfessorWriteFuncionarioReadMixin, GestaoWriteFuncionarioReadMixin,
+    GestaoSecretariaWritePublicReadMixin
+)
 
 
-class PlanoAulaViewSet(viewsets.ModelViewSet):
+class PlanoAulaViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Planos de Aula. Leitura: Funcionários | Escrita: Professores/Gestão"""
     queryset = PlanoAula.objects.select_related('professor__usuario', 'disciplina').prefetch_related('turmas', 'habilidades')
     serializer_class = PlanoAulaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['professor', 'disciplina', 'turmas']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsProfessor()]
-        return [IsFuncionario()]
 
 
-class AulaViewSet(viewsets.ModelViewSet):
+class AulaViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Aulas. Leitura: Funcionários | Escrita: Professores/Gestão"""
     queryset = Aula.objects.select_related(
         'professor_disciplina_turma__professor__usuario',
         'professor_disciplina_turma__disciplina_turma__disciplina',
@@ -44,12 +43,6 @@ class AulaViewSet(viewsets.ModelViewSet):
     serializer_class = AulaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['professor_disciplina_turma', 'professor_disciplina_turma__disciplina_turma__turma', 'data']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsProfessor()]
-        return [IsFuncionario()]
     
     @action(detail=True, methods=['get'])
     def lista_chamada(self, request, pk=None):
@@ -81,17 +74,12 @@ class AulaViewSet(viewsets.ModelViewSet):
         return Response(lista)
 
 
-class FaltasViewSet(viewsets.ModelViewSet):
+class FaltasViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Faltas. Leitura: Funcionários | Escrita: Professores/Gestão"""
     queryset = Faltas.objects.select_related('aula', 'estudante__usuario')
     serializer_class = FaltasSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['aula', 'estudante', 'aula__professor_disciplina_turma__disciplina_turma__turma']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy', 'registrar_lote']:
-            return [IsProfessor()]
-        return [IsFuncionario()]
     
     @action(detail=False, methods=['post'])
     def registrar_lote(self, request):
@@ -118,35 +106,25 @@ class FaltasViewSet(viewsets.ModelViewSet):
         return Response({'message': f'{len(faltas)} faltas registradas.'})
 
 
-class DescritorOcorrenciaPedagogicaViewSet(viewsets.ModelViewSet):
+class DescritorOcorrenciaPedagogicaViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Tipos de Ocorrência. Leitura: Funcionários | Escrita: Gestão"""
     queryset = DescritorOcorrenciaPedagogica.objects.select_related('gestor__usuario')
     serializer_class = DescritorOcorrenciaPedagogicaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['ativo']
     
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsGestao()]
-        return [IsFuncionario()]
-    
     def perform_create(self, serializer):
         serializer.save(gestor=self.request.user.funcionario)
 
 
-class OcorrenciaPedagogicaViewSet(viewsets.ModelViewSet):
+class OcorrenciaPedagogicaViewSet(GestaoSecretariaWritePublicReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Ocorrências. Leitura: Todos autenticados | Escrita: Gestão/Secretaria"""
     queryset = OcorrenciaPedagogica.objects.select_related(
         'estudante__usuario', 'autor__usuario', 'tipo'
     )
     serializer_class = OcorrenciaPedagogicaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['estudante', 'tipo', 'autor']
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsFuncionario()]
-        return [IsAuthenticated()]
     
     def perform_create(self, serializer):
         ocorrencia = serializer.save(autor=self.request.user.funcionario)
@@ -194,7 +172,8 @@ class OcorrenciaResponsavelCienteViewSet(viewsets.ModelViewSet):
         return Response(OcorrenciaResponsavelCienteSerializer(obj).data)
 
 
-class NotaBimestralViewSet(viewsets.ModelViewSet):
+class NotaBimestralViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    """ViewSet de Notas. Leitura: Funcionários | Escrita: Professores/Gestão"""
     queryset = NotaBimestral.objects.select_related(
         'matricula_turma__estudante__usuario',
         'professor_disciplina_turma__disciplina_turma__disciplina',
@@ -206,12 +185,6 @@ class NotaBimestralViewSet(viewsets.ModelViewSet):
         'matricula_turma', 'professor_disciplina_turma', 'bimestre',
         'matricula_turma__turma', 'professor_disciplina_turma__disciplina_turma__turma__ano_letivo'
     ]
-    
-    # controle_de_permissao
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsProfessor()]
-        return [IsAuthenticated()]
     
     @action(detail=False, methods=['get'])
     def boletim(self, request):

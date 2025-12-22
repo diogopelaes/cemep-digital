@@ -62,12 +62,6 @@ class Estudante(models.Model):
             self.telefone = clean_digits(self.telefone)
         super().save(*args, **kwargs)
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_secretaria
-
     @property
     def endereco_completo(self):
         partes = [self.logradouro, self.numero]
@@ -141,12 +135,6 @@ class Responsavel(models.Model):
         if self.telefone:
             self.telefone = clean_digits(self.telefone)
         super().save(*args, **kwargs)
-
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_secretaria
 
     @property
     def cpf_formatado(self):
@@ -267,12 +255,6 @@ class MatriculaCEMEP(models.Model):
             self.numero_matricula = clean_digits(self.numero_matricula)
         super().save(*args, **kwargs)
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_secretaria
-
     @property
     def numero_matricula_formatado(self):
         """Retorna a matrícula formatada: XXX.XXX.XXX-X"""
@@ -324,13 +306,6 @@ class MatriculaTurma(models.Model):
     def __str__(self):
         return f"{self.matricula_cemep.estudante} - {self.turma}"
 
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_secretaria
-
-
 class Atestado(models.Model):
     """Atestado médico de um usuário."""
     
@@ -362,10 +337,3 @@ class Atestado(models.Model):
     
     def __str__(self):
         return f"Atestado - {self.usuario_alvo} ({self.data_inicio.strftime('%d/%m/%Y')})"
-
-    def pode_alterar(self, usuario):
-        """Verifica se o usuário tem permissão para alterar este registro."""
-        if not usuario.is_authenticated:
-            return False
-        return usuario.is_gestao or usuario.is_secretaria
-
