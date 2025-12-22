@@ -39,7 +39,7 @@ class Command(BaseCommand):
         from apps.permanent.models import (
             DadosPermanenteEstudante, DadosPermanenteResponsavel,
             HistoricoEscolar, HistoricoEscolarAnoLetivo, HistoricoEscolarNotas,
-            OcorrenciaDisciplinar
+            RegistroProntuario
         )
         from apps.pedagogical.models import NotaBimestral, OcorrenciaPedagogica
         

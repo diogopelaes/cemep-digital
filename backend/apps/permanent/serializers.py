@@ -5,7 +5,7 @@ from rest_framework import serializers
 from .models import (
     DadosPermanenteEstudante, DadosPermanenteResponsavel,
     HistoricoEscolar, HistoricoEscolarAnoLetivo, HistoricoEscolarNotas,
-    OcorrenciaDisciplinar
+    RegistroProntuario
 )
 
 
@@ -58,11 +58,11 @@ class DadosPermanenteEstudanteSerializer(serializers.ModelSerializer):
         ]
 
 
-class OcorrenciaDisciplinarSerializer(serializers.ModelSerializer):
+class RegistroProntuarioSerializer(serializers.ModelSerializer):
     anexos = serializers.SerializerMethodField()
     
     class Meta:
-        model = OcorrenciaDisciplinar
+        model = RegistroProntuario
         fields = [
             'id', 'cpf', 'cpf_formatado', 'nome_estudante', 'pai_ocorrencia', 'autor_nome',
             'data_ocorrido', 'data_registro', 'descricao', 'ano_letivo', 'bimestre', 'anexos'
@@ -76,5 +76,5 @@ class OcorrenciaDisciplinarSerializer(serializers.ModelSerializer):
 class HistoricoCompletoSerializer(serializers.Serializer):
     """Serializer para emissão do histórico completo."""
     estudante = DadosPermanenteEstudanteSerializer()
-    ocorrencias = OcorrenciaDisciplinarSerializer(many=True)
+    ocorrencias = RegistroProntuarioSerializer(many=True)
 

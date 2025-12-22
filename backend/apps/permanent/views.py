@@ -11,12 +11,12 @@ from django.http import FileResponse
 from .models import (
     DadosPermanenteEstudante, DadosPermanenteResponsavel,
     HistoricoEscolar, HistoricoEscolarAnoLetivo, HistoricoEscolarNotas,
-    OcorrenciaDisciplinar
+    RegistroProntuario
 )
 from .serializers import (
     DadosPermanenteEstudanteSerializer, DadosPermanenteResponsavelSerializer,
     HistoricoEscolarSerializer, HistoricoEscolarAnoLetivoSerializer,
-    HistoricoEscolarNotasSerializer, OcorrenciaDisciplinarSerializer,
+    HistoricoEscolarNotasSerializer, RegistroProntuarioSerializer,
     HistoricoCompletoSerializer
 )
 from apps.users.permissions import IsGestao, IsGestaoOrSecretaria
@@ -36,13 +36,13 @@ class DadosPermanenteEstudanteViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def historico_completo(self, request, pk=None):
-        """Retorna o histórico completo do estudante com ocorrências."""
+        """Retorna o histórico completo do estudante com registros do prontuário."""
         estudante = self.get_object()
-        ocorrencias = OcorrenciaDisciplinar.objects.filter(cpf=estudante.cpf)
+        ocorrencias = RegistroProntuario.objects.filter(cpf=estudante.cpf)
         
         data = {
             'estudante': DadosPermanenteEstudanteSerializer(estudante).data,
-            'ocorrencias': OcorrenciaDisciplinarSerializer(ocorrencias, many=True).data
+            'ocorrencias': RegistroProntuarioSerializer(ocorrencias, many=True).data
         }
         
         return Response(data)
@@ -100,9 +100,9 @@ class HistoricoEscolarNotasViewSet(viewsets.ModelViewSet):
         return [IsGestaoOrSecretaria()]
 
 
-class OcorrenciaDisciplinarViewSet(viewsets.ModelViewSet):
-    queryset = OcorrenciaDisciplinar.objects.all()
-    serializer_class = OcorrenciaDisciplinarSerializer
+class RegistroProntuarioViewSet(viewsets.ModelViewSet):
+    queryset = RegistroProntuario.objects.all()
+    serializer_class = RegistroProntuarioSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['cpf']
     search_fields = ['nome_estudante', 'cpf', 'descricao']
@@ -113,10 +113,10 @@ class OcorrenciaDisciplinarViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def download_anexo(self, request, pk=None):
-        """Download protegido de um anexo específico da ocorrência."""
-        from .models import OcorrenciaDisciplinarAnexo
+        """Download protegido de um anexo específico do registro."""
+        from .models import RegistroProntuarioAnexo
         
-        ocorrencia = self.get_object()
+        registro = self.get_object()
         anexo_id = request.query_params.get('anexo_id')
         
         if not anexo_id:
@@ -126,8 +126,8 @@ class OcorrenciaDisciplinarViewSet(viewsets.ModelViewSet):
             )
         
         try:
-            anexo = ocorrencia.anexos.get(id=anexo_id)
-        except OcorrenciaDisciplinarAnexo.DoesNotExist:
+            anexo = registro.anexos.get(id=anexo_id)
+        except RegistroProntuarioAnexo.DoesNotExist:
             return Response(
                 {'error': 'Anexo não encontrado'},
                 status=status.HTTP_404_NOT_FOUND

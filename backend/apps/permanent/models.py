@@ -207,8 +207,10 @@ class HistoricoEscolarNotas(models.Model):
         return f"{self.nome_disciplina} - {self.nota_final}"
 
 
-class OcorrenciaDisciplinar(models.Model):
-    """Ocorrência disciplinar permanente (grave)."""
+class RegistroProntuario(models.Model):
+    """Registro do prontuário."""
+
+    ocorrencia_disciplinar = models.BooleanField(default=True, verbose_name='Ocorrência Disciplinar')
     
     cpf = models.CharField(
         max_length=14, 
@@ -223,10 +225,10 @@ class OcorrenciaDisciplinar(models.Model):
         null=True,
         blank=True,
         related_name='filhas',
-        verbose_name='Ocorrência Pai'
+        verbose_name='Registro Pai'
     )
     autor_nome = models.CharField(max_length=255, verbose_name='Nome do Autor')
-    data_ocorrido = models.DateTimeField(verbose_name='Data do Ocorrido')
+    data_ocorrido = models.DateTimeField(verbose_name='Data da Ocorrência')
     data_registro = models.DateTimeField(auto_now_add=True, verbose_name='Data do Registro')
     descricao = RichTextField(verbose_name='Descrição')
     
@@ -235,12 +237,12 @@ class OcorrenciaDisciplinar(models.Model):
     bimestre = models.PositiveSmallIntegerField(verbose_name='Bimestre', null=True, blank=True)
     
     class Meta:
-        verbose_name = 'Ocorrência Disciplinar'
-        verbose_name_plural = 'Ocorrências Disciplinares'
+        verbose_name = 'Registro de Prontuário'
+        verbose_name_plural = 'Registros de Prontuário'
         ordering = ['-data_ocorrido']
     
     def __str__(self):
-        return f"Ocorrência - {self.nome_estudante} ({self.data_ocorrido.strftime('%d/%m/%Y')})"
+        return f"Registro - {self.nome_estudante} ({self.data_ocorrido.strftime('%d/%m/%Y')})"
 
     def save(self, *args, **kwargs):
         if self.cpf:
@@ -274,16 +276,16 @@ class OcorrenciaDisciplinar(models.Model):
         return f"{self.cpf[:3]}.{self.cpf[3:6]}.{self.cpf[6:9]}-{self.cpf[9:]}"
 
 
-class OcorrenciaDisciplinarAnexo(models.Model):
-    """Anexos para ocorrência disciplinar permanente."""
+class RegistroProntuarioAnexo(models.Model):
+    """Anexos para registro do prontuário."""
     
-    ocorrencia = models.ForeignKey(
-        OcorrenciaDisciplinar,
+    registro_prontuario = models.ForeignKey(
+        RegistroProntuario,
         on_delete=models.CASCADE,
         related_name='anexos'
     )
     arquivo = models.FileField(
-        upload_to='ocorrencias_permanentes/',
+        upload_to='registro_prontuario/',
         verbose_name='Arquivo'
     )
     descricao = models.CharField(
@@ -294,10 +296,10 @@ class OcorrenciaDisciplinarAnexo(models.Model):
     criado_em = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name = 'Anexo de Ocorrência'
-        verbose_name_plural = 'Anexos de Ocorrência'
+        verbose_name = 'Anexo de Registro Prontuário'
+        verbose_name_plural = 'Anexos de Registro Prontuário'
     
     def __str__(self):
-        return f"Anexo de {self.ocorrencia} ({self.descricao or 'Sem descrição'})"
+        return f"Anexo de {self.registro_prontuario} ({self.descricao or 'Sem descrição'})"
 
 

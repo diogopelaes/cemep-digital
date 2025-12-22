@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     DadosPermanenteEstudanteViewSet, DadosPermanenteResponsavelViewSet,
     HistoricoEscolarViewSet, HistoricoEscolarAnoLetivoViewSet,
-    HistoricoEscolarNotasViewSet, OcorrenciaDisciplinarViewSet
+    HistoricoEscolarNotasViewSet, RegistroProntuarioViewSet
 )
 
 router = DefaultRouter()
@@ -15,7 +15,7 @@ router.register('responsaveis', DadosPermanenteResponsavelViewSet)
 router.register('historicos', HistoricoEscolarViewSet)
 router.register('historicos-anos', HistoricoEscolarAnoLetivoViewSet)
 router.register('historicos-notas', HistoricoEscolarNotasViewSet)
-router.register('ocorrencias', OcorrenciaDisciplinarViewSet)
+router.register('registros-prontuario', RegistroProntuarioViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
