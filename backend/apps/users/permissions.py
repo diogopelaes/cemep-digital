@@ -98,6 +98,28 @@ class GestaoSecretariaMixin:
         return [IsGestaoOrSecretaria()]
 
 
+class NeverAllow(BasePermission):
+    """
+    Permissão que sempre nega acesso.
+    Usado para bloquear operações específicas (ex: delete).
+    """
+    def has_permission(self, request, view):
+        return False
+
+
+class GestaoSecretariaCRUMixin:
+    """
+    Permissões:
+    - GESTAO/SECRETARIA: CRU (Create, Read, Update)
+    - Delete: Bloqueado para TODOS
+    - OUTROS: Sem acesso
+    """
+    def get_permissions(self):
+        if self.action == 'destroy':
+            return [NeverAllow()]
+        return [IsGestaoOrSecretaria()]
+
+
 class GestaoWriteSecretariaReadMixin:
     """
     Permissões:

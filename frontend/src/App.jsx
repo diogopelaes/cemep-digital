@@ -8,6 +8,8 @@ import Login from './pages/Login'
 import RecuperarSenha from './pages/RecuperarSenha'
 import Dashboard from './pages/Dashboard'
 import Estudantes from './pages/Estudantes'
+import EstudanteForm from './pages/EstudanteForm'
+import EstudanteDetalhes from './pages/EstudanteDetalhes'
 import Turmas from './pages/Turmas'
 import TurmaForm from './pages/TurmaForm'
 import TurmaDetalhes from './pages/TurmaDetalhes'
@@ -62,8 +64,19 @@ function App() {
         <Route path="/cursos/:id/editar" element={
           <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><CursoForm /></ProtectedRoute>
         } />
+
+        {/* Rotas de Estudantes */}
         <Route path="/estudantes" element={
-          <ProtectedRoute allowedRoles={FUNCIONARIOS}><Estudantes /></ProtectedRoute>
+          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><Estudantes /></ProtectedRoute>
+        } />
+        <Route path="/estudantes/novo" element={
+          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><EstudanteForm /></ProtectedRoute>
+        } />
+        <Route path="/estudantes/:cpf" element={
+          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><EstudanteDetalhes /></ProtectedRoute>
+        } />
+        <Route path="/estudantes/:cpf/editar" element={
+          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><EstudanteForm /></ProtectedRoute>
         } />
         <Route path="/disciplinas" element={
           <ProtectedRoute allowedRoles={FUNCIONARIOS}><Disciplinas /></ProtectedRoute>

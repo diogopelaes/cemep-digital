@@ -8,3 +8,5 @@ export { default as Table, TableHead, TableBody, TableRow, TableHeader, TableCel
 export { default as Badge } from './Badge'
 export { default as Loading, PageLoading, Skeleton } from './Loading'
 export { default as MultiCombobox } from './MultiCombobox'
+export { default as ImageCropper } from './ImageCropper'
+

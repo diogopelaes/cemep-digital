@@ -25,7 +25,7 @@ const formatToISO = (brDate) => {
 const applyDateMask = (value) => {
   // Remove tudo que não é número
   const numbers = value.replace(/\D/g, '').slice(0, 8)
-  
+
   if (numbers.length <= 2) {
     return numbers
   }
@@ -40,26 +40,26 @@ const applyDateMask = (value) => {
  */
 const isValidDate = (brDate) => {
   if (!brDate || brDate.length !== 10) return false
-  
+
   const [day, month, year] = brDate.split('/').map(Number)
-  
+
   if (day < 1 || day > 31) return false
   if (month < 1 || month > 12) return false
   if (year < 1900 || year > 2100) return false
-  
+
   const date = new Date(year, month - 1, day)
-  return date.getDate() === day && 
-         date.getMonth() === month - 1 && 
-         date.getFullYear() === year
+  return date.getDate() === day &&
+    date.getMonth() === month - 1 &&
+    date.getFullYear() === year
 }
 
-const DateInput = forwardRef(({ 
+const DateInput = forwardRef(({
   label,
   error,
   className = '',
   value = '', // Valor em formato ISO (yyyy-mm-dd)
   onChange,
-  ...props 
+  ...props
 }, ref) => {
   const [displayValue, setDisplayValue] = useState(() => formatToBrazilian(value))
   const [showPicker, setShowPicker] = useState(false)
@@ -74,7 +74,7 @@ const DateInput = forwardRef(({
   const handleTextChange = (e) => {
     const masked = applyDateMask(e.target.value)
     setDisplayValue(masked)
-    
+
     // Se a data estiver completa e válida, atualiza o valor ISO
     if (masked.length === 10 && isValidDate(masked)) {
       const isoDate = formatToISO(masked)
@@ -118,6 +118,9 @@ const DateInput = forwardRef(({
           onBlur={handleBlur}
           className={`input pr-12 ${error ? 'input-error' : ''} ${className}`}
           maxLength={10}
+          autoComplete="one-time-code"
+          data-lpignore="true"
+          data-form-type="other"
           {...props}
         />
         <button
@@ -127,7 +130,7 @@ const DateInput = forwardRef(({
         >
           <HiCalendar className="h-5 w-5" />
         </button>
-        
+
         {/* Input date escondido para usar o picker nativo */}
         <input
           ref={hiddenInputRef}
@@ -136,6 +139,7 @@ const DateInput = forwardRef(({
           onChange={handlePickerChange}
           className="date-picker-hidden"
           tabIndex={-1}
+          autoComplete="off"
         />
       </div>
       {error && (

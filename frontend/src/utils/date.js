@@ -10,15 +10,15 @@
  */
 export const formatDateBR = (date, options = {}) => {
   if (!date) return ''
-  
+
   try {
     // Se for string no formato ISO (yyyy-mm-dd), adiciona T00:00:00 para evitar problemas de timezone
     const dateObj = typeof date === 'string' && date.match(/^\d{4}-\d{2}-\d{2}$/)
       ? new Date(date + 'T00:00:00')
       : new Date(date)
-    
+
     if (isNaN(dateObj.getTime())) return ''
-    
+
     return dateObj.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
@@ -37,14 +37,14 @@ export const formatDateBR = (date, options = {}) => {
  */
 export const formatDateLongBR = (date) => {
   if (!date) return ''
-  
+
   try {
     const dateObj = typeof date === 'string' && date.match(/^\d{4}-\d{2}-\d{2}$/)
       ? new Date(date + 'T00:00:00')
       : new Date(date)
-    
+
     if (isNaN(dateObj.getTime())) return ''
-    
+
     return dateObj.toLocaleDateString('pt-BR', {
       weekday: 'long',
       day: '2-digit',
@@ -63,12 +63,12 @@ export const formatDateLongBR = (date) => {
  */
 export const formatDateTimeBR = (date) => {
   if (!date) return ''
-  
+
   try {
     const dateObj = new Date(date)
-    
+
     if (isNaN(dateObj.getTime())) return ''
-    
+
     return dateObj.toLocaleString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
@@ -110,5 +110,34 @@ export const isoToBR = (isoDate) => {
   if (!isoDate || isoDate.length !== 10) return ''
   const [year, month, day] = isoDate.split('-')
   return `${day}/${month}/${year}`
+}
+
+/**
+ * Calcula a idade a partir de uma data de nascimento
+ * @param {string|Date} birthDate - Data de nascimento em formato ISO ou Date object
+ * @returns {number|null} Idade em anos ou null se inválida
+ */
+export const calcularIdade = (birthDate) => {
+  if (!birthDate) return null
+
+  try {
+    const dateObj = typeof birthDate === 'string' && birthDate.match(/^\d{4}-\d{2}-\d{2}$/)
+      ? new Date(birthDate + 'T00:00:00')
+      : new Date(birthDate)
+
+    if (isNaN(dateObj.getTime())) return null
+
+    const hoje = new Date()
+    let idade = hoje.getFullYear() - dateObj.getFullYear()
+    const m = hoje.getMonth() - dateObj.getMonth()
+
+    if (m < 0 || (m === 0 && hoje.getDate() < dateObj.getDate())) {
+      idade--
+    }
+
+    return idade
+  } catch {
+    return null
+  }
 }
 

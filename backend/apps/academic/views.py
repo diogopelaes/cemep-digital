@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
+from django.db import transaction
+from django.contrib.auth import get_user_model
 
 from .models import (
     Estudante, Responsavel, ResponsavelEstudante,
@@ -20,11 +22,15 @@ from .serializers import (
     MatriculaCEMEPSerializer, MatriculaTurmaSerializer,
     AtestadoSerializer
 )
-from apps.users.permissions import GestaoSecretariaWriteFuncionarioReadMixin
+from apps.users.permissions import (
+    GestaoSecretariaCRUMixin, 
+    GestaoSecretariaWriteFuncionarioReadMixin
+)
+from apps.users.utils import send_credentials_email
 
 
-class EstudanteViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
-    """ViewSet de Estudantes. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
+class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
+    """ViewSet de Estudantes. CRU: Gestão/Secretaria | Delete: Bloqueado"""
     queryset = Estudante.objects.select_related('usuario').all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['bolsa_familia', 'pe_de_meia', 'usa_onibus']
@@ -34,6 +40,244 @@ class EstudanteViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.Model
         if self.action in ['create']:
             return EstudanteCreateSerializer
         return EstudanteSerializer
+    
+    @action(detail=False, methods=['post'], url_path='criar-completo')
+    def criar_completo(self, request):
+        """Cria usuário e estudante em uma transação atômica."""
+        User = get_user_model()
+        data = request.data
+        
+        # Validações básicas
+        required_fields = ['username', 'password', 'first_name', 'cpf', 
+                          'data_nascimento', 'logradouro', 'numero', 'bairro', 'cep']
+        for field in required_fields:
+            if not data.get(field):
+                return Response(
+                    {'detail': f'Campo obrigatório: {field}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        # Guarda senha antes de hash para enviar por email
+        student_password = data['password']
+        emails_enviados = []
+        
+        try:
+            with transaction.atomic():
+                # Cria o usuário do estudante
+                user = User(
+                    username=data['username'],
+                    email=data.get('email', ''),
+                    first_name=data['first_name'],
+                    last_name='',
+                    telefone=data.get('telefone', ''),
+                    tipo_usuario='ESTUDANTE'
+                )
+                user.set_password(student_password)
+                user.save()
+                
+                # Cria o estudante
+                estudante = Estudante.objects.create(
+                    usuario=user,
+                    cpf=data['cpf'],
+                    cin=data.get('cin', ''),
+                    nome_social=data.get('nome_social', ''),
+                    data_nascimento=data['data_nascimento'],
+                    bolsa_familia=data.get('bolsa_familia', False),
+                    pe_de_meia=data.get('pe_de_meia', True),
+                    usa_onibus=data.get('usa_onibus', True),
+                    linha_onibus=data.get('linha_onibus', ''),
+                    permissao_sair_sozinho=data.get('permissao_sair_sozinho', False),
+                    logradouro=data['logradouro'],
+                    numero=data['numero'],
+                    bairro=data['bairro'],
+                    cidade=data.get('cidade', 'Mogi Guaçu'),
+                    estado=data.get('estado', 'SP'),
+                    cep=data['cep'],
+                    complemento=data.get('complemento', ''),
+                    telefone=data.get('telefone', '')
+                )
+                
+                # Envia email para o estudante
+                if user.email:
+                    result = send_credentials_email(
+                        email=user.email,
+                        nome=data['first_name'],
+                        username=data['username'],
+                        password=student_password,
+                        tipo_usuario='ESTUDANTE'
+                    )
+                    if result['success']:
+                        emails_enviados.append(f"Estudante: {user.email}")
+                
+                # Processa Responsáveis (pode ser lista ou objeto único)
+                responsaveis_data = data.get('responsaveis', [])
+                
+                # Suporte para formato antigo (objeto único)
+                if data.get('responsavel'):
+                    responsaveis_data.append(data['responsavel'])
+                
+                for resp_data in responsaveis_data:
+                    if not resp_data or not resp_data.get('cpf'):
+                        continue
+                    
+                    resp_cpf = resp_data.get('cpf')
+                    resp_nome = resp_data.get('nome', '')
+                    resp_telefone = resp_data.get('telefone', '')
+                    resp_email = resp_data.get('email', '')
+                    resp_parentesco = resp_data.get('parentesco', 'OUTRO')
+                    
+                    # Senha padrão para responsável = CPF
+                    resp_password = resp_cpf
+                    is_new_user = False
+                    
+                    # Verifica/Cria Usuário do Responsável
+                    resp_user = User.objects.filter(username=resp_cpf).first()
+                    if not resp_user:
+                        is_new_user = True
+                        resp_user = User(
+                            username=resp_cpf,
+                            email=resp_email,
+                            first_name=resp_nome,
+                            last_name='',
+                            tipo_usuario='RESPONSAVEL',
+                            telefone=resp_telefone
+                        )
+                        resp_user.set_password(resp_password)
+                        resp_user.save()
+                    
+                    # Verifica/Cria Perfil Responsável
+                    responsavel, created = Responsavel.objects.get_or_create(
+                        cpf=resp_cpf,
+                        defaults={
+                            'usuario': resp_user,
+                            'telefone': resp_telefone
+                        }
+                    )
+                    
+                    # Vincula ao Estudante (evita duplicata)
+                    ResponsavelEstudante.objects.get_or_create(
+                        responsavel=responsavel,
+                        estudante=estudante,
+                        defaults={
+                            'parentesco': resp_parentesco,
+                            'telefone': resp_telefone
+                        }
+                    )
+                    
+                    # Envia email apenas para novos usuários
+                    if is_new_user and resp_email:
+                        result = send_credentials_email(
+                            email=resp_email,
+                            nome=resp_nome,
+                            username=resp_cpf,
+                            password=resp_password,
+                            tipo_usuario='RESPONSAVEL'
+                        )
+                        if result['success']:
+                            emails_enviados.append(f"Responsável: {resp_email}")
+                
+                response_data = EstudanteSerializer(estudante).data
+                response_data['emails_enviados'] = emails_enviados
+                
+                return Response(response_data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(
+                {'detail': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    @action(detail=True, methods=['put'], url_path='atualizar-completo')
+    def atualizar_completo(self, request, pk=None):
+        """Atualiza usuário e estudante em uma transação atômica."""
+        estudante = self.get_object()
+        data = request.data
+        
+        try:
+            with transaction.atomic():
+                # Atualiza o usuário
+                user = estudante.usuario
+                if 'first_name' in data:
+                    user.first_name = data['first_name']
+                    user.last_name = '' # Garante que last_name fique vazio se alguém mexer direto
+                
+                if 'email' in data:
+                    user.email = data['email']
+                if 'telefone' in data:
+                    user.telefone = data['telefone']
+                user.save()
+                
+                # Atualiza o estudante
+                campos_estudante = [
+                    'cin', 'nome_social', 'data_nascimento',
+                    'bolsa_familia', 'pe_de_meia', 'usa_onibus', 'linha_onibus',
+                    'permissao_sair_sozinho', 'logradouro', 'numero', 'bairro',
+                    'cidade', 'estado', 'cep', 'complemento', 'telefone'
+                ]
+                for campo in campos_estudante:
+                    if campo in data:
+                        setattr(estudante, campo, data[campo])
+                estudante.save()
+                
+                return Response(EstudanteSerializer(estudante).data)
+        except Exception as e:
+            return Response(
+                {'detail': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    @action(detail=True, methods=['post'], url_path='upload-foto')
+    def upload_foto(self, request, pk=None):
+        """Faz upload da foto 3x4 do estudante (salva no User associado)."""
+        estudante = self.get_object()
+        user = estudante.usuario
+        
+        if 'foto' not in request.FILES:
+            return Response(
+                {'detail': 'Nenhuma foto enviada'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        foto = request.FILES['foto']
+        
+        # Valida tipo de arquivo
+        allowed_types = ['image/jpeg', 'image/png', 'image/webp']
+        if foto.content_type not in allowed_types:
+            return Response(
+                {'detail': 'Formato inválido. Use JPEG, PNG ou WebP.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Limita tamanho a 5MB
+        if foto.size > 5 * 1024 * 1024:
+            return Response(
+                {'detail': 'A foto deve ter no máximo 5MB.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Remove foto antiga se existir
+        if user.foto:
+            user.foto.delete(save=False)
+        
+        user.foto = foto
+        user.save()
+        
+        return Response({
+            'detail': 'Foto atualizada com sucesso!',
+            'foto': request.build_absolute_uri(user.foto.url) if user.foto else None
+        })
+    
+    @action(detail=True, methods=['delete'], url_path='remover-foto')
+    def remover_foto(self, request, pk=None):
+        """Remove a foto 3x4 do estudante."""
+        estudante = self.get_object()
+        user = estudante.usuario
+        
+        if user.foto:
+            user.foto.delete(save=False)
+            user.foto = None
+            user.save()
+        
+        return Response({'detail': 'Foto removida com sucesso!'})
     
     @action(detail=True, methods=['get'])
     def prontuario(self, request, pk=None):

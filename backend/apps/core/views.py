@@ -30,6 +30,7 @@ from apps.users.permissions import (
     GestaoSecretariaWritePublicReadMixin
 )
 from apps.users.models import User
+from apps.users.utils import send_credentials_email
 
 
 class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
@@ -69,11 +70,14 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
         
         data = serializer.validated_data
         
+        # Guarda senha antes de hash para enviar por email
+        password_plain = data['password']
+        
         # Criar usuário
         user = User.objects.create_user(
             username=data['username'],
             email=data.get('email', ''),
-            password=data['password'],
+            password=password_plain,
             first_name=data['nome'],
             telefone=data.get('telefone', ''),
             tipo_usuario=data['tipo_usuario'],
@@ -94,10 +98,23 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
             data_saida=None,  # Ainda em atividade
         )
         
-        return Response(
-            FuncionarioSerializer(funcionario).data,
-            status=status.HTTP_201_CREATED
-        )
+        # Envia email com credenciais
+        email_result = None
+        if user.email:
+            email_result = send_credentials_email(
+                email=user.email,
+                nome=data['nome'],
+                username=data['username'],
+                password=password_plain,
+                tipo_usuario=data['tipo_usuario']
+            )
+        
+        response_data = FuncionarioSerializer(funcionario).data
+        if email_result:
+            response_data['email_enviado'] = email_result['success']
+            response_data['email_message'] = email_result['message']
+        
+        return Response(response_data, status=status.HTTP_201_CREATED)
     
     @action(detail=True, methods=['put'], url_path='atualizar-completo')
     @transaction.atomic

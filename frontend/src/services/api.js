@@ -173,11 +173,16 @@ export const academicAPI = {
   // Estudantes
   estudantes: {
     list: (params) => api.get('/academic/estudantes/', { params }),
-    get: (id) => api.get(`/academic/estudantes/${id}/`),
+    get: (cpf) => api.get(`/academic/estudantes/${cpf}/`),
     create: (data) => api.post('/academic/estudantes/', data),
-    update: (id, data) => api.patch(`/academic/estudantes/${id}/`, data),
-    delete: (id) => api.delete(`/academic/estudantes/${id}/`),
-    prontuario: (id) => api.get(`/academic/estudantes/${id}/prontuario/`),
+    criarCompleto: (data) => api.post('/academic/estudantes/criar-completo/', data),
+    atualizarCompleto: (cpf, data) => api.put(`/academic/estudantes/${cpf}/atualizar-completo/`, data),
+    update: (cpf, data) => api.patch(`/academic/estudantes/${cpf}/`, data),
+    prontuario: (cpf) => api.get(`/academic/estudantes/${cpf}/prontuario/`),
+    uploadFoto: (cpf, formData) => api.post(`/academic/estudantes/${cpf}/upload-foto/`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    removerFoto: (cpf) => api.delete(`/academic/estudantes/${cpf}/remover-foto/`),
   },
   // Matrículas
   matriculasCemep: {
