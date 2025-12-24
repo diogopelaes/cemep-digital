@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Input, Card } from '../components/ui'
-import { HiMail, HiArrowLeft } from 'react-icons/hi'
+import { HiArrowLeft, HiMail } from 'react-icons/hi'
 import { authAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -13,7 +13,7 @@ export default function RecuperarSenha() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    
+
     try {
       await authAPI.resetPassword({ email })
       setSent(true)
@@ -21,14 +21,14 @@ export default function RecuperarSenha() {
     } catch (error) {
       toast.error(error.response?.data?.email?.[0] || 'Erro ao enviar e-mail')
     }
-    
+
     setLoading(false)
   }
 
   if (sent) {
     return (
       <div className="animate-fade-in text-center">
-        <Card>
+        <Card hover={false}>
           <div className="py-8">
             <div className="w-16 h-16 rounded-full bg-success-500/10 flex items-center justify-center mx-auto mb-4">
               <HiMail className="h-8 w-8 text-success-500" />
@@ -61,17 +61,21 @@ export default function RecuperarSenha() {
         </p>
       </div>
 
-      <Card className="animate-slide-up">
+      <Card hover={false}>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Input
-            label="E-mail"
-            type="email"
-            placeholder="Digite seu e-mail"
-            icon={HiMail}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <div>
+            <label className="label">E-mail</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Digite seu e-mail"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input"
+              autoComplete="email"
+              required
+            />
+          </div>
 
           <Button
             type="submit"
@@ -83,8 +87,8 @@ export default function RecuperarSenha() {
         </form>
 
         <div className="mt-6 text-center">
-          <Link 
-            to="/login" 
+          <Link
+            to="/login"
             className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-primary-600"
           >
             <HiArrowLeft className="h-4 w-4" />

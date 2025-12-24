@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Button, Input, Card } from '../components/ui'
 import { LOGO_PATH, SYSTEM_NAME } from '../config/constants'
-import { HiMail, HiLockClosed } from 'react-icons/hi'
+import { HiEye, HiEyeOff } from 'react-icons/hi'
 
 export default function Login() {
   const { login } = useAuth()
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -38,27 +39,45 @@ export default function Login() {
       </div>
 
       {/* Card de Login */}
-      <Card className="animate-slide-up">
+      <Card hover={false}>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Input
-            label="Usuário ou E-mail"
-            type="text"
-            placeholder="Digite seu usuário ou e-mail"
-            icon={HiMail}
-            value={formData.username}
-            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-            required
-          />
+          <div>
+            <label className="label">Usuário ou E-mail</label>
+            <input
+              type="text"
+              name="username"
+              placeholder="Digite seu usuário ou e-mail"
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              className="input"
+              autoComplete="username"
+              required
+            />
+          </div>
 
-          <Input
-            label="Senha"
-            type="password"
-            placeholder="Digite sua senha"
-            icon={HiLockClosed}
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            required
-          />
+          <div>
+            <label className="label">Senha</label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                placeholder="Digite sua senha"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                autoComplete="current-password"
+                className="input pr-10"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                title={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              >
+                {showPassword ? <HiEyeOff className="h-5 w-5" /> : <HiEye className="h-5 w-5" />}
+              </button>
+            </div>
+          </div>
 
           <Button
             type="submit"

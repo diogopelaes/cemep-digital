@@ -135,25 +135,33 @@ class PasswordResetRequestView(generics.GenericAPIView):
         user.set_password(temp_password)
         user.save()
         
-        # Envia o e-mail
-        send_mail(
-            subject='CEMEP Digital - Recuperação de Senha',
-            message=f'''
-Olá {user.first_name},
-
-Você solicitou a recuperação de senha.
-
-Sua nova senha temporária é: {temp_password}
-
-Por favor, altere sua senha após o login.
-
-Atenciosamente,
-Equipe CEMEP Digital
-            ''',
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            fail_silently=False,
-        )
+        # Contexto para o template de e-mail
+        context = {
+            'nome': user.first_name or user.username,
+            'username': user.username,
+            'password': temp_password,
+            'site_url': settings.SITE_URL,
+            'site_name': settings.SITE_NAME,
+            'institution_name': settings.INSTITUTION_NAME,
+            'logo_url': f"{settings.SITE_URL}/static/img/{settings.INSTITUTIONAL_DATA['institution']['logo']['filename']}",
+        }
+        
+        try:
+            # Renderiza o template HTML
+            html_message = render_to_string('emails/password_reset_email.html', context)
+            plain_message = strip_tags(html_message)
+            
+            send_mail(
+                subject=f'{settings.SITE_NAME} - Recuperação de Senha',
+                message=plain_message,
+                html_message=html_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            # Em caso de erro no envio, podemos logar o erro
+            print(f"Erro ao enviar e-mail de recuperação: {e}")
         
         return Response({'message': 'E-mail de recuperação enviado.'})
 

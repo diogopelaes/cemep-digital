@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Card, Button, Select, Table, TableHead, TableBody, TableRow,
+  Card, Button, Input, Select, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading, Badge, Modal, ModalFooter, DateInput, Pagination
 } from '../components/ui'
 import {
   HiPlus, HiPencil, HiCalendar, HiCheck, HiX, HiRefresh, HiUser,
-  HiCheckCircle, HiXCircle, HiPrinter
+  HiCheckCircle, HiXCircle, HiPrinter, HiSearch
 } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import { formatDateBR } from '../utils/date'
@@ -36,6 +36,7 @@ export default function Funcionarios() {
   const [loading, setLoading] = useState(true)
   const [funcionarios, setFuncionarios] = useState([])
   const [generatingPDF, setGeneratingPDF] = useState(null)
+  const [search, setSearch] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('')
   const [filtroAtivo, setFiltroAtivo] = useState('')
 
@@ -55,13 +56,17 @@ export default function Funcionarios() {
   const [totalCount, setTotalCount] = useState(0)
   const pageSize = 20
 
+  // Debounce para busca automática
   useEffect(() => {
-    loadFuncionarios()
-  }, [filtroTipo, filtroAtivo, currentPage])
+    const timer = setTimeout(() => {
+      loadFuncionarios()
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [search, filtroTipo, filtroAtivo, currentPage])
 
   const loadFuncionarios = async () => {
     try {
-      const params = { page: currentPage }
+      const params = { search, page: currentPage }
       if (filtroTipo) params['usuario__tipo_usuario'] = filtroTipo
       if (filtroAtivo !== '') params['usuario__is_active'] = filtroAtivo
 
@@ -287,9 +292,17 @@ export default function Funcionarios() {
         </Button>
       </div>
 
-      {/* Filtros */}
+      {/* Busca e Filtros */}
       <Card hover={false}>
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 items-end">
+          <div className="flex-1 min-w-[200px]">
+            <Input
+              placeholder="Buscar por matrícula, nome ou apelido..."
+              icon={HiSearch}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
           <div className="w-48">
             <Select
               label="Tipo"

@@ -27,9 +27,13 @@ export default function Estudantes() {
   const [totalCount, setTotalCount] = useState(0)
   const pageSize = 20
 
+  // Debounce para busca automática
   useEffect(() => {
-    loadEstudantes()
-  }, [currentPage])
+    const timer = setTimeout(() => {
+      loadEstudantes()
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [search, currentPage])
 
   const loadEstudantes = async () => {
     try {
@@ -42,12 +46,6 @@ export default function Estudantes() {
       toast.error('Erro ao carregar estudantes')
     }
     setLoading(false)
-  }
-
-  const handleSearch = (e) => {
-    e.preventDefault()
-    setCurrentPage(1)
-    loadEstudantes()
   }
 
   const handlePageChange = (page) => {
@@ -243,17 +241,12 @@ export default function Estudantes() {
 
       {/* Search */}
       <Card hover={false}>
-        <form onSubmit={handleSearch} className="flex gap-4">
-          <div className="flex-1">
-            <Input
-              placeholder="Buscar por nome, CPF..."
-              icon={HiSearch}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <Button type="submit">Buscar</Button>
-        </form>
+        <Input
+          placeholder="Buscar por nome, CPF ou nome social..."
+          icon={HiSearch}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </Card>
 
       {/* Table */}

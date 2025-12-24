@@ -1,7 +1,7 @@
 """
 Views para o App Core
 """
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -36,8 +36,9 @@ from apps.users.utils import send_credentials_email
 class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
     """ViewSet de Funcionários. Leitura: Funcionários | Escrita: Gestão"""
     queryset = Funcionario.objects.select_related('usuario').all()
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['usuario__tipo_usuario', 'usuario__is_active']
+    search_fields = ['matricula', 'usuario__first_name', 'apelido']
     
     def get_serializer_class(self):
         if self.action == 'criar_completo':
