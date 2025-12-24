@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Card, Button, Table, TableHead, TableBody, TableRow,
-  TableHeader, TableCell, TableEmpty, Loading
+  TableHeader, TableCell, TableEmpty, Loading, Pagination
 } from '../components/ui'
 import { HiPlus, HiTrash, HiBookOpen, HiX, HiCheck } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
@@ -14,18 +14,31 @@ export default function Cursos() {
   const [cursos, setCursos] = useState([])
   const [confirmDelete, setConfirmDelete] = useState(null)
 
+  // Paginação
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const pageSize = 20
+
   useEffect(() => {
     loadCursos()
-  }, [])
+  }, [currentPage])
 
   const loadCursos = async () => {
     try {
-      const response = await coreAPI.cursos.list()
-      setCursos(response.data.results || response.data)
+      const response = await coreAPI.cursos.list({ page: currentPage })
+      const data = response.data
+      setCursos(data.results || data)
+      setTotalCount(data.count || (data.results || data).length)
+      setTotalPages(Math.ceil((data.count || (data.results || data).length) / pageSize))
     } catch (error) {
       toast.error('Erro ao carregar cursos')
     }
     setLoading(false)
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
   }
 
   const handleDelete = async (curso) => {
@@ -147,7 +160,17 @@ export default function Cursos() {
             )}
           </TableBody>
         </Table>
+
+        {/* Paginação */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalCount}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+        />
       </Card>
     </div>
   )
 }
+

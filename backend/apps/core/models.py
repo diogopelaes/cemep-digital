@@ -114,8 +114,24 @@ class PeriodoTrabalho(models.Model):
 class Disciplina(models.Model):
     """Disciplina do currículo escolar."""
     
+    class AreaConhecimento(models.TextChoices):
+        LINGUAGENS = 'LINGUAGENS', 'Linguagens e suas Tecnologias'
+        MATEMATICA = 'MATEMATICA', 'Matemática e suas Tecnologias'
+        CIENCIAS_NATUREZA = 'CIENCIAS_NATUREZA', 'Ciências da Natureza e suas Tecnologias'
+        CIENCIAS_HUMANAS = 'CIENCIAS_HUMANAS', 'Ciências Humanas e Sociais Aplicadas'
+        TEC_INFORMATICA = 'TEC_INFORMATICA', 'Técnico em Informática'
+        TEC_QUIMICA = 'TEC_QUIMICA', 'Técnico em Química'
+        TEC_ENFERMAGEM = 'TEC_ENFERMAGEM', 'Técnico em Enfermagem'
+    
     nome = models.CharField(max_length=100, verbose_name='Nome')
     sigla = models.CharField(max_length=10, verbose_name='Sigla')
+    area_conhecimento = models.CharField(
+        max_length=20,
+        choices=AreaConhecimento.choices,
+        null=True,
+        blank=True,
+        verbose_name='Área de Conhecimento'
+    )
     descontinuada = models.BooleanField(default=False, verbose_name='Descontinuada')
     
     class Meta:

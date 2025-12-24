@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Card, Button, Select, Table, TableHead, TableBody, TableRow,
-  TableHeader, TableCell, TableEmpty, Loading
+  TableHeader, TableCell, TableEmpty, Loading, Pagination
 } from '../components/ui'
 import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
@@ -14,17 +14,24 @@ export default function Turmas() {
   const [turmas, setTurmas] = useState([])
   const [anosDisponiveis, setAnosDisponiveis] = useState([])
   const [anoLetivo, setAnoLetivo] = useState(null)
+
+  // Paginação
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const pageSize = 20
+
   // Carrega anos disponíveis na primeira montagem
   useEffect(() => {
     loadAnosDisponiveis()
   }, [])
 
-  // Carrega turmas quando o ano muda
+  // Carrega turmas quando o ano muda ou página muda
   useEffect(() => {
     if (anoLetivo) {
       loadTurmas()
     }
-  }, [anoLetivo])
+  }, [anoLetivo, currentPage])
 
   const loadAnosDisponiveis = async () => {
     try {
@@ -52,13 +59,27 @@ export default function Turmas() {
   const loadTurmas = async () => {
     setLoading(true)
     try {
-      const response = await coreAPI.turmas.list({ ano_letivo: anoLetivo })
-      setTurmas(response.data.results || response.data)
+      const response = await coreAPI.turmas.list({ ano_letivo: anoLetivo, page: currentPage })
+      const data = response.data
+      setTurmas(data.results || data)
+      setTotalCount(data.count || (data.results || data).length)
+      setTotalPages(Math.ceil((data.count || (data.results || data).length) / pageSize))
     } catch (error) {
       toast.error('Erro ao carregar turmas')
     }
     setLoading(false)
   }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
+  // Reset página quando muda o ano
+  const handleAnoChange = (e) => {
+    setAnoLetivo(parseInt(e.target.value))
+    setCurrentPage(1)
+  }
+
 
   // Formata o nome da turma
   const formatTurmaNome = (turma) => {
@@ -99,7 +120,7 @@ export default function Turmas() {
               <Select
                 label="Ano Letivo"
                 value={anoLetivo}
-                onChange={(e) => setAnoLetivo(parseInt(e.target.value))}
+                onChange={handleAnoChange}
                 options={anosDisponiveis.map(ano => ({ value: ano, label: ano.toString() }))}
               />
             </div>
@@ -175,6 +196,15 @@ export default function Turmas() {
             )}
           </TableBody>
         </Table>
+
+        {/* Paginação */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalCount}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+        />
       </Card>
     </div>
   )

@@ -10,4 +10,5 @@ export { default as Loading, PageLoading, Skeleton } from './Loading'
 export { default as MultiCombobox } from './MultiCombobox'
 export { default as Combobox } from './Combobox'
 export { default as ImageCropper } from './ImageCropper'
+export { default as Pagination } from './Pagination'
 

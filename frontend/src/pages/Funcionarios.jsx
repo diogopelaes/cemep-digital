@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Card, Button, Select, Table, TableHead, TableBody, TableRow,
-  TableHeader, TableCell, TableEmpty, Loading, Badge, Modal, ModalFooter, DateInput
+  TableHeader, TableCell, TableEmpty, Loading, Badge, Modal, ModalFooter, DateInput, Pagination
 } from '../components/ui'
 import {
   HiPlus, HiPencil, HiCalendar, HiCheck, HiX, HiRefresh, HiUser,
@@ -49,22 +49,46 @@ export default function Funcionarios() {
   const [modalReset, setModalReset] = useState({ open: false, funcionario: null })
   const [loadingReset, setLoadingReset] = useState(false)
 
+  // Paginação
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const pageSize = 20
+
   useEffect(() => {
     loadFuncionarios()
-  }, [filtroTipo, filtroAtivo])
+  }, [filtroTipo, filtroAtivo, currentPage])
 
   const loadFuncionarios = async () => {
     try {
-      const params = {}
+      const params = { page: currentPage }
       if (filtroTipo) params['usuario__tipo_usuario'] = filtroTipo
       if (filtroAtivo !== '') params['usuario__is_active'] = filtroAtivo
 
       const response = await coreAPI.funcionarios.list(params)
-      setFuncionarios(response.data.results || response.data)
+      const data = response.data
+      setFuncionarios(data.results || data)
+      setTotalCount(data.count || (data.results || data).length)
+      setTotalPages(Math.ceil((data.count || (data.results || data).length) / pageSize))
     } catch (error) {
       toast.error('Erro ao carregar funcionários')
     }
     setLoading(false)
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
+  // Reset página quando muda filtro
+  const handleFiltroTipoChange = (e) => {
+    setFiltroTipo(e.target.value)
+    setCurrentPage(1)
+  }
+
+  const handleFiltroAtivoChange = (e) => {
+    setFiltroAtivo(e.target.value)
+    setCurrentPage(1)
   }
 
   const handleToggleAtivo = async (funcionario) => {
@@ -270,7 +294,7 @@ export default function Funcionarios() {
             <Select
               label="Tipo"
               value={filtroTipo}
-              onChange={(e) => setFiltroTipo(e.target.value)}
+              onChange={handleFiltroTipoChange}
               options={TIPOS_USUARIO}
               placeholder="Todos"
             />
@@ -279,7 +303,7 @@ export default function Funcionarios() {
             <Select
               label="Status"
               value={filtroAtivo}
-              onChange={(e) => setFiltroAtivo(e.target.value)}
+              onChange={handleFiltroAtivoChange}
               options={[
                 { value: 'true', label: 'Ativos' },
                 { value: 'false', label: 'Inativos' },
@@ -399,6 +423,15 @@ export default function Funcionarios() {
           )}
         </TableBody>
       </Table>
+
+      {/* Paginação */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalCount}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+      />
 
       {/* Modal de Períodos */}
       <Modal

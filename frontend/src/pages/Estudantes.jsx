@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Card, Button, Input, Table, TableHead, TableBody, TableRow,
-  TableHeader, TableCell, TableEmpty, Badge, Loading
+  TableHeader, TableCell, TableEmpty, Badge, Loading, Pagination
 } from '../components/ui'
 import { HiPlus, HiSearch, HiPrinter, HiDownload, HiUser } from 'react-icons/hi'
 import { academicAPI } from '../services/api'
@@ -21,14 +21,23 @@ export default function Estudantes() {
   const [search, setSearch] = useState('')
   const [generatingPDF, setGeneratingPDF] = useState(null)
 
+  // Paginação
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const pageSize = 20
+
   useEffect(() => {
     loadEstudantes()
-  }, [])
+  }, [currentPage])
 
   const loadEstudantes = async () => {
     try {
-      const response = await academicAPI.estudantes.list({ search })
-      setEstudantes(response.data.results || response.data)
+      const response = await academicAPI.estudantes.list({ search, page: currentPage })
+      const data = response.data
+      setEstudantes(data.results || data)
+      setTotalCount(data.count || (data.results || data).length)
+      setTotalPages(Math.ceil((data.count || (data.results || data).length) / pageSize))
     } catch (error) {
       toast.error('Erro ao carregar estudantes')
     }
@@ -37,7 +46,12 @@ export default function Estudantes() {
 
   const handleSearch = (e) => {
     e.preventDefault()
+    setCurrentPage(1)
     loadEstudantes()
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
   }
 
   const handleView = (estudante) => {
@@ -332,6 +346,15 @@ export default function Estudantes() {
           )}
         </TableBody>
       </Table>
+
+      {/* Paginação */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalCount}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+      />
     </div>
   )
 }

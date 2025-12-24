@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Card, Button, Table, TableHead, TableBody, TableRow,
-  TableHeader, TableCell, TableEmpty, Loading
+  Card, Button, Select, Table, TableHead, TableBody, TableRow,
+  TableHeader, TableCell, TableEmpty, Loading, Pagination
 } from '../components/ui'
 import { HiPlus, HiTrash, HiBookOpen, HiX, HiCheck, HiAcademicCap } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
@@ -13,22 +13,44 @@ export default function Disciplinas() {
   const [loading, setLoading] = useState(true)
   const [disciplinas, setDisciplinas] = useState([])
   const [confirmDelete, setConfirmDelete] = useState(null)
-  const [mostrarDescontinuadas, setMostrarDescontinuadas] = useState(false)
+  const [filtroStatus, setFiltroStatus] = useState('false')
+
+  // Paginação
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const pageSize = 20
 
   useEffect(() => {
     loadDisciplinas()
-  }, [mostrarDescontinuadas])
+  }, [filtroStatus, currentPage])
 
   const loadDisciplinas = async () => {
     setLoading(true)
     try {
-      const params = mostrarDescontinuadas ? {} : { descontinuada: false }
+      const params = { page: currentPage }
+      if (filtroStatus !== '') {
+        params.descontinuada = filtroStatus
+      }
+
       const response = await coreAPI.disciplinas.list(params)
-      setDisciplinas(response.data.results || response.data)
+      const data = response.data
+      setDisciplinas(data.results || data)
+      setTotalCount(data.count || (data.results || data).length)
+      setTotalPages(Math.ceil((data.count || (data.results || data).length) / pageSize))
     } catch (error) {
       toast.error('Erro ao carregar disciplinas')
     }
     setLoading(false)
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
+  const handleFiltroStatusChange = (e) => {
+    setFiltroStatus(e.target.value)
+    setCurrentPage(1)
   }
 
   const handleDelete = async (disciplina) => {
@@ -64,29 +86,28 @@ export default function Disciplinas() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          {/* Filtro Descontinuadas */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-500 dark:text-slate-400">
-              Mostrar descontinuadas
-            </span>
-            <button
-              onClick={() => setMostrarDescontinuadas(!mostrarDescontinuadas)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${mostrarDescontinuadas
-                  ? 'bg-amber-500'
-                  : 'bg-slate-300 dark:bg-slate-600'
-                }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${mostrarDescontinuadas ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-              />
-            </button>
-          </div>
           <Button icon={HiPlus} onClick={() => navigate('/disciplinas/novo')}>
             Nova Disciplina
           </Button>
         </div>
       </div>
+
+      {/* Filtros */}
+      <Card hover={false}>
+        <div className="w-48">
+          <Select
+            label="Status"
+            value={filtroStatus}
+            onChange={handleFiltroStatusChange}
+            options={[
+              { value: 'false', label: 'Ativas' },
+              { value: 'true', label: 'Descontinuadas' },
+            ]}
+            placeholder="Todas"
+          />
+        </div>
+      </Card>
+
 
       {/* Tabela */}
       <Card hover={false}>
@@ -142,8 +163,8 @@ export default function Disciplinas() {
                             <HiBookOpen className="h-5 w-5 text-white" />
                           </div>
                           <span className={`font-medium group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors ${disciplina.descontinuada
-                              ? 'text-slate-400 dark:text-slate-500 line-through'
-                              : 'text-slate-800 dark:text-white'
+                            ? 'text-slate-400 dark:text-slate-500 line-through'
+                            : 'text-slate-800 dark:text-white'
                             }`}>
                             {disciplina.nome}
                           </span>
@@ -184,20 +205,16 @@ export default function Disciplinas() {
             )}
           </TableBody>
         </Table>
-      </Card>
 
-      {/* Dica */}
-      <div className="flex items-start gap-3 p-4 rounded-xl bg-primary-500/10 border border-primary-500/20">
-        <HiAcademicCap className="h-6 w-6 text-primary-600 dark:text-primary-400 flex-shrink-0 mt-0.5" />
-        <div>
-          <p className="text-sm font-medium text-primary-700 dark:text-primary-300">
-            Gerenciamento de Habilidades BNCC
-          </p>
-          <p className="text-sm text-primary-600/80 dark:text-primary-400/80 mt-1">
-            Clique em "Editar" para gerenciar as habilidades vinculadas a cada disciplina.
-          </p>
-        </div>
-      </div>
-    </div>
+        {/* Paginação */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalCount}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+        />
+      </Card>
+    </div >
   )
 }
