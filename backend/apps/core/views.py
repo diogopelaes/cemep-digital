@@ -90,6 +90,19 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
             matricula=data['matricula'],
             area_atuacao=data.get('area_atuacao') or None,
             apelido=data.get('apelido') or None,
+            cpf=data.get('cpf') or None,
+            cin=data.get('cin') or '',
+            nome_social=data.get('nome_social') or '',
+            data_nascimento=data.get('data_nascimento'),
+            logradouro=data.get('logradouro') or '',
+            numero=data.get('numero') or '',
+            bairro=data.get('bairro') or '',
+            cidade=data.get('cidade') or 'Mogi Guaçu',
+            estado=data.get('estado') or 'SP',
+            cep=data.get('cep') or '',
+            complemento=data.get('complemento') or '',
+            telefone=data.get('telefone') or '',  # Telefone duplicado no model Funcionario
+            data_admissao=data.get('data_admissao'),
         )
         
         # Criar período de trabalho inicial
@@ -144,6 +157,25 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
         funcionario.matricula = data['matricula']
         funcionario.area_atuacao = data.get('area_atuacao') or None
         funcionario.apelido = data.get('apelido') or None
+        
+        # Novos campos
+        funcionario.cpf = data.get('cpf') or None
+        funcionario.cin = data.get('cin') or ''
+        funcionario.nome_social = data.get('nome_social') or ''
+        funcionario.data_nascimento = data.get('data_nascimento')
+        funcionario.logradouro = data.get('logradouro') or ''
+        funcionario.numero = data.get('numero') or ''
+        funcionario.bairro = data.get('bairro') or ''
+        funcionario.cidade = data.get('cidade') or 'Mogi Guaçu'
+        funcionario.estado = data.get('estado') or 'SP'
+        funcionario.cep = data.get('cep') or ''
+        funcionario.complemento = data.get('complemento') or ''
+        if 'telefone' in data:
+            funcionario.telefone = data['telefone']
+        
+        # Data de admissão
+        funcionario.data_admissao = data.get('data_admissao')
+            
         funcionario.save()
         
         # Atualizar ou criar período de trabalho

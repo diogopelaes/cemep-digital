@@ -16,7 +16,11 @@ class FuncionarioSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Funcionario
-        fields = ['id', 'usuario', 'nome_completo', 'matricula', 'area_atuacao', 'apelido', 'data_entrada']
+        fields = [
+            'id', 'usuario', 'nome_completo', 'matricula', 'area_atuacao', 'apelido', 'data_entrada', 'data_admissao',
+            'cpf', 'cin', 'nome_social', 'data_nascimento', 'telefone',
+            'logradouro', 'numero', 'bairro', 'cidade', 'estado', 'cep', 'complemento'
+        ]
     
     def get_data_entrada(self, obj):
         """Retorna a data de entrada do primeiro período de trabalho."""
@@ -27,7 +31,11 @@ class FuncionarioSerializer(serializers.ModelSerializer):
 class FuncionarioCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Funcionario
-        fields = ['usuario', 'matricula', 'area_atuacao', 'apelido']
+        fields = [
+            'usuario', 'matricula', 'area_atuacao', 'apelido', 'data_admissao',
+            'cpf', 'cin', 'nome_social', 'data_nascimento', 'telefone',
+            'logradouro', 'numero', 'bairro', 'cidade', 'estado', 'cep', 'complemento'
+        ]
 
 
 class FuncionarioCompletoSerializer(serializers.Serializer):
@@ -51,6 +59,24 @@ class FuncionarioCompletoSerializer(serializers.Serializer):
     area_atuacao = serializers.CharField(max_length=100, required=False, allow_blank=True, allow_null=True)
     apelido = serializers.CharField(max_length=50, required=False, allow_blank=True, allow_null=True)
     data_entrada = serializers.DateField()
+
+    # Dados pessoais extras
+    cpf = serializers.CharField(max_length=14, required=False, allow_blank=True)
+    cin = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    nome_social = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    data_nascimento = serializers.DateField(required=False, allow_null=True)
+    
+    # Endereço
+    logradouro = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    numero = serializers.CharField(max_length=10, required=False, allow_blank=True)
+    bairro = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    cidade = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    estado = serializers.CharField(max_length=2, required=False, allow_blank=True)
+    cep = serializers.CharField(max_length=8, required=False, allow_blank=True)
+    complemento = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    
+    # Data de admissão
+    data_admissao = serializers.DateField(required=False, allow_null=True)
     
     def validate_username(self, value):
         from apps.users.models import User
@@ -89,6 +115,24 @@ class FuncionarioUpdateSerializer(serializers.Serializer):
     area_atuacao = serializers.CharField(max_length=100, required=False, allow_blank=True, allow_null=True)
     apelido = serializers.CharField(max_length=50, required=False, allow_blank=True, allow_null=True)
     data_entrada = serializers.DateField()
+
+    # Dados pessoais extras
+    cpf = serializers.CharField(max_length=14, required=False, allow_blank=True)
+    cin = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    nome_social = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    data_nascimento = serializers.DateField(required=False, allow_null=True)
+    
+    # Endereço
+    logradouro = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    numero = serializers.CharField(max_length=10, required=False, allow_blank=True)
+    bairro = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    cidade = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    estado = serializers.CharField(max_length=2, required=False, allow_blank=True)
+    cep = serializers.CharField(max_length=8, required=False, allow_blank=True)
+    complemento = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    
+    # Data de admissão
+    data_admissao = serializers.DateField(required=False, allow_null=True)
     
     def validate_matricula(self, value):
         funcionario = self.context.get('funcionario')

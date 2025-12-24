@@ -10,9 +10,20 @@ from .models import (
 
 @admin.register(Funcionario)
 class FuncionarioAdmin(admin.ModelAdmin):
-    list_display = ['usuario', 'matricula', 'area_atuacao']
-    list_filter = ['usuario__tipo_usuario']
-    search_fields = ['usuario__first_name', 'usuario__last_name', 'area_atuacao', 'matricula']
+    list_display = ['usuario', 'matricula', 'cpf', 'area_atuacao']
+    list_filter = ['usuario__tipo_usuario', 'estado', 'cidade']
+    search_fields = ['usuario__first_name', 'usuario__last_name', 'area_atuacao', 'matricula', 'cpf']
+    fieldsets = (
+        ('Dados Pessoais', {
+            'fields': ('usuario', 'nome_social', 'cpf', 'cin', 'data_nascimento', 'telefone')
+        }),
+        ('Dados Profissionais', {
+            'fields': ('matricula', 'area_atuacao', 'apelido', 'data_admissao')
+        }),
+        ('Endereço', {
+            'fields': ('logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'cep')
+        }),
+    )
 
 
 @admin.register(PeriodoTrabalho)

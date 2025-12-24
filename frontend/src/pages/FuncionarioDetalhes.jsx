@@ -84,30 +84,61 @@ export default function FuncionarioDetalhes() {
 
             const col1 = CONFIG.margin
             const col2 = CONFIG.margin + (pageWidth - CONFIG.margin * 2) / 2
+            const maxW = 80
 
             let yTemp = y
-            addField(doc, 'Nome Completo', String(funcionario.nome_completo || funcionario.usuario?.first_name || ''), col1, y)
-            y = addField(doc, 'Matrícula', String(funcionario.matricula || '-'), col2, yTemp)
+            let y1 = addField(doc, 'Nome Completo', String(funcionario.nome_completo || funcionario.usuario?.first_name || ''), col1, y, maxW)
+            let y2 = addField(doc, 'Matrícula', String(funcionario.matricula || '-'), col2, yTemp, maxW)
+            y = Math.max(y1, y2)
 
             yTemp = y
-            addField(doc, 'CPF', String(funcionario.cpf || '-'), col1, y)
-            y = addField(doc, 'Tipo de Usuário', String(funcionario.usuario?.tipo_usuario || '-'), col2, yTemp)
+            y1 = addField(doc, 'CPF', String(funcionario.cpf || '-'), col1, y, maxW)
+            y2 = addField(doc, 'Data Nascimento', funcionario.data_nascimento ? formatDateBR(funcionario.data_nascimento) : '-', col2, yTemp, maxW)
+            y = Math.max(y1, y2)
 
             yTemp = y
-            addField(doc, 'E-mail', String(funcionario.usuario?.email || '-'), col1, y)
-            y = addField(doc, 'Telefone', String(funcionario.usuario?.telefone || funcionario.telefone || '-'), col2, yTemp)
+            y1 = addField(doc, 'CIN', String(funcionario.cin || '-'), col1, y, maxW)
+            y2 = addField(doc, 'Nome Social', String(funcionario.nome_social || '-'), col2, yTemp, maxW)
+            y = Math.max(y1, y2)
+
+            yTemp = y
+            y1 = addField(doc, 'Tipo de Usuário', String(funcionario.usuario?.tipo_usuario || '-'), col1, y, maxW)
+            y2 = addField(doc, 'E-mail', String(funcionario.usuario?.email || '-'), col2, yTemp, maxW)
+            y = Math.max(y1, y2)
+
+            yTemp = y
+            y1 = addField(doc, 'Telefone', String(funcionario.usuario?.telefone || funcionario.telefone || '-'), col1, y, maxW)
+            y2 = yTemp // Placeholder for empty col2 if needed, or just keep y1 if single column row
+            y = Math.max(y1, y2)
+
+            // === ENDEREÇO ===
+            y = checkNewPage(doc, y, 40)
+            y = addSectionTitle(doc, 'Endereço', y)
+
+            yTemp = y
+            const endereco = `${funcionario.logradouro || ''}, ${funcionario.numero || ''} ${funcionario.complemento ? ' - ' + funcionario.complemento : ''}`
+            y1 = addField(doc, 'Logradouro', endereco, col1, y, maxW)
+            y2 = addField(doc, 'Bairro', String(funcionario.bairro || '-'), col2, yTemp, maxW)
+            y = Math.max(y1, y2)
+
+            yTemp = y
+            y1 = addField(doc, 'Cidade/UF', `${funcionario.cidade || ''}/${funcionario.estado || ''}`, col1, y, maxW)
+            y2 = addField(doc, 'CEP', String(funcionario.cep || '-'), col2, yTemp, maxW)
+            y = Math.max(y1, y2)
 
             // === DADOS PROFISSIONAIS ===
             y = checkNewPage(doc, y, 40)
             y = addSectionTitle(doc, 'Dados Profissionais', y)
 
             yTemp = y
-            addField(doc, 'Cargo/Função', String(funcionario.cargo || '-'), col1, y)
-            y = addField(doc, 'Área de Atuação', String(funcionario.area_atuacao || '-'), col2, yTemp)
+            y1 = addField(doc, 'Área de Atuação', String(funcionario.area_atuacao || '-'), col1, y, maxW)
+            y2 = addField(doc, 'Apelido', String(funcionario.apelido || '-'), col2, yTemp, maxW)
+            y = Math.max(y1, y2)
 
             yTemp = y
-            addField(doc, 'Data de Admissão', formatDateBR(funcionario.data_admissao), col1, y)
-            y = addField(doc, 'Status', funcionario.usuario?.is_active ? 'Ativo' : 'Inativo', col2, yTemp)
+            y1 = addField(doc, 'Data de Admissão', funcionario.data_admissao ? formatDateBR(funcionario.data_admissao) : '-', col1, y, maxW)
+            y2 = addField(doc, 'Status', funcionario.usuario?.is_active ? 'Ativo' : 'Inativo', col2, yTemp, maxW)
+            y = Math.max(y1, y2)
 
 
             // === PERÍODOS DE TRABALHO ===
@@ -117,7 +148,7 @@ export default function FuncionarioDetalhes() {
 
                 const headers = ['Data Entrada', 'Data Saída', 'Situação']
                 const data = periodos.map(p => [
-                    formatDateBR(p.data_entrada),
+                    p.data_entrada ? formatDateBR(p.data_entrada) : '-',
                     p.data_saida ? formatDateBR(p.data_saida) : '-',
                     p.data_saida ? 'Concluído' : 'Atual'
                 ])
@@ -250,8 +281,18 @@ export default function FuncionarioDetalhes() {
                             />
                             <InfoItem
                                 icon={HiBriefcase}
-                                label="Cargo / Função"
-                                value={funcionario.cargo || '-'}
+                                label="CIN"
+                                value={funcionario.cin || '-'}
+                            />
+                            <InfoItem
+                                icon={HiUser}
+                                label="Nome Social"
+                                value={funcionario.nome_social || '-'}
+                            />
+                            <InfoItem
+                                icon={HiCalendar}
+                                label="Data Nascimento"
+                                value={funcionario.data_nascimento ? formatDateBR(funcionario.data_nascimento) : '-'}
                             />
                             <InfoItem
                                 icon={HiBriefcase}
@@ -259,9 +300,14 @@ export default function FuncionarioDetalhes() {
                                 value={funcionario.area_atuacao || '-'}
                             />
                             <InfoItem
+                                icon={HiUser}
+                                label="Apelido"
+                                value={funcionario.apelido || '-'}
+                            />
+                            <InfoItem
                                 icon={HiCalendar}
                                 label="Data de Admissão"
-                                value={formatDateBR(funcionario.data_admissao)}
+                                value={funcionario.data_admissao ? formatDateBR(funcionario.data_admissao) : '-'}
                             />
                             <InfoItem
                                 icon={HiMail}
@@ -273,6 +319,40 @@ export default function FuncionarioDetalhes() {
                                 label="Telefone"
                                 value={funcionario.usuario?.telefone || funcionario.telefone || '-'}
                             />
+                        </div>
+
+                        {/* Seção de Endereço */}
+                        <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
+                            <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">
+                                Endereço
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <InfoItem
+                                    icon={HiLocationMarker}
+                                    label="Logradouro"
+                                    value={`${funcionario.logradouro || ''}, ${funcionario.numero || ''}`}
+                                />
+                                <InfoItem
+                                    icon={HiLocationMarker}
+                                    label="Complemento"
+                                    value={funcionario.complemento || '-'}
+                                />
+                                <InfoItem
+                                    icon={HiLocationMarker}
+                                    label="Bairro"
+                                    value={funcionario.bairro || '-'}
+                                />
+                                <InfoItem
+                                    icon={HiLocationMarker}
+                                    label="Cidade/UF"
+                                    value={`${funcionario.cidade || ''}/${funcionario.estado || ''}`}
+                                />
+                                <InfoItem
+                                    icon={HiLocationMarker}
+                                    label="CEP"
+                                    value={funcionario.cep || '-'}
+                                />
+                            </div>
                         </div>
 
                         <div className="pt-4 border-t border-slate-200 dark:border-slate-700">

@@ -155,6 +155,9 @@ export function addFooter(doc) {
 export function addSectionTitle(doc, title, y) {
     const pageWidth = doc.internal.pageSize.getWidth()
 
+    // Espaço extra antes do título da seção
+    y += 6
+
     // Fundo colorido
     doc.setFillColor(...COLORS.gray)
     doc.roundedRect(CONFIG.margin, y - 4, pageWidth - (CONFIG.margin * 2), 10, 2, 2, 'F')
@@ -169,7 +172,7 @@ export function addSectionTitle(doc, title, y) {
     doc.setFont('helvetica', 'bold')
     doc.text(title, CONFIG.margin + 8, y + 2)
 
-    return y + 14
+    return y + 16
 }
 
 /**

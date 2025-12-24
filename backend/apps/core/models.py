@@ -5,6 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from ckeditor.fields import RichTextField
+from .validators import validate_cpf
 
 
 class Parentesco(models.TextChoices):
@@ -45,6 +46,28 @@ class Funcionario(models.Model):
         default=None,
         verbose_name='Apelido'
     )
+    cpf = models.CharField(
+        max_length=14, 
+        unique=True,
+        null=True,
+        blank=True,
+        verbose_name='CPF',
+        validators=[validate_cpf]
+    )
+    cin = models.CharField(max_length=20, verbose_name='CIN', blank=True)
+    nome_social = models.CharField(max_length=255, blank=True, verbose_name='Nome Social')
+    data_nascimento = models.DateField(verbose_name='Data de Nascimento', null=True, blank=True)
+    
+    # Endereço
+    logradouro = models.CharField(max_length=255, verbose_name='Logradouro', default='')
+    numero = models.CharField(max_length=10, verbose_name='Número', default='')
+    bairro = models.CharField(max_length=100, verbose_name='Bairro', default='')
+    cidade = models.CharField(max_length=100, default='Mogi Guaçu', verbose_name='Cidade')
+    estado = models.CharField(max_length=2, default='SP', verbose_name='Estado')
+    cep = models.CharField(max_length=8, verbose_name='CEP', default='')
+    complemento = models.CharField(max_length=100, blank=True, verbose_name='Complemento')
+    telefone = models.CharField(max_length=15, blank=True, verbose_name='Telefone')
+    data_admissao = models.DateField(verbose_name='Data de Admissão', null=True, blank=True)
     
     class Meta:
         verbose_name = 'Funcionário'

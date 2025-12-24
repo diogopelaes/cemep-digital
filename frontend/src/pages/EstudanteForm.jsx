@@ -309,7 +309,7 @@ export default function EstudanteForm() {
                 numero: est.numero || '',
                 complemento: est.complemento || '',
                 bairro: est.bairro || '',
-                cidade: est.cidade || 'Mogi Guaçu',
+                cidade: est.cidade || 'Paulínia',
                 estado: est.estado || 'SP',
                 cep: formatCEP(est.cep || ''),
             })
@@ -503,7 +503,7 @@ export default function EstudanteForm() {
                 numero: formData.numero.trim(),
                 complemento: formData.complemento || '',
                 bairro: formData.bairro.trim(),
-                cidade: formData.cidade || 'Mogi Guaçu',
+                cidade: formData.cidade || 'Paulínia',
                 estado: formData.estado || 'SP',
                 cep: cepNumbers,
                 responsaveis: responsaveisPayload,
@@ -882,7 +882,7 @@ export default function EstudanteForm() {
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="flex items-end gap-2">
-                                <div className="flex-1">
+                                <div className="flex-1 min-w-[140px]">
                                     <Input
                                         label="CEP *"
                                         placeholder="00.000-000"
