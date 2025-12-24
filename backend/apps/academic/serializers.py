@@ -15,6 +15,7 @@ class EstudanteSerializer(serializers.ModelSerializer):
     endereco_completo = serializers.CharField(read_only=True)
     nome_exibicao = serializers.SerializerMethodField()
     responsaveis = serializers.SerializerMethodField()
+    cursos_matriculados = serializers.SerializerMethodField()
     
     class Meta:
         model = Estudante
@@ -24,7 +25,8 @@ class EstudanteSerializer(serializers.ModelSerializer):
             'bolsa_familia', 'pe_de_meia', 'usa_onibus', 'linha_onibus',
             'permissao_sair_sozinho',
             'logradouro', 'numero', 'bairro', 'cidade', 'estado', 'cep', 'complemento',
-            'telefone', 'telefone_formatado', 'endereco_completo', 'responsaveis'
+            'telefone', 'telefone_formatado', 'endereco_completo', 'responsaveis',
+            'cursos_matriculados'
         ]
     
     def get_nome_exibicao(self, obj):
@@ -50,6 +52,22 @@ class EstudanteSerializer(serializers.ModelSerializer):
                 }
             })
         return result
+    
+    def get_cursos_matriculados(self, obj):
+        """Retorna lista de cursos em que o estudante está matriculado."""
+        from .models import MatriculaCEMEP
+        matriculas = MatriculaCEMEP.objects.filter(
+            estudante=obj, 
+            status='MATRICULADO'
+        ).select_related('curso')
+        return [
+            {
+                'sigla': m.curso.sigla,
+                'nome': m.curso.nome,
+                'numero_matricula': m.numero_matricula
+            }
+            for m in matriculas
+        ]
 
 
 class EstudanteCreateSerializer(serializers.ModelSerializer):
@@ -100,13 +118,25 @@ class EstudanteCreateSerializer(serializers.ModelSerializer):
         return estudante
 
 
+
+class ResponsavelSummarySerializer(serializers.ModelSerializer):
+    """Serializer simplificado para exibir dados do responsável aninhado."""
+    usuario = UserSerializer(read_only=True)
+    
+    class Meta:
+        model = Responsavel
+        fields = ['cpf', 'usuario', 'cpf_formatado', 'telefone', 'telefone_formatado']
+
+
 class ResponsavelEstudanteSerializer(serializers.ModelSerializer):
     estudante = EstudanteSerializer(read_only=True)
+    responsavel = ResponsavelSummarySerializer(read_only=True)
     parentesco_display = serializers.CharField(source='get_parentesco_display', read_only=True)
     
     class Meta:
         model = ResponsavelEstudante
-        fields = ['id', 'estudante', 'parentesco', 'parentesco_display']
+        fields = ['id', 'estudante', 'responsavel', 'parentesco', 'parentesco_display']
+
 
 
 class ResponsavelSerializer(serializers.ModelSerializer):
@@ -193,11 +223,12 @@ class MatriculaCEMEPSerializer(serializers.ModelSerializer):
         write_only=True
     )
     status_display = serializers.CharField(source='get_status_display', read_only=True)
+    numero_matricula_formatado = serializers.CharField(read_only=True)
     
     class Meta:
         model = MatriculaCEMEP
         fields = [
-            'numero_matricula', 'estudante', 'estudante_id', 'curso', 'curso_id',
+            'numero_matricula', 'numero_matricula_formatado', 'estudante', 'estudante_id', 'curso', 'curso_id',
             'data_entrada', 'data_saida', 'status', 'status_display'
         ]
 

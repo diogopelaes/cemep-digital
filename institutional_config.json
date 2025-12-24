@@ -1,0 +1,49 @@
+{
+    "system": {
+        "name": "CEMEP Digital",
+        "version": "1.0.0",
+        "site_url": "https://cemep.net.br"
+    },
+    "institution": {
+        "name_official": "CEMEP - Centro Municipal de Ensino Profissionalizante",
+        "name_fantasy": "CEMEP",
+        "type": "Pública Municipal",
+        "inep": "35071286",
+        "director": "Wagner Luiz Schmidt",
+        "logo": {
+            "filename": "logo.jpeg",
+            "path_relative": "/logo.jpeg",
+            "format": "1:1"
+        },
+        "contact": {
+            "email": "cemep@paulinia.sp.gov.br",
+            "phone": "(19) 3874-9457",
+            "site": "https://cemep.net.br"
+        },
+        "address": {
+            "street": "Av. Brasil",
+            "number": "330",
+            "complement": "",
+            "neighborhood": "Vila Bressani",
+            "city": "Paulínia",
+            "state": "SP",
+            "zip_code": "13140-496"
+        },
+        "administrative": {
+            "maintainer": "Prefeitura Municipal de Paulínia",
+            "secretary": "Secretaria Municipal de Educação",
+            "cnpj": "",
+            "creation_act": "",
+            "creation_date": ""
+        },
+        "apm": {
+            "has_apm": false,
+            "name": "",
+            "cnpj": ""
+        },
+        "legal": {
+            "authorization_act": "",
+            "recognition_act": ""
+        }
+    }
+}

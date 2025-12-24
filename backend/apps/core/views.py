@@ -189,7 +189,7 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
             'site_url': settings.SITE_URL,
             'site_name': settings.SITE_NAME,
             'institution_name': settings.INSTITUTION_NAME,
-            'logo_url': f"{settings.SITE_URL}/static/img/logo.jpeg",
+            'logo_url': f"{settings.SITE_URL}/static/img/{settings.INSTITUTIONAL_DATA['institution']['logo']['filename']}",
         }
         
         try:

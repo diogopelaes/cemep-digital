@@ -14,8 +14,6 @@ export default function Turmas() {
   const [turmas, setTurmas] = useState([])
   const [anosDisponiveis, setAnosDisponiveis] = useState([])
   const [anoLetivo, setAnoLetivo] = useState(null)
-  const [confirmDelete, setConfirmDelete] = useState(null)
-
   // Carrega anos disponíveis na primeira montagem
   useEffect(() => {
     loadAnosDisponiveis()
@@ -60,20 +58,6 @@ export default function Turmas() {
       toast.error('Erro ao carregar turmas')
     }
     setLoading(false)
-  }
-
-  const handleDelete = async (turma) => {
-    try {
-      await coreAPI.turmas.delete(turma.id)
-      toast.success('Turma excluída com sucesso!')
-      setConfirmDelete(null)
-      loadTurmas()
-      // Recarrega anos disponíveis caso tenha removido a última turma do ano
-      loadAnosDisponiveis()
-    } catch (error) {
-      const msg = error.response?.data?.detail || 'Erro ao excluir turma. Verifique se não há alunos ou disciplinas vinculadas.'
-      toast.error(msg)
-    }
   }
 
   // Formata o nome da turma
@@ -137,96 +121,52 @@ export default function Turmas() {
               <TableHeader>Curso</TableHeader>
               <TableHeader>Estudantes</TableHeader>
               <TableHeader>Disciplinas</TableHeader>
-              <TableHeader className="w-32 text-right">Ações</TableHeader>
             </TableRow>
           </TableHead>
           <TableBody>
             {turmas.length > 0 ? (
               turmas.map((turma) => (
                 <TableRow key={turma.id}>
-                  {confirmDelete?.id === turma.id ? (
-                    // Linha em modo de confirmação de exclusão
-                    <>
-                      <TableCell colSpan={4}>
-                        <span className="text-danger-600 dark:text-danger-400 font-medium">
-                          Confirma exclusão de "{turma.numero}º {turma.letra}"?
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => navigate(`/turmas/${turma.id}`)}
+                        className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center hover:scale-105 hover:shadow-lg transition-all"
+                      >
+                        <span className="text-white font-bold text-sm">
+                          {turma.numero}{turma.letra}
                         </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleDelete(turma)}
-                            className="p-2 rounded-lg bg-danger-500/10 hover:bg-danger-500/20 text-danger-600 transition-colors"
-                            title="Confirmar exclusão"
-                          >
-                            <HiCheck className="h-5 w-5" />
-                          </button>
-                          <button
-                            onClick={() => setConfirmDelete(null)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition-colors"
-                            title="Cancelar"
-                          >
-                            <HiX className="h-5 w-5" />
-                          </button>
-                        </div>
-                      </TableCell>
-                    </>
-                  ) : (
-                    // Linha normal
-                    <>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => navigate(`/turmas/${turma.id}`)}
-                            className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center hover:scale-105 hover:shadow-lg transition-all"
-                          >
-                            <span className="text-white font-bold text-sm">
-                              {turma.numero}{turma.letra}
-                            </span>
-                          </button>
-                          <button
-                            onClick={() => navigate(`/turmas/${turma.id}`)}
-                            className="font-medium text-link-subtle text-left"
-                          >
-                            {formatTurmaNome(turma)}
-                          </button>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-slate-600 dark:text-slate-400">
-                          {turma.curso?.nome || 'Curso não definido'}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1 text-sm text-slate-500">
-                          <HiUserGroup className="h-4 w-4" />
-                          <span>{turma.estudantes_count || 0}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1 text-sm text-slate-500">
-                          <HiBookOpen className="h-4 w-4" />
-                          <span>{turma.disciplinas_count || 0}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => setConfirmDelete(turma)}
-                            className="p-2 rounded-lg hover:bg-danger-500/10 text-danger-600 transition-colors"
-                            title="Excluir"
-                          >
-                            <HiTrash className="h-5 w-5" />
-                          </button>
-                        </div>
-                      </TableCell>
-                    </>
-                  )}
+                      </button>
+                      <button
+                        onClick={() => navigate(`/turmas/${turma.id}`)}
+                        className="font-medium text-link-subtle text-left"
+                      >
+                        {formatTurmaNome(turma)}
+                      </button>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">
+                      {turma.curso?.nome || 'Curso não definido'}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1 text-sm text-slate-500">
+                      <HiUserGroup className="h-4 w-4" />
+                      <span>{turma.estudantes_count || 0}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1 text-sm text-slate-500">
+                      <HiBookOpen className="h-4 w-4" />
+                      <span>{turma.disciplinas_count || 0}</span>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableEmpty
-                colSpan={5}
+                colSpan={4}
                 message={anosDisponiveis.length > 0
                   ? `Nenhuma turma encontrada para ${anoLetivo}`
                   : 'Nenhuma turma cadastrada'

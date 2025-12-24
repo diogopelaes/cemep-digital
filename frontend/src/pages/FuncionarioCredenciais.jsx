@@ -5,13 +5,14 @@ import { HiPrinter, HiMail, HiArrowLeft, HiCheckCircle, HiUserCircle, HiKey, HiC
 import { usersAPI } from '../services/api'
 import { formatDateBR } from '../utils/date'
 import toast from 'react-hot-toast'
+import { SYSTEM_NAME } from '../config/constants'
 
 export default function FuncionarioCredenciais() {
   const navigate = useNavigate()
   const location = useLocation()
   const printRef = useRef(null)
   const [sendingEmail, setSendingEmail] = useState(false)
-  
+
   const funcionario = location.state?.funcionario
 
   useEffect(() => {
@@ -27,12 +28,12 @@ export default function FuncionarioCredenciais() {
 
   const handlePrint = () => {
     const printWindow = window.open('', '', 'width=800,height=600')
-    
+
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Credenciais de Acesso - CEMEP Digital</title>
+          <title>Credenciais de Acesso - ${SYSTEM_NAME}</title>
           <style>
             * {
               margin: 0;
@@ -135,7 +136,7 @@ export default function FuncionarioCredenciais() {
         </head>
         <body>
           <div class="header">
-            <h1>CEMEP Digital</h1>
+            <h1>${SYSTEM_NAME}</h1>
             <p>Credenciais de Acesso ao Sistema</p>
           </div>
 
@@ -192,15 +193,15 @@ export default function FuncionarioCredenciais() {
 
           <div class="footer">
             <p>Documento gerado em ${new Date().toLocaleString('pt-BR')}</p>
-            <p>CEMEP Digital - Sistema de Gestão Escolar</p>
+            <p>${SYSTEM_NAME} - Sistema de Gestão Escolar</p>
           </div>
         </body>
       </html>
     `)
-    
+
     printWindow.document.close()
     printWindow.focus()
-    
+
     setTimeout(() => {
       printWindow.print()
       printWindow.close()
@@ -306,7 +307,7 @@ export default function FuncionarioCredenciais() {
             </button>
           )}
         </div>
-        
+
         <div className="space-y-4">
           {/* Login */}
           <div className="bg-white/10 backdrop-blur rounded-xl p-4">
@@ -324,7 +325,7 @@ export default function FuncionarioCredenciais() {
               </button>
             </div>
           </div>
-          
+
           {/* Senha */}
           <div className="bg-white/10 backdrop-blur rounded-xl p-4">
             <div className="flex items-center justify-between">
@@ -347,22 +348,22 @@ export default function FuncionarioCredenciais() {
       {/* Aviso */}
       <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
         <p className="text-sm text-amber-800 dark:text-amber-200">
-          <strong className="font-semibold">⚠️ Importante:</strong> Recomende ao funcionário alterar a senha no primeiro acesso. 
+          <strong className="font-semibold">⚠️ Importante:</strong> Recomende ao funcionário alterar a senha no primeiro acesso.
           Estas credenciais são pessoais e intransferíveis.
         </p>
       </div>
 
       {/* Ações */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Button 
+        <Button
           onClick={handlePrint}
           icon={HiPrinter}
           size="lg"
         >
           Imprimir Credenciais
         </Button>
-        
-        <Button 
+
+        <Button
           onClick={handleSendEmail}
           variant={funcionario.email ? 'secondary' : 'ghost'}
           icon={sendingEmail ? null : HiMail}
@@ -370,16 +371,16 @@ export default function FuncionarioCredenciais() {
           disabled={!funcionario.email || sendingEmail}
           loading={sendingEmail}
         >
-          {sendingEmail 
-            ? 'Enviando...' 
-            : funcionario.email 
-              ? 'Enviar por E-mail' 
+          {sendingEmail
+            ? 'Enviando...'
+            : funcionario.email
+              ? 'Enviar por E-mail'
               : 'Sem e-mail cadastrado'
           }
         </Button>
       </div>
 
-      <Button 
+      <Button
         onClick={() => navigate('/funcionarios')}
         variant="ghost"
         icon={HiArrowLeft}

@@ -152,6 +152,34 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
+import json
+
+# Carrega configurações institucionais do JSON na raiz
+try:
+    with open(BASE_DIR.parent / 'institutional_config.json', 'r', encoding='utf-8') as f:
+        INSTITUTIONAL_DATA = json.load(f)
+except Exception as e:
+    # Fallback caso o arquivo não exista ou esteja mal formatado
+    print(f"Aviso: Não foi possível carregar institutional_config.json: {e}")
+    INSTITUTIONAL_DATA = {
+        "system": {
+            "name": "CEMEP Digital",
+            "version": "1.0.0",
+            "site_url": "https://cemep.digital"
+        },
+        "institution": {
+            "name_official": "CEMEP - Centro Municipal de Educação Profissionalizante",
+            "name_fantasy": "CEMEP",
+            "logo": {
+                "filename": "logo.jpeg",
+                "path_relative": "/logo.jpeg"
+            },
+            "contact": {
+                "email": "contato@cemep.digital"
+            }
+        }
+    }
+
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
@@ -159,12 +187,12 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'studytask@etep.com.br')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'qfxy dvhs cvvu rofx')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'CEMEP Digital <studytask@etep.com.br>')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', f"{INSTITUTIONAL_DATA['system']['name']} <studytask@etep.com.br>")
 
 # URL do site (centralizado - altere aqui para refletir em todo o sistema)
-SITE_URL = os.getenv('SITE_URL', 'https://cemep.digital')
-SITE_NAME = 'CEMEP Digital'
-INSTITUTION_NAME = 'CEMEP - Centro Municipal de Educação Profissionalizante'
+SITE_URL = os.getenv('SITE_URL', INSTITUTIONAL_DATA['system']['site_url'])
+SITE_NAME = INSTITUTIONAL_DATA['system']['name']
+INSTITUTION_NAME = INSTITUTIONAL_DATA['institution']['name_official']
 
 # Create necessary directories
 os.makedirs(STATIC_ROOT, exist_ok=True)

@@ -42,7 +42,7 @@ def send_credentials_email(email, nome, username, password, tipo_usuario='USUARI
         'site_url': getattr(settings, 'SITE_URL', 'http://localhost:5173'),
         'site_name': getattr(settings, 'SITE_NAME', 'CEMEP Digital'),
         'institution_name': getattr(settings, 'INSTITUTION_NAME', 'CEMEP'),
-        'logo_url': f"{getattr(settings, 'SITE_URL', 'http://localhost:5173')}/static/img/logo.jpeg",
+        'logo_url': f"{getattr(settings, 'SITE_URL', 'http://localhost:5173')}/static/img/{settings.INSTITUTIONAL_DATA['institution']['logo']['filename']}",
     }
     
     try:

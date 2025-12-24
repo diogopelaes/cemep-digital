@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-    Card, Button, Input, DateInput, Select, Loading, ImageCropper
+    Card, Button, Input, DateInput, Select, Loading, ImageCropper, Combobox
 } from '../components/ui'
-import { HiArrowLeft, HiRefresh, HiSave, HiEye, HiEyeOff, HiCamera } from 'react-icons/hi'
-import { academicAPI } from '../services/api'
+import { HiArrowLeft, HiRefresh, HiSave, HiEye, HiEyeOff, HiCamera, HiSearch } from 'react-icons/hi'
+import { academicAPI, coreAPI } from '../services/api'
 import { generatePassword } from '../utils/password'
 import { validateCPF } from '../utils/validators'
 import toast from 'react-hot-toast'
@@ -44,6 +44,25 @@ const formatCEP = (value) => {
     return `${numbers.slice(0, 2)}.${numbers.slice(2, 5)}-${numbers.slice(5)}`
 }
 
+// Máscara de Matrícula: XXX.XXX.XXX-X (10 dígitos)
+const formatMatricula = (value) => {
+    const numbers = value.replace(/\D/g, '').slice(0, 10)
+
+    if (numbers.length <= 3) return numbers
+    if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`
+    if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`
+    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9)}`
+}
+
+// Opções de status da matrícula
+const STATUS_MATRICULA = [
+    { value: 'MATRICULADO', label: 'Matriculado' },
+    { value: 'CONCLUIDO', label: 'Concluído' },
+    { value: 'ABANDONO', label: 'Abandono' },
+    { value: 'TRANSFERIDO', label: 'Transferido' },
+    { value: 'OUTRO', label: 'Outro' },
+]
+
 const ESTADOS = [
     { value: 'SP', label: 'São Paulo' },
     { value: 'MG', label: 'Minas Gerais' },
@@ -68,6 +87,7 @@ export default function EstudanteForm() {
     const [showPassword, setShowPassword] = useState(false)
     const [fotoBlob, setFotoBlob] = useState(null)     // Foto recortada (blob)
     const [fotoPreview, setFotoPreview] = useState(null) // URL da foto atual
+    const [cursos, setCursos] = useState([])
 
     const [formData, setFormData] = useState({
         // Dados do usuário
@@ -116,6 +136,48 @@ export default function EstudanteForm() {
     const [responsaveis, setResponsaveis] = useState([
         { nome: '', cpf: '', telefone: '', email: '', parentesco: '' }
     ])
+
+    // Estado para matrículas (array de objetos)
+    const [matriculas, setMatriculas] = useState([
+        { numero_matricula: '', curso_id: '', data_entrada: new Date().toISOString().split('T')[0], data_saida: '', status: 'MATRICULADO' }
+    ])
+
+    // Carregar cursos
+    useEffect(() => {
+        loadCursos()
+    }, [])
+
+    const loadCursos = async () => {
+        try {
+            const response = await coreAPI.cursos.list()
+            const cursosData = response.data.results || response.data
+            setCursos(cursosData)
+        } catch (error) {
+            console.error('Erro ao carregar cursos:', error)
+        }
+    }
+
+    const addMatricula = () => {
+        setMatriculas([...matriculas, {
+            numero_matricula: '',
+            curso_id: '',
+            data_entrada: new Date().toISOString().split('T')[0],
+            data_saida: '',
+            status: 'MATRICULADO'
+        }])
+    }
+
+    const removeMatricula = (index) => {
+        if (matriculas.length > 1) {
+            setMatriculas(matriculas.filter((_, i) => i !== index))
+        }
+    }
+
+    const updateMatricula = (index, field, value) => {
+        const newMatriculas = [...matriculas]
+        newMatriculas[index] = { ...newMatriculas[index], [field]: value }
+        setMatriculas(newMatriculas)
+    }
 
     const addResponsavel = () => {
         setResponsaveis([...responsaveis, { nome: '', cpf: '', telefone: '', email: '', parentesco: '' }])
@@ -180,14 +242,6 @@ export default function EstudanteForm() {
         }
     }, [formData.cpf])
 
-    // Efeito para buscar CEP automaticamente quando tiver 8 dígitos
-    useEffect(() => {
-        const cleanCep = formData.cep.replace(/\D/g, '')
-        if (cleanCep.length === 8) {
-            fetchCep(cleanCep)
-        }
-    }, [formData.cep])
-
     const fetchCep = async (cleanCep) => {
         if (cleanCep.length !== 8) return
 
@@ -228,8 +282,13 @@ export default function EstudanteForm() {
 
     const loadEstudante = async () => {
         try {
-            const response = await academicAPI.estudantes.get(cpfParam)
-            const est = response.data
+            // Carrega dados básicos e prontuário
+            const [respEstudante, respProntuario] = await Promise.all([
+                academicAPI.estudantes.get(cpfParam),
+                academicAPI.estudantes.prontuario(cpfParam)
+            ])
+            const est = respEstudante.data
+            const prontuario = respProntuario.data
 
             setFormData({
                 username: est.usuario?.username || '',
@@ -252,7 +311,7 @@ export default function EstudanteForm() {
                 bairro: est.bairro || '',
                 cidade: est.cidade || 'Mogi Guaçu',
                 estado: est.estado || 'SP',
-                cep: est.cep || '',
+                cep: formatCEP(est.cep || ''),
             })
 
             // Carrega responsáveis se existirem
@@ -265,6 +324,18 @@ export default function EstudanteForm() {
                     parentesco: r.parentesco || ''
                 }))
                 setResponsaveis(respArray)
+            }
+
+            // Carrega matrículas se existirem
+            if (prontuario.matriculas_cemep && prontuario.matriculas_cemep.length > 0) {
+                const matArray = prontuario.matriculas_cemep.map(m => ({
+                    numero_matricula: formatMatricula(m.numero_matricula || ''),
+                    curso_id: m.curso?.id?.toString() || '',
+                    data_entrada: m.data_entrada || '',
+                    data_saida: m.data_saida || '',
+                    status: m.status || 'MATRICULADO'
+                }))
+                setMatriculas(matArray)
             }
 
             // Carrega foto se existir
@@ -356,6 +427,37 @@ export default function EstudanteForm() {
             }
         }
 
+        // Validação de matrículas (obrigatório pelo menos uma)
+        const temMatriculaValida = matriculas.some(m =>
+            m.numero_matricula.replace(/\D/g, '').length === 10 && m.curso_id && m.data_entrada
+        )
+        if (!temMatriculaValida) {
+            toast.error('Pelo menos uma matrícula completa é obrigatória')
+            return
+        }
+
+        // Valida cada matrícula preenchida
+        for (let i = 0; i < matriculas.length; i++) {
+            const mat = matriculas[i]
+            const numMatricula = mat.numero_matricula.replace(/\D/g, '')
+
+            // Se começou a preencher, deve completar
+            if (numMatricula || mat.curso_id) {
+                if (numMatricula.length !== 10) {
+                    toast.error(`Matrícula ${i + 1}: Número deve ter 10 dígitos`)
+                    return
+                }
+                if (!mat.curso_id) {
+                    toast.error(`Matrícula ${i + 1}: Curso é obrigatório`)
+                    return
+                }
+                if (!mat.data_entrada) {
+                    toast.error(`Matrícula ${i + 1}: Data de entrada é obrigatória`)
+                    return
+                }
+            }
+        }
+
         setSaving(true)
         try {
             const telefoneNumbers = formData.telefone.replace(/\D/g, '')
@@ -371,6 +473,17 @@ export default function EstudanteForm() {
                     telefone: r.telefone.replace(/\D/g, ''),
                     email: r.email || '',
                     parentesco: r.parentesco
+                }))
+
+            // Processa matrículas válidas
+            const matriculasPayload = matriculas
+                .filter(m => m.numero_matricula.replace(/\D/g, '').length === 10 && m.curso_id)
+                .map(m => ({
+                    numero_matricula: m.numero_matricula.replace(/\D/g, ''),
+                    curso_id: parseInt(m.curso_id),
+                    data_entrada: m.data_entrada,
+                    data_saida: m.data_saida || null,
+                    status: m.status
                 }))
 
             const payload = {
@@ -393,7 +506,8 @@ export default function EstudanteForm() {
                 cidade: formData.cidade || 'Mogi Guaçu',
                 estado: formData.estado || 'SP',
                 cep: cepNumbers,
-                responsaveis: responsaveisPayload
+                responsaveis: responsaveisPayload,
+                matriculas: matriculasPayload
             }
 
             if (isEditing) {
@@ -671,33 +785,130 @@ export default function EstudanteForm() {
                         </div>
                     </div>
 
+                    {/* Matrículas */}
+                    <div>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-semibold text-slate-800 dark:text-white">
+                                Matrículas
+                                <span className="ml-2 text-sm font-normal text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+                                    Obrigatório
+                                </span>
+                            </h2>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={addMatricula}
+                            >
+                                + Adicionar Curso
+                            </Button>
+                        </div>
+
+                        <div className="space-y-6">
+                            {matriculas.map((mat, index) => (
+                                <div
+                                    key={index}
+                                    className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30"
+                                >
+                                    <div className="flex items-center justify-between mb-4">
+                                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                            Matrícula {index + 1}
+                                        </span>
+                                        {matriculas.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => removeMatricula(index)}
+                                                className="text-sm text-danger-500 hover:text-danger-700 dark:hover:text-danger-400"
+                                            >
+                                                Remover
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <Input
+                                            label="Número da Matrícula *"
+                                            placeholder="000.000.000-0"
+                                            value={mat.numero_matricula}
+                                            onChange={(e) => updateMatricula(index, 'numero_matricula', formatMatricula(e.target.value))}
+                                            onKeyDown={(e) => {
+                                                const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End']
+                                                if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
+                                                    e.preventDefault()
+                                                }
+                                            }}
+                                            maxLength={13}
+                                            autoComplete="off"
+                                        />
+                                        <div className="md:col-span-2">
+                                            <Combobox
+                                                label="Curso"
+                                                value={mat.curso_id}
+                                                onChange={(val) => updateMatricula(index, 'curso_id', val)}
+                                                options={cursos.map(c => ({
+                                                    value: c.id,
+                                                    label: c.nome,
+                                                    subLabel: c.sigla
+                                                }))}
+                                                placeholder="Pesquise por nome ou sigla..."
+                                                required
+                                            />
+                                        </div>
+                                        <DateInput
+                                            label="Data de Entrada *"
+                                            value={mat.data_entrada}
+                                            onChange={(e) => updateMatricula(index, 'data_entrada', e.target.value)}
+                                        />
+                                        <DateInput
+                                            label="Data de Saída"
+                                            value={mat.data_saida}
+                                            onChange={(e) => updateMatricula(index, 'data_saida', e.target.value)}
+                                        />
+                                        <Select
+                                            label="Status *"
+                                            value={mat.status}
+                                            onChange={(e) => updateMatricula(index, 'status', e.target.value)}
+                                            options={STATUS_MATRICULA}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
                     {/* Endereço */}
                     <div>
                         <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">
                             Endereço
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div className="relative">
-                                <Input
-                                    label="CEP *"
-                                    placeholder="00.000-000"
-                                    value={formData.cep}
-                                    onChange={(e) => setFormData({ ...formData, cep: formatCEP(e.target.value) })}
-                                    onKeyDown={(e) => {
-                                        const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End']
-                                        if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
-                                            e.preventDefault()
-                                        }
-                                    }}
-                                    maxLength={10}
-                                    autoComplete="off"
-                                    required
-                                />
-                                {cepLoading && (
-                                    <div className="absolute right-3 top-[2.2rem]">
-                                        <Loading size="sm" />
-                                    </div>
-                                )}
+                            <div className="flex items-end gap-2">
+                                <div className="flex-1">
+                                    <Input
+                                        label="CEP *"
+                                        placeholder="00.000-000"
+                                        value={formData.cep}
+                                        onChange={(e) => setFormData({ ...formData, cep: formatCEP(e.target.value) })}
+                                        onKeyDown={(e) => {
+                                            const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End']
+                                            if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
+                                                e.preventDefault()
+                                            }
+                                        }}
+                                        maxLength={10}
+                                        autoComplete="off"
+                                        required
+                                    />
+                                </div>
+                                <Button
+                                    type="button"
+                                    onClick={() => fetchCep(formData.cep.replace(/\D/g, ''))}
+                                    disabled={formData.cep.replace(/\D/g, '').length !== 8 || cepLoading}
+                                    loading={cepLoading}
+                                    className="mb-[2px]" // Alinhamento visual com input
+                                    title="Buscar CEP"
+                                >
+                                    {!cepLoading && <HiSearch className="h-5 w-5" />}
+                                </Button>
                             </div>
 
                             {/* Quebra de linha forçada para separar CEP dos outros campos */}

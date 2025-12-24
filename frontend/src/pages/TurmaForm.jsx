@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Input, Select, Loading, MultiCombobox } from '../components/ui'
-import { HiArrowLeft, HiSave } from 'react-icons/hi'
+import { Card, Button, Input, Select, Loading, MultiCombobox, Modal, ModalFooter } from '../components/ui'
+import { HiArrowLeft, HiSave, HiTrash } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -18,6 +18,7 @@ export default function TurmaForm() {
 
   const [loading, setLoading] = useState(isEditing)
   const [saving, setSaving] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [cursos, setCursos] = useState([])
   const [professores, setProfessores] = useState([])
   const [formData, setFormData] = useState({
@@ -194,6 +195,24 @@ export default function TurmaForm() {
     setSaving(false)
   }
 
+  const handleDelete = () => {
+    setShowDeleteModal(true)
+  }
+
+  const confirmDelete = async () => {
+    setSaving(true)
+    try {
+      await coreAPI.turmas.delete(id)
+      toast.success('Turma excluída com sucesso!')
+      navigate('/turmas')
+    } catch (error) {
+      const msg = error.response?.data?.detail || 'Erro ao excluir turma. Verifique se não há alunos ou disciplinas vinculadas.'
+      toast.error(msg)
+      setShowDeleteModal(false)
+    }
+    setSaving(false)
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -330,16 +349,68 @@ export default function TurmaForm() {
           )}
 
           {/* Botões */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
-            <Button type="button" variant="secondary" onClick={() => navigate('/turmas')}>
-              Cancelar
-            </Button>
-            <Button type="submit" icon={HiSave} loading={saving}>
-              {isEditing ? 'Salvar Alterações' : 'Criar Turma'}
-            </Button>
+          <div className="flex justify-between items-center pt-4 border-t border-slate-200 dark:border-slate-700">
+            {isEditing ? (
+              <Button
+                type="button"
+                variant="danger"
+                icon={HiTrash}
+                onClick={handleDelete}
+              >
+                Excluir Turma
+              </Button>
+            ) : (
+              <div></div> // Spacer
+            )}
+            <div className="flex gap-3">
+              <Button type="button" variant="secondary" onClick={() => navigate('/turmas')}>
+                Cancelar
+              </Button>
+              <Button type="submit" icon={HiSave} loading={saving}>
+                {isEditing ? 'Salvar Alterações' : 'Criar Turma'}
+              </Button>
+            </div>
           </div>
         </form>
       </Card>
+
+      {/* Modal de Confirmação de Exclusão */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Excluir Turma"
+        size="md"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+              <HiTrash className="h-8 w-8 text-red-600 dark:text-red-400" />
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-slate-600 dark:text-slate-300">
+              Tem certeza que deseja excluir esta turma?
+            </p>
+            <p className="text-sm text-slate-500 mt-1">
+              Esta ação não pode ser desfeita e removerá permanentemente o vínculo com alunos e disciplinas.
+            </p>
+          </div>
+        </div>
+
+        <ModalFooter>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancelar
+          </Button>
+          <Button
+            variant="danger"
+            onClick={confirmDelete}
+            loading={saving}
+          >
+            Confirmar Exclusão
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   )
 }

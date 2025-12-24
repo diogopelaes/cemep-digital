@@ -20,6 +20,7 @@ import Disciplinas from './pages/Disciplinas'
 import DisciplinaForm from './pages/DisciplinaForm'
 import Funcionarios from './pages/Funcionarios'
 import FuncionarioForm from './pages/FuncionarioForm'
+import FuncionarioDetalhes from './pages/FuncionarioDetalhes'
 import FuncionarioCredenciais from './pages/FuncionarioCredenciais'
 import NotFound from './pages/NotFound'
 
@@ -94,6 +95,9 @@ function App() {
         } />
         <Route path="/funcionarios/novo" element={
           <ProtectedRoute allowedRoles={GESTAO_ONLY}><FuncionarioForm /></ProtectedRoute>
+        } />
+        <Route path="/funcionarios/:id" element={
+          <ProtectedRoute allowedRoles={GESTAO_ONLY}><FuncionarioDetalhes /></ProtectedRoute>
         } />
         <Route path="/funcionarios/:id/editar" element={
           <ProtectedRoute allowedRoles={GESTAO_ONLY}><FuncionarioForm /></ProtectedRoute>

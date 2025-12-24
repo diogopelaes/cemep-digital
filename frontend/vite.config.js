@@ -5,6 +5,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    fs: {
+      // Permite servir arquivos de um nível acima (raiz do projeto)
+      allow: ['..'],
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:8000',

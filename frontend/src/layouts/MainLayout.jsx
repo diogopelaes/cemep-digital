@@ -3,7 +3,7 @@ import { Outlet, Navigate, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
 import { PageLoading } from '../components/ui/Loading'
-import { LOGO_PATH, SYSTEM_NAME } from '../config/constants'
+import { LOGO_PATH, SYSTEM_NAME, INSTITUTION_FANTASY } from '../config/constants'
 import {
   HiHome, HiUserGroup, HiAcademicCap, HiClipboardList,
   HiCalendar, HiCog, HiLogout, HiMenu, HiX, HiSun, HiMoon,
@@ -101,7 +101,7 @@ export default function MainLayout() {
                 className="w-12 h-12 rounded-xl object-cover shadow-lg"
               />
               <div>
-                <h1 className="font-bold text-xl text-slate-800 dark:text-white">CEMEP</h1>
+                <h1 className="font-bold text-xl text-slate-800 dark:text-white">{INSTITUTION_FANTASY}</h1>
                 <p className="text-xs text-slate-500">Digital</p>
               </div>
             </div>
@@ -171,7 +171,7 @@ export default function MainLayout() {
             >
               <HiMenu className="h-6 w-6" />
             </button>
-            <h1 className="font-bold text-lg">CEMEP Digital</h1>
+            <h1 className="font-bold text-lg">{SYSTEM_NAME}</h1>
             <div className="w-10" />
           </div>
         </header>

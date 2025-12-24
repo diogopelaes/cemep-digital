@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Card, CardHeader, CardTitle, CardContent, Loading, Badge } from '../components/ui'
-import { 
+import {
   HiUserGroup, HiAcademicCap, HiClipboardList, HiCalendar,
   HiCheckCircle, HiClock, HiExclamationCircle
 } from 'react-icons/hi'
 import { managementAPI, academicAPI, coreAPI } from '../services/api'
 import { formatDateBR } from '../utils/date'
+import { SYSTEM_NAME } from '../config/constants'
 
 export default function Dashboard() {
   const { user, isGestao, isFuncionario, isEstudante, isResponsavel } = useAuth()
@@ -29,7 +30,7 @@ export default function Dashboard() {
             academicAPI.estudantes.list({ page_size: 1 }),
             coreAPI.turmas.list({ page_size: 1 }),
           ])
-          
+
           setStats({
             ...tarefasRes.data,
             totalEstudantes: estudantesRes.data.count || 0,
@@ -40,7 +41,7 @@ export default function Dashboard() {
           setStats({ total: 0, pendentes: 0, concluidas: 0, totalEstudantes: 0, totalTurmas: 0 })
         }
       }
-      
+
       // Avisos para todos
       try {
         const avisosRes = await managementAPI.avisos.meus()
@@ -48,7 +49,7 @@ export default function Dashboard() {
       } catch (e) {
         console.warn('Erro ao carregar avisos:', e)
       }
-      
+
       // Tarefas para funcionários
       if (isFuncionario) {
         try {
@@ -80,32 +81,32 @@ export default function Dashboard() {
           Olá, {user?.first_name || user?.username}! 👋
         </h1>
         <p className="text-slate-500 dark:text-slate-400 mt-1">
-          Bem-vindo ao CEMEP Digital
+          Bem-vindo ao {SYSTEM_NAME}
         </p>
       </div>
 
       {/* Stats Cards - Apenas Gestão */}
       {isGestao && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard 
+          <StatsCard
             title="Estudantes"
             value={stats.totalEstudantes || 0}
             icon={HiAcademicCap}
             color="primary"
           />
-          <StatsCard 
+          <StatsCard
             title="Turmas Ativas"
             value={stats.totalTurmas || 0}
             icon={HiUserGroup}
             color="accent"
           />
-          <StatsCard 
+          <StatsCard
             title="Tarefas Pendentes"
             value={stats.pendentes || 0}
             icon={HiClock}
             color="warning"
           />
-          <StatsCard 
+          <StatsCard
             title="Tarefas Concluídas"
             value={stats.concluidas || 0}
             icon={HiCheckCircle}
@@ -128,7 +129,7 @@ export default function Dashboard() {
               {tarefas.length > 0 ? (
                 <ul className="space-y-3">
                   {tarefas.map((tarefa) => (
-                    <li 
+                    <li
                       key={tarefa.id}
                       className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50"
                     >
@@ -167,7 +168,7 @@ export default function Dashboard() {
             {avisos.length > 0 ? (
               <ul className="space-y-3">
                 {avisos.map((aviso) => (
-                  <li 
+                  <li
                     key={aviso.id}
                     className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50"
                   >
@@ -252,7 +253,7 @@ function QuickAccessButton({ to, icon: Icon, label, color }) {
   }
 
   return (
-    <a 
+    <a
       href={to}
       className={`flex flex-col items-center gap-3 p-6 rounded-2xl bg-gradient-to-br ${colors[color]} transition-all duration-200`}
     >

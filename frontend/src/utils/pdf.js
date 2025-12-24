@@ -3,7 +3,9 @@
  * Usado em todo o sistema CEMEP Digital
  */
 import { jsPDF } from 'jspdf'
-import 'jspdf-autotable'
+import autoTable from 'jspdf-autotable'
+
+import { INSTITUTION_FANTASY, INSTITUTION_NAME, ADDRESS_CITY, ADDRESS_STATE, SYSTEM_NAME } from '../config/constants'
 
 // Cores do tema CEMEP
 const COLORS = {
@@ -71,12 +73,12 @@ export function addHeader(doc, title, subtitle = '') {
     doc.setTextColor(...COLORS.white)
     doc.setFontSize(CONFIG.fontSize.title)
     doc.setFont('helvetica', 'bold')
-    doc.text('CEMEP', CONFIG.margin, 15)
+    doc.text(INSTITUTION_FANTASY, CONFIG.margin, 15)
 
     doc.setFontSize(CONFIG.fontSize.small)
     doc.setFont('helvetica', 'normal')
-    doc.text('Centro Municipal de Ensino Profissionalizante', CONFIG.margin, 22)
-    doc.text('Mogi Guaçu - SP', CONFIG.margin, 28)
+    doc.text(INSTITUTION_NAME, CONFIG.margin, 22)
+    doc.text(`${ADDRESS_CITY} - ${ADDRESS_STATE}`, CONFIG.margin, 28)
 
     // Data de geração (lado direito)
     const dataAtual = new Date().toLocaleDateString('pt-BR', {
@@ -138,7 +140,7 @@ export function addFooter(doc) {
         doc.setFontSize(CONFIG.fontSize.small)
         doc.setFont('helvetica', 'normal')
 
-        doc.text('CEMEP Digital - Sistema de Gestão Escolar', CONFIG.margin, pageHeight - 10)
+        doc.text(`${SYSTEM_NAME} - Sistema de Gestão Escolar`, CONFIG.margin, pageHeight - 10)
         doc.text(`Página ${i} de ${pageCount}`, pageWidth - CONFIG.margin, pageHeight - 10, { align: 'right' })
     }
 }
@@ -269,7 +271,7 @@ function addPlaceholderPhoto(doc, x, y, width, height) {
  * @returns {number} Posição Y final
  */
 export function addTable(doc, headers, data, startY, options = {}) {
-    doc.autoTable({
+    autoTable(doc, {
         head: [headers],
         body: data,
         startY: startY,

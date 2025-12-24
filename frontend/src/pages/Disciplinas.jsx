@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { 
-  Card, Button, Table, TableHead, TableBody, TableRow, 
+import {
+  Card, Button, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading
 } from '../components/ui'
-import { HiPlus, HiPencil, HiTrash, HiBookOpen, HiX, HiCheck, HiAcademicCap } from 'react-icons/hi'
+import { HiPlus, HiTrash, HiBookOpen, HiX, HiCheck, HiAcademicCap } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -111,11 +111,14 @@ export default function Disciplinas() {
                     // Linha normal
                     <>
                       <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-500 to-primary-500 flex items-center justify-center">
+                        <div
+                          className="flex items-center gap-3 cursor-pointer group"
+                          onClick={() => navigate(`/disciplinas/${disciplina.id}/editar`)}
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-500 to-primary-500 flex items-center justify-center group-hover:scale-105 transition-transform">
                             <HiBookOpen className="h-5 w-5 text-white" />
                           </div>
-                          <span className="font-medium text-slate-800 dark:text-white">
+                          <span className="font-medium text-slate-800 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                             {disciplina.nome}
                           </span>
                         </div>
@@ -132,13 +135,6 @@ export default function Disciplinas() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => navigate(`/disciplinas/${disciplina.id}/editar`)}
-                            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-primary-600 transition-colors"
-                            title="Editar e gerenciar habilidades"
-                          >
-                            <HiPencil className="h-5 w-5" />
-                          </button>
                           <button
                             onClick={() => setConfirmDelete(disciplina)}
                             className="p-2 rounded-lg hover:bg-danger-500/10 text-danger-600 transition-colors"

@@ -24,8 +24,8 @@ export default function Login() {
     <div className="animate-fade-in">
       {/* Logo e Título */}
       <div className="text-center mb-8">
-        <img 
-          src={LOGO_PATH} 
+        <img
+          src={LOGO_PATH}
           alt={SYSTEM_NAME}
           className="w-24 h-24 rounded-2xl object-cover shadow-2xl shadow-primary-500/30 mx-auto mb-6"
         />
@@ -70,8 +70,8 @@ export default function Login() {
         </form>
 
         <div className="mt-6 text-center">
-          <Link 
-            to="/recuperar-senha" 
+          <Link
+            to="/recuperar-senha"
             className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
           >
             Esqueceu sua senha?
@@ -81,7 +81,7 @@ export default function Login() {
 
       {/* Footer */}
       <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-8">
-        © 2025 CEMEP Digital. Todos os direitos reservados.
+        © {new Date().getFullYear()} {SYSTEM_NAME}. Todos os direitos reservados.
       </p>
     </div>
   )

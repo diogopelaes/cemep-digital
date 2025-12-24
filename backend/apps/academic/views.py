@@ -15,6 +15,7 @@ from .models import (
     Estudante, Responsavel, ResponsavelEstudante,
     MatriculaCEMEP, MatriculaTurma, Atestado
 )
+from apps.core.models import Curso
 from .serializers import (
     EstudanteSerializer, EstudanteCreateSerializer,
     ResponsavelSerializer, ResponsavelCreateSerializer,
@@ -176,6 +177,23 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                         if result['success']:
                             emails_enviados.append(f"Responsável: {resp_email}")
                 
+                # Processa Matrículas
+                matriculas_data = data.get('matriculas', [])
+                for mat_data in matriculas_data:
+                    if not mat_data or not mat_data.get('numero_matricula') or not mat_data.get('curso_id'):
+                        continue
+                    
+                    curso = Curso.objects.get(id=mat_data['curso_id'])
+                    
+                    MatriculaCEMEP.objects.create(
+                        numero_matricula=mat_data['numero_matricula'],
+                        estudante=estudante,
+                        curso=curso,
+                        data_entrada=mat_data['data_entrada'],
+                        data_saida=mat_data.get('data_saida') or None,
+                        status=mat_data.get('status', 'MATRICULADO')
+                    )
+                
                 response_data = EstudanteSerializer(estudante).data
                 response_data['emails_enviados'] = emails_enviados
                 
@@ -217,6 +235,27 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     if campo in data:
                         setattr(estudante, campo, data[campo])
                 estudante.save()
+                
+                # Processa Matrículas (cria novas ou atualiza existentes)
+                matriculas_data = data.get('matriculas', [])
+                for mat_data in matriculas_data:
+                    if not mat_data or not mat_data.get('numero_matricula') or not mat_data.get('curso_id'):
+                        continue
+                    
+                    curso = Curso.objects.get(id=mat_data['curso_id'])
+                    numero_matricula = mat_data['numero_matricula']
+                    
+                    # Tenta atualizar se já existe, ou cria nova
+                    matricula, created = MatriculaCEMEP.objects.update_or_create(
+                        numero_matricula=numero_matricula,
+                        defaults={
+                            'estudante': estudante,
+                            'curso': curso,
+                            'data_entrada': mat_data['data_entrada'],
+                            'data_saida': mat_data.get('data_saida') or None,
+                            'status': mat_data.get('status', 'MATRICULADO')
+                        }
+                    )
                 
                 return Response(EstudanteSerializer(estudante).data)
         except Exception as e:

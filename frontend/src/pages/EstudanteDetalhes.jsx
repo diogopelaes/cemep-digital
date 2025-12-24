@@ -57,8 +57,13 @@ export default function EstudanteDetalhes() {
             // Cabeçalho
             let y = addHeader(doc, 'Ficha do Estudante', estudante.nome_exibicao || estudante.usuario?.first_name)
 
+            // === DADOS PESSOAIS ===
+            y = addSectionTitle(doc, 'Dados Pessoais', y)
+
             // Layout: Foto à direita, dados à esquerda
-            const fotoX = pageWidth - CONFIG.margin - 35
+            const fotoWidth = 30
+            const fotoHeight = 40
+            const fotoX = pageWidth - CONFIG.margin - fotoWidth
             const fotoY = y
             const dadosWidth = fotoX - CONFIG.margin - 10
 
@@ -71,10 +76,7 @@ export default function EstudanteDetalhes() {
                     console.log('Erro ao carregar foto para PDF')
                 }
             }
-            addPhoto(doc, fotoBase64, fotoX, fotoY, 35, 46.67)
-
-            // === DADOS PESSOAIS ===
-            y = addSectionTitle(doc, 'Dados Pessoais', y)
+            addPhoto(doc, fotoBase64, fotoX, fotoY, fotoWidth, fotoHeight)
 
             // Primeira linha
             const col1 = CONFIG.margin
@@ -106,6 +108,7 @@ export default function EstudanteDetalhes() {
             y = checkNewPage(doc, y, 40)
             y = addSectionTitle(doc, 'Endereço', y)
             y = addField(doc, 'Endereço Completo', estudante.endereco_completo, col1, y, pageWidth - CONFIG.margin * 2)
+            y += 6 // Espaço extra antes de Benefícios
 
             // === BENEFÍCIOS E TRANSPORTE ===
             y = checkNewPage(doc, y, 30)
@@ -117,23 +120,28 @@ export default function EstudanteDetalhes() {
                 `Usa Ônibus Escolar: ${estudante.usa_onibus ? 'Sim' : 'Não'}`,
                 estudante.usa_onibus && estudante.linha_onibus ? `Linha: ${estudante.linha_onibus}` : null,
                 `Permissão para Sair Sozinho: ${estudante.permissao_sair_sozinho ? 'Sim' : 'Não'}`
-            ].filter(Boolean).join('  |  ')
+            ].filter(Boolean)
 
             doc.setFontSize(10)
             doc.setTextColor(30, 41, 59)
-            doc.text(beneficios, col1, y)
-            y += 12
+
+            beneficios.forEach((texto) => {
+                doc.text(texto, col1, y)
+                y += 6
+            })
+            y += 6
 
             // === MATRÍCULAS ===
             if (prontuario.matriculas_cemep && prontuario.matriculas_cemep.length > 0) {
                 y = checkNewPage(doc, y, 40)
                 y = addSectionTitle(doc, 'Matrículas', y)
 
-                const headers = ['Nº Matrícula', 'Curso', 'Data Entrada', 'Status']
+                const headers = ['Nº Matrícula', 'Curso', 'Entrada', 'Saída', 'Status']
                 const data = prontuario.matriculas_cemep.map(m => [
-                    m.numero_matricula,
+                    m.numero_matricula_formatado || m.numero_matricula,
                     m.curso?.nome || m.curso?.sigla || '-',
-                    formatDateBR(m.data_entrada),
+                    formatDateBR(m.data_entrada) || '-',
+                    m.data_saida ? formatDateBR(m.data_saida) : '-',
                     m.status_display || m.status
                 ])
 
@@ -382,7 +390,7 @@ export default function EstudanteDetalhes() {
                             >
                                 <div>
                                     <p className="font-medium text-slate-800 dark:text-white">
-                                        {mat.numero_matricula}
+                                        {mat.numero_matricula_formatado || mat.numero_matricula}
                                     </p>
                                     <p className="text-sm text-slate-500">
                                         {mat.curso?.nome || mat.curso?.sigla} • Entrada: {formatDateBR(mat.data_entrada)}
@@ -408,7 +416,7 @@ export default function EstudanteDetalhes() {
                         {prontuario.responsaveis.map((resp, idx) => (
                             <div
                                 key={idx}
-                                className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50"
+                                className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 space-y-3"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center">
@@ -423,12 +431,29 @@ export default function EstudanteDetalhes() {
                                         </p>
                                     </div>
                                 </div>
-                                {resp.responsavel?.telefone && (
-                                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                                        <HiPhone className="w-4 h-4" />
-                                        {resp.responsavel.telefone_formatado || resp.responsavel.telefone}
-                                    </p>
-                                )}
+
+                                <div className="space-y-1 pt-2 border-t border-slate-200 dark:border-slate-700">
+                                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                        <HiDocumentText className="w-4 h-4" />
+                                        <span>{resp.responsavel?.cpf_formatado}</span>
+                                    </div>
+
+                                    {resp.responsavel?.usuario?.email && (
+                                        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                            <HiMail className="w-4 h-4" />
+                                            <span>{resp.responsavel.usuario.email}</span>
+                                        </div>
+                                    )}
+
+                                    {resp.responsavel?.telefone && (
+                                        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                            <HiPhone className="w-4 h-4" />
+                                            <span>
+                                                {resp.responsavel.telefone_formatado || resp.responsavel.telefone}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>
