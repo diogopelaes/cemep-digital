@@ -321,6 +321,8 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def prontuario(self, request, pk=None):
         """Retorna o prontuário completo do estudante."""
+        from apps.core.models import DisciplinaTurma, ProfessorDisciplinaTurma
+        
         estudante = self.get_object()
         
         # Dados do estudante
@@ -332,10 +334,12 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
         ).data
         
         # Buscar matrículas turma através do caminho correto
+        matriculas_turma_qs = MatriculaTurma.objects.filter(
+            matricula_cemep__estudante=estudante
+        ).select_related('turma__curso')
+        
         matriculas_turma = MatriculaTurmaSerializer(
-            MatriculaTurma.objects.filter(
-                matricula_cemep__estudante=estudante
-            ).select_related('turma__curso'), many=True
+            matriculas_turma_qs, many=True
         ).data
         
         # Responsáveis
@@ -344,11 +348,53 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
             many=True
         ).data
         
+        # Grade de disciplinas para turmas com status CURSANDO
+        grade_disciplinas = []
+        turmas_cursando = matriculas_turma_qs.filter(status='CURSANDO')
+        
+        for mat_turma in turmas_cursando:
+            turma = mat_turma.turma
+            disciplinas_turma = DisciplinaTurma.objects.filter(
+                turma=turma
+            ).select_related('disciplina').prefetch_related(
+                'professores__professor__usuario'
+            )
+            
+            disciplinas_list = []
+            for dt in disciplinas_turma:
+                professores_list = []
+                for pdt in dt.professores.all():
+                    prof = pdt.professor
+                    professores_list.append({
+                        'id': prof.id,
+                        'nome': prof.usuario.get_full_name(),
+                        'apelido': prof.apelido or prof.usuario.first_name,
+                        'tipo': pdt.tipo,
+                        'tipo_display': pdt.get_tipo_display(),
+                    })
+                
+                disciplinas_list.append({
+                    'id': dt.disciplina.id,
+                    'nome': dt.disciplina.nome,
+                    'sigla': dt.disciplina.sigla,
+                    'aulas_semanais': dt.aulas_semanais,
+                    'professores': professores_list,
+                })
+            
+            grade_disciplinas.append({
+                'turma_id': turma.id,
+                'turma_nome': turma.nome_completo,
+                'curso': turma.curso.nome if turma.curso else None,
+                'ano_letivo': turma.ano_letivo,
+                'disciplinas': disciplinas_list,
+            })
+        
         return Response({
             'estudante': dados,
             'matriculas_cemep': matriculas_cemep,
             'matriculas_turma': matriculas_turma,
-            'responsaveis': responsaveis
+            'responsaveis': responsaveis,
+            'grade_disciplinas': grade_disciplinas,
         })
 
 

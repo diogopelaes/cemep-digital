@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Select, Loading, Badge, MultiCombobox } from '../components/ui'
+import { Card, Button, Loading, Badge, MultiCombobox } from '../components/ui'
 import {
   HiArrowLeft, HiPencil, HiTrash, HiPlus, HiBookOpen,
-  HiUserGroup, HiAcademicCap, HiCheck, HiX, HiStar, HiSave
+  HiUserGroup, HiAcademicCap, HiStar
 } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
@@ -25,8 +25,7 @@ export default function TurmaDetalhes() {
 
   // Professores (para atribuição inline)
   const [professoresDisponiveis, setProfessoresDisponiveis] = useState([])
-  const [atribuindo, setAtribuindo] = useState(null) // ID da disciplina sendo atribuída
-  const [professorSelecionado, setProfessorSelecionado] = useState('')
+  const [salvandoProfessores, setSalvandoProfessores] = useState(null) // ID da disciplina sendo salva
 
   // Representantes
   const [todosRepresentantes, setTodosRepresentantes] = useState([]) // Todos os professores disponíveis
@@ -79,16 +78,24 @@ export default function TurmaDetalhes() {
       setTodasDisciplinas(todas)
       setProfessoresDisponiveis(funcionarios)
 
-      // Mapeia disciplinas vinculadas com atribuições
+      // Mapeia disciplinas vinculadas com atribuições (múltiplos professores)
       const vinculadasMap = {}
       const aulasMap = {}
       vinculadas.forEach(v => {
-        const atribuicao = atribuicoes.find(a => a.disciplina_turma?.id === v.id)
+        // Encontra todas as atribuições para esta disciplina-turma
+        const atribuicoesDestaDisc = atribuicoes.filter(a => a.disciplina_turma?.id === v.id)
         vinculadasMap[v.disciplina.id] = {
           id: v.id,
           aulas_semanais: v.aulas_semanais,
-          professor: atribuicao?.professor || null,
-          atribuicao_id: atribuicao?.id || null,
+          professores: atribuicoesDestaDisc.map(a => ({
+            id: a.professor?.id,
+            atribuicao_id: a.id,
+            tipo: a.tipo || 'TITULAR',
+            tipo_display: a.tipo_display || 'Titular',
+            data_inicio: a.data_inicio,
+            data_fim: a.data_fim,
+            ...a.professor
+          })),
         }
         aulasMap[v.disciplina.id] = v.aulas_semanais?.toString() || ''
       })
@@ -188,52 +195,76 @@ export default function TurmaDetalhes() {
     (acc, v) => acc + (v.aulas_semanais || 0), 0
   )
 
-  // === ATRIBUIÇÃO DE PROFESSORES ===
-  const handleAtribuirProfessor = async (disciplinaId) => {
-    if (!professorSelecionado) {
-      toast.error('Selecione um professor')
-      return
-    }
-
+  // === ATRIBUIÇÃO DE PROFESSORES (MÚLTIPLOS) ===
+  const handleProfessoresChange = async (disciplinaId, novosProfessoresIds) => {
     const vinculo = disciplinasVinculadas[disciplinaId]
     if (!vinculo) return
 
+    const anteriores = vinculo.professores || []
+    const anterioresIds = anteriores.map(p => p.id)
+
+    // Identifica adições e remoções
+    const adicionados = novosProfessoresIds.filter(id => !anterioresIds.includes(id))
+    const removidos = anteriores.filter(p => !novosProfessoresIds.includes(p.id))
+
+    if (adicionados.length === 0 && removidos.length === 0) return
+
+    setSalvandoProfessores(disciplinaId)
+
     try {
-      if (vinculo.atribuicao_id) {
-        // Atualiza atribuição existente
-        await coreAPI.atribuicoes.update(vinculo.atribuicao_id, {
-          professor_id: parseInt(professorSelecionado),
-          disciplina_turma_id: vinculo.id,
-        })
-      } else {
-        // Cria nova atribuição
+      // Remove atribuições
+      for (const prof of removidos) {
+        if (prof.atribuicao_id) {
+          await coreAPI.atribuicoes.delete(prof.atribuicao_id)
+        }
+      }
+
+      // Adiciona novas atribuições
+      for (const profId of adicionados) {
         await coreAPI.atribuicoes.create({
-          professor_id: parseInt(professorSelecionado),
+          professor_id: profId,
           disciplina_turma_id: vinculo.id,
         })
       }
 
-      toast.success('Professor atribuído!')
-      setAtribuindo(null)
-      setProfessorSelecionado('')
-      loadDisciplinas()
+      // Mensagem de sucesso
+      if (adicionados.length > 0 && removidos.length > 0) {
+        toast.success('Professores atualizados!')
+      } else if (adicionados.length > 0) {
+        const prof = professoresDisponiveis.find(p => p.id === adicionados[0])
+        toast.success(`${prof?.apelido || prof?.nome_completo || 'Professor'} adicionado`)
+      } else {
+        toast.success('Professor removido')
+      }
+
+      await loadDisciplinas()
     } catch (error) {
-      const msg = error.response?.data?.non_field_errors?.[0] || 'Erro ao atribuir professor'
+      const msg = error.response?.data?.non_field_errors?.[0] || 'Erro ao atualizar professores'
       toast.error(msg)
+      await loadDisciplinas() // Recarrega para sincronizar
     }
+    setSalvandoProfessores(null)
   }
 
-  const handleRemoverAtribuicao = async (disciplinaId) => {
+  // Altera o tipo do professor (Titular/Substituto)
+  const handleTipoChange = async (disciplinaId, professorId, novoTipo) => {
     const vinculo = disciplinasVinculadas[disciplinaId]
-    if (!vinculo?.atribuicao_id) return
+    if (!vinculo) return
 
+    const prof = vinculo.professores?.find(p => p.id === professorId)
+    if (!prof?.atribuicao_id) return
+
+    setSalvandoProfessores(disciplinaId)
     try {
-      await coreAPI.atribuicoes.delete(vinculo.atribuicao_id)
-      toast.success('Professor removido!')
-      loadDisciplinas()
+      await coreAPI.atribuicoes.update(prof.atribuicao_id, {
+        tipo: novoTipo
+      })
+      toast.success(`Tipo alterado para ${novoTipo === 'TITULAR' ? 'Titular' : 'Substituto'}`)
+      await loadDisciplinas()
     } catch (error) {
-      toast.error('Erro ao remover atribuição')
+      toast.error('Erro ao alterar tipo')
     }
+    setSalvandoProfessores(null)
   }
 
   // === REPRESENTANTES ===
@@ -457,10 +488,38 @@ export default function TurmaDetalhes() {
                                 value={aulasSemanais[disciplina.id] || ''}
                                 onChange={(e) => handleAulasSemanaisChange(disciplina.id, e.target.value)}
                                 onBlur={() => handleAulasSemanaisBlur(disciplina.id)}
+                                onClick={(e) => e.target.select()}
+                                onFocus={(e) => e.target.select()}
                                 onKeyDown={(e) => {
-                                  const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End']
+                                  const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'Enter']
                                   if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
                                     e.preventDefault()
+                                    return
+                                  }
+
+                                  // Tab ou Enter: salva e vai para o próximo input
+                                  if (e.key === 'Tab' || e.key === 'Enter') {
+                                    e.preventDefault()
+
+                                    // Encontra apenas inputs ATIVOS (não desabilitados)
+                                    const allInputs = document.querySelectorAll('input[data-aulas-input]:not(:disabled)')
+                                    const currentIndex = Array.from(allInputs).findIndex(input => input === e.target)
+                                    const nextInput = allInputs[currentIndex + 1]
+                                    const nextDisciplinaId = nextInput?.getAttribute('data-aulas-input')
+
+                                    // Salva primeiro
+                                    handleAulasSemanaisBlur(disciplina.id)
+
+                                    // Depois foca no próximo (com delay para esperar possível re-render)
+                                    if (nextDisciplinaId) {
+                                      setTimeout(() => {
+                                        const targetInput = document.querySelector(`input[data-aulas-input="${nextDisciplinaId}"]:not(:disabled)`)
+                                        if (targetInput) {
+                                          targetInput.focus()
+                                          targetInput.select()
+                                        }
+                                      }, 50)
+                                    }
                                   }
                                 }}
                                 disabled={!selecionada && !aulasSemanais[disciplina.id]}
@@ -469,6 +528,7 @@ export default function TurmaDetalhes() {
                                   : 'border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50'
                                   } text-slate-800 dark:text-white`}
                                 inputMode="numeric"
+                                data-aulas-input={disciplina.id}
                               />
                               <span className="text-sm text-slate-500 w-12">aulas</span>
                             </div>
@@ -477,71 +537,62 @@ export default function TurmaDetalhes() {
                           {/* Professor Assignment - Only for selected disciplines */}
                           {selecionada && (
                             <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm text-slate-500 flex items-center gap-2">
+                              <div className="flex items-center gap-3">
+                                <span className="text-sm text-slate-500 flex items-center gap-2 flex-shrink-0">
                                   <HiAcademicCap className="h-4 w-4" />
-                                  Professor:
+                                  Professores:
+                                  {salvandoProfessores === disciplina.id && (
+                                    <span className="text-primary-600 text-xs">(salvando...)</span>
+                                  )}
                                 </span>
-
-                                {atribuindo === disciplina.id ? (
-                                  <div className="flex items-center gap-2">
-                                    <Select
-                                      value={professorSelecionado}
-                                      onChange={(e) => setProfessorSelecionado(e.target.value)}
-                                      placeholder="Selecione..."
-                                      options={professoresDisponiveis.map(p => ({
-                                        value: p.id,
-                                        label: p.apelido || p.nome_completo
-                                      }))}
-                                      className="w-48"
-                                    />
-                                    <button
-                                      onClick={() => handleAtribuirProfessor(disciplina.id)}
-                                      className="p-2 rounded-lg bg-success-500/10 hover:bg-success-500/20 text-success-600 transition-colors"
-                                    >
-                                      <HiCheck className="h-5 w-5" />
-                                    </button>
-                                    <button
-                                      onClick={() => { setAtribuindo(null); setProfessorSelecionado(''); }}
-                                      className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition-colors"
-                                    >
-                                      <HiX className="h-5 w-5" />
-                                    </button>
-                                  </div>
-                                ) : vinculo?.professor ? (
-                                  <div className="flex items-center gap-2">
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-7 h-7 rounded-full bg-primary-500/10 flex items-center justify-center">
-                                        <HiAcademicCap className="h-4 w-4 text-primary-600" />
-                                      </div>
-                                      <span className="font-medium text-slate-700 dark:text-slate-300 text-sm">
-                                        {vinculo.professor.apelido || vinculo.professor.usuario?.first_name || vinculo.professor.nome_completo}
-                                      </span>
-                                    </div>
-                                    <button
-                                      onClick={() => { setAtribuindo(disciplina.id); setProfessorSelecionado(vinculo.professor.id); }}
-                                      className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-primary-600 transition-colors"
-                                      title="Alterar professor"
-                                    >
-                                      <HiPencil className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                      onClick={() => handleRemoverAtribuicao(disciplina.id)}
-                                      className="p-1.5 rounded-lg hover:bg-danger-500/10 text-danger-600 transition-colors"
-                                      title="Remover professor"
-                                    >
-                                      <HiTrash className="h-4 w-4" />
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <button
-                                    onClick={() => setAtribuindo(disciplina.id)}
-                                    className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
-                                  >
-                                    + Atribuir professor
-                                  </button>
-                                )}
+                                <div className="flex-1">
+                                  <MultiCombobox
+                                    value={vinculo.professores?.map(p => p.id) || []}
+                                    onChange={(ids) => handleProfessoresChange(disciplina.id, ids)}
+                                    options={professoresDisponiveis.map(p => ({
+                                      value: p.id,
+                                      label: p.nome_completo,
+                                      subLabel: p.apelido
+                                    }))}
+                                    placeholder="Pesquise por nome ou apelido..."
+                                    disabled={salvandoProfessores === disciplina.id}
+                                  />
+                                </div>
                               </div>
+                              {/* Lista compacta de professores selecionados com tipo */}
+                              {vinculo.professores?.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                  {vinculo.professores.map(prof => (
+                                    <div
+                                      key={prof.id}
+                                      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm transition-all ${prof.tipo === 'TITULAR'
+                                        ? 'bg-primary-500/10 text-primary-700 dark:text-primary-300'
+                                        : 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
+                                        }`}
+                                    >
+                                      <HiAcademicCap className="h-3.5 w-3.5" />
+                                      <span className="font-medium">
+                                        {prof.apelido || prof.usuario?.first_name || prof.nome_completo}
+                                      </span>
+                                      <button
+                                        onClick={() => handleTipoChange(
+                                          disciplina.id,
+                                          prof.id,
+                                          prof.tipo === 'TITULAR' ? 'SUBSTITUTO' : 'TITULAR'
+                                        )}
+                                        className={`ml-1 px-1.5 py-0.5 rounded text-xs font-medium transition-colors ${prof.tipo === 'TITULAR'
+                                          ? 'bg-primary-600/20 hover:bg-primary-600/30 text-primary-800 dark:text-primary-200'
+                                          : 'bg-amber-600/20 hover:bg-amber-600/30 text-amber-800 dark:text-amber-200'
+                                          }`}
+                                        title="Clique para alternar entre Titular e Substituto"
+                                        disabled={salvandoProfessores === disciplina.id}
+                                      >
+                                        {prof.tipo === 'TITULAR' ? 'T' : 'S'}
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>

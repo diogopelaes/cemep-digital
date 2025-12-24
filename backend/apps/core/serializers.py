@@ -192,10 +192,14 @@ class ProfessorDisciplinaTurmaSerializer(serializers.ModelSerializer):
         source='disciplina_turma',
         write_only=True
     )
+    tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
     
     class Meta:
         model = ProfessorDisciplinaTurma
-        fields = ['id', 'professor', 'disciplina_turma', 'professor_id', 'disciplina_turma_id']
+        fields = [
+            'id', 'professor', 'disciplina_turma', 'professor_id', 'disciplina_turma_id',
+            'tipo', 'tipo_display', 'data_inicio', 'data_fim'
+        ]
     
     def validate_professor_id(self, value):
         """Valida que o funcionário é do tipo PROFESSOR."""
@@ -204,6 +208,18 @@ class ProfessorDisciplinaTurmaSerializer(serializers.ModelSerializer):
                 'Apenas funcionários do tipo PROFESSOR podem ser atribuídos.'
             )
         return value
+    
+    def validate(self, data):
+        """Valida que data_fim não é anterior a data_inicio."""
+        data_inicio = data.get('data_inicio')
+        data_fim = data.get('data_fim')
+        
+        if data_inicio and data_fim and data_fim < data_inicio:
+            raise serializers.ValidationError({
+                'data_fim': 'A data de fim não pode ser anterior à data de início.'
+            })
+        
+        return data
 
 
 class BimestreSerializer(serializers.ModelSerializer):

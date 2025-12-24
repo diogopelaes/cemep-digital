@@ -229,6 +229,8 @@ class DisciplinaViewSet(GestaoWritePublicReadMixin, viewsets.ModelViewSet):
     """ViewSet de Disciplinas. Leitura: Todos autenticados | Escrita: Gestão"""
     queryset = Disciplina.objects.all()
     serializer_class = DisciplinaSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['descontinuada']
     search_fields = ['nome', 'sigla']
 
 

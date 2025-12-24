@@ -116,11 +116,13 @@ class Disciplina(models.Model):
     
     nome = models.CharField(max_length=100, verbose_name='Nome')
     sigla = models.CharField(max_length=10, verbose_name='Sigla')
+    descontinuada = models.BooleanField(default=False, verbose_name='Descontinuada')
     
     class Meta:
         verbose_name = 'Disciplina'
         verbose_name_plural = 'Disciplinas'
         ordering = ['nome']
+        unique_together = ['nome', 'sigla', 'descontinuada']
     
     def __str__(self):
         return f"{self.nome} ({self.sigla})"
@@ -211,7 +213,17 @@ class DisciplinaTurma(models.Model):
 
 
 class ProfessorDisciplinaTurma(models.Model):
-    """Vínculo entre Professor e Disciplina/Turma (atribuição de aulas)."""
+    """Vínculo entre Professor e Disciplina/Turma (atribuição de aulas).
+    
+    Permite múltiplos professores por disciplina-turma (ex: professor titular + substituto).
+    A constraint unique_together garante que o mesmo professor não seja cadastrado
+    duas vezes na mesma disciplina-turma.
+    """
+    
+    class TipoProfessor(models.TextChoices):
+        TITULAR = 'TITULAR', 'Titular'
+        SUBSTITUTO = 'SUBSTITUTO', 'Substituto'
+        AUXILIAR = 'AUXILIAR', 'Auxiliar'
     
     professor = models.ForeignKey(
         Funcionario,
@@ -223,14 +235,31 @@ class ProfessorDisciplinaTurma(models.Model):
         on_delete=models.CASCADE,
         related_name='professores'
     )
+    tipo = models.CharField(
+        max_length=15,
+        choices=TipoProfessor.choices,
+        default=TipoProfessor.TITULAR,
+        verbose_name='Tipo'
+    )
+    data_inicio = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name='Data de Início'
+    )
+    data_fim = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name='Data de Fim'
+    )
     
     class Meta:
-        verbose_name = 'Atribuição de Aulas'
-        verbose_name_plural = 'Atribuições de Aulas'
-        unique_together = ['professor', 'disciplina_turma']
+        verbose_name = 'Atribuição de Professor'
+        verbose_name_plural = 'Atribuições de Professores'
+        ordering = ['tipo', 'professor__usuario__first_name']
     
     def __str__(self):
-        return f"{self.professor.usuario.get_full_name()} - {self.disciplina_turma}"
+        tipo = self.get_tipo_display()
+        return f"{self.professor.usuario.get_full_name()} ({tipo}) - {self.disciplina_turma}"
 
 
 class Bimestre(models.Model):

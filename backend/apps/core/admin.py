@@ -24,7 +24,8 @@ class PeriodoTrabalhoAdmin(admin.ModelAdmin):
 
 @admin.register(Disciplina)
 class DisciplinaAdmin(admin.ModelAdmin):
-    list_display = ['nome', 'sigla']
+    list_display = ['nome', 'sigla', 'descontinuada']
+    list_filter = ['descontinuada']
     search_fields = ['nome', 'sigla']
 
 

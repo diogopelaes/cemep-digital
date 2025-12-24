@@ -6,7 +6,7 @@ import {
 import {
     HiArrowLeft, HiPencil, HiPrinter, HiDownload, HiPhone, HiMail,
     HiLocationMarker, HiCalendar, HiAcademicCap, HiUser, HiUsers,
-    HiCheckCircle, HiXCircle, HiDocumentText
+    HiCheckCircle, HiXCircle, HiDocumentText, HiBookOpen
 } from 'react-icons/hi'
 import { academicAPI } from '../services/api'
 import { formatDateBR, calcularIdade } from '../utils/date'
@@ -399,6 +399,76 @@ export default function EstudanteDetalhes() {
                                 <Badge variant={mat.status === 'MATRICULADO' ? 'success' : 'default'}>
                                     {mat.status_display || mat.status}
                                 </Badge>
+                            </div>
+                        ))}
+                    </div>
+                </Card>
+            )}
+
+            {/* Grade de Disciplinas */}
+            {prontuario?.grade_disciplinas && prontuario.grade_disciplinas.length > 0 && (
+                <Card hover={false}>
+                    <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                        <HiBookOpen className="text-primary-500" />
+                        Grade de Disciplinas
+                    </h3>
+                    <div className="space-y-6">
+                        {prontuario.grade_disciplinas.map((turma) => (
+                            <div key={turma.turma_id}>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                                        {turma.turma_nome}
+                                    </span>
+                                    <Badge variant="primary">{turma.ano_letivo}</Badge>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {turma.disciplinas.map((disc) => (
+                                        <div
+                                            key={disc.id}
+                                            className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50"
+                                        >
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-medium text-slate-800 dark:text-white">
+                                                        {disc.nome}
+                                                    </span>
+                                                    <span className="px-1.5 py-0.5 text-xs font-mono rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
+                                                        {disc.sigla}
+                                                    </span>
+                                                </div>
+                                                <span className="text-xs text-slate-500">
+                                                    {disc.aulas_semanais} aulas/sem
+                                                </span>
+                                            </div>
+                                            {disc.professores.length > 0 ? (
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {disc.professores.map((prof) => (
+                                                        <div
+                                                            key={prof.id}
+                                                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${prof.tipo === 'TITULAR'
+                                                                    ? 'bg-primary-500/10 text-primary-700 dark:text-primary-300'
+                                                                    : 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
+                                                                }`}
+                                                        >
+                                                            <HiAcademicCap className="h-3 w-3" />
+                                                            <span>{prof.apelido || prof.nome}</span>
+                                                            <span className={`ml-0.5 px-1 py-0.5 rounded text-[10px] font-semibold ${prof.tipo === 'TITULAR'
+                                                                    ? 'bg-primary-600/20 text-primary-800 dark:text-primary-200'
+                                                                    : 'bg-amber-600/20 text-amber-800 dark:text-amber-200'
+                                                                }`}>
+                                                                {prof.tipo === 'TITULAR' ? 'T' : 'S'}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-slate-400 italic">
+                                                    Nenhum professor atribuído
+                                                </span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         ))}
                     </div>

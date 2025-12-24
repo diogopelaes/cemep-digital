@@ -13,14 +13,17 @@ export default function Disciplinas() {
   const [loading, setLoading] = useState(true)
   const [disciplinas, setDisciplinas] = useState([])
   const [confirmDelete, setConfirmDelete] = useState(null)
+  const [mostrarDescontinuadas, setMostrarDescontinuadas] = useState(false)
 
   useEffect(() => {
     loadDisciplinas()
-  }, [])
+  }, [mostrarDescontinuadas])
 
   const loadDisciplinas = async () => {
+    setLoading(true)
     try {
-      const response = await coreAPI.disciplinas.list()
+      const params = mostrarDescontinuadas ? {} : { descontinuada: false }
+      const response = await coreAPI.disciplinas.list(params)
       setDisciplinas(response.data.results || response.data)
     } catch (error) {
       toast.error('Erro ao carregar disciplinas')
@@ -60,9 +63,29 @@ export default function Disciplinas() {
             Gerencie as disciplinas e suas habilidades (BNCC)
           </p>
         </div>
-        <Button icon={HiPlus} onClick={() => navigate('/disciplinas/novo')}>
-          Nova Disciplina
-        </Button>
+        <div className="flex items-center gap-4">
+          {/* Filtro Descontinuadas */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-slate-500 dark:text-slate-400">
+              Mostrar descontinuadas
+            </span>
+            <button
+              onClick={() => setMostrarDescontinuadas(!mostrarDescontinuadas)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${mostrarDescontinuadas
+                  ? 'bg-amber-500'
+                  : 'bg-slate-300 dark:bg-slate-600'
+                }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${mostrarDescontinuadas ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+              />
+            </button>
+          </div>
+          <Button icon={HiPlus} onClick={() => navigate('/disciplinas/novo')}>
+            Nova Disciplina
+          </Button>
+        </div>
       </div>
 
       {/* Tabela */}
@@ -118,9 +141,17 @@ export default function Disciplinas() {
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-500 to-primary-500 flex items-center justify-center group-hover:scale-105 transition-transform">
                             <HiBookOpen className="h-5 w-5 text-white" />
                           </div>
-                          <span className="font-medium text-slate-800 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                          <span className={`font-medium group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors ${disciplina.descontinuada
+                              ? 'text-slate-400 dark:text-slate-500 line-through'
+                              : 'text-slate-800 dark:text-white'
+                            }`}>
                             {disciplina.nome}
                           </span>
+                          {disciplina.descontinuada && (
+                            <span className="px-1.5 py-0.5 text-xs rounded bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                              Descontinuada
+                            </span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>

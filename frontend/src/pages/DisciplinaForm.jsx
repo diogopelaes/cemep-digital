@@ -26,6 +26,7 @@ export default function DisciplinaForm() {
     nome: '',
     sigla: '',
     area_conhecimento: '',
+    descontinuada: false,
   })
 
   // Habilidades (apenas para edição)
@@ -49,6 +50,7 @@ export default function DisciplinaForm() {
         nome: disciplina.nome || '',
         sigla: disciplina.sigla || '',
         area_conhecimento: disciplina.area_conhecimento || '',
+        descontinuada: disciplina.descontinuada || false,
       })
     } catch (error) {
       toast.error('Erro ao carregar disciplina')
@@ -70,7 +72,7 @@ export default function DisciplinaForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!formData.nome.trim() || !formData.sigla.trim() || !formData.area_conhecimento) {
       toast.error('Preencha todos os campos obrigatórios')
       return
@@ -89,10 +91,10 @@ export default function DisciplinaForm() {
         navigate(`/disciplinas/${response.data.id}/editar`, { replace: true })
       }
     } catch (error) {
-      const msg = error.response?.data?.detail || 
-                  error.response?.data?.nome?.[0] ||
-                  error.response?.data?.sigla?.[0] ||
-                  'Erro ao salvar disciplina'
+      const msg = error.response?.data?.detail ||
+        error.response?.data?.nome?.[0] ||
+        error.response?.data?.sigla?.[0] ||
+        'Erro ao salvar disciplina'
       toast.error(msg)
     }
     setSaving(false)
@@ -100,7 +102,7 @@ export default function DisciplinaForm() {
 
   const handleAddHabilidade = async (e) => {
     e.preventDefault()
-    
+
     if (!novaHabilidade.codigo.trim() || !novaHabilidade.descricao.trim()) {
       toast.error('Preencha código e descrição')
       return
@@ -186,7 +188,7 @@ export default function DisciplinaForm() {
               />
             </div>
           </div>
-          
+
           <Select
             label="Área de Conhecimento *"
             value={formData.area_conhecimento}
@@ -194,6 +196,31 @@ export default function DisciplinaForm() {
             placeholder="Selecione a área..."
             options={AREAS_CONHECIMENTO}
           />
+
+          {/* Switch Descontinuada */}
+          <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+            <div>
+              <span className="font-medium text-slate-700 dark:text-slate-300">
+                Disciplina Descontinuada
+              </span>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                Marque se esta disciplina não está mais em uso
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, descontinuada: !formData.descontinuada })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.descontinuada
+                  ? 'bg-amber-500'
+                  : 'bg-slate-300 dark:bg-slate-600'
+                }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.descontinuada ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+              />
+            </button>
+          </div>
 
           {/* Botões */}
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -255,7 +282,7 @@ export default function DisciplinaForm() {
           ) : habilidades.length > 0 ? (
             <div className="space-y-2">
               {habilidades.map((hab) => (
-                <div 
+                <div
                   key={hab.id}
                   className="flex items-start justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50"
                 >
