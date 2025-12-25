@@ -101,6 +101,10 @@ export const coreAPI = {
     delete: (id) => api.delete(`/core/funcionarios/${id}/`),
     resetarSenha: (id) => api.post(`/core/funcionarios/${id}/resetar-senha/`),
     toggleAtivo: (id) => api.post(`/core/funcionarios/${id}/toggle-ativo/`),
+    uploadFile: (formData) => api.post('/core/funcionarios/importar-arquivo/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    downloadModel: () => api.get('/core/funcionarios/download-modelo/', { responseType: 'blob' }),
   },
   // Disciplinas
   disciplinas: {
@@ -109,6 +113,10 @@ export const coreAPI = {
     create: (data) => api.post('/core/disciplinas/', data),
     update: (id, data) => api.patch(`/core/disciplinas/${id}/`, data),
     delete: (id) => api.delete(`/core/disciplinas/${id}/`),
+    uploadFile: (formData) => api.post('/core/disciplinas/importar-arquivo/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    downloadModel: () => api.get('/core/disciplinas/download-modelo/', { responseType: 'blob' }),
   },
   // Cursos
   cursos: {

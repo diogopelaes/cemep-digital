@@ -6,9 +6,10 @@ import {
 } from '../components/ui'
 import {
   HiPlus, HiPencil, HiCalendar, HiCheck, HiX, HiRefresh, HiUser,
-  HiCheckCircle, HiXCircle, HiPrinter, HiSearch
+  HiCheckCircle, HiXCircle, HiPrinter, HiSearch, HiUpload
 } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
+import BulkUploadModal from '../components/modals/BulkUploadModal'
 import { formatDateBR } from '../utils/date'
 import {
   createPDF, addHeader, addFooter, addSectionTitle, addField,
@@ -39,6 +40,7 @@ export default function Funcionarios() {
   const [search, setSearch] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('')
   const [filtroAtivo, setFiltroAtivo] = useState('')
+  const [showUploadModal, setShowUploadModal] = useState(false)
 
   // Modal de Períodos
   const [modalPeriodos, setModalPeriodos] = useState({ open: false, funcionario: null })
@@ -287,9 +289,14 @@ export default function Funcionarios() {
             Gerencie os funcionários e turnos
           </p>
         </div>
-        <Button icon={HiPlus} onClick={() => navigate('/funcionarios/novo')}>
-          Novo Funcionário
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button variant="secondary" icon={HiUpload} onClick={() => setShowUploadModal(true)}>
+            Cadastro em massa
+          </Button>
+          <Button icon={HiPlus} onClick={() => navigate('/funcionarios/novo')}>
+            Novo Funcionário
+          </Button>
+        </div>
       </div>
 
       {/* Busca e Filtros */}
@@ -582,6 +589,44 @@ export default function Funcionarios() {
           </Button>
         </ModalFooter>
       </Modal>
+
+      <BulkUploadModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUpload={async (formData) => {
+          const response = await coreAPI.funcionarios.uploadFile(formData)
+          if (response.data.errors?.length > 0) {
+            toast.error('Alguns registros não foram importados. Verifique os erros.')
+          }
+          loadFuncionarios()
+          return response
+        }}
+        entityName="Funcionários"
+        templateHeaders={['NOME_COMPLETO', 'EMAIL', 'MATRICULA', 'TIPO_USUARIO', 'SENHA', 'CPF', 'APELIDO']}
+        onDownloadTemplate={async () => {
+          try {
+            const response = await coreAPI.funcionarios.downloadModel()
+            const url = window.URL.createObjectURL(new Blob([response.data]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'modelo_funcionarios.xlsx')
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+          } catch (error) {
+            console.error(error)
+            toast.error('Erro ao baixar o modelo.')
+          }
+        }}
+        instructions={
+          <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
+            <li>Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong>.</li>
+            <li><strong>Matrícula</strong> será usada como Nome de Usuário.</li>
+            <li><strong>CPF</strong> e <strong>Senha</strong> são opcionais.</li>
+            <li>Tipos permitidos: <strong>GESTAO, SECRETARIA, PROFESSOR, MONITOR</strong>.</li>
+          </ul>
+        }
+      />
     </div>
   )
 }

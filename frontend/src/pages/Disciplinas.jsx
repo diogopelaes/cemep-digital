@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 import {
   Card, Button, Select, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading, Pagination
 } from '../components/ui'
-import { HiPlus, HiTrash, HiBookOpen, HiX, HiCheck, HiAcademicCap } from 'react-icons/hi'
+import { HiPlus, HiTrash, HiBookOpen, HiX, HiCheck, HiAcademicCap, HiUpload } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
+import BulkUploadModal from '../components/modals/BulkUploadModal'
 
 export default function Disciplinas() {
   const navigate = useNavigate()
@@ -14,6 +16,8 @@ export default function Disciplinas() {
   const [disciplinas, setDisciplinas] = useState([])
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [filtroStatus, setFiltroStatus] = useState('false')
+  const [showUploadModal, setShowUploadModal] = useState(false)
+
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
@@ -86,6 +90,9 @@ export default function Disciplinas() {
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <Button variant="secondary" icon={HiUpload} onClick={() => setShowUploadModal(true)}>
+            Cadastro em massa
+          </Button>
           <Button icon={HiPlus} onClick={() => navigate('/disciplinas/novo')}>
             Nova Disciplina
           </Button>
@@ -215,6 +222,49 @@ export default function Disciplinas() {
           onPageChange={handlePageChange}
         />
       </Card>
+
+      <BulkUploadModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUpload={async (formData) => {
+          const response = await coreAPI.disciplinas.uploadFile(formData)
+          // If success, reload
+          loadDisciplinas()
+          return response
+        }}
+        entityName="Disciplinas"
+        templateHeaders={['NOME', 'SIGLA', 'AREA_CONHECIMENTO']}
+        onDownloadTemplate={async () => {
+          try {
+            const response = await coreAPI.disciplinas.downloadModel()
+            const url = window.URL.createObjectURL(new Blob([response.data]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'modelo_disciplinas.xlsx')
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+          } catch (error) {
+            console.error(error)
+            toast.error('Erro ao baixar o modelo.')
+          }
+        }}
+        instructions={
+          <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
+            <li>Você pode usar arquivo <strong>.csv</strong> ou <strong>.xlsx</strong> (Excel).</li>
+            <li>As colunas obrigatórias são: <strong>NOME, SIGLA</strong>.</li>
+            <li>A coluna <strong>AREA_CONHECIMENTO</strong> deve conter um dos seguintes códigos:
+              <ul className="pl-6 mt-1 space-y-1 text-xs text-slate-500">
+                <li>LINGUAGENS</li>
+                <li>MATEMATICA</li>
+                <li>CIENCIAS_NATUREZA</li>
+                <li>CIENCIAS_HUMANAS</li>
+                <li>TEC_INFORMATICA</li>
+              </ul>
+            </li>
+          </ul>
+        }
+      />
     </div >
   )
 }
