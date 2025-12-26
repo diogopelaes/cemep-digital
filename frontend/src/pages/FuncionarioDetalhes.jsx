@@ -9,6 +9,7 @@ import {
 } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import { formatDateBR } from '../utils/date'
+import { formatCPF, formatTelefone, formatCEP } from '../utils/formatters'
 import {
     createPDF, addHeader, addFooter, addSectionTitle, addField,
     addTable, checkNewPage, downloadPDF, openPDF, CONFIG
@@ -92,7 +93,7 @@ export default function FuncionarioDetalhes() {
             y = Math.max(y1, y2)
 
             yTemp = y
-            y1 = addField(doc, 'CPF', String(funcionario.cpf || '-'), col1, y, maxW)
+            y1 = addField(doc, 'CPF', formatCPF(funcionario.cpf), col1, y, maxW)
             y2 = addField(doc, 'Data Nascimento', funcionario.data_nascimento ? formatDateBR(funcionario.data_nascimento) : '-', col2, yTemp, maxW)
             y = Math.max(y1, y2)
 
@@ -107,7 +108,7 @@ export default function FuncionarioDetalhes() {
             y = Math.max(y1, y2)
 
             yTemp = y
-            y1 = addField(doc, 'Telefone', String(funcionario.usuario?.telefone || funcionario.telefone || '-'), col1, y, maxW)
+            y1 = addField(doc, 'Telefone', formatTelefone(funcionario.usuario?.telefone || funcionario.telefone), col1, y, maxW)
             y2 = yTemp // Placeholder for empty col2 if needed, or just keep y1 if single column row
             y = Math.max(y1, y2)
 
@@ -123,7 +124,7 @@ export default function FuncionarioDetalhes() {
 
             yTemp = y
             y1 = addField(doc, 'Cidade/UF', `${funcionario.cidade || ''}/${funcionario.estado || ''}`, col1, y, maxW)
-            y2 = addField(doc, 'CEP', String(funcionario.cep || '-'), col2, yTemp, maxW)
+            y2 = addField(doc, 'CEP', formatCEP(funcionario.cep), col2, yTemp, maxW)
             y = Math.max(y1, y2)
 
             // === DADOS PROFISSIONAIS ===
@@ -277,7 +278,7 @@ export default function FuncionarioDetalhes() {
                             <InfoItem
                                 icon={HiIdentification}
                                 label="CPF"
-                                value={funcionario.cpf || '-'}
+                                value={formatCPF(funcionario.cpf)}
                             />
                             <InfoItem
                                 icon={HiBriefcase}
@@ -317,7 +318,7 @@ export default function FuncionarioDetalhes() {
                             <InfoItem
                                 icon={HiPhone}
                                 label="Telefone"
-                                value={funcionario.usuario?.telefone || funcionario.telefone || '-'}
+                                value={formatTelefone(funcionario.usuario?.telefone || funcionario.telefone)}
                             />
                         </div>
 
@@ -350,7 +351,7 @@ export default function FuncionarioDetalhes() {
                                 <InfoItem
                                     icon={HiLocationMarker}
                                     label="CEP"
-                                    value={funcionario.cep || '-'}
+                                    value={formatCEP(funcionario.cep)}
                                 />
                             </div>
                         </div>

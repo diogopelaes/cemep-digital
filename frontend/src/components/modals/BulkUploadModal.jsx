@@ -311,9 +311,18 @@ export default function BulkUploadModal({
                         <Button
                             onClick={handleUpload}
                             disabled={!file || uploading}
-                            icon={uploading ? Loading : HiCheck}
                         >
-                            {uploading ? 'Importando...' : 'Iniciar Importação'}
+                            {uploading ? (
+                                <>
+                                    <Loading size="sm" className="mr-2" />
+                                    Importando...
+                                </>
+                            ) : (
+                                <>
+                                    <HiCheck className="w-5 h-5 mr-2" />
+                                    Iniciar Importação
+                                </>
+                            )}
                         </Button>
                     )}
                 </div>

@@ -36,6 +36,9 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['bolsa_familia', 'pe_de_meia', 'usa_onibus']
     search_fields = ['usuario__first_name', 'usuario__last_name', 'cpf', 'nome_social']
+
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
     def get_serializer_class(self):
         if self.action in ['create']:
@@ -403,6 +406,9 @@ class ResponsavelViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.Mod
     queryset = Responsavel.objects.select_related('usuario').all()
     filter_backends = [DjangoFilterBackend]
     search_fields = ['usuario__first_name', 'usuario__last_name', 'usuario__email']
+
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
     def get_serializer_class(self):
         if self.action == 'create':
@@ -445,6 +451,9 @@ class MatriculaCEMEPViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.
     filterset_fields = ['status', 'curso', 'estudante']
     search_fields = ['numero_matricula', 'estudante__usuario__first_name']
 
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 class MatriculaTurmaViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
     """ViewSet de Matrículas Turma. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
@@ -456,6 +465,8 @@ class MatriculaTurmaViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.
     filterset_fields = ['status', 'turma', 'matricula_cemep', 'turma__ano_letivo']
     search_fields = ['matricula_cemep__estudante__usuario__first_name', 'matricula_cemep__numero_matricula']
 
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 class AtestadoViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
     """ViewSet de Atestados. Leitura: Funcionários | Escrita: Gestão/Secretaria"""

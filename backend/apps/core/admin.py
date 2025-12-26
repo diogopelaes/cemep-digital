@@ -35,20 +35,20 @@ class PeriodoTrabalhoAdmin(admin.ModelAdmin):
 
 @admin.register(Disciplina)
 class DisciplinaAdmin(admin.ModelAdmin):
-    list_display = ['nome', 'sigla', 'descontinuada']
-    list_filter = ['descontinuada']
+    list_display = ['nome', 'sigla', 'is_active']
+    list_filter = ['is_active']
     search_fields = ['nome', 'sigla']
 
 
 @admin.register(Curso)
 class CursoAdmin(admin.ModelAdmin):
-    list_display = ['nome', 'sigla']
+    list_display = ['nome', 'sigla', 'is_active']
     search_fields = ['nome', 'sigla']
 
 
 @admin.register(Turma)
 class TurmaAdmin(admin.ModelAdmin):
-    list_display = ['numero', 'letra', 'ano_letivo', 'nomenclatura', 'curso']
+    list_display = ['numero', 'letra', 'ano_letivo', 'nomenclatura', 'curso', 'is_active']
     list_filter = ['ano_letivo', 'curso', 'nomenclatura']
     search_fields = ['numero', 'letra']
     filter_horizontal = ['professores_representantes']
@@ -82,7 +82,7 @@ class CalendarioEscolarAdmin(admin.ModelAdmin):
 
 @admin.register(Habilidade)
 class HabilidadeAdmin(admin.ModelAdmin):
-    list_display = ['codigo', 'disciplina', 'descricao']
+    list_display = ['codigo', 'disciplina', 'descricao', 'is_active']
     list_filter = ['disciplina']
     search_fields = ['codigo', 'descricao']
 

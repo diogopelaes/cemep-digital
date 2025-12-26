@@ -160,13 +160,13 @@ class DisciplinaSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Disciplina
-        fields = ['id', 'nome', 'sigla', 'area_conhecimento', 'area_conhecimento_display', 'descontinuada']
+        fields = ['id', 'nome', 'sigla', 'area_conhecimento', 'area_conhecimento_display', 'is_active']
 
 
 class CursoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Curso
-        fields = ['id', 'nome', 'sigla']
+        fields = ['id', 'nome', 'sigla', 'is_active']
 
 
 class TurmaSerializer(serializers.ModelSerializer):
@@ -195,7 +195,7 @@ class TurmaSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'numero', 'letra', 'ano_letivo', 'nomenclatura',
             'curso', 'curso_id', 'nome_completo', 'disciplinas_count', 'estudantes_count',
-            'professores_representantes', 'professores_representantes_details'
+            'professores_representantes', 'professores_representantes_details', 'is_active'
         ]
     
     def get_disciplinas_count(self, obj):
@@ -294,5 +294,5 @@ class HabilidadeSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Habilidade
-        fields = ['id', 'codigo', 'descricao', 'disciplina', 'disciplina_id']
+        fields = ['id', 'codigo', 'descricao', 'disciplina', 'disciplina_id', 'is_active']
 

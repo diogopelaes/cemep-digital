@@ -155,13 +155,13 @@ class Disciplina(models.Model):
         blank=True,
         verbose_name='Área de Conhecimento'
     )
-    descontinuada = models.BooleanField(default=False, verbose_name='Descontinuada')
+    is_active = models.BooleanField(default=True, verbose_name='Ativa')
     
     class Meta:
         verbose_name = 'Disciplina'
         verbose_name_plural = 'Disciplinas'
         ordering = ['nome']
-        unique_together = ['nome', 'sigla', 'descontinuada']
+        unique_together = ['nome', 'sigla']
     
     def __str__(self):
         return f"{self.nome} ({self.sigla})"
@@ -173,12 +173,14 @@ class Curso(models.Model):
     
     nome = models.CharField(max_length=100, verbose_name='Nome')
     sigla = models.CharField(max_length=10, verbose_name='Sigla')
+    is_active = models.BooleanField(default=True, verbose_name='Ativa')
     
     class Meta:
         verbose_name = 'Curso'
         verbose_name_plural = 'Cursos'
         ordering = ['nome']
-    
+        unique_together = ['nome', 'sigla']    
+
     def __str__(self):
         return f"{self.nome} ({self.sigla})"
 
@@ -210,6 +212,7 @@ class Turma(models.Model):
         related_name='turmas',
         verbose_name='Curso'
     )
+    is_active = models.BooleanField(default=True, verbose_name='Ativa')
     
     class Meta:
         verbose_name = 'Turma'
@@ -388,6 +391,7 @@ class Habilidade(models.Model):
         null=True,
         blank=True
     )
+    is_active = models.BooleanField(default=True, verbose_name='Ativa')
     
     class Meta:
         verbose_name = 'Habilidade'

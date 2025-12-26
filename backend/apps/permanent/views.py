@@ -30,6 +30,9 @@ class DadosPermanenteEstudanteViewSet(GestaoWriteSecretariaReadMixin, viewsets.M
     serializer_class = DadosPermanenteEstudanteSerializer
     filter_backends = [DjangoFilterBackend]
     search_fields = ['nome', 'cpf']
+
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
     @action(detail=True, methods=['get'])
     def historico_completo(self, request, pk=None):
@@ -52,6 +55,9 @@ class DadosPermanenteResponsavelViewSet(GestaoWriteSecretariaReadMixin, viewsets
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['estudante']
 
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 class HistoricoEscolarViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
     """ViewSet de Histórico Escolar. Leitura: Gestão/Secretaria | Escrita: Gestão"""
@@ -60,6 +66,8 @@ class HistoricoEscolarViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelView
     filter_backends = [DjangoFilterBackend]
     search_fields = ['estudante__nome', 'estudante__cpf', 'numero_matricula']
 
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 class HistoricoEscolarAnoLetivoViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
     """ViewSet de Histórico por Ano Letivo. Leitura: Gestão/Secretaria | Escrita: Gestão"""
@@ -68,6 +76,8 @@ class HistoricoEscolarAnoLetivoViewSet(GestaoWriteSecretariaReadMixin, viewsets.
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['historico', 'ano_letivo', 'status_final']
 
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 class HistoricoEscolarNotasViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
     """ViewSet de Histórico de Notas. Leitura: Gestão/Secretaria | Escrita: Gestão"""
@@ -75,6 +85,9 @@ class HistoricoEscolarNotasViewSet(GestaoWriteSecretariaReadMixin, viewsets.Mode
     serializer_class = HistoricoEscolarNotasSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['ano_letivo_ref']
+
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class RegistroProntuarioViewSet(GestaoOnlyMixin, viewsets.ModelViewSet):
@@ -84,6 +97,9 @@ class RegistroProntuarioViewSet(GestaoOnlyMixin, viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['cpf']
     search_fields = ['nome_estudante', 'cpf', 'descricao']
+
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
     @action(detail=True, methods=['get'])
     def download_anexo(self, request, pk=None):

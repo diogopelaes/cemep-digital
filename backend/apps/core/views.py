@@ -46,6 +46,9 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
     filterset_fields = ['usuario__tipo_usuario', 'usuario__is_active']
     search_fields = ['matricula', 'usuario__first_name', 'apelido']
     
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
     def get_serializer_class(self):
         if self.action == 'criar_completo':
             return FuncionarioCompletoSerializer
@@ -433,8 +436,19 @@ class DisciplinaViewSet(GestaoWritePublicReadMixin, viewsets.ModelViewSet):
     queryset = Disciplina.objects.all()
     serializer_class = DisciplinaSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['descontinuada']
+    filterset_fields = ['is_active']
     search_fields = ['nome', 'sigla']
+
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(detail=True, methods=['post'], url_path='toggle-ativo')
+    @transaction.atomic
+    def toggle_active(self, request, pk=None):
+        disciplina = self.get_object()
+        disciplina.is_active = not disciplina.is_active
+        disciplina.save()
+        return Response({'status': 'status updated', 'is_active': disciplina.is_active})
 
     @action(detail=False, methods=['post'], url_path='importar-arquivo')
     @transaction.atomic
@@ -506,7 +520,8 @@ class DisciplinaViewSet(GestaoWritePublicReadMixin, viewsets.ModelViewSet):
                         defaults={
                             'nome': nome,
                             'area_conhecimento': area if area else None,
-                            'descontinuada': False
+                            'area_conhecimento': area if area else None,
+                            'is_active': True
                         }
                     )
                     
@@ -569,7 +584,12 @@ class CursoViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
     """ViewSet de Cursos. Leitura: Gestão/Secretaria | Escrita: Gestão/Secretaria"""
     queryset = Curso.objects.all()
     serializer_class = CursoSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['is_active']
     search_fields = ['nome', 'sigla']
+
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class TurmaViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
@@ -577,8 +597,11 @@ class TurmaViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
     queryset = Turma.objects.select_related('curso').prefetch_related('professores_representantes__usuario').all()
     serializer_class = TurmaSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['numero', 'letra', 'ano_letivo', 'curso', 'nomenclatura']
+    filterset_fields = ['numero', 'letra', 'ano_letivo', 'curso', 'nomenclatura', 'is_active']
     search_fields = ['numero', 'letra']
+
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(detail=False, methods=['get'], url_path='anos-disponiveis')
     def anos_disponiveis(self, request):
@@ -634,6 +657,6 @@ class HabilidadeViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
     queryset = Habilidade.objects.select_related('disciplina').all()
     serializer_class = HabilidadeSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['disciplina']
+    filterset_fields = ['disciplina', 'is_active']
     search_fields = ['codigo', 'descricao']
 

@@ -113,6 +113,7 @@ export const coreAPI = {
     create: (data) => api.post('/core/disciplinas/', data),
     update: (id, data) => api.patch(`/core/disciplinas/${id}/`, data),
     delete: (id) => api.delete(`/core/disciplinas/${id}/`),
+    toggleAtivo: (id) => api.post(`/core/disciplinas/${id}/toggle-ativo/`),
     uploadFile: (formData) => api.post('/core/disciplinas/importar-arquivo/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
@@ -125,6 +126,7 @@ export const coreAPI = {
     create: (data) => api.post('/core/cursos/', data),
     update: (id, data) => api.patch(`/core/cursos/${id}/`, data),
     delete: (id) => api.delete(`/core/cursos/${id}/`),
+    toggleAtivo: (id) => api.post(`/core/cursos/${id}/toggle-ativo/`),
   },
   // Turmas
   turmas: {
@@ -133,6 +135,7 @@ export const coreAPI = {
     create: (data) => api.post('/core/turmas/', data),
     update: (id, data) => api.patch(`/core/turmas/${id}/`, data),
     delete: (id) => api.delete(`/core/turmas/${id}/`),
+    toggleAtivo: (id) => api.post(`/core/turmas/${id}/toggle-ativo/`),
     anosDisponiveis: () => api.get('/core/turmas/anos-disponiveis/'),
   },
   // Calendário

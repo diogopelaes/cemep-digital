@@ -66,7 +66,7 @@ export default function TurmaDetalhes() {
     try {
       const [vinculadasRes, todasRes, atribuicoesRes, funcionariosRes] = await Promise.all([
         coreAPI.disciplinasTurma.list({ turma: id }),
-        coreAPI.disciplinas.list({ descontinuada: false }),
+        coreAPI.disciplinas.list({ is_active: 'true' }),
         coreAPI.atribuicoes.list({ turma: id }),
         coreAPI.funcionarios.list({ 'usuario__tipo_usuario': 'PROFESSOR', ativo: true }),
       ])

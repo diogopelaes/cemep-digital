@@ -4,7 +4,7 @@ import {
   Card, Button, Select, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading, Pagination
 } from '../components/ui'
-import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil } from 'react-icons/hi'
+import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil, HiCheckCircle, HiXCircle } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -14,6 +14,7 @@ export default function Turmas() {
   const [turmas, setTurmas] = useState([])
   const [anosDisponiveis, setAnosDisponiveis] = useState([])
   const [anoLetivo, setAnoLetivo] = useState(null)
+  const [filtroAtivo, setFiltroAtivo] = useState('')
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
@@ -31,7 +32,7 @@ export default function Turmas() {
     if (anoLetivo) {
       loadTurmas()
     }
-  }, [anoLetivo, currentPage])
+  }, [anoLetivo, currentPage, filtroAtivo])
 
   const loadAnosDisponiveis = async () => {
     try {
@@ -59,7 +60,11 @@ export default function Turmas() {
   const loadTurmas = async () => {
     setLoading(true)
     try {
-      const response = await coreAPI.turmas.list({ ano_letivo: anoLetivo, page: currentPage })
+      const params = { ano_letivo: anoLetivo, page: currentPage }
+      if (filtroAtivo !== '') {
+        params.is_active = filtroAtivo
+      }
+      const response = await coreAPI.turmas.list(params)
       const data = response.data
       setTurmas(data.results || data)
       setTotalCount(data.count || (data.results || data).length)
@@ -80,6 +85,20 @@ export default function Turmas() {
     setCurrentPage(1)
   }
 
+  const handleFiltroActiveChange = (e) => {
+    setFiltroAtivo(e.target.value)
+    setCurrentPage(1)
+  }
+
+  const handleToggleAtivo = async (turma) => {
+    try {
+      await coreAPI.turmas.toggleAtivo(turma.id)
+      toast.success(turma.is_active ? 'Turma desativada' : 'Turma ativada')
+      loadTurmas()
+    } catch (error) {
+      toast.error('Erro ao alterar status')
+    }
+  }
 
   // Formata o nome da turma
   const formatTurmaNome = (turma) => {
@@ -124,6 +143,19 @@ export default function Turmas() {
                 options={anosDisponiveis.map(ano => ({ value: ano, label: ano.toString() }))}
               />
             </div>
+            <div className="w-40">
+              <Select
+                label="Status"
+                value={filtroAtivo}
+                onChange={handleFiltroActiveChange}
+                options={[
+                  { value: 'true', label: 'Ativas' },
+                  { value: 'false', label: 'Inativas' },
+                ]}
+                placeholder="Todas"
+                allowClear
+              />
+            </div>
             <div className="flex-1">
               <p className="text-sm text-slate-500 mt-6">
                 {turmas.length} turma{turmas.length !== 1 ? 's' : ''} encontrada{turmas.length !== 1 ? 's' : ''}
@@ -142,6 +174,7 @@ export default function Turmas() {
               <TableHeader>Curso</TableHeader>
               <TableHeader>Estudantes</TableHeader>
               <TableHeader>Disciplinas</TableHeader>
+              <TableHeader>Status</TableHeader>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -152,18 +185,26 @@ export default function Turmas() {
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => navigate(`/turmas/${turma.id}`)}
-                        className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center hover:scale-105 hover:shadow-lg transition-all"
+                        className={`w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center hover:scale-105 hover:shadow-lg transition-all ${turma.is_active
+                          ? 'from-primary-500 to-accent-500'
+                          : 'from-slate-400 to-slate-500 grayscale'
+                          }`}
                       >
                         <span className="text-white font-bold text-sm">
                           {turma.numero}{turma.letra}
                         </span>
                       </button>
-                      <button
-                        onClick={() => navigate(`/turmas/${turma.id}`)}
-                        className="font-medium text-link-subtle text-left"
-                      >
-                        {formatTurmaNome(turma)}
-                      </button>
+                      <div>
+                        <button
+                          onClick={() => navigate(`/turmas/${turma.id}`)}
+                          className={`font-medium text-left ${!turma.is_active ? 'text-slate-400 line-through' : 'text-link-subtle'}`}
+                        >
+                          {formatTurmaNome(turma)}
+                        </button>
+                        {!turma.is_active && (
+                          <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">Inativa</p>
+                        )}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -182,6 +223,31 @@ export default function Turmas() {
                       <HiBookOpen className="h-4 w-4" />
                       <span>{turma.disciplinas_count || 0}</span>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleToggleAtivo(turma)
+                      }}
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${turma.is_active
+                        ? 'bg-success-500/10 text-success-600 hover:bg-success-500/20 dark:text-success-400'
+                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400'
+                        }`}
+                      title="Alterar Status"
+                    >
+                      {turma.is_active ? (
+                        <>
+                          <HiCheckCircle className="w-4 h-4" />
+                          Ativa
+                        </>
+                      ) : (
+                        <>
+                          <HiXCircle className="w-4 h-4" />
+                          Inativa
+                        </>
+                      )}
+                    </button>
                   </TableCell>
                 </TableRow>
               ))

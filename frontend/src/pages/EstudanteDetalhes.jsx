@@ -10,6 +10,7 @@ import {
 } from 'react-icons/hi'
 import { academicAPI } from '../services/api'
 import { formatDateBR, calcularIdade } from '../utils/date'
+import { formatCPF, formatTelefone, formatCEP } from '../utils/formatters'
 import {
     createPDF, addHeader, addFooter, addSectionTitle, addField,
     addPhoto, addTable, checkNewPage, imageToBase64, downloadPDF, openPDF,
@@ -90,7 +91,7 @@ export default function EstudanteDetalhes() {
 
             // CPF e CIN
             let yTemp = y
-            addField(doc, 'CPF', estudante.cpf_formatado || estudante.cpf, col1, y)
+            addField(doc, 'CPF', formatCPF(estudante.cpf), col1, y)
             y = addField(doc, 'CIN', estudante.cin || '-', col2, yTemp)
 
             // Data de nascimento e Idade
@@ -101,7 +102,7 @@ export default function EstudanteDetalhes() {
 
             // Telefone e Email
             yTemp = y
-            addField(doc, 'Telefone', estudante.telefone_formatado || estudante.telefone || '-', col1, y)
+            addField(doc, 'Telefone', formatTelefone(estudante.telefone), col1, y)
             y = addField(doc, 'E-mail', estudante.usuario?.email || '-', col2, yTemp)
 
             // === ENDEREÇO ===
@@ -319,7 +320,7 @@ export default function EstudanteDetalhes() {
                             <InfoItem
                                 icon={HiDocumentText}
                                 label="CPF"
-                                value={estudante.cpf_formatado || estudante.cpf}
+                                value={formatCPF(estudante.cpf)}
                             />
                             <InfoItem
                                 icon={HiDocumentText}
@@ -334,7 +335,7 @@ export default function EstudanteDetalhes() {
                             <InfoItem
                                 icon={HiPhone}
                                 label="Telefone"
-                                value={estudante.telefone_formatado || estudante.telefone || '-'}
+                                value={formatTelefone(estudante.telefone)}
                             />
                             <InfoItem
                                 icon={HiMail}
@@ -446,15 +447,15 @@ export default function EstudanteDetalhes() {
                                                         <div
                                                             key={prof.id}
                                                             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${prof.tipo === 'TITULAR'
-                                                                    ? 'bg-primary-500/10 text-primary-700 dark:text-primary-300'
-                                                                    : 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
+                                                                ? 'bg-primary-500/10 text-primary-700 dark:text-primary-300'
+                                                                : 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
                                                                 }`}
                                                         >
                                                             <HiAcademicCap className="h-3 w-3" />
                                                             <span>{prof.apelido || prof.nome}</span>
                                                             <span className={`ml-0.5 px-1 py-0.5 rounded text-[10px] font-semibold ${prof.tipo === 'TITULAR'
-                                                                    ? 'bg-primary-600/20 text-primary-800 dark:text-primary-200'
-                                                                    : 'bg-amber-600/20 text-amber-800 dark:text-amber-200'
+                                                                ? 'bg-primary-600/20 text-primary-800 dark:text-primary-200'
+                                                                : 'bg-amber-600/20 text-amber-800 dark:text-amber-200'
                                                                 }`}>
                                                                 {prof.tipo === 'TITULAR' ? 'T' : 'S'}
                                                             </span>

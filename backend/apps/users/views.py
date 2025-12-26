@@ -25,6 +25,9 @@ class UserViewSet(viewsets.ModelViewSet):
     """ViewSet para gerenciamento de usuários."""
     
     queryset = User.objects.all()
+
+    def destroy(self, request, *args, **kwargs):
+        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
     def get_serializer_class(self):
         if self.action == 'create':
