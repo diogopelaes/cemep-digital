@@ -73,6 +73,7 @@ class Funcionario(models.Model):
         verbose_name = 'Funcionário'
         verbose_name_plural = 'Funcionários'
         ordering = ['usuario__first_name']
+        unique_together = ('usuario', 'matricula')
 
     def get_apelido(self):
         if self.apelido:

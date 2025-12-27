@@ -127,6 +127,10 @@ export const coreAPI = {
     update: (id, data) => api.patch(`/core/cursos/${id}/`, data),
     delete: (id) => api.delete(`/core/cursos/${id}/`),
     toggleAtivo: (id) => api.post(`/core/cursos/${id}/toggle-ativo/`),
+    importarArquivo: (formData) => api.post('/core/cursos/importar-arquivo/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    downloadModelo: () => api.get('/core/cursos/download-modelo/', { responseType: 'blob' }),
   },
   // Turmas
   turmas: {

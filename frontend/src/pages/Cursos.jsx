@@ -4,7 +4,8 @@ import {
   Card, Button, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading, Pagination, Select
 } from '../components/ui'
-import { HiPlus, HiTrash, HiBookOpen, HiX, HiCheck, HiCheckCircle, HiXCircle } from 'react-icons/hi'
+import { HiPlus, HiTrash, HiBookOpen, HiX, HiCheck, HiCheckCircle, HiXCircle, HiUpload } from 'react-icons/hi'
+import BulkUploadModal from '../components/modals/BulkUploadModal'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -14,6 +15,7 @@ export default function Cursos() {
   const [cursos, setCursos] = useState([])
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [filtroAtivo, setFiltroAtivo] = useState('')
+  const [showUploadModal, setShowUploadModal] = useState(false)
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
@@ -93,9 +95,14 @@ export default function Cursos() {
             Gerencie os cursos oferecidos pela instituição
           </p>
         </div>
-        <Button icon={HiPlus} onClick={() => navigate('/cursos/novo')}>
-          Novo Curso
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button variant="secondary" icon={HiUpload} onClick={() => setShowUploadModal(true)}>
+            Cadastro em massa
+          </Button>
+          <Button icon={HiPlus} onClick={() => navigate('/cursos/novo')}>
+            Novo Curso
+          </Button>
+        </div>
       </div>
 
       {/* Filtros */}
@@ -241,6 +248,43 @@ export default function Cursos() {
           onPageChange={handlePageChange}
         />
       </Card>
+
+      <BulkUploadModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUpload={async (formData) => {
+          const response = await coreAPI.cursos.importarArquivo(formData)
+          if (response.data.errors?.length > 0) {
+            toast.error('Alguns registros não foram importados. Verifique os erros.')
+          }
+          loadCursos()
+          return response
+        }}
+        entityName="Cursos"
+        templateHeaders={['NOME', 'SIGLA']}
+        onDownloadTemplate={async () => {
+          try {
+            const response = await coreAPI.cursos.downloadModelo()
+            const url = window.URL.createObjectURL(new Blob([response.data]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'modelo_cursos.xlsx')
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+          } catch (error) {
+            console.error(error)
+            toast.error('Erro ao baixar o modelo.')
+          }
+        }}
+        instructions={
+          <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
+            <li>Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong>.</li>
+            <li>Colunas obrigatórias: <strong>NOME</strong> e <strong>SIGLA</strong>.</li>
+            <li>A <strong>SIGLA</strong> é usada para identificar duplicatas.</li>
+          </ul>
+        }
+      />
     </div>
   )
 }
