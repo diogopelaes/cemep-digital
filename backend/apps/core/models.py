@@ -242,7 +242,7 @@ class DisciplinaTurma(models.Model):
         on_delete=models.CASCADE,
         related_name='disciplinas_vinculadas'
     )
-    aulas_semanais = models.PositiveSmallIntegerField(verbose_name='Aulas Semanais')
+    aulas_semanais = models.PositiveSmallIntegerField(verbose_name='Aulas Semanais', default=4)
     
     class Meta:
         verbose_name = 'Disciplina da Turma'

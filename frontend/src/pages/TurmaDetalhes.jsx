@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Loading, Badge, MultiCombobox } from '../components/ui'
+import { Card, Button, Loading, Badge, MultiCombobox, Pagination } from '../components/ui'
 import {
   HiArrowLeft, HiPencil, HiTrash, HiPlus, HiBookOpen,
-  HiUserGroup, HiAcademicCap, HiStar
+  HiUserGroup, HiAcademicCap, HiStar, HiUpload, HiX
 } from 'react-icons/hi'
+import BulkUploadModal from '../components/modals/BulkUploadModal'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -15,6 +16,7 @@ export default function TurmaDetalhes() {
   const [loading, setLoading] = useState(true)
   const [turma, setTurma] = useState(null)
   const [activeTab, setActiveTab] = useState('disciplinas')
+  const [showUploadModal, setShowUploadModal] = useState(false)
 
   // Disciplinas
   const [todasDisciplinas, setTodasDisciplinas] = useState([]) // Todas as disciplinas do sistema
@@ -22,6 +24,12 @@ export default function TurmaDetalhes() {
   const [aulasSemanais, setAulasSemanais] = useState({}) // { disciplina_id: '4' }
   const [loadingDisciplinas, setLoadingDisciplinas] = useState(false)
   const [savingDisciplinas, setSavingDisciplinas] = useState(false)
+
+  // Paginação de Disciplinas
+  const [disciplinasPage, setDisciplinasPage] = useState(1)
+  const [disciplinasTotalPages, setDisciplinasTotalPages] = useState(1)
+  const [disciplinasTotalCount, setDisciplinasTotalCount] = useState(0)
+  const disciplinasPageSize = 20
 
   // Professores (para atribuição inline)
   const [professoresDisponiveis, setProfessoresDisponiveis] = useState([])
@@ -47,7 +55,7 @@ export default function TurmaDetalhes() {
         loadRepresentantes()
       }
     }
-  }, [turma, activeTab])
+  }, [turma, activeTab, disciplinasPage])
 
   const loadTurma = async () => {
     try {
@@ -65,10 +73,10 @@ export default function TurmaDetalhes() {
     setLoadingDisciplinas(true)
     try {
       const [vinculadasRes, todasRes, atribuicoesRes, funcionariosRes] = await Promise.all([
-        coreAPI.disciplinasTurma.list({ turma: id }),
-        coreAPI.disciplinas.list({ is_active: 'true' }),
-        coreAPI.atribuicoes.list({ turma: id }),
-        coreAPI.funcionarios.list({ 'usuario__tipo_usuario': 'PROFESSOR', ativo: true }),
+        coreAPI.disciplinasTurma.list({ turma: id, page_size: 1000 }), // Carrega todas as vinculadas
+        coreAPI.disciplinas.list({ is_active: 'true', page: disciplinasPage }),
+        coreAPI.atribuicoes.list({ turma: id, page_size: 1000 }),
+        coreAPI.funcionarios.list({ 'usuario__tipo_usuario': 'PROFESSOR', ativo: true, page_size: 1000 }),
       ])
       const vinculadas = vinculadasRes.data.results || vinculadasRes.data
       const todas = todasRes.data.results || todasRes.data
@@ -76,6 +84,10 @@ export default function TurmaDetalhes() {
       const funcionarios = funcionariosRes.data.results || funcionariosRes.data
 
       setTodasDisciplinas(todas)
+      if (todasRes.data.count) {
+        setDisciplinasTotalCount(todasRes.data.count)
+        setDisciplinasTotalPages(Math.ceil(todasRes.data.count / disciplinasPageSize))
+      }
       setProfessoresDisponiveis(funcionarios)
 
       // Mapeia disciplinas vinculadas com atribuições (múltiplos professores)
@@ -105,6 +117,53 @@ export default function TurmaDetalhes() {
       toast.error('Erro ao carregar disciplinas')
     }
     setLoadingDisciplinas(false)
+  }
+
+  // Reload silencioso para evitar desmontar o modal
+  const reloadDisciplinasSilent = async () => {
+    try {
+      const [vinculadasRes, todasRes, atribuicoesRes, funcionariosRes] = await Promise.all([
+        coreAPI.disciplinasTurma.list({ turma: id, page_size: 1000 }),
+        coreAPI.disciplinas.list({ is_active: 'true', page: disciplinasPage }),
+        coreAPI.atribuicoes.list({ turma: id, page_size: 1000 }),
+        coreAPI.funcionarios.list({ 'usuario__tipo_usuario': 'PROFESSOR', ativo: true, page_size: 1000 }),
+      ])
+      const vinculadas = vinculadasRes.data.results || vinculadasRes.data
+      const todas = todasRes.data.results || todasRes.data
+      const atribuicoes = atribuicoesRes.data.results || atribuicoesRes.data
+      const funcionarios = funcionariosRes.data.results || funcionariosRes.data
+
+      setTodasDisciplinas(todas)
+      if (todasRes.data.count) {
+        setDisciplinasTotalCount(todasRes.data.count)
+        setDisciplinasTotalPages(Math.ceil(todasRes.data.count / disciplinasPageSize))
+      }
+      setProfessoresDisponiveis(funcionarios)
+
+      const vinculadasMap = {}
+      const aulasMap = {}
+      vinculadas.forEach(v => {
+        const atribuicoesDestaDisc = atribuicoes.filter(a => a.disciplina_turma?.id === v.id)
+        vinculadasMap[v.disciplina.id] = {
+          id: v.id,
+          aulas_semanais: v.aulas_semanais,
+          professores: atribuicoesDestaDisc.map(a => ({
+            id: a.professor?.id,
+            atribuicao_id: a.id,
+            tipo: a.tipo || 'TITULAR',
+            tipo_display: a.tipo_display || 'Titular',
+            data_inicio: a.data_inicio,
+            data_fim: a.data_fim,
+            ...a.professor
+          })),
+        }
+        aulasMap[v.disciplina.id] = v.aulas_semanais?.toString() || ''
+      })
+      setDisciplinasVinculadas(vinculadasMap)
+      setAulasSemanais(aulasMap)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const isDisciplinaSelecionada = (disciplinaId) => {
@@ -237,11 +296,11 @@ export default function TurmaDetalhes() {
         toast.success('Professor removido')
       }
 
-      await loadDisciplinas()
+      await reloadDisciplinasSilent()
     } catch (error) {
       const msg = error.response?.data?.non_field_errors?.[0] || 'Erro ao atualizar professores'
       toast.error(msg)
-      await loadDisciplinas() // Recarrega para sincronizar
+      await reloadDisciplinasSilent() // Recarrega para sincronizar
     }
     setSalvandoProfessores(null)
   }
@@ -260,7 +319,7 @@ export default function TurmaDetalhes() {
         tipo: novoTipo
       })
       toast.success(`Tipo alterado para ${novoTipo === 'TITULAR' ? 'Titular' : 'Substituto'}`)
-      await loadDisciplinas()
+      await reloadDisciplinasSilent()
     } catch (error) {
       toast.error('Erro ao alterar tipo')
     }
@@ -361,7 +420,7 @@ export default function TurmaDetalhes() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-800 dark:text-white">
-                {turma.nome_completo || `${turma.numero}º ${turma.nomenclatura === 'SERIE' ? 'Série' : turma.nomenclatura === 'ANO' ? 'Ano' : 'Módulo'} ${turma.letra}`}
+                {turma.nome_completo || `${turma.numero}º ${turma.nomenclatura === 'SERIE' ? 'Série' : (turma.nomenclatura === 'ANO' ? 'Ano' : 'Módulo')} ${turma.letra}`}
               </h1>
               <p className="text-slate-500 dark:text-slate-400">
                 {turma.curso?.nome} • {turma.ano_letivo}
@@ -427,9 +486,14 @@ export default function TurmaDetalhes() {
                 Selecione as disciplinas e informe as aulas semanais
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-slate-500">Total de aulas semanais</p>
-              <p className="text-2xl font-bold text-primary-600">{totalAulasSemanais}</p>
+            <div className="flex items-center gap-4 text-right">
+              <div>
+                <p className="text-sm text-slate-500">Total de aulas semanais</p>
+                <p className="text-2xl font-bold text-primary-600">{totalAulasSemanais}</p>
+              </div>
+              <Button variant="secondary" icon={HiUpload} onClick={() => setShowUploadModal(true)}>
+                Importar
+              </Button>
             </div>
           </div>
 
@@ -437,7 +501,7 @@ export default function TurmaDetalhes() {
             <div className="flex justify-center py-8">
               <Loading size="md" />
             </div>
-          ) : todasDisciplinas.length > 0 ? (
+          ) : (todasDisciplinas.length > 0 ? (
             <div className="space-y-6">
               {Object.entries(disciplinasPorArea).map(([area, disciplinasArea]) => (
                 <div key={area}>
@@ -615,6 +679,25 @@ export default function TurmaDetalhes() {
                 Cadastrar disciplinas
               </Button>
             </div>
+          ))}
+
+          {/* Paginação */}
+          {todasDisciplinas.length > 0 && (
+            <div className="mt-6 border-t border-slate-200 dark:border-slate-700 pt-4">
+              <Pagination
+                currentPage={disciplinasPage}
+                totalPages={disciplinasTotalPages}
+                totalItems={disciplinasTotalCount}
+                pageSize={disciplinasPageSize}
+                onPageChange={(page) => {
+                  setDisciplinasPage(page)
+                  // O useEffect do activeTab ou loadDisciplinas deve ser chamado,
+                  // mas como loadDisciplinas depende do state disciplinasPage, 
+                  // precisamos garantir que ele seja chamado quando a página mudar.
+                  // Melhor adicionar um useEffect específico para disciplinasPage.
+                }}
+              />
+            </div>
           )}
         </Card>
       )}
@@ -714,7 +797,44 @@ export default function TurmaDetalhes() {
           </div>
         </Card>
       )}
-    </div>
+
+      {/* Modal de Importação */}
+      <BulkUploadModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUpload={async (formData) => {
+          // Adiciona o ID da turma ao FormData
+          formData.append('turma_id', id)
+          const response = await coreAPI.disciplinasTurma.importarArquivo(formData)
+          // Atualiza lista sem loading visual
+          reloadDisciplinasSilent()
+          return response
+        }}
+        entityName="Disciplinas da Turma"
+        templateHeaders={['SIGLA_DISCIPLINA', 'AULAS_SEMANAIS']}
+        onDownloadTemplate={async () => {
+          try {
+            const response = await coreAPI.disciplinasTurma.downloadModelo()
+            const url = window.URL.createObjectURL(new Blob([response.data]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'modelo_disciplinas_turma.xlsx')
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+          } catch (error) {
+            console.error(error)
+            toast.error('Erro ao baixar o modelo.')
+          }
+        }}
+        instructions={
+          <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
+            <li>O arquivo deve conter a coluna obrigatória: <strong>SIGLA_DISCIPLINA</strong>.</li>
+            <li>Opcionalmente, informe <strong>AULAS_SEMANAIS</strong> (padrão é 4).</li>
+            <li>A disciplina será buscada pela Sigla. Se não encontrar, será listado como erro.</li>
+          </ul>
+        }
+      />
+    </div >
   )
 }
-

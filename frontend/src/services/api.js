@@ -177,6 +177,10 @@ export const coreAPI = {
     create: (data) => api.post('/core/disciplinas-turma/', data),
     update: (id, data) => api.patch(`/core/disciplinas-turma/${id}/`, data),
     delete: (id) => api.delete(`/core/disciplinas-turma/${id}/`),
+    importarArquivo: (formData) => api.post('/core/disciplinas-turma/importar-arquivo/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    downloadModelo: () => api.get('/core/disciplinas-turma/download-modelo/', { responseType: 'blob' }),
   },
   // Atribuição de Aulas (Professor -> Disciplina/Turma)
   atribuicoes: {

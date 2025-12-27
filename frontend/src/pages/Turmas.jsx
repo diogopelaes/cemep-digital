@@ -104,7 +104,7 @@ export default function Turmas() {
 
   // Formata o nome da turma
   const formatTurmaNome = (turma) => {
-    const nomenclatura = turma.nomenclatura === 'SERIE' ? 'Série' : turma.nomenclatura === 'ANO' ? 'Ano' : 'Módulo'
+    const nomenclatura = turma.nomenclatura === 'SERIE' ? 'Série' : (turma.nomenclatura === 'ANO' ? 'Ano' : 'Módulo')
     return `${turma.numero}º ${nomenclatura} ${turma.letra}`
   }
 
