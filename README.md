@@ -2,181 +2,193 @@
 
 ![CEMEP Digital](Documentation/img/CEMEP.jpeg)
 
-Sistema de gestão escolar desenvolvido sob medida para o CEMEP (Centro Municipal de Educação Profissional), modernizando o controle de notas, frequências, ocorrências e comunicação.
+Sistema de gestão escolar desenvolvido sob medida para o **CEMEP - Centro Municipal de Ensino Profissionalizante** de Paulínia/SP, modernizando o controle de notas, frequências, ocorrências e comunicação.
+
+---
 
 ## 🚀 Tecnologias
 
-### Backend
-- **Python 3.14** com Django REST Framework
-- **PostgreSQL 18** como banco de dados
-- **JWT** para autenticação
-- **Uvicorn** como servidor ASGI
-- **Caddy** como reverse proxy com SSL automático
+| Camada | Stack |
+|--------|-------|
+| **Backend** | Python 3.14, Django 4, DRF, PostgreSQL 18, JWT, Uvicorn |
+| **Frontend** | React 18, Vite, TailwindCSS, React Router, Axios |
+| **Infra** | Caddy (reverse proxy + SSL), VPS Hostinger |
 
-### Frontend
-- **React 18** com Vite
-- **TailwindCSS** para estilização
-- **React Router** para navegação
-- **Axios** para requisições HTTP
-- **React Icons** para ícones
+---
 
 ## 📁 Estrutura do Projeto
 
 ```
 cemep-digital/
-├── backend/                 # API Django REST
-│   ├── core_project/        # Configurações do projeto
+├── backend/                    # API Django REST
+│   ├── core_project/           # Configurações Django
 │   ├── apps/
-│   │   ├── users/           # Autenticação e perfis
-│   │   ├── core/            # Cadastros base
-│   │   ├── academic/        # Vida escolar
-│   │   ├── pedagogical/     # Notas, faltas, ocorrências
-│   │   ├── management/      # Tarefas e avisos
-│   │   └── permanent/       # Arquivo permanente
-│   ├── requirements.txt
+│   │   ├── users/              # Autenticação e perfis
+│   │   ├── core/               # Funcionários, Turmas, Disciplinas
+│   │   ├── academic/           # Estudantes, Matrículas, Responsáveis
+│   │   ├── pedagogical/        # Aulas, Notas, Faltas, Ocorrências
+│   │   ├── management/         # Tarefas, Avisos, HTPC
+│   │   └── permanent/          # Histórico escolar, Prontuário
 │   └── manage.py
 │
-├── frontend/                # React + Vite
+├── frontend/                   # React + Vite
 │   ├── src/
-│   │   ├── components/      # Componentes UI
-│   │   ├── contexts/        # Auth e Theme
-│   │   ├── layouts/         # Layouts de página
-│   │   ├── pages/           # Páginas
-│   │   └── services/        # API
-│   ├── package.json
+│   │   ├── components/         # Componentes reutilizáveis (ui/, common/)
+│   │   ├── pages/              # Páginas da aplicação
+│   │   ├── hooks/              # Custom hooks
+│   │   ├── contexts/           # Auth e Theme
+│   │   ├── services/           # Camada de API
+│   │   ├── utils/              # Formatadores e validadores
+│   │   └── data/               # Constantes centralizadas
 │   └── vite.config.js
 │
-├── Documentation/           # Documentação técnica
-├── GUIA_DEPLOY.md           # Guia de deploy na VPS
-└── README.md
+├── Documentation/              # Documentação técnica
+│   ├── FRONTEND_ARCHITECTURE.md
+│   └── BACKEND_ARCHITECTURE.md
+│
+└── institutional_config.json   # Dados institucionais centralizados
 ```
 
-## 🔧 Configuração Local
+---
+
+## 🔧 Início Rápido
 
 ### Pré-requisitos
 - Python 3.14+
 - Node.js 20+
 - PostgreSQL 17+
 
-### Backend
+### Opção 1: Script Automático (Recomendado)
 
 ```powershell
-# Entrar na pasta backend
+# Na raiz do projeto
+.\Documentation\start-app.ps1
+```
+
+### Opção 2: Manual
+
+**Backend:**
+```powershell
 cd backend
-
-# Criar ambiente virtual
-python -m venv .venv
-
-# Ativar ambiente (Windows PowerShell)
-.\.venv\Scripts\Activate.ps1
-
-# Instalar dependências
-pip install -r requirements.txt
-
-# Configurar variáveis de ambiente
-# Copie .env.example para .env e configure
-
-# Executar migrações
-python manage.py migrate
-
-# Criar superusuário
-python manage.py createsuperuser
-
-# Rodar servidor
-python manage.py runserver
+..\\.venv\Scripts\Activate.ps1   # Ativar venv
+pip install -r requirements.txt  # Instalar dependências
+python manage.py migrate         # Migrações
+python manage.py runserver       # Iniciar servidor
 ```
 
-### Frontend
-
+**Frontend:**
 ```powershell
-# Entrar na pasta frontend
 cd frontend
-
-# Instalar dependências
-npm install
-
-# Rodar em desenvolvimento
-npm run dev
+npm install                      # Instalar dependências
+npm run dev                      # Iniciar dev server
 ```
 
-### Acessar
-- **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:8000/api/v1/
-- **Admin Django:** http://localhost:8000/admin/
-
-## 👥 Perfis de Usuário
-
-| Perfil | Descrição |
-|--------|-----------|
-| **Gestão** | Acesso total ao sistema |
-| **Secretaria** | Cadastros e matrículas |
-| **Professor** | Diário, notas e ocorrências |
-| **Monitor** | Tarefas e avisos |
-| **Estudante** | Boletim e avisos |
-| **Responsável** | Boletim, ocorrências e avisos |
-
-## 📋 Funcionalidades Principais
-
-### Gestão Escolar
-- ✅ Cadastro de funcionários com períodos de trabalho
-- ✅ Cadastro de cursos, disciplinas e turmas
-- ✅ Calendário escolar
-- ✅ Atribuição de aulas
-
-### Vida Escolar
-- ✅ Cadastro completo de estudantes
-- ✅ Matrículas e enturmação
-- ✅ Cadastro de responsáveis
-- ✅ Atestados médicos
-
-### Pedagógico
-- ✅ Planos de aula
-- ✅ Diário de classe
-- ✅ Registro de faltas
-- ✅ Notas bimestrais
-- ✅ Recuperação
-- ✅ Ocorrências pedagógicas
-- ✅ 5º Conceito (Conselho de Classe)
-
-### Comunicação
-- ✅ Tarefas para funcionários
-- ✅ Reuniões HTPC com ata
-- ✅ Avisos com anexos
-
-### Arquivo Permanente
-- ✅ Histórico escolar
-- ✅ Ocorrências disciplinares
-- ✅ Limpeza automática de dados (1 ano após saída)
-
-## 🔒 Segurança
-
-- Autenticação via JWT
-- Permissões por perfil de usuário
-- Arquivos de mídia protegidos
-- CORS configurado
-- Senhas criptografadas
-
-## 📦 Deploy
-
-Consulte o arquivo **[GUIA_DEPLOY.md](GUIA_DEPLOY.md)** para instruções detalhadas de deploy na VPS Hostinger.
-
-## 🛠️ Comandos Úteis
-
-### Limpeza de Dados Expirados
-```bash
-python manage.py limpar_dados_expirados --dry-run  # Simulação
-python manage.py limpar_dados_expirados            # Execução real
-```
-
-### Build de Produção (Frontend)
-```bash
-npm run build
-```
-
-## 📄 Licença
-
-Este projeto é de uso exclusivo do CEMEP - Centro Municipal de Educação Profissional.
+### Acessos
+| Serviço | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| API Backend | http://localhost:8000/api/v1/ |
+| Django Admin | http://localhost:8000/admin/ |
 
 ---
 
-**Desenvolvido com ❤️ para o CEMEP**
+## 👥 Perfis de Usuário e Permissões
+
+| Perfil | Escrita | Leitura |
+|--------|---------|---------|
+| **Gestão** | Tudo | Tudo |
+| **Secretaria** | Cadastros, Matrículas | Tudo (exceto prontuário) |
+| **Professor** | Aulas, Notas, Faltas, Planos | Cadastros |
+| **Monitor** | - | Cadastros, Avisos |
+| **Estudante** | - | Próprio boletim |
+| **Responsável** | - | Filhos: boletim, ocorrências |
+
+---
+
+## 📋 Funcionalidades
+
+### ✅ Gestão Escolar (Core)
+- Funcionários com períodos de trabalho e importação em massa
+- Cursos, Disciplinas e Turmas com toggle ativo/inativo
+- Calendário escolar e bimestres
+- Atribuição de professores às disciplinas
+
+### ✅ Vida Escolar (Academic)
+- Cadastro completo de estudantes com foto 3x4
+- Sistema de matrículas CEMEP (10 dígitos) + Enturmação
+- Responsáveis com parentesco
+- Atestados médicos com arquivo
+
+### ✅ Pedagógico (Pedagogical)
+- Planos de aula com habilidades BNCC
+- Diário de classe e registro de aulas
+- Chamada e faltas em lote
+- Notas bimestrais e boletim
+- Ocorrências pedagógicas com notificação aos responsáveis
+
+### ✅ Gestão Interna (Management)
+- Tarefas atribuídas a funcionários
+- Reuniões HTPC com ata e presença
+- Avisos com destinatários e controle de leitura
+
+### ✅ Arquivo Permanente (Permanent)
+- Histórico escolar completo
+- Prontuário com anexos
+- Dados imutáveis para auditoria
+
+---
+
+## 📖 Documentação para Desenvolvedores
+
+> **Para IAs/LLMs:** Consulte estes arquivos antes de desenvolver:
+
+| Documento | Conteúdo |
+|-----------|----------|
+| [FRONTEND_ARCHITECTURE.md](Documentation/FRONTEND_ARCHITECTURE.md) | Estrutura React, componentes, hooks, padrões |
+| [BACKEND_ARCHITECTURE.md](Documentation/BACKEND_ARCHITECTURE.md) | Apps Django, modelos, permissões, ViewSets |
+| [GUIA_DEPLOY.md](Documentation/GUIA_DEPLOY.md) | Deploy na VPS Hostinger com Caddy |
+| [REQUISITOS_SISTEMA.md](Documentation/REQUISITOS_SISTEMA.md) | Requisitos funcionais do sistema |
+
+---
+
+## 🔒 Segurança
+
+- **Autenticação JWT** com access/refresh tokens
+- **Permissões por perfil** via Mixins no backend
+- **Arquivos protegidos** (fotos, atestados, anexos)
+- **CORS configurado** para domínios específicos
+- **Senhas criptografadas** com Django hasher
+
+---
+
+## 🛠️ Comandos Úteis
+
+```bash
+# Backend
+python manage.py check              # Verificar erros
+python manage.py makemigrations     # Criar migrações
+python manage.py migrate            # Aplicar migrações
+python manage.py createsuperuser    # Criar admin
+
+# Frontend
+npm run dev                         # Desenvolvimento
+npm run build                       # Build produção
+npm run lint                        # Verificar código
+```
+
+---
+
+## 📦 Deploy
+
+Consulte **[GUIA_DEPLOY.md](Documentation/GUIA_DEPLOY.md)** para instruções de deploy na VPS.
+
+---
+
+## 📄 Licença
+
+Uso exclusivo do **CEMEP - Centro Municipal de Ensino Profissionalizante**  
+Prefeitura Municipal de Paulínia/SP
+
+---
+
+**Desenvolvido com ❤️ para a educação profissional de Paulínia**
