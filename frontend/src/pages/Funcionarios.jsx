@@ -602,7 +602,11 @@ export default function Funcionarios() {
           return response
         }}
         entityName="Funcionários"
-        templateHeaders={['NOME_COMPLETO', 'EMAIL', 'MATRICULA', 'TIPO_USUARIO', 'SENHA', 'CPF', 'APELIDO']}
+        templateHeaders={[
+          'NOME_COMPLETO', 'EMAIL', 'MATRICULA', 'TIPO_USUARIO', 'SENHA', 'CPF', 'APELIDO',
+          'AREA_ATUACAO', 'CIN', 'NOME_SOCIAL', 'DATA_NASCIMENTO', 'LOGRADOURO', 'NUMERO',
+          'BAIRRO', 'CIDADE', 'ESTADO', 'CEP', 'COMPLEMENTO', 'TELEFONE', 'DATA_ADMISSAO'
+        ]}
         onDownloadTemplate={async () => {
           try {
             const response = await coreAPI.funcionarios.downloadModel()
@@ -622,7 +626,7 @@ export default function Funcionarios() {
           <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
             <li>Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong>.</li>
             <li><strong>Matrícula</strong> será usada como Nome de Usuário.</li>
-            <li><strong>CPF</strong> e <strong>Senha</strong> são opcionais.</li>
+            <li><strong>CPF</strong> e <strong>Datas</strong> são validados (se inválidos, o registro é criado sem eles).</li>
             <li>Tipos permitidos: <strong>GESTAO, SECRETARIA, PROFESSOR, MONITOR</strong>.</li>
           </ul>
         }

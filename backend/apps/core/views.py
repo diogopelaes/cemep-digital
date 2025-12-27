@@ -72,10 +72,11 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
     @transaction.atomic
     def importar_arquivo(self, request):
         """
-        Importa funcionários via XLSX/CSV.
-        Colunas: NOME_COMPLETO, EMAIL, MATRICULA, TIPO_USUARIO, SENHA, CPF, APELIDO
-        User Creation: MATRICULA -> username.
-        Validação: FuncionarioCompletoSerializer logic (manual).
+        Importa funcionários via XLSX/CSV com suporte a todos os campos.
+        Obrigatórios: NOME_COMPLETO, EMAIL, MATRICULA, TIPO_USUARIO.
+        Opcionais com validação 'soft': CPF, DATA_NASCIMENTO, DATA_ADMISSAO.
+        Outros opcionais: AREA_ATUACAO, CIN, NOME_SOCIAL, LOGRADOURO, NUMERO, BAIRRO, 
+                          CIDADE, ESTADO, CEP, COMPLEMENTO, TELEFONE, APELIDO, SENHA.
         """
         file = request.FILES.get('file')
         if not file:
@@ -85,24 +86,40 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
             # Ler com Pandas
             if file.name.endswith('.csv'):
                 try:
-                    df = pd.read_csv(file, sep=';', dtype={'MATRICULA': str, 'TELEFONE': str, 'CPF': str, 'SENHA': str})
+                    df = pd.read_csv(file, sep=';', dtype=str)
                 except:
                     file.seek(0)
-                    df = pd.read_csv(file, sep=',', dtype={'MATRICULA': str, 'TELEFONE': str, 'CPF': str, 'SENHA': str})
+                    df = pd.read_csv(file, sep=',', dtype=str)
             else:
-                df = pd.read_excel(file, dtype={'MATRICULA': str, 'TELEFONE': str, 'CPF': str, 'SENHA': str})
+                df = pd.read_excel(file, dtype=str)
             
             df = df.fillna('')
             df.columns = [c.strip().upper() for c in df.columns]
             
+            # Campos obrigatórios
             required = ['NOME_COMPLETO', 'MATRICULA', 'TIPO_USUARIO', 'EMAIL']
             missing = [c for c in required if c not in df.columns]
             if missing:
-                return Response({'detail': f'Colunas faltando: {", ".join(missing)}'}, status=400)
+                return Response({'detail': f'Colunas obrigatórias faltando: {", ".join(missing)}'}, status=400)
 
             created_count = 0
             updated_count = 0
             errors = []
+            warnings = []
+
+            # Validadores auxiliares
+            from .validators import validate_cpf
+            from django.core.exceptions import ValidationError
+            from datetime import datetime
+
+            def parse_date(date_str):
+                if not date_str: return None
+                for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y'):
+                    try:
+                        return datetime.strptime(date_str, fmt).date()
+                    except ValueError:
+                        continue
+                return None
 
             for idx, row in df.iterrows():
                 try:
@@ -110,12 +127,14 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
                     matricula = str(row['MATRICULA']).strip()
                     nome = row['NOME_COMPLETO'].strip()
                     tipo = row['TIPO_USUARIO'].strip().upper()
+                    email = row.get('EMAIL', '').strip()
                     
-                    if not matricula or not nome:
-                         errors.append(f"Linha {line}: Matrícula ou Nome inválidos.")
+                    # 1. Validação Obrigatória
+                    if not matricula or not nome or not tipo:
+                         errors.append(f"Linha {line}: Matrícula, Nome e Tipo são obrigatórios.")
                          continue
-
-                    # Mapeamento e Validação de Tipo
+                    
+                    # Mapeamento Tipo
                     map_tipo = {
                         'GESTÃO': 'GESTAO', 'SECRETARIA': 'SECRETARIA', 
                         'PROFESSOR': 'PROFESSOR', 'MONITOR': 'MONITOR',
@@ -127,33 +146,81 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
                          errors.append(f"Linha {line}: Tipo '{tipo}' inválido.")
                          continue
 
-                    # Password Logic
+                    # 2. Dados Opcionais com Soft Validation
+                    campo_cpf = str(row.get('CPF', '')).strip().replace('.', '').replace('-', '')
+                    cpf_final = None
+                    if campo_cpf:
+                        try:
+                            # Validação simples de formato/existencia.
+                            # Nota: validate_cpf lança ValidationError se inválido
+                            validate_cpf(campo_cpf)
+                            
+                            # Verificar unicidade (se for novo ou se mudou)
+                            # Para simplificar na importação em massa, checamos se já existe outro employee com esse CPF
+                            # que não seja o atual (caso update). Como não temos o ID fácil aqui,
+                            # vamos assumir: se existe e user.username != matricula, erro.
+                            
+                            qs_cpf = Funcionario.objects.filter(cpf=campo_cpf)
+                            if qs_cpf.exists() and qs_cpf.first().usuario.username != matricula:
+                                warnings.append(f"Linha {line}: CPF {campo_cpf} já pertence a outro funcionário. Ignorado.")
+                            else:
+                                cpf_final = campo_cpf
+                        except ValidationError:
+                            warnings.append(f"Linha {line}: CPF {campo_cpf} inválido. Ignorado.")
+
+                    data_nasc_final = None
+                    d_nasc_str = str(row.get('DATA_NASCIMENTO', '')).strip()
+                    if d_nasc_str:
+                        parsed = parse_date(d_nasc_str)
+                        if parsed:
+                            data_nasc_final = parsed
+                        else:
+                            warnings.append(f"Linha {line}: Data Nascimento '{d_nasc_str}' inválida (use dd/mm/aaaa). Ignorada.")
+
+                    data_adm_final = None
+                    d_adm_str = str(row.get('DATA_ADMISSAO', '')).strip()
+                    if d_adm_str:
+                        parsed = parse_date(d_adm_str)
+                        if parsed:
+                            data_adm_final = parsed
+                        else:
+                            warnings.append(f"Linha {line}: Data Admissão '{d_adm_str}' inválida (use dd/mm/aaaa). Ignorada.")
+
+                    # 3. Preparação do Usuário
                     raw_password = str(row.get('SENHA', '')).strip()
+                    should_update_password = False
                     if not raw_password:
-                        import random, string
-                        chars = string.ascii_letters + string.digits + "!@#"
-                        raw_password = ''.join(random.choice(chars) for _ in range(8))
+                        # Se for criação, precisa de senha. Se for update, mantém a antiga se não vier nova.
+                        # Para garantir, geramos senha se for criação.
+                        try:
+                            user_exists = User.objects.get(username=matricula)
+                            should_update_password = False
+                        except User.DoesNotExist:
+                            import random, string
+                            chars = string.ascii_letters + string.digits + "!@#"
+                            raw_password = ''.join(random.choice(chars) for _ in range(8))
+                            should_update_password = True
+                    else:
+                        should_update_password = True
 
                     sid = transaction.savepoint()
                     
                     try:
                         # -- USER --
-                        # Username agora é a MATRICULA
                         user_defaults={
-                            'first_name': nome, # Nome Completo no first_name como solicitado
+                            'first_name': nome,
                             'last_name': '',
-                            'email': row.get('EMAIL', '').strip(),
+                            'email': email,
                             'tipo_usuario': tipo_codigo,
-                            'is_active': True 
+                            'is_active': True
                         }
-
+                        
                         user, user_created = User.objects.update_or_create(
                             username=matricula,
                             defaults=user_defaults
                         )
                         
-                        # Se criado ou se senha fornecida explicitamente, atualizar senha
-                        if user_created or row.get('SENHA', '').strip():
+                        if should_update_password:
                             user.set_password(raw_password)
                             user.save()
 
@@ -162,21 +229,37 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
                         if not apelido:
                             apelido = nome.split(' ')[0]
 
-                        cpf = str(row.get('CPF', '')).strip().replace('.', '').replace('-', '')
-                        if not cpf: # Garantir que não tente salvar string vazia se campo for unique/validado
-                            cpf = None
+                        # Campos opcionais simples (sem validação complexa além de trim)
+                        func_defaults = {
+                            'apelido': apelido,
+                            'area_atuacao': row.get('AREA_ATUACAO', '').strip() or None,
+                            'cin': row.get('CIN', '').strip(),
+                            'nome_social': row.get('NOME_SOCIAL', '').strip(),
+                            'logradouro': row.get('LOGRADOURO', '').strip(),
+                            'numero': row.get('NUMERO', '').strip(),
+                            'bairro': row.get('BAIRRO', '').strip(),
+                            'cidade': row.get('CIDADE', '').strip() or 'Mogi Guaçu',
+                            'estado': row.get('ESTADO', '').strip() or 'SP',
+                            'cep': row.get('CEP', '').strip(),
+                            'complemento': row.get('COMPLEMENTO', '').strip(),
+                            'telefone': row.get('TELEFONE', '').strip(),
+                            'cpf': cpf_final,
+                            'data_nascimento': data_nasc_final,
+                            'data_admissao': data_adm_final,
+                        }
 
                         func, func_created = Funcionario.objects.update_or_create(
                             usuario=user,
-                            defaults={
-                                'matricula': matricula, # Redundante mas mantido
-                                'apelido': apelido,
-                                'cpf': cpf,
-                                # Outros campos opcionais não solicitados mas mantidos como nullable
-                            }
+                            defaults=func_defaults
                         )
                         
                         if func_created:
+                            # Se tem data admissão definida, cria período de trabalho inicial
+                            if data_adm_final:
+                                PeriodoTrabalho.objects.create(
+                                    funcionario=func,
+                                    data_entrada=data_adm_final
+                                )
                             created_count += 1
                         else:
                             updated_count += 1
@@ -192,11 +275,14 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
 
             msg = f'Importação concluída: {created_count} criados, {updated_count} atualizados.'
             if errors:
-                msg += f' {len(errors)} erros.'
+                msg += f' {len(errors)} falhas.'
+            if warnings:
+                msg += f' {len(warnings)} alertas.'
             
             return Response({
                 'message': msg,
                 'errors': errors,
+                'warnings': warnings,
                 'created_count': created_count,
                 'updated_count': updated_count
             })
@@ -207,14 +293,28 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
     @action(detail=False, methods=['get'], url_path='download-modelo', permission_classes=[AllowAny])
     def download_modelo(self, request):
         buffer = io.BytesIO()
+        # Modelo com todos os campos aceitos
         data = {
             'NOME_COMPLETO': ['Maria Oliveira'],
             'EMAIL': ['maria@escola.com.br'],
             'MATRICULA': ['202401'],
             'TIPO_USUARIO': ['PROFESSOR'],
-            'SENHA': ['123@Mudar'],
+            'SENHA': ['123@Mudar'], # Opcional
             'CPF': ['12345678900'],
-            'APELIDO': ['Maria']
+            'APELIDO': ['Maria'],
+            'AREA_ATUACAO': ['Matemática'],
+            'CIN': ['12345'],
+            'NOME_SOCIAL': [''],
+            'DATA_NASCIMENTO': ['15/05/1980'],
+            'LOGRADOURO': ['Rua Exemplo'],
+            'NUMERO': ['123'],
+            'BAIRRO': ['Centro'],
+            'CIDADE': ['Mogi Guaçu'],
+            'ESTADO': ['SP'],
+            'CEP': ['13840000'],
+            'COMPLEMENTO': ['Apto 1'],
+            'TELEFONE': ['19999999999'],
+            'DATA_ADMISSAO': ['01/02/2024']
         }
         df = pd.DataFrame(data)
         
@@ -228,7 +328,7 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
         return FileResponse(
             buffer, 
             as_attachment=True, 
-            filename='modelo_funcionarios.xlsx',
+            filename='modelo_funcionarios_completo.xlsx',
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
     

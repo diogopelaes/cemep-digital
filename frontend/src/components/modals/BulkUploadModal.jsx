@@ -207,6 +207,27 @@ export default function BulkUploadModal({
                                     </div>
                                 </div>
                             )}
+
+                            {/* Warnings List */}
+                            {importResult.warnings && importResult.warnings.length > 0 && (
+                                <div className="border border-amber-200 dark:border-amber-900/30 rounded-xl overflow-hidden">
+                                    <div className="bg-amber-50 dark:bg-amber-900/20 p-3 border-b border-amber-100 dark:border-amber-900/30 flex items-center gap-2">
+                                        <HiExclamationCircle className="w-5 h-5 text-amber-500" />
+                                        <h3 className="font-semibold text-amber-700 dark:text-amber-300 text-sm">
+                                            Alertas ({importResult.warnings.length})
+                                        </h3>
+                                    </div>
+                                    <div className="max-h-48 overflow-y-auto bg-white dark:bg-slate-800 p-2">
+                                        <ul className="space-y-1">
+                                            {importResult.warnings.map((warn, idx) => (
+                                                <li key={idx} className="text-xs text-amber-600 dark:text-amber-400 p-2 hover:bg-amber-50 dark:hover:bg-amber-900/10 rounded">
+                                                    {warn}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <div className="space-y-6">
