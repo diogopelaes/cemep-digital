@@ -15,6 +15,7 @@ export default function CursoForm() {
   const [formData, setFormData] = useState({
     nome: '',
     sigla: '',
+    is_active: true,
   })
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function CursoForm() {
       setFormData({
         nome: curso.nome || '',
         sigla: curso.sigla || '',
+        is_active: curso.is_active ?? true,
       })
     } catch (error) {
       toast.error('Erro ao carregar curso')
@@ -40,7 +42,7 @@ export default function CursoForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!formData.nome.trim() || !formData.sigla.trim()) {
       toast.error('Preencha todos os campos obrigatórios')
       return
@@ -57,10 +59,10 @@ export default function CursoForm() {
       }
       navigate('/cursos')
     } catch (error) {
-      const msg = error.response?.data?.detail || 
-                  error.response?.data?.nome?.[0] ||
-                  error.response?.data?.sigla?.[0] ||
-                  'Erro ao salvar curso'
+      const msg = error.response?.data?.detail ||
+        error.response?.data?.nome?.[0] ||
+        error.response?.data?.sigla?.[0] ||
+        'Erro ao salvar curso'
       toast.error(msg)
     }
     setSaving(false)
@@ -119,6 +121,31 @@ export default function CursoForm() {
                 required
               />
             </div>
+          </div>
+
+          {/* Switch Ativa */}
+          <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+            <div>
+              <span className="font-medium text-slate-700 dark:text-slate-300">
+                Curso Ativo
+              </span>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                Desative para impedir novos cadastros neste curso
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.is_active
+                ? 'bg-success-500'
+                : 'bg-slate-300 dark:bg-slate-600'
+                }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.is_active ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+              />
+            </button>
           </div>
 
           {/* Botões */}

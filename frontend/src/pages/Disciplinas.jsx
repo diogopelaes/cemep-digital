@@ -218,17 +218,7 @@ export default function Disciplinas() {
         onUpload={async (formData) => {
           const response = await coreAPI.disciplinas.uploadFile(formData)
           // Se sucesso, recarrega a lista
-          loadDisciplinas()
-
-          // Verifica se houve erros
-          const hasErrors = response.data?.errors && response.data.errors.length > 0
-
-          // Se não houver erros, fecha o modal e notifica
-          if (!hasErrors) {
-            setShowUploadModal(false)
-            toast.success(`Importação realizada! ${response.data?.created_count || 0} criados, ${response.data?.updated_count || 0} atualizados.`)
-          }
-
+          loadDisciplinas(true)
           return response
         }}
         entityName="Disciplinas"

@@ -141,6 +141,10 @@ export const coreAPI = {
     delete: (id) => api.delete(`/core/turmas/${id}/`),
     toggleAtivo: (id) => api.post(`/core/turmas/${id}/toggle-ativo/`),
     anosDisponiveis: () => api.get('/core/turmas/anos-disponiveis/'),
+    importarArquivo: (formData) => api.post('/core/turmas/importar-arquivo/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    downloadModelo: () => api.get('/core/turmas/download-modelo/', { responseType: 'blob' }),
   },
   // Calendário
   calendario: {

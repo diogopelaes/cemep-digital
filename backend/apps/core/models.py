@@ -73,7 +73,7 @@ class Funcionario(models.Model):
         verbose_name = 'Funcionário'
         verbose_name_plural = 'Funcionários'
         ordering = ['usuario__first_name']
-        unique_together = ('usuario', 'matricula')
+        unique_together = ['usuario', 'matricula']
 
     def get_apelido(self):
         if self.apelido:
@@ -172,15 +172,14 @@ class Disciplina(models.Model):
 class Curso(models.Model):
     """Curso oferecido pela escola."""
     
-    nome = models.CharField(max_length=100, verbose_name='Nome')
-    sigla = models.CharField(max_length=10, verbose_name='Sigla')
+    nome = models.CharField(max_length=100, unique=True, verbose_name='Nome')
+    sigla = models.CharField(max_length=10, unique=True, verbose_name='Sigla')
     is_active = models.BooleanField(default=True, verbose_name='Ativa')
     
     class Meta:
         verbose_name = 'Curso'
         verbose_name_plural = 'Cursos'
         ordering = ['nome']
-        unique_together = ['nome', 'sigla']    
 
     def __str__(self):
         return f"{self.nome} ({self.sigla})"

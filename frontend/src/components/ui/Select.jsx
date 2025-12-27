@@ -1,12 +1,13 @@
 import { forwardRef } from 'react'
 
-const Select = forwardRef(({ 
+const Select = forwardRef(({
   label,
   error,
   options = [],
   placeholder = 'Selecione...',
   className = '',
-  ...props 
+  allowClear, // Destructure to avoid passing to DOM
+  ...props
 }, ref) => {
   return (
     <div className="w-full">

@@ -4,7 +4,8 @@ import {
   Card, Button, Select, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading, Pagination
 } from '../components/ui'
-import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil, HiCheckCircle, HiXCircle } from 'react-icons/hi'
+import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil, HiCheckCircle, HiXCircle, HiUpload } from 'react-icons/hi'
+import BulkUploadModal from '../components/modals/BulkUploadModal'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -15,6 +16,7 @@ export default function Turmas() {
   const [anosDisponiveis, setAnosDisponiveis] = useState([])
   const [anoLetivo, setAnoLetivo] = useState(null)
   const [filtroAtivo, setFiltroAtivo] = useState('')
+  const [showUploadModal, setShowUploadModal] = useState(false)
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
@@ -57,8 +59,8 @@ export default function Turmas() {
     }
   }
 
-  const loadTurmas = async () => {
-    setLoading(true)
+  const loadTurmas = async (silent = false) => {
+    if (!silent) setLoading(true)
     try {
       const params = { ano_letivo: anoLetivo, page: currentPage }
       if (filtroAtivo !== '') {
@@ -72,7 +74,7 @@ export default function Turmas() {
     } catch (error) {
       toast.error('Erro ao carregar turmas')
     }
-    setLoading(false)
+    if (!silent) setLoading(false)
   }
 
   const handlePageChange = (page) => {
@@ -126,9 +128,14 @@ export default function Turmas() {
             Gerencie as turmas do ano letivo
           </p>
         </div>
-        <Button icon={HiPlus} onClick={() => navigate('/turmas/novo')}>
-          Nova Turma
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button variant="secondary" icon={HiUpload} onClick={() => setShowUploadModal(true)}>
+            Cadastro em massa
+          </Button>
+          <Button icon={HiPlus} onClick={() => navigate('/turmas/novo')}>
+            Nova Turma
+          </Button>
+        </div>
       </div>
 
       {/* Filtro de Ano */}
@@ -272,6 +279,42 @@ export default function Turmas() {
           onPageChange={handlePageChange}
         />
       </Card>
+
+      <BulkUploadModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUpload={async (formData) => {
+          const response = await coreAPI.turmas.importarArquivo(formData)
+          loadTurmas(true)
+          loadAnosDisponiveis() // Atualiza anos se houver novos
+          return response
+        }}
+        entityName="Turmas"
+        templateHeaders={['NUMERO', 'LETRA', 'ANO_LETIVO', 'NOMENCLATURA', 'SIGLA_CURSO']}
+        onDownloadTemplate={async () => {
+          try {
+            const response = await coreAPI.turmas.downloadModelo()
+            const url = window.URL.createObjectURL(new Blob([response.data]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'modelo_turmas.xlsx')
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+          } catch (error) {
+            console.error(error)
+            toast.error('Erro ao baixar o modelo.')
+          }
+        }}
+        instructions={
+          <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
+            <li>Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong>.</li>
+            <li>Todos os campos são obrigatórios.</li>
+            <li><strong>SIGLA_CURSO</strong> deve corresponder a um curso existente.</li>
+            <li><strong>NOMENCLATURA</strong>: SÉRIE, ANO ou MÓDULO.</li>
+          </ul>
+        }
+      />
     </div>
   )
 }
