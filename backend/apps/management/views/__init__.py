@@ -1,26 +1,25 @@
 """
 Views para o App Management
+
+Re-exporta todos os ViewSets para manter compatibilidade com imports existentes.
 """
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
-from django.db.models import Q
 
-from .models import (
+from apps.management.models import (
     Tarefa, NotificacaoTarefa, ReuniaoHTPC, NotificacaoHTPC,
     Aviso, AvisoVisualizacao
 )
-from .serializers import (
+from apps.management.serializers import (
     TarefaSerializer, NotificacaoTarefaSerializer,
     ReuniaoHTPCSerializer, NotificacaoHTPCSerializer,
     AvisoSerializer, AvisoVisualizacaoSerializer
 )
 from apps.users.permissions import (
-    GestaoWriteFuncionarioReadMixin, FuncionarioMixin, GestaoOnlyMixin,
-    GestaoSecretariaWritePublicReadMixin
+    GestaoWriteFuncionarioReadMixin, GestaoSecretariaWritePublicReadMixin
 )
 from apps.core.models import Funcionario
 
@@ -34,13 +33,8 @@ class TarefaViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         tarefa = serializer.save(criador=self.request.user)
-        
-        # Cria notificações para os funcionários
         for funcionario in tarefa.funcionarios.all():
-            NotificacaoTarefa.objects.create(
-                tarefa=tarefa,
-                funcionario=funcionario
-            )
+            NotificacaoTarefa.objects.create(tarefa=tarefa, funcionario=funcionario)
     
     @action(detail=True, methods=['post'])
     def concluir(self, request, pk=None):
@@ -55,25 +49,19 @@ class TarefaViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
     def minhas_tarefas(self, request):
         """Retorna as tarefas do funcionário logado."""
         if not hasattr(request.user, 'funcionario'):
-            return Response([])  # Retorna lista vazia se não é funcionário
-        
+            return Response([])
         tarefas = self.queryset.filter(funcionarios=request.user.funcionario)
-        serializer = self.get_serializer(tarefas, many=True)
-        return Response(serializer.data)
+        return Response(self.get_serializer(tarefas, many=True).data)
     
     @action(detail=False, methods=['get'])
     def relatorio(self, request):
         """Relatório de tarefas concluídas/pendentes."""
         total = self.queryset.count()
         concluidas = self.queryset.filter(concluido=True).count()
-        pendentes = total - concluidas
         atrasadas = self.queryset.filter(concluido=False, prazo__lt=timezone.now()).count()
-        
         return Response({
-            'total': total,
-            'concluidas': concluidas,
-            'pendentes': pendentes,
-            'atrasadas': atrasadas
+            'total': total, 'concluidas': concluidas,
+            'pendentes': total - concluidas, 'atrasadas': atrasadas
         })
 
 
@@ -85,7 +73,6 @@ class NotificacaoTarefaViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def marcar_visualizado(self, request, pk=None):
-        """Marca a notificação como visualizada."""
         obj = self.get_object()
         obj.visualizado = True
         obj.data_visualizacao = timezone.now()
@@ -94,16 +81,10 @@ class NotificacaoTarefaViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def minhas_notificacoes(self, request):
-        """Retorna as notificações do funcionário logado."""
         if not hasattr(request.user, 'funcionario'):
-            return Response([])  # Retorna lista vazia se não é funcionário
-        
-        notificacoes = self.queryset.filter(
-            funcionario=request.user.funcionario,
-            visualizado=False
-        )
-        serializer = self.get_serializer(notificacoes, many=True)
-        return Response(serializer.data)
+            return Response([])
+        notificacoes = self.queryset.filter(funcionario=request.user.funcionario, visualizado=False)
+        return Response(self.get_serializer(notificacoes, many=True).data)
 
 
 class ReuniaoHTPCViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
@@ -115,24 +96,16 @@ class ReuniaoHTPCViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
     
     def perform_create(self, serializer):
         reuniao = serializer.save(quem_registrou=self.request.user)
-        
-        # Cria notificações para todos os funcionários ativos
         funcionarios = Funcionario.objects.filter(ativo=True)
         for funcionario in funcionarios:
-            NotificacaoHTPC.objects.create(
-                reuniao=reuniao,
-                funcionario=funcionario
-            )
+            NotificacaoHTPC.objects.create(reuniao=reuniao, funcionario=funcionario)
     
     @action(detail=True, methods=['post'])
     def registrar_presenca(self, request, pk=None):
-        """Registra a presença de funcionários na reunião."""
         reuniao = self.get_object()
         funcionarios_ids = request.data.get('funcionarios_ids', [])
-        
         funcionarios = Funcionario.objects.filter(id__in=funcionarios_ids)
         reuniao.presentes.set(funcionarios)
-        
         return Response(ReuniaoHTPCSerializer(reuniao).data)
 
 
@@ -144,7 +117,6 @@ class NotificacaoHTPCViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def marcar_visualizado(self, request, pk=None):
-        """Marca a notificação como visualizada."""
         obj = self.get_object()
         obj.visualizado = True
         obj.data_visualizacao = timezone.now()
@@ -161,20 +133,13 @@ class AvisoViewSet(GestaoSecretariaWritePublicReadMixin, viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         aviso = serializer.save(criador=self.request.user.funcionario)
-        
-        # Cria registros de visualização para os destinatários
         for destinatario in aviso.destinatarios.all():
-            AvisoVisualizacao.objects.create(
-                aviso=aviso,
-                usuario=destinatario
-            )
+            AvisoVisualizacao.objects.create(aviso=aviso, usuario=destinatario)
     
     @action(detail=False, methods=['get'])
     def meus_avisos(self, request):
-        """Retorna os avisos do usuário logado."""
         avisos = self.queryset.filter(destinatarios=request.user)
-        serializer = self.get_serializer(avisos, many=True)
-        return Response(serializer.data)
+        return Response(self.get_serializer(avisos, many=True).data)
 
 
 class AvisoVisualizacaoViewSet(viewsets.ModelViewSet):
@@ -185,10 +150,15 @@ class AvisoVisualizacaoViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def marcar_visualizado(self, request, pk=None):
-        """Marca o aviso como visualizado."""
         obj = self.get_object()
         obj.visualizado = True
         obj.data_visualizacao = timezone.now()
         obj.save()
         return Response(AvisoVisualizacaoSerializer(obj).data)
 
+
+__all__ = [
+    'TarefaViewSet', 'NotificacaoTarefaViewSet',
+    'ReuniaoHTPCViewSet', 'NotificacaoHTPCViewSet',
+    'AvisoViewSet', 'AvisoVisualizacaoViewSet',
+]

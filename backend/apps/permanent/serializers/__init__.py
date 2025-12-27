@@ -1,8 +1,10 @@
 """
 Serializers para o App Permanent
+
+Re-exporta todos os Serializers para manter compatibilidade.
 """
 from rest_framework import serializers
-from .models import (
+from apps.permanent.models import (
     DadosPermanenteEstudante, DadosPermanenteResponsavel,
     HistoricoEscolar, HistoricoEscolarAnoLetivo, HistoricoEscolarNotas,
     RegistroProntuario
@@ -78,3 +80,10 @@ class HistoricoCompletoSerializer(serializers.Serializer):
     estudante = DadosPermanenteEstudanteSerializer()
     ocorrencias = RegistroProntuarioSerializer(many=True)
 
+
+__all__ = [
+    'DadosPermanenteEstudanteSerializer', 'DadosPermanenteResponsavelSerializer',
+    'HistoricoEscolarSerializer', 'HistoricoEscolarAnoLetivoSerializer',
+    'HistoricoEscolarNotasSerializer', 'RegistroProntuarioSerializer',
+    'HistoricoCompletoSerializer',
+]

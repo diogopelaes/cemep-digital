@@ -1,9 +1,11 @@
 """
 Serializers para o App Users
+
+Re-exporta todos os Serializers para manter compatibilidade.
 """
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
-from .models import User
+from apps.users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -21,7 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserCreateSerializer(serializers.ModelSerializer):
     """Serializer para criação de usuário."""
-    
     password = serializers.CharField(write_only=True, validators=[validate_password])
     password_confirm = serializers.CharField(write_only=True)
     
@@ -51,15 +52,11 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = [
-            'first_name', 'last_name', 'email',
-            'telefone', 'foto', 'dark_mode'
-        ]
+        fields = ['first_name', 'last_name', 'email', 'telefone', 'foto', 'dark_mode']
 
 
 class ChangePasswordSerializer(serializers.Serializer):
     """Serializer para troca de senha."""
-    
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True, validators=[validate_password])
     
@@ -72,7 +69,6 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class PasswordResetRequestSerializer(serializers.Serializer):
     """Serializer para solicitação de recuperação de senha."""
-    
     email = serializers.EmailField(required=True)
     
     def validate_email(self, value):
@@ -80,3 +76,8 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             raise serializers.ValidationError('E-mail não encontrado.')
         return value
 
+
+__all__ = [
+    'UserSerializer', 'UserCreateSerializer', 'UserUpdateSerializer',
+    'ChangePasswordSerializer', 'PasswordResetRequestSerializer',
+]

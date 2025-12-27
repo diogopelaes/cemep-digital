@@ -1,24 +1,27 @@
 """
 Serializers para o App Management
+
+Re-exporta todos os Serializers para manter compatibilidade.
 """
 from rest_framework import serializers
-from .models import (
+from django.contrib.auth import get_user_model
+from apps.management.models import (
     Tarefa, NotificacaoTarefa, ReuniaoHTPC, NotificacaoHTPC,
     Aviso, AvisoVisualizacao
 )
+from apps.core.models import Funcionario
 from apps.core.serializers import FuncionarioSerializer
 from apps.users.serializers import UserSerializer
+
+
+User = get_user_model()
 
 
 class TarefaSerializer(serializers.ModelSerializer):
     funcionarios = FuncionarioSerializer(many=True, read_only=True)
     criador = UserSerializer(read_only=True)
-    
     funcionarios_ids = serializers.PrimaryKeyRelatedField(
-        queryset=__import__('apps.core.models', fromlist=['Funcionario']).Funcionario.objects.all(),
-        source='funcionarios',
-        many=True,
-        write_only=True
+        queryset=Funcionario.objects.all(), source='funcionarios', many=True, write_only=True
     )
     
     class Meta:
@@ -43,13 +46,8 @@ class NotificacaoTarefaSerializer(serializers.ModelSerializer):
 class ReuniaoHTPCSerializer(serializers.ModelSerializer):
     presentes = FuncionarioSerializer(many=True, read_only=True)
     quem_registrou = UserSerializer(read_only=True)
-    
     presentes_ids = serializers.PrimaryKeyRelatedField(
-        queryset=__import__('apps.core.models', fromlist=['Funcionario']).Funcionario.objects.all(),
-        source='presentes',
-        many=True,
-        write_only=True,
-        required=False
+        queryset=Funcionario.objects.all(), source='presentes', many=True, write_only=True, required=False
     )
     
     class Meta:
@@ -74,20 +72,13 @@ class NotificacaoHTPCSerializer(serializers.ModelSerializer):
 class AvisoSerializer(serializers.ModelSerializer):
     criador = FuncionarioSerializer(read_only=True)
     destinatarios = UserSerializer(many=True, read_only=True)
-    
     destinatarios_ids = serializers.PrimaryKeyRelatedField(
-        queryset=__import__('django.contrib.auth', fromlist=['get_user_model']).get_user_model().objects.all(),
-        source='destinatarios',
-        many=True,
-        write_only=True
+        queryset=User.objects.all(), source='destinatarios', many=True, write_only=True
     )
     
     class Meta:
         model = Aviso
-        fields = [
-            'id', 'titulo', 'texto', 'data_aviso',
-            'criador', 'destinatarios', 'destinatarios_ids'
-        ]
+        fields = ['id', 'titulo', 'texto', 'data_aviso', 'criador', 'destinatarios', 'destinatarios_ids']
         read_only_fields = ['data_aviso', 'criador']
 
 
@@ -100,3 +91,9 @@ class AvisoVisualizacaoSerializer(serializers.ModelSerializer):
         fields = ['id', 'aviso', 'usuario', 'visualizado', 'data_visualizacao']
         read_only_fields = ['data_visualizacao']
 
+
+__all__ = [
+    'TarefaSerializer', 'NotificacaoTarefaSerializer',
+    'ReuniaoHTPCSerializer', 'NotificacaoHTPCSerializer',
+    'AvisoSerializer', 'AvisoVisualizacaoSerializer',
+]

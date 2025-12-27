@@ -1,32 +1,24 @@
 """
-Views para o App Academic
+View para Estudante
 """
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from django.http import FileResponse
-from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.contrib.auth import get_user_model
 
-from .models import (
+from apps.academic.models import (
     Estudante, Responsavel, ResponsavelEstudante,
-    MatriculaCEMEP, MatriculaTurma, Atestado
+    MatriculaCEMEP, MatriculaTurma
 )
 from apps.core.models import Curso
-from .serializers import (
+from apps.academic.serializers import (
     EstudanteSerializer, EstudanteCreateSerializer,
-    ResponsavelSerializer, ResponsavelCreateSerializer,
-    ResponsavelEstudanteSerializer,
-    MatriculaCEMEPSerializer, MatriculaTurmaSerializer,
-    AtestadoSerializer
+    ResponsavelEstudanteSerializer, MatriculaCEMEPSerializer,
+    MatriculaTurmaSerializer
 )
-from apps.users.permissions import (
-    GestaoSecretariaCRUMixin, 
-    GestaoSecretariaWriteFuncionarioReadMixin
-)
+from apps.users.permissions import GestaoSecretariaCRUMixin
 from apps.users.utils import send_credentials_email
 
 
@@ -51,7 +43,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
         User = get_user_model()
         data = request.data
         
-        # Validações básicas
         required_fields = ['username', 'password', 'first_name', 'cpf', 
                           'data_nascimento', 'logradouro', 'numero', 'bairro', 'cep']
         for field in required_fields:
@@ -61,13 +52,11 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
         
-        # Guarda senha antes de hash para enviar por email
         student_password = data['password']
         emails_enviados = []
         
         try:
             with transaction.atomic():
-                # Cria o usuário do estudante
                 user = User(
                     username=data['username'],
                     email=data.get('email', ''),
@@ -79,7 +68,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                 user.set_password(student_password)
                 user.save()
                 
-                # Cria o estudante
                 estudante = Estudante.objects.create(
                     usuario=user,
                     cpf=data['cpf'],
@@ -101,7 +89,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     telefone=data.get('telefone', '')
                 )
                 
-                # Envia email para o estudante
                 if user.email:
                     result = send_credentials_email(
                         email=user.email,
@@ -113,10 +100,7 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     if result['success']:
                         emails_enviados.append(f"Estudante: {user.email}")
                 
-                # Processa Responsáveis (pode ser lista ou objeto único)
                 responsaveis_data = data.get('responsaveis', [])
-                
-                # Suporte para formato antigo (objeto único)
                 if data.get('responsavel'):
                     responsaveis_data.append(data['responsavel'])
                 
@@ -129,12 +113,9 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     resp_telefone = resp_data.get('telefone', '')
                     resp_email = resp_data.get('email', '')
                     resp_parentesco = resp_data.get('parentesco', 'OUTRO')
-                    
-                    # Senha padrão para responsável = CPF
                     resp_password = resp_cpf
                     is_new_user = False
                     
-                    # Verifica/Cria Usuário do Responsável
                     resp_user = User.objects.filter(username=resp_cpf).first()
                     if not resp_user:
                         is_new_user = True
@@ -149,7 +130,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                         resp_user.set_password(resp_password)
                         resp_user.save()
                     
-                    # Verifica/Cria Perfil Responsável
                     responsavel, created = Responsavel.objects.get_or_create(
                         cpf=resp_cpf,
                         defaults={
@@ -158,7 +138,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                         }
                     )
                     
-                    # Vincula ao Estudante (evita duplicata)
                     ResponsavelEstudante.objects.get_or_create(
                         responsavel=responsavel,
                         estudante=estudante,
@@ -168,7 +147,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                         }
                     )
                     
-                    # Envia email apenas para novos usuários
                     if is_new_user and resp_email:
                         result = send_credentials_email(
                             email=resp_email,
@@ -180,7 +158,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                         if result['success']:
                             emails_enviados.append(f"Responsável: {resp_email}")
                 
-                # Processa Matrículas
                 matriculas_data = data.get('matriculas', [])
                 for mat_data in matriculas_data:
                     if not mat_data or not mat_data.get('numero_matricula') or not mat_data.get('curso_id'):
@@ -215,11 +192,10 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
         
         try:
             with transaction.atomic():
-                # Atualiza o usuário
                 user = estudante.usuario
                 if 'first_name' in data:
                     user.first_name = data['first_name']
-                    user.last_name = '' # Garante que last_name fique vazio se alguém mexer direto
+                    user.last_name = ''
                 
                 if 'email' in data:
                     user.email = data['email']
@@ -227,7 +203,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     user.telefone = data['telefone']
                 user.save()
                 
-                # Atualiza o estudante
                 campos_estudante = [
                     'cin', 'nome_social', 'data_nascimento',
                     'bolsa_familia', 'pe_de_meia', 'usa_onibus', 'linha_onibus',
@@ -239,7 +214,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                         setattr(estudante, campo, data[campo])
                 estudante.save()
                 
-                # Processa Matrículas (cria novas ou atualiza existentes)
                 matriculas_data = data.get('matriculas', [])
                 for mat_data in matriculas_data:
                     if not mat_data or not mat_data.get('numero_matricula') or not mat_data.get('curso_id'):
@@ -248,7 +222,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     curso = Curso.objects.get(id=mat_data['curso_id'])
                     numero_matricula = mat_data['numero_matricula']
                     
-                    # Tenta atualizar se já existe, ou cria nova
                     matricula, created = MatriculaCEMEP.objects.update_or_create(
                         numero_matricula=numero_matricula,
                         defaults={
@@ -281,7 +254,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
         
         foto = request.FILES['foto']
         
-        # Valida tipo de arquivo
         allowed_types = ['image/jpeg', 'image/png', 'image/webp']
         if foto.content_type not in allowed_types:
             return Response(
@@ -289,14 +261,12 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Limita tamanho a 5MB
         if foto.size > 5 * 1024 * 1024:
             return Response(
                 {'detail': 'A foto deve ter no máximo 5MB.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Remove foto antiga se existir
         if user.foto:
             user.foto.delete(save=False)
         
@@ -328,15 +298,12 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
         
         estudante = self.get_object()
         
-        # Dados do estudante
         dados = EstudanteSerializer(estudante).data
         
-        # Matrículas
         matriculas_cemep = MatriculaCEMEPSerializer(
             estudante.matriculas_cemep.all(), many=True
         ).data
         
-        # Buscar matrículas turma através do caminho correto
         matriculas_turma_qs = MatriculaTurma.objects.filter(
             matricula_cemep__estudante=estudante
         ).select_related('turma__curso')
@@ -345,13 +312,11 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
             matriculas_turma_qs, many=True
         ).data
         
-        # Responsáveis
         responsaveis = ResponsavelEstudanteSerializer(
             ResponsavelEstudante.objects.filter(estudante=estudante).select_related('responsavel__usuario'),
             many=True
         ).data
         
-        # Grade de disciplinas para turmas com status CURSANDO
         grade_disciplinas = []
         turmas_cursando = matriculas_turma_qs.filter(status='CURSANDO')
         
@@ -399,100 +364,3 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
             'responsaveis': responsaveis,
             'grade_disciplinas': grade_disciplinas,
         })
-
-
-class ResponsavelViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
-    """ViewSet de Responsáveis. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
-    queryset = Responsavel.objects.select_related('usuario').all()
-    filter_backends = [DjangoFilterBackend]
-    search_fields = ['usuario__first_name', 'usuario__last_name', 'usuario__email']
-
-    def destroy(self, request, *args, **kwargs):
-        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return ResponsavelCreateSerializer
-        return ResponsavelSerializer
-    
-    @action(detail=True, methods=['post'])
-    def vincular_estudante(self, request, pk=None):
-        """Vincula um estudante ao responsável."""
-        responsavel = self.get_object()
-        estudante_id = request.data.get('estudante_id')
-        parentesco = request.data.get('parentesco')
-        
-        if not estudante_id or not parentesco:
-            return Response(
-                {'error': 'estudante_id e parentesco são obrigatórios'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        estudante = get_object_or_404(Estudante, id=estudante_id)
-        
-        vinculo, created = ResponsavelEstudante.objects.get_or_create(
-            responsavel=responsavel,
-            estudante=estudante,
-            defaults={'parentesco': parentesco}
-        )
-        
-        if not created:
-            vinculo.parentesco = parentesco
-            vinculo.save()
-        
-        return Response(ResponsavelSerializer(responsavel).data)
-
-
-class MatriculaCEMEPViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
-    """ViewSet de Matrículas CEMEP. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
-    queryset = MatriculaCEMEP.objects.select_related('estudante__usuario', 'curso').all()
-    serializer_class = MatriculaCEMEPSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['status', 'curso', 'estudante']
-    search_fields = ['numero_matricula', 'estudante__usuario__first_name']
-
-    def destroy(self, request, *args, **kwargs):
-        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-class MatriculaTurmaViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
-    """ViewSet de Matrículas Turma. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
-    queryset = MatriculaTurma.objects.select_related(
-        'matricula_cemep__estudante__usuario', 'turma__curso'
-    ).all()
-    serializer_class = MatriculaTurmaSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['status', 'turma', 'matricula_cemep', 'turma__ano_letivo']
-    search_fields = ['matricula_cemep__estudante__usuario__first_name', 'matricula_cemep__numero_matricula']
-
-    def destroy(self, request, *args, **kwargs):
-        return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-class AtestadoViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
-    """ViewSet de Atestados. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
-    queryset = Atestado.objects.select_related('usuario_alvo', 'criado_por').all()
-    serializer_class = AtestadoSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['usuario_alvo']
-    
-    @action(detail=True, methods=['get'])
-    def download(self, request, pk=None):
-        """Download protegido do arquivo do atestado."""
-        atestado = self.get_object()
-        
-        # Verifica permissões adicionais
-        user = request.user
-        if user.tipo_usuario not in ['GESTAO', 'SECRETARIA']:
-            # Estudante só vê próprios atestados
-            if hasattr(user, 'estudante') and atestado.usuario_alvo != user:
-                return Response(
-                    {'error': 'Acesso não autorizado'},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-        
-        return FileResponse(
-            atestado.arquivo.open('rb'),
-            as_attachment=True,
-            filename=atestado.arquivo.name.split('/')[-1]
-        )
-

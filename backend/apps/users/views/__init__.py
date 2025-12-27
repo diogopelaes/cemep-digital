@@ -1,5 +1,7 @@
 """
 Views para o App Users
+
+Re-exporta todos os ViewSets e views para manter compatibilidade.
 """
 from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
@@ -12,18 +14,17 @@ from django.utils.html import strip_tags
 from django.conf import settings
 import secrets
 
-from .serializers import (
+from apps.users.serializers import (
     UserSerializer, UserCreateSerializer, UserUpdateSerializer,
     ChangePasswordSerializer, PasswordResetRequestSerializer
 )
-from .permissions import IsGestao, IsOwnerOrGestao
+from apps.users.permissions import IsGestao, IsOwnerOrGestao
 
 User = get_user_model()
 
 
 class UserViewSet(viewsets.ModelViewSet):
     """ViewSet para gerenciamento de usuários."""
-    
     queryset = User.objects.all()
 
     def destroy(self, request, *args, **kwargs):
@@ -36,7 +37,6 @@ class UserViewSet(viewsets.ModelViewSet):
             return UserUpdateSerializer
         return UserSerializer
     
-    # controle_de_permissao
     def get_permissions(self):
         if self.action in ['create', 'destroy']:
             return [IsGestao()]
@@ -47,8 +47,7 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def me(self, request):
         """Retorna os dados do usuário autenticado."""
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data)
+        return Response(UserSerializer(request.user).data)
     
     @action(detail=False, methods=['put'])
     def update_me(self, request):
@@ -78,21 +77,13 @@ class UserViewSet(viewsets.ModelViewSet):
     def send_credentials(self, request):
         """Envia credenciais de acesso por e-mail usando template HTML."""
         email = request.data.get('email')
-        username = request.data.get('username')
-        password = request.data.get('password')
-        nome = request.data.get('nome')
-        
         if not email:
-            return Response(
-                {'detail': 'E-mail é obrigatório.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({'detail': 'E-mail é obrigatório.'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Contexto para o template
         context = {
-            'nome': nome,
-            'username': username,
-            'password': password,
+            'nome': request.data.get('nome'),
+            'username': request.data.get('username'),
+            'password': request.data.get('password'),
             'site_url': settings.SITE_URL,
             'site_name': settings.SITE_NAME,
             'institution_name': settings.INSTITUTION_NAME,
@@ -100,13 +91,10 @@ class UserViewSet(viewsets.ModelViewSet):
         }
         
         try:
-            # Renderiza o template HTML
             html_message = render_to_string('emails/credentials_email.html', context)
-            plain_message = strip_tags(html_message)
-            
             send_mail(
                 subject=f'{settings.SITE_NAME} - Suas Credenciais de Acesso',
-                message=plain_message,
+                message=strip_tags(html_message),
                 html_message=html_message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[email],
@@ -114,15 +102,11 @@ class UserViewSet(viewsets.ModelViewSet):
             )
             return Response({'message': 'E-mail enviado com sucesso.'})
         except Exception as e:
-            return Response(
-                {'detail': f'Erro ao enviar e-mail: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response({'detail': f'Erro ao enviar e-mail: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class PasswordResetRequestView(generics.GenericAPIView):
     """View para solicitação de recuperação de senha."""
-    
     permission_classes = [AllowAny]
     serializer_class = PasswordResetRequestSerializer
     
@@ -133,12 +117,10 @@ class PasswordResetRequestView(generics.GenericAPIView):
         email = serializer.validated_data['email']
         user = User.objects.get(email=email)
         
-        # Gera uma senha temporária
         temp_password = secrets.token_urlsafe(8)
         user.set_password(temp_password)
         user.save()
         
-        # Contexto para o template de e-mail
         context = {
             'nome': user.first_name or user.username,
             'username': user.username,
@@ -150,21 +132,19 @@ class PasswordResetRequestView(generics.GenericAPIView):
         }
         
         try:
-            # Renderiza o template HTML
             html_message = render_to_string('emails/password_reset_email.html', context)
-            plain_message = strip_tags(html_message)
-            
             send_mail(
                 subject=f'{settings.SITE_NAME} - Recuperação de Senha',
-                message=plain_message,
+                message=strip_tags(html_message),
                 html_message=html_message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[email],
                 fail_silently=False,
             )
         except Exception as e:
-            # Em caso de erro no envio, podemos logar o erro
             print(f"Erro ao enviar e-mail de recuperação: {e}")
         
         return Response({'message': 'E-mail de recuperação enviado.'})
 
+
+__all__ = ['UserViewSet', 'PasswordResetRequestView']

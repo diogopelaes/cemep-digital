@@ -1,27 +1,25 @@
 """
 Views para o App Permanent
+
+Re-exporta todos os ViewSets para manter compatibilidade.
 """
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import FileResponse
 
-from .models import (
+from apps.permanent.models import (
     DadosPermanenteEstudante, DadosPermanenteResponsavel,
     HistoricoEscolar, HistoricoEscolarAnoLetivo, HistoricoEscolarNotas,
     RegistroProntuario
 )
-from .serializers import (
+from apps.permanent.serializers import (
     DadosPermanenteEstudanteSerializer, DadosPermanenteResponsavelSerializer,
     HistoricoEscolarSerializer, HistoricoEscolarAnoLetivoSerializer,
-    HistoricoEscolarNotasSerializer, RegistroProntuarioSerializer,
-    HistoricoCompletoSerializer
+    HistoricoEscolarNotasSerializer, RegistroProntuarioSerializer
 )
-from apps.users.permissions import (
-    GestaoOnlyMixin, GestaoWriteSecretariaReadMixin, IsGestao
-)
+from apps.users.permissions import GestaoOnlyMixin, GestaoWriteSecretariaReadMixin
 
 
 class DadosPermanenteEstudanteViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
@@ -36,16 +34,12 @@ class DadosPermanenteEstudanteViewSet(GestaoWriteSecretariaReadMixin, viewsets.M
     
     @action(detail=True, methods=['get'])
     def historico_completo(self, request, pk=None):
-        """Retorna o histórico completo do estudante com registros do prontuário."""
         estudante = self.get_object()
         ocorrencias = RegistroProntuario.objects.filter(cpf=estudante.cpf)
-        
-        data = {
+        return Response({
             'estudante': DadosPermanenteEstudanteSerializer(estudante).data,
             'ocorrencias': RegistroProntuarioSerializer(ocorrencias, many=True).data
-        }
-        
-        return Response(data)
+        })
 
 
 class DadosPermanenteResponsavelViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
@@ -69,6 +63,7 @@ class HistoricoEscolarViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelView
     def destroy(self, request, *args, **kwargs):
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+
 class HistoricoEscolarAnoLetivoViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
     """ViewSet de Histórico por Ano Letivo. Leitura: Gestão/Secretaria | Escrita: Gestão"""
     queryset = HistoricoEscolarAnoLetivo.objects.select_related('historico__estudante').prefetch_related('notas')
@@ -78,6 +73,7 @@ class HistoricoEscolarAnoLetivoViewSet(GestaoWriteSecretariaReadMixin, viewsets.
 
     def destroy(self, request, *args, **kwargs):
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 class HistoricoEscolarNotasViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
     """ViewSet de Histórico de Notas. Leitura: Gestão/Secretaria | Escrita: Gestão"""
@@ -103,29 +99,23 @@ class RegistroProntuarioViewSet(GestaoOnlyMixin, viewsets.ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def download_anexo(self, request, pk=None):
-        """Download protegido de um anexo específico do registro."""
-        from .models import RegistroProntuarioAnexo
-        
+        from apps.permanent.models import RegistroProntuarioAnexo
         registro = self.get_object()
         anexo_id = request.query_params.get('anexo_id')
         
         if not anexo_id:
-            return Response(
-                {'error': 'anexo_id é obrigatório'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({'error': 'anexo_id é obrigatório'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             anexo = registro.anexos.get(id=anexo_id)
         except RegistroProntuarioAnexo.DoesNotExist:
-            return Response(
-                {'error': 'Anexo não encontrado'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({'error': 'Anexo não encontrado'}, status=status.HTTP_404_NOT_FOUND)
         
-        return FileResponse(
-            anexo.arquivo.open('rb'),
-            as_attachment=True,
-            filename=anexo.arquivo.name.split('/')[-1]
-        )
+        return FileResponse(anexo.arquivo.open('rb'), as_attachment=True, filename=anexo.arquivo.name.split('/')[-1])
 
+
+__all__ = [
+    'DadosPermanenteEstudanteViewSet', 'DadosPermanenteResponsavelViewSet',
+    'HistoricoEscolarViewSet', 'HistoricoEscolarAnoLetivoViewSet',
+    'HistoricoEscolarNotasViewSet', 'RegistroProntuarioViewSet',
+]
