@@ -7,6 +7,7 @@ import {
 import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil, HiCheckCircle, HiXCircle, HiUpload } from 'react-icons/hi'
 import BulkUploadModal from '../components/modals/BulkUploadModal'
 import { coreAPI } from '../services/api'
+import { getNomenclaturaLabel } from '../data'
 import toast from 'react-hot-toast'
 
 export default function Turmas() {
@@ -104,8 +105,7 @@ export default function Turmas() {
 
   // Formata o nome da turma
   const formatTurmaNome = (turma) => {
-    const nomenclatura = turma.nomenclatura === 'SERIE' ? 'Série' : (turma.nomenclatura === 'ANO' ? 'Ano' : 'Módulo')
-    return `${turma.numero}º ${nomenclatura} ${turma.letra}`
+    return `${turma.numero}º ${getNomenclaturaLabel(turma.nomenclatura)} ${turma.letra}`
   }
 
   if (loading) {

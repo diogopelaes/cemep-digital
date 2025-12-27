@@ -3,13 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Card, Button, Input, Select, Loading, MultiCombobox, Modal, ModalFooter } from '../components/ui'
 import { HiArrowLeft, HiSave, HiTrash } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
+import { NOMENCLATURAS } from '../data'
 import toast from 'react-hot-toast'
-
-const NOMENCLATURAS = [
-  { value: 'ANO', label: 'Ano' },
-  { value: 'SERIE', label: 'Série' },
-  { value: 'MODULO', label: 'Módulo' },
-]
 
 export default function TurmaForm() {
   const navigate = useNavigate()

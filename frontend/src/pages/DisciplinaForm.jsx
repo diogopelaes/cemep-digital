@@ -1,19 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Card, Button, Input, Select, Loading, Badge } from '../components/ui'
+import { ToggleSwitch } from '../components/common'
 import { HiArrowLeft, HiSave, HiPlus, HiTrash, HiAcademicCap } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
+import { AREAS_CONHECIMENTO } from '../data'
 import toast from 'react-hot-toast'
-
-const AREAS_CONHECIMENTO = [
-  { value: 'LINGUAGENS', label: 'Linguagens e suas Tecnologias' },
-  { value: 'MATEMATICA', label: 'Matemática e suas Tecnologias' },
-  { value: 'CIENCIAS_NATUREZA', label: 'Ciências da Natureza e suas Tecnologias' },
-  { value: 'CIENCIAS_HUMANAS', label: 'Ciências Humanas e Sociais Aplicadas' },
-  { value: 'TEC_INFORMATICA', label: 'Técnico em Informática' },
-  { value: 'TEC_QUIMICA', label: 'Técnico em Química' },
-  { value: 'TEC_ENFERMAGEM', label: 'Técnico em Enfermagem' },
-]
 
 export default function DisciplinaForm() {
   const navigate = useNavigate()
@@ -198,29 +190,12 @@ export default function DisciplinaForm() {
           />
 
           {/* Switch Ativa */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
-            <div>
-              <span className="font-medium text-slate-700 dark:text-slate-300">
-                Disciplina Ativa
-              </span>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                Desative para impedir novos usos desta disciplina
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.is_active
-                ? 'bg-success-500'
-                : 'bg-slate-300 dark:bg-slate-600'
-                }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.is_active ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Disciplina Ativa"
+            description="Desative para impedir novos usos desta disciplina"
+            checked={formData.is_active}
+            onChange={(checked) => setFormData({ ...formData, is_active: checked })}
+          />
 
           {/* Botões */}
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">

@@ -11,26 +11,12 @@ import {
 import { coreAPI } from '../services/api'
 import BulkUploadModal from '../components/modals/BulkUploadModal'
 import { formatDateBR } from '../utils/date'
+import { TIPOS_USUARIO, TIPOS_USUARIO_COLORS } from '../data'
 import {
   createPDF, addHeader, addFooter, addSectionTitle, addField,
   addTable, checkNewPage, downloadPDF, CONFIG
 } from '../utils/pdf'
 import toast from 'react-hot-toast'
-
-const TIPOS_USUARIO = [
-  { value: 'GESTAO', label: 'Gestão' },
-  { value: 'SECRETARIA', label: 'Secretaria' },
-  { value: 'PROFESSOR', label: 'Professor' },
-  { value: 'MONITOR', label: 'Monitor' },
-]
-
-// Configuração de cores por tipo de usuário (para Badges se necessário)
-const TIPO_COLORS = {
-  GESTAO: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-  SECRETARIA: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  PROFESSOR: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  MONITOR: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-}
 
 export default function Funcionarios() {
   const navigate = useNavigate()
@@ -374,7 +360,7 @@ export default function Funcionarios() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${TIPO_COLORS[func.usuario?.tipo_usuario] || 'bg-slate-100 text-slate-600'}`}>
+                  <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${TIPOS_USUARIO_COLORS[func.usuario?.tipo_usuario] || 'bg-slate-100 text-slate-600'}`}>
                     {func.usuario?.tipo_usuario}
                   </span>
                 </TableCell>

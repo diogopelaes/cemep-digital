@@ -1,29 +1,27 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-    Card, Button, Badge, Loading, Modal, ModalFooter, Table, TableHead, TableBody, TableRow, TableHeader, TableCell
+    Card, Button, Badge, Loading, Modal, ModalFooter,
+    Table, TableHead, TableBody, TableRow, TableHeader, TableCell
 } from '../components/ui'
+import { InfoItem } from '../components/common'
 import {
     HiArrowLeft, HiPencil, HiPrinter, HiDownload, HiPhone, HiMail,
     HiLocationMarker, HiCalendar, HiUser, HiIdentification, HiBriefcase, HiRefresh
 } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import { formatDateBR } from '../utils/date'
-import { formatCPF, formatTelefone, formatCEP } from '../utils/formatters'
+import { displayCPF, displayTelefone, displayCEP } from '../utils/formatters'
+import { TIPOS_USUARIO_COLORS } from '../data'
 import {
     createPDF, addHeader, addFooter, addSectionTitle, addField,
     addTable, checkNewPage, downloadPDF, openPDF, CONFIG
 } from '../utils/pdf'
 import toast from 'react-hot-toast'
 
-// Configuração de cores por tipo de usuário
-const TIPO_COLORS = {
-    GESTAO: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-    SECRETARIA: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-    PROFESSOR: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-    MONITOR: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-}
-
+/**
+ * Página de detalhes do funcionário
+ */
 export default function FuncionarioDetalhes() {
     const navigate = useNavigate()
     const { id } = useParams()
@@ -77,7 +75,6 @@ export default function FuncionarioDetalhes() {
             const doc = createPDF()
             const pageWidth = doc.internal.pageSize.getWidth()
 
-            // Cabeçalho
             let y = addHeader(doc, 'Ficha do Funcionário', funcionario.nome_completo || funcionario.usuario?.first_name)
 
             // === DADOS PESSOAIS ===
@@ -93,7 +90,7 @@ export default function FuncionarioDetalhes() {
             y = Math.max(y1, y2)
 
             yTemp = y
-            y1 = addField(doc, 'CPF', formatCPF(funcionario.cpf), col1, y, maxW)
+            y1 = addField(doc, 'CPF', displayCPF(funcionario.cpf), col1, y, maxW)
             y2 = addField(doc, 'Data Nascimento', funcionario.data_nascimento ? formatDateBR(funcionario.data_nascimento) : '-', col2, yTemp, maxW)
             y = Math.max(y1, y2)
 
@@ -108,9 +105,8 @@ export default function FuncionarioDetalhes() {
             y = Math.max(y1, y2)
 
             yTemp = y
-            y1 = addField(doc, 'Telefone', formatTelefone(funcionario.usuario?.telefone || funcionario.telefone), col1, y, maxW)
-            y2 = yTemp // Placeholder for empty col2 if needed, or just keep y1 if single column row
-            y = Math.max(y1, y2)
+            y1 = addField(doc, 'Telefone', displayTelefone(funcionario.usuario?.telefone || funcionario.telefone), col1, y, maxW)
+            y = Math.max(y1, yTemp)
 
             // === ENDEREÇO ===
             y = checkNewPage(doc, y, 40)
@@ -124,7 +120,7 @@ export default function FuncionarioDetalhes() {
 
             yTemp = y
             y1 = addField(doc, 'Cidade/UF', `${funcionario.cidade || ''}/${funcionario.estado || ''}`, col1, y, maxW)
-            y2 = addField(doc, 'CEP', formatCEP(funcionario.cep), col2, yTemp, maxW)
+            y2 = addField(doc, 'CEP', displayCEP(funcionario.cep), col2, yTemp, maxW)
             y = Math.max(y1, y2)
 
             // === DADOS PROFISSIONAIS ===
@@ -141,7 +137,6 @@ export default function FuncionarioDetalhes() {
             y2 = addField(doc, 'Status', funcionario.usuario?.is_active ? 'Ativo' : 'Inativo', col2, yTemp, maxW)
             y = Math.max(y1, y2)
 
-
             // === PERÍODOS DE TRABALHO ===
             if (periodos && periodos.length > 0) {
                 y = checkNewPage(doc, y, 40)
@@ -157,10 +152,8 @@ export default function FuncionarioDetalhes() {
                 y = addTable(doc, headers, data, y)
             }
 
-            // Rodapé
             addFooter(doc)
 
-            // Gera o PDF
             const nomeArquivo = `ficha_funcionario_${funcionario.matricula}.pdf`
 
             if (download) {
@@ -191,6 +184,9 @@ export default function FuncionarioDetalhes() {
             </div>
         )
     }
+
+    const tipoUsuario = funcionario.usuario?.tipo_usuario
+    const tipoColor = TIPOS_USUARIO_COLORS[tipoUsuario] || 'bg-slate-100 text-slate-600'
 
     return (
         <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
@@ -262,8 +258,8 @@ export default function FuncionarioDetalhes() {
                                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
                                     {funcionario.nome_completo || funcionario.usuario?.first_name}
                                 </h2>
-                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${TIPO_COLORS[funcionario.usuario?.tipo_usuario] || 'bg-slate-100 text-slate-600'}`}>
-                                    {funcionario.usuario?.tipo_usuario}
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${tipoColor}`}>
+                                    {tipoUsuario}
                                 </span>
                                 <Badge variant={funcionario.usuario?.is_active ? 'success' : 'default'}>
                                     {funcionario.usuario?.is_active ? 'Ativo' : 'Inativo'}
@@ -278,7 +274,7 @@ export default function FuncionarioDetalhes() {
                             <InfoItem
                                 icon={HiIdentification}
                                 label="CPF"
-                                value={formatCPF(funcionario.cpf)}
+                                value={displayCPF(funcionario.cpf)}
                             />
                             <InfoItem
                                 icon={HiBriefcase}
@@ -318,7 +314,7 @@ export default function FuncionarioDetalhes() {
                             <InfoItem
                                 icon={HiPhone}
                                 label="Telefone"
-                                value={formatTelefone(funcionario.usuario?.telefone || funcionario.telefone)}
+                                value={displayTelefone(funcionario.usuario?.telefone || funcionario.telefone)}
                             />
                         </div>
 
@@ -351,7 +347,7 @@ export default function FuncionarioDetalhes() {
                                 <InfoItem
                                     icon={HiLocationMarker}
                                     label="CEP"
-                                    value={formatCEP(funcionario.cep)}
+                                    value={displayCEP(funcionario.cep)}
                                 />
                             </div>
                         </div>
@@ -407,7 +403,7 @@ export default function FuncionarioDetalhes() {
                 )}
             </Card>
 
-            {/* Modal Reset Senha - Reutilizado */}
+            {/* Modal Reset Senha */}
             <Modal
                 isOpen={modalReset.open}
                 onClose={() => setModalReset({ open: false })}
@@ -441,20 +437,6 @@ export default function FuncionarioDetalhes() {
                     </Button>
                 </ModalFooter>
             </Modal>
-        </div>
-    )
-}
-
-function InfoItem({ icon: Icon, label, value }) {
-    return (
-        <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-400">
-                <Icon className="w-5 h-5" />
-            </div>
-            <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
-                <p className="font-medium text-slate-800 dark:text-white break-all">{value}</p>
-            </div>
         </div>
     )
 }

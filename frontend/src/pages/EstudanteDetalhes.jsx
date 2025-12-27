@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import {
-    Card, Button, Badge, Loading, Modal, ModalFooter
-} from '../components/ui'
+import { Card, Button, Badge, Loading } from '../components/ui'
+import { InfoItem, BooleanItem } from '../components/common'
 import {
     HiArrowLeft, HiPencil, HiPrinter, HiDownload, HiPhone, HiMail,
     HiLocationMarker, HiCalendar, HiAcademicCap, HiUser, HiUsers,
-    HiCheckCircle, HiXCircle, HiDocumentText, HiBookOpen
+    HiDocumentText, HiBookOpen
 } from 'react-icons/hi'
 import { academicAPI } from '../services/api'
 import { formatDateBR, calcularIdade } from '../utils/date'
-import { formatCPF, formatTelefone, formatCEP } from '../utils/formatters'
+import { displayCPF, displayTelefone } from '../utils/formatters'
 import {
     createPDF, addHeader, addFooter, addSectionTitle, addField,
     addPhoto, addTable, checkNewPage, imageToBase64, downloadPDF, openPDF,
@@ -18,6 +17,9 @@ import {
 } from '../utils/pdf'
 import toast from 'react-hot-toast'
 
+/**
+ * Página de detalhes do estudante
+ */
 export default function EstudanteDetalhes() {
     const navigate = useNavigate()
     const { cpf } = useParams()
@@ -33,7 +35,6 @@ export default function EstudanteDetalhes() {
 
     const loadEstudante = async () => {
         try {
-            // Carrega dados básicos e prontuário
             const [respEstudante, respProntuario] = await Promise.all([
                 academicAPI.estudantes.get(cpf),
                 academicAPI.estudantes.prontuario(cpf)
@@ -61,7 +62,6 @@ export default function EstudanteDetalhes() {
             // === DADOS PESSOAIS ===
             y = addSectionTitle(doc, 'Dados Pessoais', y)
 
-            // Layout: Foto à direita, dados à esquerda
             const fotoWidth = 30
             const fotoHeight = 40
             const fotoX = pageWidth - CONFIG.margin - fotoWidth
@@ -79,7 +79,6 @@ export default function EstudanteDetalhes() {
             }
             addPhoto(doc, fotoBase64, fotoX, fotoY, fotoWidth, fotoHeight)
 
-            // Primeira linha
             const col1 = CONFIG.margin
             const col2 = CONFIG.margin + dadosWidth / 2
 
@@ -89,27 +88,24 @@ export default function EstudanteDetalhes() {
                 y = addField(doc, 'Nome Social', estudante.nome_social, col1, y)
             }
 
-            // CPF e CIN
             let yTemp = y
-            addField(doc, 'CPF', formatCPF(estudante.cpf), col1, y)
+            addField(doc, 'CPF', displayCPF(estudante.cpf), col1, y)
             y = addField(doc, 'CIN', estudante.cin || '-', col2, yTemp)
 
-            // Data de nascimento e Idade
             yTemp = y
             const idade = estudante.data_nascimento ? calcularIdade(estudante.data_nascimento) : null
             addField(doc, 'Data de Nascimento', formatDateBR(estudante.data_nascimento), col1, y)
             y = addField(doc, 'Idade', idade ? `${idade} anos` : '-', col2, yTemp)
 
-            // Telefone e Email
             yTemp = y
-            addField(doc, 'Telefone', formatTelefone(estudante.telefone), col1, y)
+            addField(doc, 'Telefone', displayTelefone(estudante.telefone), col1, y)
             y = addField(doc, 'E-mail', estudante.usuario?.email || '-', col2, yTemp)
 
             // === ENDEREÇO ===
             y = checkNewPage(doc, y, 40)
             y = addSectionTitle(doc, 'Endereço', y)
             y = addField(doc, 'Endereço Completo', estudante.endereco_completo, col1, y, pageWidth - CONFIG.margin * 2)
-            y += 6 // Espaço extra antes de Benefícios
+            y += 6
 
             // === BENEFÍCIOS E TRANSPORTE ===
             y = checkNewPage(doc, y, 30)
@@ -320,7 +316,7 @@ export default function EstudanteDetalhes() {
                             <InfoItem
                                 icon={HiDocumentText}
                                 label="CPF"
-                                value={formatCPF(estudante.cpf)}
+                                value={displayCPF(estudante.cpf)}
                             />
                             <InfoItem
                                 icon={HiDocumentText}
@@ -335,7 +331,7 @@ export default function EstudanteDetalhes() {
                             <InfoItem
                                 icon={HiPhone}
                                 label="Telefone"
-                                value={formatTelefone(estudante.telefone)}
+                                value={displayTelefone(estudante.telefone)}
                             />
                             <InfoItem
                                 icon={HiMail}
@@ -530,37 +526,6 @@ export default function EstudanteDetalhes() {
                     </div>
                 </Card>
             )}
-        </div>
-    )
-}
-
-// Componente auxiliar para exibir informações
-function InfoItem({ icon: Icon, label, value }) {
-    return (
-        <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-400">
-                <Icon className="w-5 h-5" />
-            </div>
-            <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
-                <p className="font-medium text-slate-800 dark:text-white">{value}</p>
-            </div>
-        </div>
-    )
-}
-
-// Componente auxiliar para exibir boolean
-function BooleanItem({ label, value }) {
-    return (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50">
-            {value ? (
-                <HiCheckCircle className="w-5 h-5 text-success-500" />
-            ) : (
-                <HiXCircle className="w-5 h-5 text-slate-400" />
-            )}
-            <span className={`text-sm ${value ? 'text-slate-800 dark:text-white' : 'text-slate-500'}`}>
-                {label}
-            </span>
         </div>
     )
 }
