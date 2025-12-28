@@ -1,6 +1,6 @@
 # CEMEP Digital - Sistema de Gestão Escolar
 
-![CEMEP Digital](Documentation/img/CEMEP.jpeg)
+<img src="Documentation/img/CEMEP.jpeg" alt="CEMEP Digital" width="200">
 
 Sistema de gestão escolar desenvolvido sob medida para o **CEMEP - Centro Municipal de Ensino Profissionalizante** de Paulínia/SP, modernizando o controle de notas, frequências, ocorrências e comunicação.
 
