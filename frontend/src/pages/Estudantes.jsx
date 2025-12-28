@@ -4,7 +4,8 @@ import {
   Card, Button, Input, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Badge, Loading, Pagination
 } from '../components/ui'
-import { HiPlus, HiSearch, HiPrinter, HiDownload, HiUser } from 'react-icons/hi'
+import { HiPlus, HiSearch, HiPrinter, HiDownload, HiUser, HiUpload } from 'react-icons/hi'
+import BulkUploadModal from '../components/modals/BulkUploadModal'
 import { academicAPI } from '../services/api'
 import { formatDateBR, calcularIdade } from '../utils/date'
 import {
@@ -20,6 +21,7 @@ export default function Estudantes() {
   const [estudantes, setEstudantes] = useState([])
   const [search, setSearch] = useState('')
   const [generatingPDF, setGeneratingPDF] = useState(null)
+  const [showUploadModal, setShowUploadModal] = useState(false)
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
@@ -234,9 +236,14 @@ export default function Estudantes() {
             Gerencie os estudantes matriculados
           </p>
         </div>
-        <Button icon={HiPlus} onClick={() => navigate('/estudantes/novo')}>
-          Novo Estudante
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button variant="secondary" icon={HiUpload} onClick={() => setShowUploadModal(true)}>
+            Cadastro em massa
+          </Button>
+          <Button icon={HiPlus} onClick={() => navigate('/estudantes/novo')}>
+            Novo Estudante
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
@@ -347,6 +354,48 @@ export default function Estudantes() {
         totalItems={totalCount}
         pageSize={pageSize}
         onPageChange={handlePageChange}
+      />
+
+      <BulkUploadModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUpload={async (formData) => {
+          const response = await academicAPI.estudantes.uploadFile(formData)
+          if (response.data.errors?.length > 0) {
+            toast.error('Alguns registros não foram importados. Verifique os erros.')
+          }
+          loadEstudantes()
+          return response
+        }}
+        entityName="Estudantes"
+        templateHeaders={[
+          'NOME_COMPLETO', 'EMAIL', 'CPF', 'SENHA', 'CIN', 'LINHA_ONIBUS',
+          'LOGRADOURO', 'NUMERO', 'BAIRRO', 'CIDADE', 'ESTADO', 'CEP',
+          'COMPLEMENTO', 'TELEFONE', 'DATA_NASCIMENTO'
+        ]}
+        onDownloadTemplate={async () => {
+          try {
+            const response = await academicAPI.estudantes.downloadModel()
+            const url = window.URL.createObjectURL(new Blob([response.data]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'modelo_estudantes.xlsx')
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+          } catch (error) {
+            console.error(error)
+            toast.error('Erro ao baixar o modelo.')
+          }
+        }}
+        instructions={
+          <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
+            <li>Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong>.</li>
+            <li><strong>CPF</strong> será usado como Nome de Usuário (e valida unicidade).</li>
+            <li>Colunas Obrigatórias: <strong>NOME_COMPLETO, EMAIL, CPF</strong>.</li>
+            <li>Se a <strong>SENHA</strong> estiver vazia, uma aleatória será gerada (para novos usuários).</li>
+          </ul>
+        }
       />
     </div>
   )

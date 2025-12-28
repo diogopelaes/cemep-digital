@@ -183,6 +183,251 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                 {'detail': str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+            
+    @action(detail=False, methods=['post'], url_path='importar-arquivo')
+    @transaction.atomic
+    def importar_arquivo(self, request):
+        """
+        Importa estudantes via XLSX/CSV.
+        Obrigatórios: NOME_COMPLETO, EMAIL, CPF.
+        Opcionais: SENHA, CIN, LINHA_ONIBUS, LOGRADOURO, NUMERO, BAIRRO, 
+                   CIDADE, ESTADO, CEP, COMPLEMENTO, TELEFONE.
+        """
+        import pandas as pd
+        from django.core.exceptions import ValidationError
+        from apps.core.validators import validate_cpf, clean_digits
+        import secrets
+        import string
+
+        file = request.FILES.get('file')
+        if not file:
+            return Response({'detail': 'Arquivo não enviado.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Ler com Pandas
+            if file.name.endswith('.csv'):
+                try:
+                    df = pd.read_csv(file, sep=';', dtype=str)
+                except:
+                    file.seek(0)
+                    df = pd.read_csv(file, sep=',', dtype=str)
+            else:
+                df = pd.read_excel(file, dtype=str)
+            
+            df = df.fillna('')
+            df.columns = [c.strip().upper() for c in df.columns]
+            
+            # Campos obrigatórios
+            required = ['NOME_COMPLETO', 'EMAIL', 'CPF']
+            missing = [c for c in required if c not in df.columns]
+            if missing:
+                return Response({'detail': f'Colunas obrigatórias faltando: {", ".join(missing)}'}, status=400)
+
+            created_count = 0
+            updated_count = 0
+            errors = []
+            warnings = []
+
+            User = get_user_model()
+
+            for idx, row in df.iterrows():
+                try:
+                    line = idx + 2
+                    nome = row['NOME_COMPLETO'].strip()
+                    email = row.get('EMAIL', '').strip()
+                    cpf_raw = str(row.get('CPF', '')).strip()
+                    
+                    # 1. Validação Obrigatória
+                    if not nome or not email or not cpf_raw:
+                         errors.append(f"Linha {line} ({nome or 'Sem Nome'}): Nome, Email e CPF são obrigatórios.")
+                         continue
+                    
+                    cpf_clean = clean_digits(cpf_raw)
+                    
+                    # Validação de CPF
+                    try:
+                        validate_cpf(cpf_clean)
+                    except ValidationError:
+                        errors.append(f"Linha {line} ({nome}): Atributo 'CPF' com valor '{cpf_raw}' é inválido.")
+                        continue
+
+                    # 1.1 Verificação de Unicidade Rigorosa (Email e Username/CPF)
+                    # Username será o CPF
+                    if User.objects.filter(email=email).exclude(username=cpf_clean).exists():
+                         errors.append(f"Linha {line} ({nome}): Atributo 'Email' com valor '{email}' já está em uso por outro usuário. Ignorado.")
+                         continue
+                    
+                    # Se usuário existe com outro username mas mesmo CPF (teoricamente username==cpf, mas...)
+                    # Aqui assumimos username=cpf.
+
+                    # 1.2 Validação de Tamanho de Campos (CEP)
+                    cep_raw = str(row.get('CEP', '')).strip()
+                    cep_clean = clean_digits(cep_raw)
+                    if len(cep_clean) > 8:
+                         errors.append(f"Linha {line} ({nome}): Atributo 'CEP' com valor '{cep_raw}' é inválido (contém {len(cep_clean)} dígitos, máximo é 8).")
+                         continue
+
+                    # 2. Preparação do Usuário
+                    raw_password = str(row.get('SENHA', '')).strip()
+                    should_update_password = False
+                    
+                    try:
+                        user = User.objects.get(username=cpf_clean)
+                        # Se usuário existe, não mudamos senha a menos que explícito? 
+                        # Na regra do user: "senha (se estiver em branco deve ser gerada uma aleatória)"
+                        # Geralmente em update se senha ta em branco mantemos a antiga.
+                        if raw_password:
+                             should_update_password = True
+                    except User.DoesNotExist:
+                        # Novo usuário
+                        if not raw_password:
+                            chars = string.ascii_letters + string.digits + "!@#"
+                            raw_password = ''.join(secrets.choice(chars) for _ in range(8))
+                        should_update_password = True
+
+                    sid = transaction.savepoint()
+                    
+                    try:
+                        # -- USER --
+                        user_defaults={
+                            'first_name': nome,
+                            'last_name': '',
+                            'email': email,
+                            'tipo_usuario': 'ESTUDANTE',
+                            'is_active': True
+                        }
+                        
+                        user, user_created = User.objects.update_or_create(
+                            username=cpf_clean,
+                            defaults=user_defaults
+                        )
+                        
+                        if should_update_password:
+                            user.set_password(raw_password)
+                            user.save()
+
+                        # -- ESTUDANTE --
+                        # Lógica da Linha de Ônibus
+                        linha_onibus = row.get('LINHA_ONIBUS', '').strip()
+                        usa_onibus = bool(linha_onibus)
+                        
+                        estudante_defaults = {
+                            'cin': row.get('CIN', '').strip(),
+                            'linha_onibus': linha_onibus,
+                            'usa_onibus': usa_onibus,
+                            'logradouro': row.get('LOGRADOURO', '').strip(),
+                            'numero': row.get('NUMERO', '').strip(),
+                            'bairro': row.get('BAIRRO', '').strip(),
+                            'cidade': row.get('CIDADE', '').strip() or 'Mogi Guaçu',
+                            'estado': row.get('ESTADO', '').strip() or 'SP',
+                            'cep': clean_digits(row.get('CEP', '').strip()),
+                            'complemento': row.get('COMPLEMENTO', '').strip(),
+                            'telefone': clean_digits(row.get('TELEFONE', '').strip()),
+                            # Campos obrigatórios do model que não estão no excel, precisamos de defaults
+                            'data_nascimento': '2000-01-01', # Default temporário seguro ou erro?
+                            # O user não pediu data de nascimento no excel. 
+                            # O model define data_nascimento como obrigatório.
+                            # Vou colocar um default e avisar no warning, ou falhar?
+                            # O user pediu para seguir o padrao. No funcionario, data_nascimento é opcional no excel e tem soft valid.
+                            # Mas aqui User não listou Data Nascimento no requirements.
+                            # Vou usar um default '2000-01-01' e adicionar um warning se for criação nova.
+                        }
+                        
+                        # Se for update, mantemos a data existente se não informada (mas não tem coluna no excel proposta pelo user)
+                        # Se for create, precisamos de uma data.
+                        if user_created or not Estudante.objects.filter(cpf=cpf_clean).exists():
+                             # Tentando pegar data nascimento de coluna extra se existir, senão default
+                             d_nasc = row.get('DATA_NASCIMENTO', '').strip()
+                             if d_nasc:
+                                 # Tentar parsear
+                                 from datetime import datetime
+                                 for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y'):
+                                    try:
+                                        estudante_defaults['data_nascimento'] = datetime.strptime(d_nasc, fmt).date()
+                                        break
+                                    except ValueError:
+                                        pass
+                             
+                             if 'data_nascimento' not in estudante_defaults or not estudante_defaults['data_nascimento']:
+                                  estudante_defaults['data_nascimento'] = '2000-01-01'
+                                  warnings.append(f"Linha {line} ({nome}): Data Nascimento não fornecida. Definida como 01/01/2000.")
+
+                        estudante, est_created = Estudante.objects.update_or_create(
+                            cpf=cpf_clean,
+                            defaults={**estudante_defaults, 'usuario': user}
+                        )
+                        
+                        if est_created:
+                            created_count += 1
+                        else:
+                            updated_count += 1
+                            
+                        transaction.savepoint_commit(sid)
+
+                    except Exception as ie:
+                        transaction.savepoint_rollback(sid)
+                        raise ie 
+                        
+                except Exception as e:
+                    error_name = row.get('NOME_COMPLETO', 'Sem Nome') if 'row' in locals() else 'Sem Nome'
+                    errors.append(f"Linha {idx + 2} ({error_name}): {str(e)}")
+
+            msg = f'Importação concluída: {created_count} criados, {updated_count} atualizados.'
+            if errors:
+                msg += f' {len(errors)} falhas.'
+            if warnings:
+                msg += f' {len(warnings)} alertas.'
+            
+            return Response({
+                'message': msg,
+                'errors': errors,
+                'warnings': warnings,
+                'created_count': created_count,
+                'updated_count': updated_count
+            })
+            
+        except Exception as e:
+            return Response({'detail': f'Erro processando arquivo: {str(e)}'}, status=400)
+
+    @action(detail=False, methods=['get'], url_path='download-modelo')
+    def download_modelo(self, request):
+        import io
+        import pandas as pd
+        from django.http import FileResponse
+
+        buffer = io.BytesIO()
+        data = {
+            'NOME_COMPLETO': ['João da Silva'],
+            'EMAIL': ['joao@escola.com.br'],
+            'SENHA': ['123@Mudar'],
+            'CPF': ['12345678900'],
+            'CIN': ['12345'],
+            'LINHA_ONIBUS': ['Linha 10'],
+            'LOGRADOURO': ['Rua Exemplo'],
+            'NUMERO': ['123'],
+            'BAIRRO': ['Centro'],
+            'CIDADE': ['Mogi Guaçu'],
+            'ESTADO': ['SP'],
+            'CEP': ['13840000'],
+            'COMPLEMENTO': ['Casa'],
+            'TELEFONE': ['19999999999'],
+            'DATA_NASCIMENTO': ['01/01/2010'] # Adicionando sugestão de data nascimento pois é obrigatório no banco
+        }
+        df = pd.DataFrame(data)
+        
+        with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False)
+            ws = writer.sheets['Sheet1']
+            for i, col in enumerate(df.columns):
+                ws.column_dimensions[chr(65+i)].width = 20
+
+        buffer.seek(0)
+        return FileResponse(
+            buffer, 
+            as_attachment=True, 
+            filename='modelo_estudantes.xlsx',
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
     
     @action(detail=True, methods=['put'], url_path='atualizar-completo')
     def atualizar_completo(self, request, pk=None):

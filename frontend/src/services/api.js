@@ -206,6 +206,10 @@ export const academicAPI = {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
     removerFoto: (cpf) => api.delete(`/academic/estudantes/${cpf}/remover-foto/`),
+    uploadFile: (formData) => api.post('/academic/estudantes/importar-arquivo/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    downloadModel: () => api.get('/academic/estudantes/download-modelo/', { responseType: 'blob' }),
   },
   // Matrículas
   matriculasCemep: {
