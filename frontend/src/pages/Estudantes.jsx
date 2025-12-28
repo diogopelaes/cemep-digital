@@ -369,9 +369,10 @@ export default function Estudantes() {
         }}
         entityName="Estudantes"
         templateHeaders={[
-          'NOME_COMPLETO', 'EMAIL', 'CPF', 'SENHA', 'CIN', 'LINHA_ONIBUS',
+          'NOME_COMPLETO', 'EMAIL', 'CPF', 'SENHA', 'DATA_NASCIMENTO', 'CIN', 'LINHA_ONIBUS',
           'LOGRADOURO', 'NUMERO', 'BAIRRO', 'CIDADE', 'ESTADO', 'CEP',
-          'COMPLEMENTO', 'TELEFONE', 'DATA_NASCIMENTO'
+          'COMPLEMENTO', 'TELEFONE',
+          'NUMERO_MATRICULA', 'CURSO_SIGLA', 'DATA_ENTRADA_CURSO', 'DATA_SAIDA_CURSO', 'STATUS_MATRICULA'
         ]}
         onDownloadTemplate={async () => {
           try {
@@ -391,9 +392,13 @@ export default function Estudantes() {
         instructions={
           <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
             <li>Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong>.</li>
-            <li><strong>CPF</strong> será usado como Nome de Usuário (e valida unicidade).</li>
-            <li>Colunas Obrigatórias: <strong>NOME_COMPLETO, EMAIL, CPF</strong>.</li>
+            <li><strong>CPF</strong> será usado como Nome de Usuário (valida unicidade).</li>
+            <li>Colunas Obrigatórias do Estudante: <strong>NOME_COMPLETO, EMAIL, CPF</strong>.</li>
             <li>Se a <strong>SENHA</strong> estiver vazia, uma aleatória será gerada (para novos usuários).</li>
+            <li className="mt-2 font-semibold">Campos de Matrícula (opcionais, mas se preenchidos exigem todos os obrigatórios):</li>
+            <li className="ml-4">Obrigatórios: <strong>NUMERO_MATRICULA</strong> (10 dígitos), <strong>CURSO_SIGLA</strong>, <strong>DATA_ENTRADA_CURSO</strong>, <strong>STATUS_MATRICULA</strong>.</li>
+            <li className="ml-4">Opcional: <strong>DATA_SAIDA_CURSO</strong>.</li>
+            <li className="ml-4">Opções de STATUS_MATRICULA: <strong>MATRICULADO, CONCLUIDO, ABANDONO, TRANSFERIDO, OUTRO</strong>.</li>
           </ul>
         }
       />

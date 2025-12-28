@@ -82,7 +82,7 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     logradouro=data['logradouro'],
                     numero=data['numero'],
                     bairro=data['bairro'],
-                    cidade=data.get('cidade', 'Mogi Guaçu'),
+                    cidade=data.get('cidade', 'Paulínia'),
                     estado=data.get('estado', 'SP'),
                     cep=data['cep'],
                     complemento=data.get('complemento', ''),
@@ -318,7 +318,7 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                             'logradouro': row.get('LOGRADOURO', '').strip(),
                             'numero': row.get('NUMERO', '').strip(),
                             'bairro': row.get('BAIRRO', '').strip(),
-                            'cidade': row.get('CIDADE', '').strip() or 'Mogi Guaçu',
+                            'cidade': row.get('CIDADE', '').strip() or 'Paulínia',
                             'estado': row.get('ESTADO', '').strip() or 'SP',
                             'cep': clean_digits(row.get('CEP', '').strip()),
                             'complemento': row.get('COMPLEMENTO', '').strip(),
@@ -361,7 +361,87 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                             created_count += 1
                         else:
                             updated_count += 1
-                            
+                        
+                        # -- MATRICULA CEMEP --
+                        numero_matricula_raw = str(row.get('NUMERO_MATRICULA', '')).strip()
+                        curso_sigla = str(row.get('CURSO_SIGLA', '')).strip().upper()
+                        data_entrada_curso = str(row.get('DATA_ENTRADA_CURSO', '')).strip()
+                        data_saida_curso = str(row.get('DATA_SAIDA_CURSO', '')).strip()
+                        status_matricula = str(row.get('STATUS_MATRICULA', '')).strip().upper()
+
+                        if numero_matricula_raw and curso_sigla and data_entrada_curso and status_matricula:
+                            from apps.academic.models import MatriculaCEMEP
+                            from datetime import datetime
+                            import re as regex_import
+
+                            # Limpa matricula mantendo X/x e converte para maiúsculo
+                            numero_matricula_clean = regex_import.sub(r'[^0-9Xx]', '', str(numero_matricula_raw)).upper()
+
+                            # Validar: precisa ter pelo menos 1 caractere válido
+                            if not numero_matricula_clean:
+                                warnings.append(f"Linha {line} ({nome}): Atributo 'NUMERO_MATRICULA' com valor '{numero_matricula_raw}' inválido. Matrícula não criada.")
+                            else:
+                                # Buscar curso pela sigla
+                                try:
+                                    curso_obj = Curso.objects.get(sigla__iexact=curso_sigla)
+                                except Curso.DoesNotExist:
+                                    warnings.append(f"Linha {line} ({nome}): Atributo 'CURSO_SIGLA' com valor '{curso_sigla}' não encontrado. Matrícula não criada.")
+                                    curso_obj = None
+                                
+                                if curso_obj:
+                                    # Parsear data de entrada
+                                    data_entrada_parsed = None
+                                    for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y'):
+                                        try:
+                                            data_entrada_parsed = datetime.strptime(data_entrada_curso, fmt).date()
+                                            break
+                                        except ValueError:
+                                            pass
+                                    
+                                    if not data_entrada_parsed:
+                                        warnings.append(f"Linha {line} ({nome}): Atributo 'DATA_ENTRADA_CURSO' com valor '{data_entrada_curso}' inválido. Matrícula não criada.")
+                                    else:
+                                        # Parsear data de saida (opcional)
+                                        data_saida_parsed = None
+                                        if data_saida_curso:
+                                            for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y'):
+                                                try:
+                                                    data_saida_parsed = datetime.strptime(data_saida_curso, fmt).date()
+                                                    break
+                                                except ValueError:
+                                                    pass
+                                            if not data_saida_parsed:
+                                                warnings.append(f"Linha {line} ({nome}): Atributo 'DATA_SAIDA_CURSO' com valor '{data_saida_curso}' inválido. Ignorado.")
+                                        
+                                        # Validar status
+                                        valid_statuses = ['MATRICULADO', 'CONCLUIDO', 'ABANDONO', 'TRANSFERIDO', 'OUTRO']
+                                        if status_matricula not in valid_statuses:
+                                            warnings.append(f"Linha {line} ({nome}): Atributo 'STATUS_MATRICULA' com valor '{status_matricula}' inválido. Use: {', '.join(valid_statuses)}. Matrícula não criada.")
+                                        else:
+                                            # Criar ou atualizar matricula
+                                            MatriculaCEMEP.objects.update_or_create(
+                                                numero_matricula=numero_matricula_clean,
+                                                defaults={
+                                                    'estudante': estudante,
+                                                    'curso': curso_obj,
+                                                    'data_entrada': data_entrada_parsed,
+                                                    'data_saida': data_saida_parsed,
+                                                    'status': status_matricula
+                                                }
+                                            )
+                        elif numero_matricula_raw or curso_sigla or data_entrada_curso or status_matricula:
+                            # Se algum campo de matricula foi preenchido, mas não todos obrigatórios
+                            missing_fields = []
+                            if not numero_matricula_raw:
+                                missing_fields.append('NUMERO_MATRICULA')
+                            if not curso_sigla:
+                                missing_fields.append('CURSO_SIGLA')
+                            if not data_entrada_curso:
+                                missing_fields.append('DATA_ENTRADA_CURSO')
+                            if not status_matricula:
+                                missing_fields.append('STATUS_MATRICULA')
+                            warnings.append(f"Linha {line} ({nome}): Campos de matrícula incompletos. Faltando: {', '.join(missing_fields)}. Matrícula não criada.")
+
                         transaction.savepoint_commit(sid)
 
                     except Exception as ie:
@@ -394,32 +474,44 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
         import io
         import pandas as pd
         from django.http import FileResponse
+        from openpyxl.utils import get_column_letter
 
         buffer = io.BytesIO()
         data = {
+            # Dados do Estudante
             'NOME_COMPLETO': ['João da Silva'],
             'EMAIL': ['joao@escola.com.br'],
             'SENHA': ['123@Mudar'],
             'CPF': ['12345678900'],
+            'DATA_NASCIMENTO': ['01/01/2010'],
             'CIN': ['12345'],
             'LINHA_ONIBUS': ['Linha 10'],
             'LOGRADOURO': ['Rua Exemplo'],
             'NUMERO': ['123'],
             'BAIRRO': ['Centro'],
-            'CIDADE': ['Mogi Guaçu'],
+            'CIDADE': ['Paulínia'],
             'ESTADO': ['SP'],
             'CEP': ['13840000'],
             'COMPLEMENTO': ['Casa'],
             'TELEFONE': ['19999999999'],
-            'DATA_NASCIMENTO': ['01/01/2010'] # Adicionando sugestão de data nascimento pois é obrigatório no banco
+            # Dados da Matrícula CEMEP
+            'NUMERO_MATRICULA': ['2024010001'],
+            'CURSO_SIGLA': ['ADM'],
+            'DATA_ENTRADA_CURSO': ['01/02/2024'],
+            'DATA_SAIDA_CURSO': [''],
+            'STATUS_MATRICULA': ['MATRICULADO'],
         }
         df = pd.DataFrame(data)
         
         with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
             df.to_excel(writer, index=False)
             ws = writer.sheets['Sheet1']
-            for i, col in enumerate(df.columns):
-                ws.column_dimensions[chr(65+i)].width = 20
+            # Ajustar largura das colunas dinamicamente
+            for i, col_name in enumerate(df.columns):
+                col_letter = get_column_letter(i + 1)
+                # Largura baseada no tamanho do header ou do valor de exemplo
+                max_len = max(len(str(col_name)), len(str(df[col_name].iloc[0])) if len(df) > 0 else 0)
+                ws.column_dimensions[col_letter].width = max(max_len + 2, 15)
 
         buffer.seek(0)
         return FileResponse(

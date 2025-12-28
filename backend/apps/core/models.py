@@ -62,7 +62,7 @@ class Funcionario(models.Model):
     logradouro = models.CharField(max_length=255, verbose_name='Logradouro', default='')
     numero = models.CharField(max_length=10, verbose_name='Número', default='')
     bairro = models.CharField(max_length=100, verbose_name='Bairro', default='')
-    cidade = models.CharField(max_length=100, default='Mogi Guaçu', verbose_name='Cidade')
+    cidade = models.CharField(max_length=100, default='Paulínia', verbose_name='Cidade')
     estado = models.CharField(max_length=2, default='SP', verbose_name='Estado')
     cep = models.CharField(max_length=8, verbose_name='CEP', default='')
     complemento = models.CharField(max_length=100, blank=True, verbose_name='Complemento')
@@ -84,7 +84,6 @@ class Funcionario(models.Model):
         if self.area_atuacao:
             return f"{self.usuario.get_full_name()} - {self.area_atuacao}"
         return self.usuario.get_full_name()
-
 
 
 class PeriodoTrabalho(models.Model):
@@ -134,7 +133,6 @@ class PeriodoTrabalho(models.Model):
         return f"{self.funcionario} ({self.data_entrada.strftime('%d/%m/%Y')} - {saida})"
 
 
-
 class Disciplina(models.Model):
     """Disciplina do currículo escolar."""
     
@@ -168,7 +166,6 @@ class Disciplina(models.Model):
         return f"{self.nome} ({self.sigla})"
 
 
-
 class Curso(models.Model):
     """Curso oferecido pela escola."""
     
@@ -183,6 +180,7 @@ class Curso(models.Model):
 
     def __str__(self):
         return f"{self.nome} ({self.sigla})"
+
 
 class Turma(models.Model):
     """Turma de estudantes."""
@@ -228,7 +226,6 @@ class Turma(models.Model):
         return f"{self.numero}º {self.get_nomenclatura_display()} {self.letra} - {self.curso.sigla} ({self.ano_letivo})"
 
 
-
 class DisciplinaTurma(models.Model):
     """Vínculo entre Disciplina e Turma com carga horária."""
     
@@ -251,7 +248,6 @@ class DisciplinaTurma(models.Model):
     
     def __str__(self):
         return f"{self.disciplina.sigla} - {self.turma} ({self.aulas_semanais} aulas/sem)"
-
 
 
 class ProfessorDisciplinaTurma(models.Model):
@@ -329,7 +325,6 @@ class Bimestre(models.Model):
                 raise ValidationError('As datas de início e fim devem pertencer ao ano letivo informado.')
 
 
-
 class CalendarioEscolar(models.Model):
     """Calendário escolar com dias letivos e não letivos."""
     
@@ -378,7 +373,6 @@ class CalendarioEscolar(models.Model):
         ).first()
 
 
-
 class Habilidade(models.Model):
     """Habilidades BNCC ou internas por disciplina."""
     
@@ -400,5 +394,3 @@ class Habilidade(models.Model):
     
     def __str__(self):
         return f"{self.codigo} - {self.descricao[:50]}..."
-
-

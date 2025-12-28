@@ -14,8 +14,8 @@ const menuItems = {
   GESTAO: [
     { path: '/dashboard', label: 'Dashboard', icon: HiHome },
     { path: '/funcionarios', label: 'Funcionários', icon: HiUserGroup },
-    { path: '/estudantes', label: 'Estudantes', icon: HiAcademicCap },
     { path: '/cursos', label: 'Cursos', icon: HiAcademicCap },
+    { path: '/estudantes', label: 'Estudantes', icon: HiAcademicCap },
     { path: '/turmas', label: 'Turmas', icon: HiUsers },
     { path: '/disciplinas', label: 'Disciplinas', icon: HiBookOpen },
     { path: '/calendario', label: 'Calendário', icon: HiCalendar },

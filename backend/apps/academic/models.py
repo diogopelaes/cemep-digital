@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from apps.core.models import Parentesco, Curso, Turma
 from apps.core.validators import validate_cpf, clean_digits
+import re
 
 
 class Estudante(models.Model):
@@ -37,7 +38,7 @@ class Estudante(models.Model):
     logradouro = models.CharField(max_length=255, verbose_name='Logradouro')
     numero = models.CharField(max_length=10, verbose_name='Número')
     bairro = models.CharField(max_length=100, verbose_name='Bairro')
-    cidade = models.CharField(max_length=100, default='Mogi Guaçu', verbose_name='Cidade')
+    cidade = models.CharField(max_length=100, default='Paulínia', verbose_name='Cidade')
     estado = models.CharField(max_length=2, default='SP', verbose_name='Estado')
     cep = models.CharField(max_length=8, verbose_name='CEP')
     complemento = models.CharField(max_length=100, blank=True, verbose_name='Complemento')
@@ -200,9 +201,29 @@ class ResponsavelEstudante(models.Model):
 
 
 def validate_matricula_digits(value):
-    clean_value = clean_digits(value)
-    if len(clean_value) != 10:
-        raise ValidationError('A matrícula deve ter exatamente 10 dígitos.')
+    """Valida se a matrícula contém apenas números, podendo terminar com X."""
+    if not value:
+        raise ValidationError('A matrícula é obrigatória.')
+    
+    # Remove formatação mas mantém X/x
+    clean_value = re.sub(r'[^0-9Xx]', '', str(value))
+    
+    if not clean_value:
+        raise ValidationError('A matrícula deve conter pelo menos um caractere válido.')
+    
+    # Verifica formato: apenas dígitos, podendo terminar com X
+    # Se tem X, deve ser apenas no final
+    if 'X' in clean_value.upper():
+        # X só pode aparecer na última posição
+        if clean_value.upper().index('X') != len(clean_value) - 1:
+            raise ValidationError('X só pode aparecer no final da matrícula.')
+        # Todos os caracteres antes do X devem ser dígitos
+        if not clean_value[:-1].isdigit():
+            raise ValidationError('Todos os caracteres antes do X devem ser dígitos.')
+    else:
+        # Sem X, todos devem ser dígitos
+        if not clean_value.isdigit():
+            raise ValidationError('A matrícula deve conter apenas números (e opcionalmente X no final).')
 
 
 class MatriculaCEMEP(models.Model):
@@ -216,11 +237,11 @@ class MatriculaCEMEP(models.Model):
         OUTRO = 'OUTRO', 'Outro'
     
     numero_matricula = models.CharField(
-        max_length=10,
+        max_length=20,
         primary_key=True,
         verbose_name='Número da Matrícula',
         validators=[validate_matricula_digits],
-        help_text='Deve conter exatamente 10 dígitos numéricos. Só pode ser inserido por Gestão ou Secretaria.'
+        help_text='Números, podendo terminar com X. Só pode ser inserido por Gestão ou Secretaria.'
     )
     estudante = models.ForeignKey(
         Estudante,
@@ -251,7 +272,8 @@ class MatriculaCEMEP(models.Model):
 
     def save(self, *args, **kwargs):
         if self.numero_matricula:
-            self.numero_matricula = clean_digits(self.numero_matricula)
+            # Remove formatação mas mantém X/x (converte para maiúsculo)
+            self.numero_matricula = re.sub(r'[^0-9Xx]', '', str(self.numero_matricula)).upper()
         super().save(*args, **kwargs)
 
     @property

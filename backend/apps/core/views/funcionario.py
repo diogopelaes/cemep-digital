@@ -224,7 +224,7 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
                             'logradouro': row.get('LOGRADOURO', '').strip(),
                             'numero': row.get('NUMERO', '').strip(),
                             'bairro': row.get('BAIRRO', '').strip(),
-                            'cidade': row.get('CIDADE', '').strip() or 'Mogi Guaçu',
+                            'cidade': row.get('CIDADE', '').strip() or 'Paulínia',
                             'estado': row.get('ESTADO', '').strip() or 'SP',
                             'cep': row.get('CEP', '').strip(),
                             'complemento': row.get('COMPLEMENTO', '').strip(),
@@ -293,7 +293,7 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
             'LOGRADOURO': ['Rua Exemplo'],
             'NUMERO': ['123'],
             'BAIRRO': ['Centro'],
-            'CIDADE': ['Mogi Guaçu'],
+            'CIDADE': ['Paulínia'],
             'ESTADO': ['SP'],
             'CEP': ['13840000'],
             'COMPLEMENTO': ['Apto 1'],
@@ -350,7 +350,7 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
             logradouro=data.get('logradouro') or '',
             numero=data.get('numero') or '',
             bairro=data.get('bairro') or '',
-            cidade=data.get('cidade') or 'Mogi Guaçu',
+            cidade=data.get('cidade') or 'Paulínia',
             estado=data.get('estado') or 'SP',
             cep=data.get('cep') or '',
             complemento=data.get('complemento') or '',
@@ -413,7 +413,7 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
         funcionario.logradouro = data.get('logradouro') or ''
         funcionario.numero = data.get('numero') or ''
         funcionario.bairro = data.get('bairro') or ''
-        funcionario.cidade = data.get('cidade') or 'Mogi Guaçu'
+        funcionario.cidade = data.get('cidade') or 'Paulínia'
         funcionario.estado = data.get('estado') or 'SP'
         funcionario.cep = data.get('cep') or ''
         funcionario.complemento = data.get('complemento') or ''
