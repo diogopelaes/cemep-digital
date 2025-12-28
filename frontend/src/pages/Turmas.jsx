@@ -285,8 +285,11 @@ export default function Turmas() {
         onClose={() => setShowUploadModal(false)}
         onUpload={async (formData) => {
           const response = await coreAPI.turmas.importarArquivo(formData)
+          if (response.data.errors?.length > 0) {
+            toast.error('Alguns registros não foram importados. Verifique os erros.')
+          }
           loadTurmas(true)
-          loadAnosDisponiveis() // Atualiza anos se houver novos
+          loadAnosDisponiveis()
           return response
         }}
         entityName="Turmas"

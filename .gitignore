@@ -37,6 +37,3 @@ backend/db.sqlite3
 
 
 # Desenvolvimento
-dados_xlsx/
-start-dev.ps1
-reset-db.ps1

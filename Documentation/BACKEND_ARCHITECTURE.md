@@ -159,7 +159,7 @@ Disciplina 1:N Habilidade
 | `Estudante` | `cpf` | Estudante vinculado a User |
 | `Responsavel` | `cpf` | Responsável por estudantes |
 | `ResponsavelEstudante` | auto | Vínculo com parentesco |
-| `MatriculaCEMEP` | `numero_matricula` | Matrícula central (10 dígitos) |
+| `MatriculaCEMEP` | `numero_matricula` | Matrícula central |
 | `MatriculaTurma` | auto | Enturmação por ano letivo |
 | `Atestado` | auto | Atestados médicos |
 

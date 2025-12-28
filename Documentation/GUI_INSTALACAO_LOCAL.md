@@ -222,6 +222,35 @@ O script irá:
 
 ---
 
+## Scripts de Utilidade (Raiz do Projeto)
+
+Existem scripts no diretório raiz (`C:\Projects\cemep-digital`) para facilitar o desenvolvimento:
+
+### 1. Resetar Banco de Dados (`reset-db.ps1`)
+Este script automatiza o processo de limpeza e recriação do ambiente:
+1.  Exclui o banco de dados local `cemep_digital`.
+2.  Limpa todos os arquivos de migração antigos (exceto `__init__.py`).
+3.  Recria o banco de dados.
+4.  Executa novas migrações (`makemigrations` e `migrate`).
+5.  Cria um superusuário padrão:
+    - **Usuário:** `diogo`
+    - **Senha:** `123`
+
+**Uso:**
+```powershell
+.\reset-db.ps1
+```
+
+### 2. Iniciar Ambiente de Desenvolvimento (`start-dev.ps1`)
+Este script inicia simultaneamente o servidor do Backend e do Frontend em janelas separadas do PowerShell, facilitando o início rápido do trabalho.
+
+**Uso:**
+```powershell
+.\start-dev.ps1
+```
+
+---
+
 ## Acessar o Sistema
 
 - Frontend: http://localhost:5173/

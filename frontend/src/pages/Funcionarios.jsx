@@ -6,8 +6,9 @@ import {
 } from '../components/ui'
 import {
   HiPlus, HiPencil, HiCalendar, HiCheck, HiX, HiRefresh, HiUser,
-  HiCheckCircle, HiXCircle, HiPrinter, HiSearch, HiUpload
+  HiCheckCircle, HiXCircle, HiSearch, HiUpload
 } from 'react-icons/hi'
+import { FaFilePdf } from 'react-icons/fa'
 import { coreAPI } from '../services/api'
 import BulkUploadModal from '../components/modals/BulkUploadModal'
 import { formatDateBR } from '../utils/date'
@@ -403,7 +404,7 @@ export default function Funcionarios() {
                       {generatingPDF === func.id ? (
                         <Loading size="sm" />
                       ) : (
-                        <HiPrinter className="h-5 w-5" />
+                        <FaFilePdf className="h-5 w-5" />
                       )}
                     </button>
                     <button

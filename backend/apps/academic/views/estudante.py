@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import transaction
 from django.contrib.auth import get_user_model
+from datetime import datetime
 
 from apps.academic.models import (
     Estudante, Responsavel, ResponsavelEstudante,
@@ -218,7 +219,7 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
             df.columns = [c.strip().upper() for c in df.columns]
             
             # Campos obrigatórios
-            required = ['NOME_COMPLETO', 'EMAIL', 'CPF']
+            required = ['NOME_COMPLETO', 'EMAIL', 'CPF', 'DATA_NASCIMENTO']
             missing = [c for c in required if c not in df.columns]
             if missing:
                 return Response({'detail': f'Colunas obrigatórias faltando: {", ".join(missing)}'}, status=400)
@@ -230,6 +231,22 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
 
             User = get_user_model()
 
+            def parse_date(value):
+                if not value: return None
+                # Se já for date ou datetime (vindo do excel/pandas)
+                if isinstance(value, (datetime, pd.Timestamp)):
+                    return value.date()
+                
+                val_str = str(value).strip()
+                if not val_str: return None
+                
+                for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y'):
+                    try:
+                        return datetime.strptime(val_str, fmt).date()
+                    except (ValueError, TypeError):
+                        pass
+                return None
+
             for idx, row in df.iterrows():
                 try:
                     line = idx + 2
@@ -238,17 +255,19 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     cpf_raw = str(row.get('CPF', '')).strip()
                     
                     # 1. Validação Obrigatória
-                    if not nome or not email or not cpf_raw:
-                         errors.append(f"Linha {line} ({nome or 'Sem Nome'}): Nome, Email e CPF são obrigatórios.")
+                    # User requested only NOME, EMAIL, CPF, DATA_NASCIMENTO as mandatory
+                    required_row = ['NOME_COMPLETO', 'EMAIL', 'CPF', 'DATA_NASCIMENTO']
+                    missing_row = [c for c in required_row if not str(row.get(c, '')).strip()]
+                    
+                    if missing_row:
+                         errors.append(f"Linha {line} ({nome or 'Sem Nome'}): Campos obrigatórios faltando: {', '.join(missing_row)}")
                          continue
                     
-                    cpf_clean = clean_digits(cpf_raw)
+                    cpf_clean = clean_digits(cpf_raw).zfill(11)
+                    data_nasc_parsed = parse_date(row.get('DATA_NASCIMENTO'))
                     
-                    # Validação de CPF
-                    try:
-                        validate_cpf(cpf_clean)
-                    except ValidationError:
-                        errors.append(f"Linha {line} ({nome}): Atributo 'CPF' com valor '{cpf_raw}' é inválido.")
+                    if not data_nasc_parsed:
+                        errors.append(f"Linha {line} ({nome}): Data de Nascimento '{row.get('DATA_NASCIMENTO')}' inválida. Use DD/MM/AAAA.")
                         continue
 
                     # 1.1 Verificação de Unicidade Rigorosa (Email e Username/CPF)
@@ -260,11 +279,17 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     # Se usuário existe com outro username mas mesmo CPF (teoricamente username==cpf, mas...)
                     # Aqui assumimos username=cpf.
 
-                    # 1.2 Validação de Tamanho de Campos (CEP)
+                    # 1.2 Validação de Tamanho de Campos (CEP) e Defaults para Endereço
+                    # Se não vier, usamos padrão. Endereço é obrigatório no model, então usamos placeholder.
                     cep_raw = str(row.get('CEP', '')).strip()
                     cep_clean = clean_digits(cep_raw)
+                    if not cep_clean:
+                        cep_clean = '00000000' # Default
+                    else:
+                        cep_clean = cep_clean.zfill(8)
+                    
                     if len(cep_clean) > 8:
-                         errors.append(f"Linha {line} ({nome}): Atributo 'CEP' com valor '{cep_raw}' é inválido (contém {len(cep_clean)} dígitos, máximo é 8).")
+                         errors.append(f"Linha {line} ({nome}): Atributo 'CEP' com valor '{cep_raw}' é inválido.")
                          continue
 
                     # 2. Preparação do Usuário
@@ -310,47 +335,34 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                         # Lógica da Linha de Ônibus
                         linha_onibus = row.get('LINHA_ONIBUS', '').strip()
                         usa_onibus = bool(linha_onibus)
-                        
+
+                        # Novos campos de Benefícios
+                        def get_bool(col, default_val):
+                            val = str(row.get(col, '')).strip().upper()
+                            if not val: return default_val
+                            return val in ('SIM', '1', 'TRUE', 'S', 'T')
+
                         estudante_defaults = {
                             'cin': row.get('CIN', '').strip(),
                             'linha_onibus': linha_onibus,
                             'usa_onibus': usa_onibus,
-                            'logradouro': row.get('LOGRADOURO', '').strip(),
-                            'numero': row.get('NUMERO', '').strip(),
-                            'bairro': row.get('BAIRRO', '').strip(),
+                            'bolsa_familia': get_bool('BOLSA_FAMILIA', False),
+                            'pe_de_meia': get_bool('PE_DE_MEIA', True),
+                            'permissao_sair_sozinho': get_bool('SAIDA_SOZINHO', False),
+                            # Campos de endereço com fallback para não quebrar model
+                            'logradouro': row.get('LOGRADOURO', '').strip() or 'Não Informado',
+                            'numero': row.get('NUMERO', '').strip() or 'S/N',
+                            'bairro': row.get('BAIRRO', '').strip() or 'Não Informado',
                             'cidade': row.get('CIDADE', '').strip() or 'Paulínia',
                             'estado': row.get('ESTADO', '').strip() or 'SP',
-                            'cep': clean_digits(row.get('CEP', '').strip()),
+                            'cep': cep_clean,
                             'complemento': row.get('COMPLEMENTO', '').strip(),
                             'telefone': clean_digits(row.get('TELEFONE', '').strip()),
-                            # Campos obrigatórios do model que não estão no excel, precisamos de defaults
-                            'data_nascimento': '2000-01-01', # Default temporário seguro ou erro?
-                            # O user não pediu data de nascimento no excel. 
-                            # O model define data_nascimento como obrigatório.
-                            # Vou colocar um default e avisar no warning, ou falhar?
-                            # O user pediu para seguir o padrao. No funcionario, data_nascimento é opcional no excel e tem soft valid.
-                            # Mas aqui User não listou Data Nascimento no requirements.
-                            # Vou usar um default '2000-01-01' e adicionar um warning se for criação nova.
+                            'data_nascimento': data_nasc_parsed,
                         }
-                        
-                        # Se for update, mantemos a data existente se não informada (mas não tem coluna no excel proposta pelo user)
-                        # Se for create, precisamos de uma data.
-                        if user_created or not Estudante.objects.filter(cpf=cpf_clean).exists():
-                             # Tentando pegar data nascimento de coluna extra se existir, senão default
-                             d_nasc = row.get('DATA_NASCIMENTO', '').strip()
-                             if d_nasc:
-                                 # Tentar parsear
-                                 from datetime import datetime
-                                 for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y'):
-                                    try:
-                                        estudante_defaults['data_nascimento'] = datetime.strptime(d_nasc, fmt).date()
-                                        break
-                                    except ValueError:
-                                        pass
-                             
-                             if 'data_nascimento' not in estudante_defaults or not estudante_defaults['data_nascimento']:
-                                  estudante_defaults['data_nascimento'] = '2000-01-01'
-                                  warnings.append(f"Linha {line} ({nome}): Data Nascimento não fornecida. Definida como 01/01/2000.")
+
+                        # Se for update, a data_nascimento já está nos defaults acima e será atualizada.
+                        # Não precisamos mais do fallback manual aqui pois validamos no início do loop.
 
                         estudante, est_created = Estudante.objects.update_or_create(
                             cpf=cpf_clean,
@@ -371,7 +383,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
 
                         if numero_matricula_raw and curso_sigla and data_entrada_curso and status_matricula:
                             from apps.academic.models import MatriculaCEMEP
-                            from datetime import datetime
                             import re as regex_import
 
                             # Limpa matricula mantendo X/x e converte para maiúsculo
@@ -389,29 +400,16 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                                     curso_obj = None
                                 
                                 if curso_obj:
-                                    # Parsear data de entrada
-                                    data_entrada_parsed = None
-                                    for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y'):
-                                        try:
-                                            data_entrada_parsed = datetime.strptime(data_entrada_curso, fmt).date()
-                                            break
-                                        except ValueError:
-                                            pass
+                                    # Parsear datas
+                                    data_entrada_parsed = parse_date(row.get('DATA_ENTRADA_CURSO'))
                                     
                                     if not data_entrada_parsed:
                                         warnings.append(f"Linha {line} ({nome}): Atributo 'DATA_ENTRADA_CURSO' com valor '{data_entrada_curso}' inválido. Matrícula não criada.")
                                     else:
                                         # Parsear data de saida (opcional)
-                                        data_saida_parsed = None
-                                        if data_saida_curso:
-                                            for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y'):
-                                                try:
-                                                    data_saida_parsed = datetime.strptime(data_saida_curso, fmt).date()
-                                                    break
-                                                except ValueError:
-                                                    pass
-                                            if not data_saida_parsed:
-                                                warnings.append(f"Linha {line} ({nome}): Atributo 'DATA_SAIDA_CURSO' com valor '{data_saida_curso}' inválido. Ignorado.")
+                                        data_saida_parsed = parse_date(row.get('DATA_SAIDA_CURSO'))
+                                        if data_saida_curso and not data_saida_parsed:
+                                            warnings.append(f"Linha {line} ({nome}): Atributo 'DATA_SAIDA_CURSO' com valor '{data_saida_curso}' inválido. Ignorado.")
                                         
                                         # Validar status
                                         valid_statuses = ['MATRICULADO', 'CONCLUIDO', 'ABANDONO', 'TRANSFERIDO', 'OUTRO']
@@ -483,7 +481,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
             'EMAIL': ['joao@escola.com.br'],
             'SENHA': ['123@Mudar'],
             'CPF': ['12345678900'],
-            'DATA_NASCIMENTO': ['01/01/2010'],
             'CIN': ['12345'],
             'LINHA_ONIBUS': ['Linha 10'],
             'LOGRADOURO': ['Rua Exemplo'],
@@ -494,8 +491,12 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
             'CEP': ['13840000'],
             'COMPLEMENTO': ['Casa'],
             'TELEFONE': ['19999999999'],
+            'BOLSA_FAMILIA': ['Não'],
+            'PE_DE_MEIA': ['Sim'],
+            'SAIDA_SOZINHO': ['Não'],
             # Dados da Matrícula CEMEP
             'NUMERO_MATRICULA': ['2024010001'],
+            'DATA_NASCIMENTO': ['01/01/2010'],
             'CURSO_SIGLA': ['ADM'],
             'DATA_ENTRADA_CURSO': ['01/02/2024'],
             'DATA_SAIDA_CURSO': [''],

@@ -5,11 +5,11 @@ import { InfoItem, BooleanItem } from '../components/common'
 import {
     HiArrowLeft, HiPencil, HiPrinter, HiDownload, HiPhone, HiMail,
     HiLocationMarker, HiCalendar, HiAcademicCap, HiUser, HiUsers,
-    HiDocumentText, HiBookOpen
+    HiDocumentText, HiBookOpen, HiCheckCircle
 } from 'react-icons/hi'
 import { academicAPI } from '../services/api'
 import { formatDateBR, calcularIdade } from '../utils/date'
-import { displayCPF, displayTelefone } from '../utils/formatters'
+import { displayCPF, displayTelefone, displayCEP } from '../utils/formatters'
 import {
     createPDF, addHeader, addFooter, addSectionTitle, addField,
     addPhoto, addTable, checkNewPage, imageToBase64, downloadPDF, openPDF,
@@ -345,31 +345,122 @@ export default function EstudanteDetalhes() {
 
             {/* Endereço */}
             <Card hover={false}>
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                    <HiLocationMarker className="text-primary-500" />
-                    Endereço
-                </h3>
-                <p className="text-slate-700 dark:text-slate-300">
-                    {estudante.endereco_completo}
-                </p>
+                <div className="flex items-center gap-2 mb-6">
+                    <div className="p-2 rounded-lg bg-primary-500/10 text-primary-500">
+                        <HiLocationMarker className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+                        Endereço Residencial
+                    </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
+                    {/* Logradouro e Número */}
+                    <div className="md:col-span-2 lg:col-span-2">
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                            Logradouro e Número
+                        </p>
+                        <p className="text-slate-800 dark:text-white font-medium text-lg">
+                            {estudante.logradouro}, {estudante.numero}
+                        </p>
+                        {estudante.complemento && (
+                            <p className="text-sm text-slate-500 mt-1">
+                                {estudante.complemento}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* CEP */}
+                    <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                            CEP
+                        </p>
+                        <p className="text-slate-800 dark:text-white font-mono bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg inline-block">
+                            {displayCEP(estudante.cep)}
+                        </p>
+                    </div>
+
+                    {/* Bairro */}
+                    <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                            Bairro
+                        </p>
+                        <p className="text-slate-800 dark:text-white font-medium">
+                            {estudante.bairro || '-'}
+                        </p>
+                    </div>
+
+                    {/* Cidade e Estado */}
+                    <div className="md:col-span-2">
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                            Cidade / Estado
+                        </p>
+                        <p className="text-slate-800 dark:text-white font-medium">
+                            {estudante.cidade} — {estudante.estado}
+                        </p>
+                    </div>
+                </div>
             </Card>
 
-            {/* Benefícios e Transporte */}
-            <Card hover={false}>
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">
-                    Benefícios e Transporte
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <BooleanItem label="Bolsa Família" value={estudante.bolsa_familia} />
-                    <BooleanItem label="Pé de Meia" value={estudante.pe_de_meia} />
-                    <BooleanItem label="Usa Ônibus" value={estudante.usa_onibus} />
-                    <BooleanItem label="Pode Sair Sozinho" value={estudante.permissao_sair_sozinho} />
+            {/* Benefícios e Logística */}
+            <Card hover={false} className="overflow-hidden">
+                <div className="flex items-center gap-2 mb-6">
+                    <div className="p-2 rounded-lg bg-primary-500/10 text-primary-500">
+                        <HiCheckCircle className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+                        Benefícios e Logística
+                    </h3>
                 </div>
-                {estudante.usa_onibus && estudante.linha_onibus && (
-                    <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">
-                        <strong>Linha do Ônibus:</strong> {estudante.linha_onibus}
-                    </p>
-                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-6 gap-x-8">
+                    {/* Bolsa Família */}
+                    <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                            Bolsa Família
+                        </p>
+                        <Badge variant={estudante.bolsa_familia ? 'success' : 'default'}>
+                            {estudante.bolsa_familia ? 'Sim' : 'Não'}
+                        </Badge>
+                    </div>
+
+                    {/* Pé de Meia */}
+                    <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                            Pé de Meia
+                        </p>
+                        <Badge variant={estudante.pe_de_meia ? 'success' : 'default'}>
+                            {estudante.pe_de_meia ? 'Sim' : 'Não'}
+                        </Badge>
+                    </div>
+
+                    {/* Transporte Escolar */}
+                    <div className="md:col-span-2 lg:col-span-1">
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                            Transporte Escolar
+                        </p>
+                        <div className="flex flex-col gap-2 items-start">
+                            <Badge variant={estudante.usa_onibus ? 'success' : 'default'}>
+                                {estudante.usa_onibus ? 'Sim' : 'Não'}
+                            </Badge>
+                            {estudante.usa_onibus && estudante.linha_onibus && (
+                                <p className="text-sm font-medium text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                                    {estudante.linha_onibus}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Saída Desacompanhado */}
+                    <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                            Saída Desacompanhado
+                        </p>
+                        <Badge variant={estudante.permissao_sair_sozinho ? 'success' : 'default'}>
+                            {estudante.permissao_sair_sozinho ? 'Sim' : 'Não'}
+                        </Badge>
+                    </div>
+                </div>
             </Card>
 
             {/* Matrículas */}

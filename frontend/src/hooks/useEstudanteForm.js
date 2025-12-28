@@ -485,7 +485,8 @@ export function useEstudanteForm(cpfParam, navigate) {
             }
 
             toast.success(isEditing ? 'Estudante atualizado!' : 'Estudante cadastrado!')
-            navigate('/estudantes')
+            const cpfTarget = isEditing ? cpfParam : cpfNumbers
+            navigate(`/estudantes/${cpfTarget}`)
         } catch (error) {
             console.error('Erro ao salvar:', error)
             const msg = error.response?.data?.detail ||
