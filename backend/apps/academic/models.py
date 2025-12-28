@@ -305,6 +305,7 @@ class MatriculaTurma(models.Model):
     def __str__(self):
         return f"{self.matricula_cemep.estudante} - {self.turma}"
 
+
 class Atestado(models.Model):
     """Atestado médico de um usuário."""
     
