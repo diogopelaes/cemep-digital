@@ -1,6 +1,6 @@
 # CEMEP Digital - Documentação do Backend
 
-**Última atualização:** 27/12/2024  
+**Última atualização:** 29/12/2024  
 **Tecnologias:** Django 4, Django REST Framework, PostgreSQL, Simple JWT, django-filter, django-ckeditor
 
 ---
@@ -110,18 +110,19 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
 
 ### Modelos Principais
 
-| Modelo | Descrição | Campos Chave |
-|--------|-----------|--------------|
-| `Funcionario` | Funcionário vinculado a User | `usuario`, `matricula`, `cpf`, `area_atuacao` |
-| `PeriodoTrabalho` | Períodos de vínculo | `funcionario`, `data_entrada`, `data_saida` |
-| `Disciplina` | Disciplina curricular | `nome`, `sigla`, `area_conhecimento`, `is_active` |
-| `Curso` | Curso oferecido | `nome`, `sigla`, `is_active` |
-| `Turma` | Turma de estudantes | `numero`, `letra`, `ano_letivo`, `curso`, `nomenclatura` |
-| `DisciplinaTurma` | Vínculo disciplina-turma | `disciplina`, `turma`, `aulas_semanais` |
-| `ProfessorDisciplinaTurma` | Atribuição de professor | `professor`, `disciplina_turma`, `tipo` |
-| `Bimestre` | Período bimestral | `numero`, `data_inicio`, `data_fim`, `ano_letivo` |
-| `CalendarioEscolar` | Dias letivos/não letivos | `data`, `letivo`, `tipo`, `descricao` |
-| `Habilidade` | Habilidades BNCC | `codigo`, `descricao`, `disciplina` |
+| Modelo                    | Descrição                              | Campos Chave                                       |
+|---------------------------|----------------------------------------|----------------------------------------------------|
+| `Funcionario`             | Funcionário vinculado a User           | `usuario`, `matricula`, `cpf`, `area_atuacao`      |
+| `PeriodoTrabalho`         | Períodos de vínculo                    | `funcionario`, `data_entrada`, `data_saida`        |
+| `Disciplina`              | Disciplina curricular                  | `nome`, `sigla`, `area_conhecimento`, `is_active`  |
+| `Curso`                   | Curso oferecido                        | `nome`, `sigla`, `is_active`                       |
+| `Turma`                   | Turma de estudantes                    | `numero`, `letra`, `ano_letivo`, `curso`           |
+| `DisciplinaTurma`         | Vínculo disciplina-turma               | `disciplina`, `turma`, `aulas_semanais`            |
+| `ProfessorDisciplinaTurma`| Atribuição de professor                | `professor`, `disciplina_turma`, `tipo`            |
+| `Habilidade`              | Habilidades BNCC                       | `codigo`, `descricao`, `disciplina`                |
+| `AnoLetivo`               | Ano letivo com bimestres               | `ano` (PK), `data_inicio/fim_Xbim`, `is_active`    |
+| `DiaLetivoExtra`          | Dia letivo extra (sábado/feriado)      | `data`, `descricao`                                |
+| `DiaNaoLetivo`            | Feriado ou recesso                     | `data`, `tipo`, `descricao`                        |
 
 ### Relacionamentos Importantes
 
@@ -132,21 +133,23 @@ Curso 1:N Turma
 Turma N:M Disciplina (via DisciplinaTurma)
 DisciplinaTurma 1:N ProfessorDisciplinaTurma
 Disciplina 1:N Habilidade
+AnoLetivo N:M DiaLetivoExtra
+AnoLetivo N:M DiaNaoLetivo
 ```
 
 ### ViewSets Disponíveis (`views/`)
 
-| ViewSet | Arquivo | Ações Customizadas |
-|---------|---------|-------------------|
-| `FuncionarioViewSet` | `funcionario.py` | `criar_completo`, `atualizar_completo`, `toggle_ativo`, `importar_arquivo`, `resetar_senha` |
-| `DisciplinaViewSet` | `disciplina.py` | `toggle_active`, `importar_arquivo`, `download_modelo` |
-| `CursoViewSet` | `curso.py` | `toggle_active`, `importar_arquivo`, `download_modelo` |
-| `TurmaViewSet` | `turma.py` | `toggle_active`, `importar_arquivo`, `download_modelo` |
-| `DisciplinaTurmaViewSet` | `disciplina_turma.py` | `importar_arquivo`, `download_modelo` |
-| `ProfessorDisciplinaTurmaViewSet` | `professor_disciplina_turma.py` | - |
-| `BimestreViewSet` | `bimestre.py` | - |
-| `CalendarioEscolarViewSet` | `calendario.py` | - |
-| `HabilidadeViewSet` | `habilidade.py` | - |
+| ViewSet                          | Arquivo                        | Ações Customizadas                                                       |
+|----------------------------------|--------------------------------|--------------------------------------------------------------------------|
+| `FuncionarioViewSet`             | `funcionario.py`               | `criar_completo`, `atualizar_completo`, `toggle_ativo`, `importar_arquivo`, `resetar_senha` |
+| `DisciplinaViewSet`              | `disciplina.py`                | `toggle_active`, `importar_arquivo`, `download_modelo`                   |
+| `CursoViewSet`                   | `curso.py`                     | `toggle_active`, `importar_arquivo`, `download_modelo`                   |
+| `TurmaViewSet`                   | `turma.py`                     | `toggle_active`, `importar_arquivo`, `download_modelo`                   |
+| `DisciplinaTurmaViewSet`         | `disciplina_turma.py`          | `importar_arquivo`, `download_modelo`                                    |
+| `ProfessorDisciplinaTurmaViewSet`| `professor_disciplina_turma.py`| -                                                                        |
+| `AnoLetivoViewSet`               | `calendario.py`                | `calendario`, `dia_nao_letivo`, `dia_letivo_extra`, `remover_dia`        |
+| `HabilidadeViewSet`              | `habilidade.py`                | -                                                                        |
+| `PeriodoTrabalhoViewSet`         | `periodo_trabalho.py`          | -                                                                        |
 
 ---
 
@@ -450,7 +453,7 @@ python manage.py createsuperuser        # Criar admin
 ```python
 # Modelos
 from apps.users.models import User
-from apps.core.models import Funcionario, Disciplina, Turma, Curso, DisciplinaTurma
+from apps.core.models import Funcionario, Disciplina, Turma, Curso, DisciplinaTurma, AnoLetivo, DiaLetivoExtra, DiaNaoLetivo
 from apps.academic.models import Estudante, Responsavel, MatriculaCEMEP, MatriculaTurma
 from apps.pedagogical.models import Aula, Faltas, NotaBimestral, OcorrenciaPedagogica
 from apps.management.models import Tarefa, Aviso, ReuniaoHTPC

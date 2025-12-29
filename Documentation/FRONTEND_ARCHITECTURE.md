@@ -1,6 +1,6 @@
 # CEMEP Digital - Documentação do Frontend
 
-**Última atualização:** 27/12/2024  
+**Última atualização:** 29/12/2024  
 **Tecnologias:** React 18, Vite, TailwindCSS, React Router DOM, Axios, jsPDF
 
 ---
@@ -255,19 +255,20 @@ Configuração centralizada do Axios com interceptors para autenticação.
 export const authAPI = { login, refresh, me, changePassword, resetPassword }
 export const usersAPI = { list, get, create, update, delete, sendCredentials }
 export const coreAPI = {
-    funcionarios: { list, get, criarCompleto, atualizarCompleto, resetarSenha, toggleAtivo, uploadFile },
-    disciplinas: { list, get, create, update, toggleAtivo },
-    cursos: { list, get, create, update, toggleAtivo },
-    turmas: { list, get, create, update, toggleAtivo, anosDisponiveis },
+    funcionarios: { list, get, criarCompleto, atualizarCompleto, resetarSenha, toggleAtivo, uploadFile, downloadModel },
+    disciplinas: { list, get, create, update, toggleAtivo, uploadFile, downloadModel },
+    cursos: { list, get, create, update, toggleAtivo, importarArquivo, downloadModelo },
+    turmas: { list, get, create, update, toggleAtivo, anosDisponiveis, importarArquivo, downloadModelo },
+    disciplinasTurma: { list, get, create, update, delete, importarArquivo, downloadModelo },
+    atribuicoes: { list, get, create, update, delete },
     periodosTrabalho: { list, create, delete },
     habilidades: { list, create, delete },
-    professorDisciplinaTurma: { list, create, update, delete },
+    anosLetivos: { list, get, create, update, getCalendario, addDiaNaoLetivo, addDiaLetivoExtra, removeDia },
 }
 export const academicAPI = {
-    estudantes: { list, get, create, atualizarCompleto, prontuario },
-    matriculasCEMEP: { create, update, delete },
-    matriculasTurma: { list, create, update, delete },
-    responsaveis: { create, update, delete },
+    estudantes: { list, get, create, atualizarCompleto, prontuario, uploadFoto, removerFoto, uploadFile, downloadModel },
+    matriculasCEMEP: { list, create, update },
+    matriculasTurma: { list, create, update },
 }
 ```
 
@@ -289,33 +290,37 @@ const [estudante, prontuario] = await Promise.all([
 
 ### `/src/pages/` - Páginas da Aplicação
 
-| Página | Linhas | Descrição |
-|--------|--------|-----------|
-| `Dashboard.jsx` | ~280 | Dashboard principal com estatísticas |
-| `Login.jsx` | ~110 | Tela de login |
-| **Estudantes** | | |
-| `Estudantes.jsx` | ~354 | Listagem de estudantes |
-| `EstudanteForm.jsx` | ~210 | Formulário criar/editar (usa `useEstudanteForm`) |
-| `EstudanteDetalhes.jsx` | ~470 | Detalhes + PDF do estudante |
-| **Funcionários** | | |
-| `Funcionarios.jsx` | ~620 | Listagem de funcionários |
-| `FuncionarioForm.jsx` | ~110 | Formulário criar/editar (usa `useFuncionarioForm`) |
-| `FuncionarioDetalhes.jsx` | ~385 | Detalhes do funcionário |
-| `FuncionarioCredenciais.jsx` | ~394 | Exibição de credenciais após criação |
-| **Turmas** | | |
-| `Turmas.jsx` | ~320 | Listagem de turmas |
-| `TurmaForm.jsx` | ~412 | Formulário criar/editar turma |
-| `TurmaDetalhes.jsx` | ~140 | Detalhes da turma (usa hooks modulares) |
-| **Disciplinas** | | |
-| `Disciplinas.jsx` | ~290 | Listagem de disciplinas |
-| `DisciplinaForm.jsx` | ~292 | Formulário criar/editar com habilidades |
-| **Cursos** | | |
-| `Cursos.jsx` | ~250 | Listagem de cursos |
-| `CursoForm.jsx` | ~160 | Formulário criar/editar curso |
-| **Outros** | | |
-| `Avisos.jsx` | ~145 | Página de avisos |
-| `RecuperarSenha.jsx` | ~110 | Recuperação de senha |
-| `NotFound.jsx` | ~30 | Página 404 |
+| Página                       | Descrição                                         |
+|------------------------------|---------------------------------------------------|
+| `Dashboard.jsx`              | Dashboard principal com estatísticas              |
+| `Login.jsx`                  | Tela de login                                     |
+| `RecuperarSenha.jsx`         | Recuperação de senha                              |
+| `NotFound.jsx`               | Página 404                                        |
+| **Estudantes**               |                                                   |
+| `Estudantes.jsx`             | Listagem de estudantes                            |
+| `EstudanteForm.jsx`          | Formulário criar/editar (usa `useEstudanteForm`)  |
+| `EstudanteDetalhes.jsx`      | Detalhes + PDF do estudante                       |
+| **Funcionários**             |                                                   |
+| `Funcionarios.jsx`           | Listagem com cadastro em massa                    |
+| `FuncionarioForm.jsx`        | Formulário criar/editar (usa `useFuncionarioForm`)|
+| `FuncionarioDetalhes.jsx`    | Detalhes do funcionário                           |
+| `FuncionarioCredenciais.jsx` | Exibição de credenciais após criação              |
+| **Turmas**                   |                                                   |
+| `Turmas.jsx`                 | Listagem de turmas                                |
+| `TurmaForm.jsx`              | Formulário criar/editar turma                     |
+| `TurmaDetalhes.jsx`          | Detalhes da turma com importação de disciplinas   |
+| **Disciplinas**              |                                                   |
+| `Disciplinas.jsx`            | Listagem de disciplinas                           |
+| `DisciplinaForm.jsx`         | Formulário criar/editar com habilidades           |
+| **Cursos**                   |                                                   |
+| `Cursos.jsx`                 | Listagem de cursos                                |
+| `CursoForm.jsx`              | Formulário criar/editar curso                     |
+| **Configurações/Calendário** |                                                   |
+| `Configuracoes.jsx`          | Configurações gerais e calendário                 |
+| `CalendarioDetalhes.jsx`     | Detalhes do ano letivo com bimestres              |
+| `CalendarioForm.jsx`         | Formulário de ano letivo                          |
+| **Outros**                   |                                                   |
+| `Avisos.jsx`                 | Página de avisos                                  |
 
 ---
 

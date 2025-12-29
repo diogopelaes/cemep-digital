@@ -22,7 +22,7 @@ export default function Configuracoes() {
             </h1>
 
             {/* Tabs Navigation */}
-            <div className="flex space-x-2 border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
+            <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
                 {tabs.map((tab) => {
                     const isActive = activeTab === tab.id
                     const Icon = tab.icon
@@ -31,14 +31,12 @@ export default function Configuracoes() {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`
-                flex items-center space-x-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap
-                ${isActive
-                                    ? 'border-brand-500 text-brand-600 dark:text-brand-400'
-                                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}
-              `}
+                            className={`flex items-center gap-2 px-4 py-3 font-medium transition-colors border-b-2 -mb-px whitespace-nowrap ${isActive
+                                    ? 'text-primary-600 border-primary-500'
+                                    : 'text-slate-500 border-transparent hover:text-slate-700 dark:hover:text-slate-300'
+                                }`}
                         >
-                            <Icon className="w-5 h-5" />
+                            <Icon className="h-5 w-5" />
                             <span>{tab.label}</span>
                         </button>
                     )
