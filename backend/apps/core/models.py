@@ -337,6 +337,7 @@ class DiaLetivoExtra(models.Model):
     def __str__(self):
         return f"{self.data.strftime('%d/%m/%Y')}"
 
+
 class DiaNaoLetivo(models.Model):
     """Dia não letivo. Feriados ou ponto facultativo. Não precisa registrar sábado ou domingo."""
     
@@ -365,6 +366,7 @@ class DiaNaoLetivo(models.Model):
     
     def __str__(self):
         return f"{self.data.strftime('%d/%m/%Y')} - {self.get_tipo_display()}"
+
 
 class AnoLetivo(models.Model):
     """Ano letivo escolar."""

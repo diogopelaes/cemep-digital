@@ -147,12 +147,19 @@ export const coreAPI = {
     downloadModelo: () => api.get('/core/turmas/download-modelo/', { responseType: 'blob' }),
   },
   // Calendário
-  calendario: {
-    list: (params) => api.get('/core/calendario/', { params }),
-    get: (id) => api.get(`/core/calendario/${id}/`),
-    create: (data) => api.post('/core/calendario/', data),
-    update: (id, data) => api.patch(`/core/calendario/${id}/`, data),
-    delete: (id) => api.delete(`/core/calendario/${id}/`),
+  // Calendário (Anos Letivos e Eventos)
+  anosLetivos: {
+    list: (params) => api.get('/core/anos-letivos/', { params }),
+    get: (id) => api.get(`/core/anos-letivos/${id}/`),
+    create: (data) => api.post('/core/anos-letivos/', data),
+    update: (id, data) => api.patch(`/core/anos-letivos/${id}/`, data),
+    delete: (id) => api.delete(`/core/anos-letivos/${id}/`),
+
+    // Actions Customizadas para dias
+    getCalendario: (id) => api.get(`/core/anos-letivos/${id}/calendario/`),
+    addDiaNaoLetivo: (id, data) => api.post(`/core/anos-letivos/${id}/dia-nao-letivo/`, data),
+    addDiaLetivoExtra: (id, data) => api.post(`/core/anos-letivos/${id}/dia-letivo-extra/`, data),
+    removeDia: (anoId, diaId, tipo) => api.delete(`/core/anos-letivos/${anoId}/remover-dia/?id=${diaId}&tipo=${tipo}`),
   },
   // Habilidades
   habilidades: {

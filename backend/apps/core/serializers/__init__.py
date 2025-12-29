@@ -16,7 +16,12 @@ from .turma import TurmaSerializer
 from .disciplina_turma import DisciplinaTurmaSerializer
 from .professor_disciplina_turma import ProfessorDisciplinaTurmaSerializer
 # from .bimestre import BimestreSerializer
-# from .calendario import CalendarioEscolarSerializer
+# from .bimestre import BimestreSerializer
+from .calendario import (
+    AnoLetivoSerializer, 
+    DiaLetivoExtraSerializer, 
+    DiaNaoLetivoSerializer
+)
 from .habilidade import HabilidadeSerializer
 
 
@@ -31,5 +36,8 @@ __all__ = [
     'TurmaSerializer',
     'DisciplinaTurmaSerializer',
     'ProfessorDisciplinaTurmaSerializer',
+    'AnoLetivoSerializer',
+    'DiaLetivoExtraSerializer',
+    'DiaNaoLetivoSerializer',
     'HabilidadeSerializer',
 ]

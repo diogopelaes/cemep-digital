@@ -11,4 +11,5 @@ export { default as MultiCombobox } from './MultiCombobox'
 export { default as Combobox } from './Combobox'
 export { default as ImageCropper } from './ImageCropper'
 export { default as Pagination } from './Pagination'
+export { default as Checkbox } from './Checkbox'
 

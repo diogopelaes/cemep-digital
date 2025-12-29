@@ -23,6 +23,9 @@ import FuncionarioForm from './pages/FuncionarioForm'
 import FuncionarioDetalhes from './pages/FuncionarioDetalhes'
 import FuncionarioCredenciais from './pages/FuncionarioCredenciais'
 import NotFound from './pages/NotFound'
+import Configuracoes from './pages/Configuracoes'
+import CalendarioDetalhes from './pages/CalendarioDetalhes'
+import CalendarioForm from './pages/CalendarioForm'
 
 // Constantes de perfis para evitar repetição
 const GESTAO_ONLY = ['GESTAO']
@@ -115,7 +118,13 @@ function App() {
           <ProtectedRoute allowedRoles={GESTAO_ONLY}><PlaceholderPage title="Relatórios" /></ProtectedRoute>
         } />
         <Route path="/configuracoes" element={
-          <ProtectedRoute allowedRoles={GESTAO_ONLY}><PlaceholderPage title="Configurações" /></ProtectedRoute>
+          <ProtectedRoute allowedRoles={GESTAO_ONLY}><Configuracoes /></ProtectedRoute>
+        } />
+        <Route path="/configuracoes/calendario/:ano" element={
+          <ProtectedRoute allowedRoles={GESTAO_ONLY}><CalendarioDetalhes /></ProtectedRoute>
+        } />
+        <Route path="/configuracoes/calendario/:ano/editar" element={
+          <ProtectedRoute allowedRoles={GESTAO_ONLY}><CalendarioForm /></ProtectedRoute>
         } />
         <Route path="/minhas-turmas" element={<PlaceholderPage title="Minhas Turmas" />} />
         <Route path="/diario" element={<PlaceholderPage title="Diário de Classe" />} />

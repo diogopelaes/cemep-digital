@@ -140,6 +140,8 @@ const DateInput = forwardRef(({
           className="date-picker-hidden"
           tabIndex={-1}
           autoComplete="off"
+          min={props.min}
+          max={props.max}
         />
       </div>
       {error && (

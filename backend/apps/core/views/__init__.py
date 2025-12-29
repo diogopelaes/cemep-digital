@@ -10,7 +10,7 @@ from .curso import CursoViewSet
 from .turma import TurmaViewSet
 from .disciplina_turma import DisciplinaTurmaViewSet
 from .professor_disciplina_turma import ProfessorDisciplinaTurmaViewSet
-
+from .calendario import AnoLetivoViewSet
 from .habilidade import HabilidadeViewSet
 
 
@@ -22,6 +22,6 @@ __all__ = [
     'TurmaViewSet',
     'DisciplinaTurmaViewSet',
     'ProfessorDisciplinaTurmaViewSet',
-
+    'AnoLetivoViewSet',
     'HabilidadeViewSet',
 ]

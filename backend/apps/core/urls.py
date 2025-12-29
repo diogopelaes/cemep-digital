@@ -7,6 +7,7 @@ from .views import (
     FuncionarioViewSet, PeriodoTrabalhoViewSet, DisciplinaViewSet,
     CursoViewSet, TurmaViewSet, DisciplinaTurmaViewSet,
     ProfessorDisciplinaTurmaViewSet, HabilidadeViewSet,
+    AnoLetivoViewSet
 )
 
 router = DefaultRouter()
@@ -18,6 +19,7 @@ router.register('turmas', TurmaViewSet)
 router.register('disciplinas-turma', DisciplinaTurmaViewSet)
 router.register('atribuicoes', ProfessorDisciplinaTurmaViewSet)
 router.register('habilidades', HabilidadeViewSet)
+router.register('anos-letivos', AnoLetivoViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

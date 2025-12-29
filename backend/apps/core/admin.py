@@ -4,7 +4,8 @@ Admin para o App Core
 from django.contrib import admin
 from .models import (
     Funcionario, PeriodoTrabalho, Disciplina, Curso, Turma,
-    DisciplinaTurma, ProfessorDisciplinaTurma, Habilidade
+    DisciplinaTurma, ProfessorDisciplinaTurma, Habilidade,
+    AnoLetivo, DiaLetivoExtra, DiaNaoLetivo
 )
 
 
@@ -74,4 +75,24 @@ class HabilidadeAdmin(admin.ModelAdmin):
     list_display = ['codigo', 'disciplina', 'descricao', 'is_active']
     list_filter = ['disciplina']
     search_fields = ['codigo', 'descricao']
+
+
+@admin.register(DiaLetivoExtra)
+class DiaLetivoExtraAdmin(admin.ModelAdmin):
+    list_display = ['data', 'descricao']
+    date_hierarchy = 'data'
+
+
+@admin.register(DiaNaoLetivo)
+class DiaNaoLetivoAdmin(admin.ModelAdmin):
+    list_display = ['data', 'tipo', 'descricao']
+    list_filter = ['tipo']
+    date_hierarchy = 'data'
+
+
+@admin.register(AnoLetivo)
+class AnoLetivoAdmin(admin.ModelAdmin):
+    list_display = ['ano', 'is_active', 'total_dias_letivos']
+    list_filter = ['is_active']
+
 
