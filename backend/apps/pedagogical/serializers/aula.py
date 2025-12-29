@@ -6,7 +6,7 @@ from apps.pedagogical.models import PlanoAula, Aula
 from apps.core.models import Funcionario, Disciplina, Turma, Habilidade, ProfessorDisciplinaTurma
 from apps.core.serializers import (
     FuncionarioSerializer, DisciplinaSerializer, TurmaSerializer,
-    HabilidadeSerializer, BimestreSerializer
+    HabilidadeSerializer
 )
 
 
@@ -15,7 +15,7 @@ class PlanoAulaSerializer(serializers.ModelSerializer):
     disciplina = DisciplinaSerializer(read_only=True)
     turmas = TurmaSerializer(many=True, read_only=True)
     habilidades = HabilidadeSerializer(many=True, read_only=True)
-    bimestre = BimestreSerializer(read_only=True)
+
     
     professor_id = serializers.PrimaryKeyRelatedField(
         queryset=Funcionario.objects.all(),
@@ -46,9 +46,9 @@ class PlanoAulaSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'professor', 'professor_id', 'disciplina', 'disciplina_id',
             'turmas', 'turmas_ids', 'data_inicio', 'data_fim', 'conteudo',
-            'habilidades', 'habilidades_ids', 'bimestre', 'criado_em', 'atualizado_em'
+            'habilidades', 'habilidades_ids', 'criado_em', 'atualizado_em'
         ]
-        read_only_fields = ['criado_em', 'atualizado_em', 'bimestre']
+        read_only_fields = ['criado_em', 'atualizado_em']
 
 
 class AulaSerializer(serializers.ModelSerializer):
@@ -58,15 +58,14 @@ class AulaSerializer(serializers.ModelSerializer):
     )
     professor_disciplina_turma_detail = serializers.SerializerMethodField(read_only=True)
     total_faltas = serializers.SerializerMethodField()
-    bimestre = BimestreSerializer(read_only=True)
     
     class Meta:
         model = Aula
         fields = [
             'id', 'professor_disciplina_turma', 'professor_disciplina_turma_detail',
-            'data', 'conteudo', 'numero_aulas', 'total_faltas', 'bimestre', 'criado_em'
+            'data', 'conteudo', 'numero_aulas', 'total_faltas', 'criado_em'
         ]
-        read_only_fields = ['criado_em', 'bimestre']
+        read_only_fields = ['criado_em']
     
     def get_professor_disciplina_turma_detail(self, obj):
         from apps.core.serializers import ProfessorDisciplinaTurmaSerializer

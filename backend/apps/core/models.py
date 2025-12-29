@@ -300,80 +300,8 @@ class ProfessorDisciplinaTurma(models.Model):
         return f"{self.professor.usuario.get_full_name()} ({tipo}) - {self.disciplina_turma}"
 
 
-class Bimestre(models.Model):
-    """Bimestre escolar."""
-    numero = models.PositiveSmallIntegerField(verbose_name='Número')
-    data_inicio = models.DateField(verbose_name='Data de Início')
-    data_fim = models.DateField(verbose_name='Data de Fim')
-    ano_letivo = models.PositiveSmallIntegerField(verbose_name='Ano Letivo')
-    
-    class Meta:
-        verbose_name = 'Bimestre'
-        verbose_name_plural = 'Bimestres'
-        ordering = ['numero']
-    
-    def __str__(self):
-        return f"{self.numero}º Bimestre"
-
-    def clean(self):
-        """Valida consistência das datas e ano letivo."""
-        if self.data_inicio and self.data_fim:
-            if self.data_inicio > self.data_fim:
-                raise ValidationError('A data de início não pode ser posterior à data de fim.')
-            
-            if self.data_inicio.year != self.ano_letivo or self.data_fim.year != self.ano_letivo:
-                raise ValidationError('As datas de início e fim devem pertencer ao ano letivo informado.')
-
-
-class CalendarioEscolar(models.Model):
-    """Calendário escolar com dias letivos e não letivos."""
-    
-    class TipoNaoLetivo(models.TextChoices):
-        FERIADO = 'FERIADO', 'Feriado'
-        PONTO_FACULTATIVO = 'PONTO_FACULTATIVO', 'Ponto Facultativo'
-        RECESSO = 'RECESSO', 'Recesso'
-        FERIAS = 'FERIAS', 'Férias'
-    
-    data = models.DateField(unique=True, verbose_name='Data')
-    ano_letivo = models.PositiveSmallIntegerField(db_index=True, verbose_name='Ano Letivo')
-    letivo = models.BooleanField(default=True, verbose_name='Dia Letivo')
-    tipo = models.CharField(
-        max_length=20,
-        choices=TipoNaoLetivo.choices,
-        null=True,
-        blank=True,
-        verbose_name='Tipo (se não letivo)'
-    )
-    descricao = models.CharField(max_length=255, verbose_name='Descrição')
-    
-    class Meta:
-        verbose_name = 'Calendário Escolar'
-        verbose_name_plural = 'Calendário Escolar'
-        ordering = ['data']
-    
-    def clean(self):
-        if not self.letivo and not self.tipo:
-            raise ValidationError('Dias não letivos devem ter um tipo definido.')
-
-    def save(self, *args, **kwargs):
-        if self.data:
-            self.ano_letivo = self.data.year
-        super().save(*args, **kwargs)
-    
-    def __str__(self):
-        status = 'Letivo' if self.letivo else self.get_tipo_display()
-        return f"{self.data.strftime('%d/%m/%Y')} - {status}: {self.descricao}"
-
-    def get_bimestre(self):
-        """Retorna o bimestre correspondente à data."""
-        return Bimestre.objects.filter(
-            ano_letivo=self.ano_letivo,
-            data_inicio__lte=self.data,
-            data_fim__gte=self.data
-        ).first()
-
-
 class Habilidade(models.Model):
+
     """Habilidades BNCC ou internas por disciplina."""
     
     codigo = models.CharField(max_length=20, unique=True, verbose_name='Código')
@@ -394,3 +322,92 @@ class Habilidade(models.Model):
     
     def __str__(self):
         return f"{self.codigo} - {self.descricao[:50]}..."
+
+
+class DiaLetivoExtra(models.Model):
+    """Dia letivo extra. Sábado, Domingo ou feriado que se torna letivo."""
+    data = models.DateField(unique=True, verbose_name='Data do Dia Letivo')
+    descricao = models.CharField(max_length=255, blank=True, verbose_name='Motivo/Descrição')
+    
+    class Meta:
+        verbose_name = 'Dia Letivo Extra'
+        verbose_name_plural = 'Dias Letivos Extras'
+        ordering = ['data']
+    
+    def __str__(self):
+        return f"{self.data.strftime('%d/%m/%Y')}"
+
+class DiaNaoLetivo(models.Model):
+    """Dia não letivo. Feriados ou ponto facultativo. Não precisa registrar sábado ou domingo."""
+    
+    class Tipo(models.TextChoices):
+        FERIADO = 'FERIADO', 'Feriado'
+        PONTO_FACULTATIVO = 'PONTO_FACULTATIVO', 'Ponto facultativo'
+        RECESSO = 'RECESSO', 'Recesso escolar'
+        FERIAS = 'FERIAS', 'Férias escolares'
+        SUSPENSO = 'SUSPENSO', 'Dia letivo suspenso'
+        PLANEJAMENTO = 'PLANEJAMENTO', 'Planejamento'
+        OUTROS = 'OUTROS', 'Outros'
+        
+
+    data = models.DateField(unique=True, verbose_name='Data da Ocorrência')
+    tipo = models.CharField(
+        max_length=30,
+        choices=Tipo.choices,
+        verbose_name='Categoria do Dia'
+    )
+    descricao = models.CharField(max_length=255, blank=True, verbose_name='Motivo/Descrição')
+    
+    class Meta:
+        verbose_name = 'Dia Não Letivo'
+        verbose_name_plural = 'Dias Não Letivos'
+        ordering = ['data']
+    
+    def __str__(self):
+        return f"{self.data.strftime('%d/%m/%Y')} - {self.get_tipo_display()}"
+
+class AnoLetivo(models.Model):
+    """Ano letivo escolar."""
+    ano = models.PositiveSmallIntegerField(primary_key=True, verbose_name='Ano')
+    is_active = models.BooleanField(default=True, verbose_name='Ativa')
+    data_inicio_1bim = models.DateField(null=True, blank=True, verbose_name='Data de Início do 1º Bimestre')
+    data_fim_1bim = models.DateField(null=True, blank=True, verbose_name='Data de Fim do 1º Bimestre')
+    data_inicio_2bim = models.DateField(null=True, blank=True, verbose_name='Data de Início do 2º Bimestre')
+    data_fim_2bim = models.DateField(null=True, blank=True, verbose_name='Data de Fim do 2º Bimestre')
+    data_inicio_3bim = models.DateField(null=True, blank=True, verbose_name='Data de Início do 3º Bimestre')
+    data_fim_3bim = models.DateField(null=True, blank=True, verbose_name='Data de Fim do 3º Bimestre')
+    data_inicio_4bim = models.DateField(null=True, blank=True, verbose_name='Início do 4º Bimestre')
+    data_fim_4bim = models.DateField(null=True, blank=True, verbose_name='Fim do 4º Bimestre')
+    dias_letivos_extras = models.ManyToManyField(DiaLetivoExtra, blank=True, verbose_name='Dias Letivos Especiais')
+    dias_nao_letivos = models.ManyToManyField(DiaNaoLetivo, blank=True, verbose_name='Feriados e Recessos')
+
+    def clean(self):
+        """Valida a sequência dos bimestres."""
+        bimestres = [
+            (self.data_inicio_1bim, self.data_fim_1bim, '1º Bimestre'),
+            (self.data_inicio_2bim, self.data_fim_2bim, '2º Bimestre'),
+            (self.data_inicio_3bim, self.data_fim_3bim, '3º Bimestre'),
+            (self.data_inicio_4bim, self.data_fim_4bim, '4º Bimestre'),
+        ]
+        
+        last_date = None
+        for inicio, fim, nome in bimestres:
+            if inicio and fim:
+                if inicio > fim:
+                    raise ValidationError(f'Data de início do {nome} não pode ser posterior à data de fim.')
+                if inicio.year != self.ano or fim.year != self.ano:
+                    raise ValidationError(f'As datas do {nome} devem pertencer ao ano letivo {self.ano}.')
+                if last_date and inicio <= last_date:
+                    raise ValidationError(f'O {nome} deve começar após o fim do bimestre anterior.')
+                last_date = fim
+
+    def total_dias_letivos(self):
+        return self.dias_letivos_extras.count()
+    
+    class Meta:
+        verbose_name = 'Ano Letivo'
+        verbose_name_plural = 'Anos Letivos'
+        ordering = ['-ano']
+    
+    def __str__(self):
+        return f"{self.ano}"

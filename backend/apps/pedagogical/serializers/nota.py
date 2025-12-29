@@ -4,8 +4,7 @@ Serializers para Notas e Notificações
 from rest_framework import serializers
 from apps.pedagogical.models import NotaBimestral, NotificacaoRecuperacao
 from apps.academic.models import MatriculaTurma
-from apps.core.models import ProfessorDisciplinaTurma, Bimestre
-from apps.core.serializers import BimestreSerializer
+from apps.core.models import ProfessorDisciplinaTurma
 from apps.academic.serializers import EstudanteSerializer, MatriculaTurmaSerializer
 
 
@@ -16,16 +15,16 @@ class NotaBimestralSerializer(serializers.ModelSerializer):
         write_only=True
     )
     professor_disciplina_turma_detail = serializers.SerializerMethodField(read_only=True)
-    bimestre = BimestreSerializer(read_only=True)
+    professor_disciplina_turma_detail = serializers.SerializerMethodField(read_only=True)
     
     matricula_turma_id = serializers.PrimaryKeyRelatedField(
         queryset=MatriculaTurma.objects.all(),
         source='matricula_turma',
         write_only=True
     )
-    bimestre_id = serializers.PrimaryKeyRelatedField(
-        queryset=Bimestre.objects.all(),
-        source='bimestre',
+    matricula_turma_id = serializers.PrimaryKeyRelatedField(
+        queryset=MatriculaTurma.objects.all(),
+        source='matricula_turma',
         write_only=True
     )
     
@@ -34,7 +33,9 @@ class NotaBimestralSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'matricula_turma', 'matricula_turma_id',
             'professor_disciplina_turma', 'professor_disciplina_turma_detail',
-            'bimestre', 'bimestre_id', 'nota'
+            'id', 'matricula_turma', 'matricula_turma_id',
+            'professor_disciplina_turma', 'professor_disciplina_turma_detail',
+            'nota'
         ]
 
     def get_professor_disciplina_turma_detail(self, obj):

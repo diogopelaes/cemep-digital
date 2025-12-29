@@ -13,6 +13,7 @@ import {
 const menuItems = {
   GESTAO: [
     { path: '/dashboard', label: 'Dashboard', icon: HiHome },
+    { path: '/configuracoes', label: 'Configurações', icon: HiCog },
     { path: '/funcionarios', label: 'Funcionários', icon: HiUserGroup },
     { path: '/cursos', label: 'Cursos', icon: HiAcademicCap },
     { path: '/estudantes', label: 'Estudantes', icon: HiAcademicCap },
@@ -22,7 +23,6 @@ const menuItems = {
     { path: '/tarefas', label: 'Tarefas', icon: HiClipboardList },
     { path: '/avisos', label: 'Avisos', icon: HiBell },
     { path: '/relatorios', label: 'Relatórios', icon: HiChartBar },
-    { path: '/configuracoes', label: 'Configurações', icon: HiCog },
   ],
   SECRETARIA: [
     { path: '/dashboard', label: 'Dashboard', icon: HiHome },

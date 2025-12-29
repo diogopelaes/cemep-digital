@@ -7,7 +7,7 @@ from apps.pedagogical.models import (
     OcorrenciaResponsavelCiente
 )
 from apps.academic.models import Estudante
-from apps.core.serializers import FuncionarioSerializer, BimestreSerializer
+from apps.core.serializers import FuncionarioSerializer
 from apps.academic.serializers import EstudanteSerializer
 
 
@@ -23,7 +23,7 @@ class OcorrenciaPedagogicaSerializer(serializers.ModelSerializer):
     estudante = EstudanteSerializer(read_only=True)
     autor = FuncionarioSerializer(read_only=True)
     tipo = DescritorOcorrenciaPedagogicaSerializer(read_only=True)
-    bimestre = BimestreSerializer(read_only=True)
+    tipo = DescritorOcorrenciaPedagogicaSerializer(read_only=True)
     
     estudante_id = serializers.PrimaryKeyRelatedField(
         queryset=Estudante.objects.all(),
@@ -40,9 +40,10 @@ class OcorrenciaPedagogicaSerializer(serializers.ModelSerializer):
         model = OcorrenciaPedagogica
         fields = [
             'id', 'estudante', 'estudante_id', 'autor',
-            'tipo', 'tipo_id', 'data', 'bimestre'
+            'id', 'estudante', 'estudante_id', 'autor',
+            'tipo', 'tipo_id', 'data'
         ]
-        read_only_fields = ['data', 'autor', 'bimestre']
+        read_only_fields = ['data', 'autor']
 
 
 class OcorrenciaResponsavelCienteSerializer(serializers.ModelSerializer):

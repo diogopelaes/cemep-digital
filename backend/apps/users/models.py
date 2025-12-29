@@ -62,4 +62,3 @@ class User(AbstractUser):
     @property
     def is_responsavel(self):
         return self.tipo_usuario == self.TipoUsuario.RESPONSAVEL
-

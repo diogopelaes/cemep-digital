@@ -3,7 +3,7 @@ App Permanent - Histórico e Registros Imutáveis
 Usa CPF como PK para garantir sobrevivência dos dados após expurgo.
 """
 from django.db import models
-from apps.core.models import Parentesco, Bimestre
+from apps.core.models import Parentesco
 from apps.core.validators import validate_cpf, clean_digits
 from ckeditor.fields import RichTextField
 
@@ -248,24 +248,6 @@ class RegistroProntuario(models.Model):
         if self.cpf:
             self.cpf = clean_digits(self.cpf)
         
-        # Tenta preencher ano_letivo e bimestre automaticamente se não informados
-        if self.data_ocorrido and (not self.ano_letivo or not self.bimestre):
-            try:
-                # Busca o bimestre correspondente à data do ocorrido
-                bimestre_ativo = Bimestre.objects.filter(
-                    data_inicio__lte=self.data_ocorrido.date(),
-                    data_fim__gte=self.data_ocorrido.date()
-                ).first()
-                
-                if bimestre_ativo:
-                    if not self.ano_letivo:
-                        self.ano_letivo = bimestre_ativo.ano_letivo
-                    if not self.bimestre:
-                        self.bimestre = bimestre_ativo.numero
-            except Exception:
-                # Se não conseguir buscar (tabela vazia ou erro), apenas segue sem preencher
-                pass
-                
         super().save(*args, **kwargs)
 
     @property
@@ -301,5 +283,3 @@ class RegistroProntuarioAnexo(models.Model):
     
     def __str__(self):
         return f"Anexo de {self.registro_prontuario} ({self.descricao or 'Sem descrição'})"
-
-

@@ -6,8 +6,8 @@ from django.conf import settings
 from apps.core.models import Funcionario
 from ckeditor.fields import RichTextField
 
-
 from datetime import datetime
+
 
 def get_anexo_path(instance, filename):
     """

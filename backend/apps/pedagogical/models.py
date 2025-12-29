@@ -4,7 +4,7 @@ App Pedagogical - Diário de Classe, Notas, Faltas, Ocorrências, Recuperação
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
-from apps.core.models import Funcionario, Disciplina, DisciplinaTurma, Turma, Habilidade, ProfessorDisciplinaTurma, Bimestre
+from apps.core.models import Funcionario, Disciplina, DisciplinaTurma, Turma, Habilidade, ProfessorDisciplinaTurma
 from apps.academic.models import Estudante, MatriculaTurma, Responsavel
 from ckeditor.fields import RichTextField
 
@@ -34,13 +34,6 @@ class PlanoAula(models.Model):
         related_name='planos_aula',
         blank=True
     )
-    bimestre = models.ForeignKey(
-        Bimestre,
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-        verbose_name='Bimestre'
-    )
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
     
@@ -49,18 +42,8 @@ class PlanoAula(models.Model):
         verbose_name_plural = 'Planos de Aula'
         ordering = ['-data_inicio']
     
-    def save(self, *args, **kwargs):
-        if not self.bimestre and self.data_inicio:
-            self.bimestre = Bimestre.objects.filter(
-                ano_letivo=self.data_inicio.year,
-                data_inicio__lte=self.data_inicio,
-                data_fim__gte=self.data_inicio
-            ).first()
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f"{self.professor} - {self.disciplina} ({self.data_inicio} a {self.data_fim})"
-
 
 
 class Aula(models.Model):
@@ -78,13 +61,6 @@ class Aula(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(4)],
         verbose_name='Número de Aulas (Geminadas)'
     )
-    bimestre = models.ForeignKey(
-        Bimestre,
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-        verbose_name='Bimestre'
-    )
     criado_em = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -93,18 +69,8 @@ class Aula(models.Model):
         ordering = ['-data']
         unique_together = ['professor_disciplina_turma', 'data']
     
-    def save(self, *args, **kwargs):
-        if not self.bimestre and self.data:
-            self.bimestre = Bimestre.objects.filter(
-                ano_letivo=self.data.year,
-                data_inicio__lte=self.data,
-                data_fim__gte=self.data
-            ).first()
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f"{self.professor_disciplina_turma} - {self.data.strftime('%d/%m/%Y')}"
-
 
 
 class Faltas(models.Model):
@@ -133,10 +99,6 @@ class Faltas(models.Model):
     
     def __str__(self):
         return f"{self.estudante} - Falta na aula {self.aula_numero} ({self.aula.data})"
-    
-    def get_bimestre(self):
-        return self.aula.bimestre
-
 
 
 class DescritorOcorrenciaPedagogica(models.Model):
@@ -159,7 +121,6 @@ class DescritorOcorrenciaPedagogica(models.Model):
         return self.texto
 
 
-
 class OcorrenciaPedagogica(models.Model):
     """Ocorrência pedagógica de um estudante (não permanente)."""
     
@@ -178,13 +139,6 @@ class OcorrenciaPedagogica(models.Model):
         on_delete=models.PROTECT,
         related_name='ocorrencias'
     )
-    bimestre = models.ForeignKey(
-        Bimestre,
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-        verbose_name='Bimestre'
-    )
     data = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -192,23 +146,8 @@ class OcorrenciaPedagogica(models.Model):
         verbose_name_plural = 'Ocorrências Pedagógicas'
         ordering = ['-data', 'estudante']
     
-    def save(self, *args, **kwargs):
-        # Para auto_now_add, a data pode não estar disponível em um novo objeto até salvar
-        # Mas podemos tentar inferir hoje se for novo, ou usar a data se já existir
-        from django.utils import timezone
-        data_ref = self.data if self.data else timezone.now()
-        
-        if not self.bimestre:
-             self.bimestre = Bimestre.objects.filter(
-                ano_letivo=data_ref.year,
-                data_inicio__lte=data_ref.date(),
-                data_fim__gte=data_ref.date()
-            ).first()
-        super().save(*args, **kwargs)
-    
     def __str__(self):
         return f"{self.estudante} - {self.tipo} ({self.data.strftime('%d/%m/%Y')})"
-
 
 
 class OcorrenciaResponsavelCiente(models.Model):
@@ -246,12 +185,6 @@ class Avaliacao(models.Model):
         related_name='avaliacoes'
     )
 
-    bimestre = models.ForeignKey(
-        Bimestre,
-        on_delete=models.PROTECT,
-        verbose_name='Bimestre'
-    )
-
     valor = models.DecimalField(
         max_digits=4,
         decimal_places=2,
@@ -283,10 +216,10 @@ class Avaliacao(models.Model):
     class Meta:
         verbose_name = 'Avaliação'
         verbose_name_plural = 'Avaliações'
-        unique_together = ['professor_disciplina_turma', 'bimestre', 'tipo']
+        unique_together = ['professor_disciplina_turma', 'tipo']
     
     def __str__(self):
-        return f"{self.professor_disciplina_turma.disciplina_turma.disciplina} - {self.bimestre} ({self.get_tipo_display()})"
+        return f"{self.professor_disciplina_turma.disciplina_turma.disciplina} ({self.get_tipo_display()})"
 
     def clean(self):
         """Validações de regras de negócio."""
@@ -294,11 +227,10 @@ class Avaliacao(models.Model):
         
         disciplina_turma = self.professor_disciplina_turma.disciplina_turma
         
-        # Validação: soma dos valores das avaliações regulares por disciplina/turma/bimestre deve ser <= 10
+        # Validação: soma dos valores das avaliações regulares por disciplina/turma deve ser <= 10
         if self.tipo == 'AVALIACAO_REGULAR':
             qs = Avaliacao.objects.filter(
                 professor_disciplina_turma__disciplina_turma=disciplina_turma,
-                bimestre=self.bimestre,
                 tipo='AVALIACAO_REGULAR'
             )
             if self.pk:
@@ -308,21 +240,20 @@ class Avaliacao(models.Model):
             if soma_avaliacoes + self.valor > Decimal('10.00'):
                 raise ValidationError(
                     f'A soma das avaliações regulares ({soma_avaliacoes} + {self.valor}) '
-                    f'ultrapassa 10 pontos para esta disciplina/turma/bimestre.'
+                    f'ultrapassa 10 pontos para esta disciplina/turma.'
                 )
         
-        # Validação: só pode existir UMA avaliação de recuperação por disciplina/turma/bimestre
+        # Validação: só pode existir UMA avaliação de recuperação por disciplina/turma
         if self.tipo == 'AVALIACAO_RECUPERACAO':
             qs = Avaliacao.objects.filter(
                 professor_disciplina_turma__disciplina_turma=disciplina_turma,
-                bimestre=self.bimestre,
                 tipo='AVALIACAO_RECUPERACAO'
             )
             if self.pk:
                 qs = qs.exclude(pk=self.pk)
             if qs.exists():
                 raise ValidationError(
-                    'Já existe uma avaliação de recuperação para esta disciplina/turma/bimestre.'
+                    'Já existe uma avaliação de recuperação para esta disciplina/turma.'
                 )
             
             # Validação: valor da avaliação de recuperação deve ser sempre 10
@@ -330,7 +261,6 @@ class Avaliacao(models.Model):
                 raise ValidationError(
                     'O valor da avaliação de recuperação deve ser sempre 10.'
                 )
-
 
 
 class InstrumentoAvaliativo(models.Model):
@@ -407,7 +337,6 @@ class InstrumentoAvaliativo(models.Model):
                     )
     
 
-
 class ControleVisto(models.Model):
     """Registro de visto de um estudante, opcionalmente vinculado a um instrumento."""
     
@@ -448,7 +377,6 @@ class ControleVisto(models.Model):
     def __str__(self):
         status = 'Sim' if self.visto is True else ('Não' if self.visto is False else 'N/A')
         return f"{self.titulo} - {status}"
-
 
 
 class NotaInstrumentoAvaliativo(models.Model):
@@ -513,7 +441,6 @@ class NotaInstrumentoAvaliativo(models.Model):
         porcentagem = Decimal(feitos) / Decimal(total)
         
         return (porcentagem * self.instrumento_avaliativo.valor).quantize(Decimal('0.01'))
-
 
 
 class NotaAvaliacao(models.Model):
@@ -581,7 +508,6 @@ class NotaAvaliacao(models.Model):
         return None
 
 
-
 class NotaBimestral(models.Model):
     """Nota bimestral de um estudante em uma disciplina."""
     
@@ -596,12 +522,6 @@ class NotaBimestral(models.Model):
         related_name='notas_bimestrais'
     )
 
-    bimestre = models.ForeignKey(
-        Bimestre,
-        on_delete=models.PROTECT,
-        verbose_name='Bimestre'
-    )
-    
     nota = models.DecimalField(
         max_digits=4,
         decimal_places=2,
@@ -612,14 +532,12 @@ class NotaBimestral(models.Model):
     class Meta:
         verbose_name = 'Nota Bimestral'
         verbose_name_plural = 'Notas Bimestrais'
-        unique_together = ['matricula_turma', 'professor_disciplina_turma', 'bimestre']
-        ordering = ['matricula_turma', 'bimestre']
+        unique_together = ['matricula_turma', 'professor_disciplina_turma']
+        ordering = ['matricula_turma']
     
     def __str__(self):
-        return f"{self.matricula_turma} - {self.professor_disciplina_turma.disciplina_turma.disciplina} ({self.bimestre})"
+        return f"{self.matricula_turma} - {self.professor_disciplina_turma.disciplina_turma.disciplina}"
 
-
-        
 
 class NotificacaoRecuperacao(models.Model):
     """Notificação de recuperação para estudante/responsável."""
@@ -642,5 +560,3 @@ class NotificacaoRecuperacao(models.Model):
     
     def __str__(self):
         return f"{self.estudante} - {self.professor_disciplina_turma}"
-
-

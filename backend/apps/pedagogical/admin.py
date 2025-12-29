@@ -10,15 +10,15 @@ from .models import (
 
 @admin.register(PlanoAula)
 class PlanoAulaAdmin(admin.ModelAdmin):
-    list_display = ['professor', 'disciplina', 'bimestre', 'data_inicio', 'data_fim']
-    list_filter = ['disciplina', 'bimestre', 'data_inicio']
+    list_display = ['professor', 'disciplina', 'data_inicio', 'data_fim']
+    list_filter = ['disciplina', 'data_inicio']
     filter_horizontal = ['turmas', 'habilidades']
 
 
 @admin.register(Aula)
 class AulaAdmin(admin.ModelAdmin):
-    list_display = ['professor_disciplina_turma', 'bimestre', 'data', 'numero_aulas']
-    list_filter = ['bimestre', 'data', 'professor_disciplina_turma__disciplina_turma__turma__ano_letivo']
+    list_display = ['professor_disciplina_turma', 'data', 'numero_aulas']
+    list_filter = ['data', 'professor_disciplina_turma__disciplina_turma__turma__ano_letivo']
     date_hierarchy = 'data'
 
 
@@ -36,8 +36,8 @@ class DescritorOcorrenciaPedagogicaAdmin(admin.ModelAdmin):
 
 @admin.register(OcorrenciaPedagogica)
 class OcorrenciaPedagogicaAdmin(admin.ModelAdmin):
-    list_display = ['estudante', 'tipo', 'bimestre', 'autor', 'data']
-    list_filter = ['tipo', 'bimestre', 'data']
+    list_display = ['estudante', 'tipo', 'autor', 'data']
+    list_filter = ['tipo', 'data']
     date_hierarchy = 'data'
 
 
@@ -49,8 +49,8 @@ class OcorrenciaResponsavelCienteAdmin(admin.ModelAdmin):
 
 @admin.register(NotaBimestral)
 class NotaBimestralAdmin(admin.ModelAdmin):
-    list_display = ['matricula_turma', 'professor_disciplina_turma', 'bimestre', 'nota']
-    list_filter = ['bimestre', 'professor_disciplina_turma__disciplina_turma__turma__ano_letivo']
+    list_display = ['matricula_turma', 'professor_disciplina_turma', 'nota']
+    list_filter = ['professor_disciplina_turma__disciplina_turma__turma__ano_letivo']
 
 
 @admin.register(NotificacaoRecuperacao)
