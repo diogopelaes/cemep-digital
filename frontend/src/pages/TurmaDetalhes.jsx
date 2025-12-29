@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Loading } from '../components/ui'
 import BulkUploadModal from '../components/modals/BulkUploadModal'
+import { coreAPI } from '../services/api'
+import toast from 'react-hot-toast'
 
 // Hooks
 import { useTurma, useDisciplinasTurma, useRepresentantesTurma } from '../hooks'
@@ -131,12 +133,41 @@ export default function TurmaDetalhes() {
       <BulkUploadModal
         isOpen={showUploadModal}
         onClose={() => setShowUploadModal(false)}
-        type="disciplinas"
-        turmaId={parseInt(id)}
-        onSuccess={() => {
+        onUpload={async (formData) => {
+          formData.append('turma_id', id)
+          const response = await coreAPI.disciplinasTurma.importarArquivo(formData)
+          if (response.data.errors?.length > 0) {
+            toast.error('Alguns registros não foram importados. Verifique os erros.')
+          }
           disciplinas.reloadDisciplinas()
-          setShowUploadModal(false)
+          return response
         }}
+        title="Importar Disciplinas"
+        entityName="Disciplinas da Turma"
+        templateHeaders={['SIGLA_DISCIPLINA', 'AULAS_SEMANAIS']}
+        onDownloadTemplate={async () => {
+          try {
+            const response = await coreAPI.disciplinasTurma.downloadModelo()
+            const url = window.URL.createObjectURL(new Blob([response.data]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'modelo_disciplinas_turma.xlsx')
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+          } catch (error) {
+            console.error(error)
+            toast.error('Erro ao baixar o modelo.')
+          }
+        }}
+        instructions={
+          <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
+            <li>Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong>.</li>
+            <li><strong>SIGLA_DISCIPLINA</strong>: Sigla de uma disciplina já cadastrada no sistema.</li>
+            <li><strong>AULAS_SEMANAIS</strong>: Número de aulas semanais (opcional, padrão: 4).</li>
+            <li>A vinculação será feita automaticamente com a turma <strong>{turma?.nome_completo}</strong>.</li>
+          </ul>
+        }
       />
     </div>
   )

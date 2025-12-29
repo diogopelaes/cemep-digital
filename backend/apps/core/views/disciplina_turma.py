@@ -112,9 +112,17 @@ class DisciplinaTurmaViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='download-modelo')
     def download_modelo(self, request):
         buffer = io.BytesIO()
-        df = pd.DataFrame(columns=['SIGLA_DISCIPLINA', 'AULAS_SEMANAIS'])
+        data = {
+            'SIGLA_DISCIPLINA': ['MAT', 'POR', 'FIS'],
+            'AULAS_SEMANAIS': ['4', '4', '2']
+        }
+        df = pd.DataFrame(data)
+        
         with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
             df.to_excel(writer, index=False)
+            ws = writer.sheets['Sheet1']
+            ws.column_dimensions['A'].width = 20
+            ws.column_dimensions['B'].width = 18
         
         buffer.seek(0)
         response = HttpResponse(

@@ -50,7 +50,7 @@ export default function TurmaDisciplinas({
                         <p className="text-2xl font-bold text-primary-600">{totalAulasSemanais}</p>
                     </div>
                     <Button variant="secondary" icon={HiUpload} onClick={onImport}>
-                        Importar
+                        Importar Disciplinas
                     </Button>
                 </div>
             </div>
@@ -142,8 +142,8 @@ function DisciplinaCard({
     return (
         <div
             className={`p-4 rounded-xl border-2 transition-all ${selecionada
-                    ? 'border-primary-500 bg-primary-500/5'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                ? 'border-primary-500 bg-primary-500/5'
+                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
         >
             <div className="flex items-center gap-4">
@@ -209,8 +209,8 @@ function DisciplinaCard({
                         }}
                         disabled={!selecionada && !aulasSemanais}
                         className={`w-16 px-3 py-2 text-center rounded-lg border transition-all ${selecionada
-                                ? 'border-primary-300 dark:border-primary-600 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary-500 focus:border-transparent'
-                                : 'border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50'
+                            ? 'border-primary-300 dark:border-primary-600 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary-500 focus:border-transparent'
+                            : 'border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50'
                             } text-slate-800 dark:text-white`}
                         inputMode="numeric"
                         data-aulas-input={disciplina.id}
@@ -252,8 +252,8 @@ function DisciplinaCard({
                                 <div
                                     key={prof.id}
                                     className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm transition-all ${prof.tipo === 'TITULAR'
-                                            ? 'bg-primary-500/10 text-primary-700 dark:text-primary-300'
-                                            : 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
+                                        ? 'bg-primary-500/10 text-primary-700 dark:text-primary-300'
+                                        : 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
                                         }`}
                                 >
                                     <HiAcademicCap className="h-3.5 w-3.5" />
@@ -266,8 +266,8 @@ function DisciplinaCard({
                                             prof.tipo === 'TITULAR' ? 'SUBSTITUTO' : 'TITULAR'
                                         )}
                                         className={`ml-1 px-1.5 py-0.5 rounded text-xs font-medium transition-colors ${prof.tipo === 'TITULAR'
-                                                ? 'bg-primary-600/20 hover:bg-primary-600/30 text-primary-800 dark:text-primary-200'
-                                                : 'bg-amber-600/20 hover:bg-amber-600/30 text-amber-800 dark:text-amber-200'
+                                            ? 'bg-primary-600/20 hover:bg-primary-600/30 text-primary-800 dark:text-primary-200'
+                                            : 'bg-amber-600/20 hover:bg-amber-600/30 text-amber-800 dark:text-amber-200'
                                             }`}
                                         title="Clique para alternar entre Titular e Substituto"
                                         disabled={salvandoProfessores === disciplina.id}
