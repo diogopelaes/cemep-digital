@@ -3,8 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import {
     Card, Button, DateInput, Checkbox, Loading, Input, Select
 } from '../components/ui'
-import { HiArrowLeft, HiSave } from 'react-icons/hi'
+import { HiArrowLeft, HiSave, HiTrash } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
+import { formatDateBR } from '../utils/date'
 import toast from 'react-hot-toast'
 
 const TIPOS_DIA_NAO_LETIVO = [
@@ -135,7 +136,7 @@ export default function CalendarioForm() {
 
     // ====== Dias Não Letivos - Inline ======
     const addDiaNaoLetivo = () => {
-        setDiasNaoLetivos(prev => [...prev, { id: null, data: '', tipo: 'FERIADO', descricao: '', isNew: true }])
+        setDiasNaoLetivos(prev => [{ id: null, data: '', tipo: 'FERIADO', descricao: '', isNew: true }, ...prev])
     }
 
     const updateDiaNaoLetivo = (index, field, value) => {
@@ -187,7 +188,7 @@ export default function CalendarioForm() {
 
     // ====== Dias Letivos Extras - Inline ======
     const addDiaExtra = () => {
-        setDiasExtras(prev => [...prev, { id: null, data: '', descricao: '', isNew: true }])
+        setDiasExtras(prev => [{ id: null, data: '', descricao: '', isNew: true }, ...prev])
     }
 
     const updateDiaExtra = (index, field, value) => {
@@ -425,58 +426,69 @@ export default function CalendarioForm() {
                 </div>
 
                 <div className="space-y-6">
-                    {diasNaoLetivos.map((dia, index) => (
-                        <div
-                            key={dia.id || `new-${index}`}
-                            className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30"
-                        >
-                            <div className="flex items-center justify-between mb-4">
-                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                                    {dia.isNew ? 'Novo dia não letivo' : `Dia ${index + 1}`}
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={() => removeDiaNaoLetivo(index)}
-                                    className="text-sm text-danger-500 hover:text-danger-700 dark:hover:text-danger-400"
+                    {[...diasNaoLetivos]
+                        .sort((a, b) => {
+                            // Novos (sem data) ficam no topo
+                            if (!a.data && !b.data) return 0
+                            if (!a.data) return -1
+                            if (!b.data) return 1
+                            return a.data.localeCompare(b.data)
+                        })
+                        .map((dia, index) => {
+                            const originalIndex = diasNaoLetivos.findIndex(d => d === dia)
+                            return (
+                                <div
+                                    key={dia.id || `new-${originalIndex}`}
+                                    className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30"
                                 >
-                                    Remover
-                                </button>
-                            </div>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                            {dia.isNew ? 'Novo dia não letivo' : (dia.data ? formatDateBR(dia.data) : `Dia ${index + 1}`)}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeDiaNaoLetivo(originalIndex)}
+                                            className="p-1 text-danger-500 hover:text-danger-700 dark:hover:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-900/20 rounded"
+                                        >
+                                            <HiTrash className="w-5 h-5" />
+                                        </button>
+                                    </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <DateInput
-                                    label="Data *"
-                                    value={dia.data}
-                                    onChange={(e) => updateDiaNaoLetivo(index, 'data', e.target.value)}
-                                    disabled={!dia.isNew}
-                                    min={minDate}
-                                    max={maxDate}
-                                />
-                                <Select
-                                    label="Tipo *"
-                                    value={dia.tipo}
-                                    onChange={(e) => updateDiaNaoLetivo(index, 'tipo', e.target.value)}
-                                    options={TIPOS_DIA_NAO_LETIVO}
-                                    disabled={!dia.isNew}
-                                />
-                                <Input
-                                    label="Descrição"
-                                    placeholder="Ex: Feriado Nacional"
-                                    value={dia.descricao}
-                                    onChange={(e) => updateDiaNaoLetivo(index, 'descricao', e.target.value)}
-                                    disabled={!dia.isNew}
-                                />
-                            </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <DateInput
+                                            label="Data *"
+                                            value={dia.data}
+                                            onChange={(e) => updateDiaNaoLetivo(originalIndex, 'data', e.target.value)}
+                                            disabled={!dia.isNew}
+                                            min={minDate}
+                                            max={maxDate}
+                                        />
+                                        <Select
+                                            label="Tipo *"
+                                            value={dia.tipo}
+                                            onChange={(e) => updateDiaNaoLetivo(originalIndex, 'tipo', e.target.value)}
+                                            options={TIPOS_DIA_NAO_LETIVO}
+                                            disabled={!dia.isNew}
+                                        />
+                                        <Input
+                                            label="Descrição"
+                                            placeholder="Ex: Feriado Nacional"
+                                            value={dia.descricao}
+                                            onChange={(e) => updateDiaNaoLetivo(originalIndex, 'descricao', e.target.value)}
+                                            disabled={!dia.isNew}
+                                        />
+                                    </div>
 
-                            {dia.isNew && (
-                                <div className="mt-4 flex justify-end">
-                                    <Button size="sm" onClick={() => saveDiaNaoLetivo(index)}>
-                                        Salvar Dia
-                                    </Button>
+                                    {dia.isNew && (
+                                        <div className="mt-4 flex justify-end">
+                                            <Button size="sm" onClick={() => saveDiaNaoLetivo(originalIndex)}>
+                                                Salvar Dia
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                    ))}
+                            )
+                        })}
 
                     {diasNaoLetivos.length === 0 && (
                         <p className="text-center text-slate-500 py-6">Nenhum dia não letivo cadastrado.</p>
@@ -499,51 +511,61 @@ export default function CalendarioForm() {
                 </div>
 
                 <div className="space-y-6">
-                    {diasExtras.map((dia, index) => (
-                        <div
-                            key={dia.id || `new-extra-${index}`}
-                            className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30"
-                        >
-                            <div className="flex items-center justify-between mb-4">
-                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                                    {dia.isNew ? 'Novo dia extra' : `Dia ${index + 1}`}
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={() => removeDiaExtra(index)}
-                                    className="text-sm text-danger-500 hover:text-danger-700 dark:hover:text-danger-400"
+                    {[...diasExtras]
+                        .sort((a, b) => {
+                            if (!a.data && !b.data) return 0
+                            if (!a.data) return -1
+                            if (!b.data) return 1
+                            return a.data.localeCompare(b.data)
+                        })
+                        .map((dia, index) => {
+                            const originalIndex = diasExtras.findIndex(d => d === dia)
+                            return (
+                                <div
+                                    key={dia.id || `new-extra-${originalIndex}`}
+                                    className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30"
                                 >
-                                    Remover
-                                </button>
-                            </div>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                            {dia.isNew ? 'Novo dia extra' : (dia.data ? formatDateBR(dia.data) : `Dia ${index + 1}`)}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeDiaExtra(originalIndex)}
+                                            className="p-1 text-danger-500 hover:text-danger-700 dark:hover:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-900/20 rounded"
+                                        >
+                                            <HiTrash className="w-5 h-5" />
+                                        </button>
+                                    </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <DateInput
-                                    label="Data *"
-                                    value={dia.data}
-                                    onChange={(e) => updateDiaExtra(index, 'data', e.target.value)}
-                                    disabled={!dia.isNew}
-                                    min={minDate}
-                                    max={maxDate}
-                                />
-                                <Input
-                                    label="Descrição"
-                                    placeholder="Ex: Sábado letivo - reposição"
-                                    value={dia.descricao}
-                                    onChange={(e) => updateDiaExtra(index, 'descricao', e.target.value)}
-                                    disabled={!dia.isNew}
-                                />
-                            </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <DateInput
+                                            label="Data *"
+                                            value={dia.data}
+                                            onChange={(e) => updateDiaExtra(originalIndex, 'data', e.target.value)}
+                                            disabled={!dia.isNew}
+                                            min={minDate}
+                                            max={maxDate}
+                                        />
+                                        <Input
+                                            label="Descrição"
+                                            placeholder="Ex: Sábado letivo - reposição"
+                                            value={dia.descricao}
+                                            onChange={(e) => updateDiaExtra(originalIndex, 'descricao', e.target.value)}
+                                            disabled={!dia.isNew}
+                                        />
+                                    </div>
 
-                            {dia.isNew && (
-                                <div className="mt-4 flex justify-end">
-                                    <Button size="sm" onClick={() => saveDiaExtra(index)}>
-                                        Salvar Dia
-                                    </Button>
+                                    {dia.isNew && (
+                                        <div className="mt-4 flex justify-end">
+                                            <Button size="sm" onClick={() => saveDiaExtra(originalIndex)}>
+                                                Salvar Dia
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                    ))}
+                            )
+                        })}
 
                     {diasExtras.length === 0 && (
                         <p className="text-center text-slate-500 py-6">Nenhum dia extra cadastrado.</p>
