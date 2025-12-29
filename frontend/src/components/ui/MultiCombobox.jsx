@@ -5,10 +5,12 @@ export default function MultiCombobox({
     label,
     value = [], // Array of selected values (IDs)
     onChange,   // (newValue) => void
+    onEnter,    // () => void - chamado quando Enter é pressionado com seleções
     options = [], // { value, label, subLabel }
     placeholder = 'Selecione...',
     error,
-    loading = false
+    loading = false,
+    disabled = false
 }) {
     const [query, setQuery] = useState('')
     const [isOpen, setIsOpen] = useState(false)
@@ -91,7 +93,7 @@ export default function MultiCombobox({
                     <input
                         ref={inputRef}
                         type="text"
-                        className="flex-1 bg-transparent border-none outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 min-w-[120px]"
+                        className="flex-1 bg-transparent border-none outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 min-w-[120px] disabled:cursor-not-allowed"
                         placeholder={selectedOptions.length === 0 ? placeholder : ''}
                         value={query}
                         onChange={(e) => {
@@ -99,6 +101,13 @@ export default function MultiCombobox({
                             setIsOpen(true)
                         }}
                         onFocus={() => setIsOpen(true)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && value.length > 0 && onEnter) {
+                                e.preventDefault()
+                                onEnter()
+                            }
+                        }}
+                        disabled={disabled}
                     />
                 </div>
 

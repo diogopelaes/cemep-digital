@@ -1,7 +1,7 @@
 """
 View para Estudante
 """
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
@@ -26,7 +26,7 @@ from apps.users.utils import send_credentials_email
 class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
     """ViewSet de Estudantes. CRU: Gestão/Secretaria | Delete: Bloqueado"""
     queryset = Estudante.objects.select_related('usuario').all()
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['bolsa_familia', 'pe_de_meia', 'usa_onibus']
     search_fields = ['usuario__first_name', 'usuario__last_name', 'cpf', 'nome_social']
 

@@ -374,9 +374,10 @@ export function useEstudanteForm(cpfParam, navigate) {
         }
 
         // Validação de matrículas
-        const temMatriculaValida = matriculas.some(m =>
-            m.numero_matricula.replace(/\D/g, '').length === 10 && m.curso_id && m.data_entrada
-        )
+        const temMatriculaValida = matriculas.some(m => {
+            const num = m.numero_matricula.replace(/[^0-9Xx]/g, '')
+            return num.length === 10 && m.curso_id && m.data_entrada
+        })
         if (!temMatriculaValida) {
             toast.error('Pelo menos uma matrícula completa é obrigatória')
             return false
@@ -384,7 +385,7 @@ export function useEstudanteForm(cpfParam, navigate) {
 
         for (let i = 0; i < matriculas.length; i++) {
             const mat = matriculas[i]
-            const numMatricula = mat.numero_matricula.replace(/\D/g, '')
+            const numMatricula = mat.numero_matricula.replace(/[^0-9Xx]/g, '')
 
             if (numMatricula || mat.curso_id) {
                 if (numMatricula.length !== 10) {
@@ -430,9 +431,12 @@ export function useEstudanteForm(cpfParam, navigate) {
 
             // Processa matrículas válidas
             const matriculasPayload = matriculas
-                .filter(m => m.numero_matricula.replace(/\D/g, '').length === 10 && m.curso_id)
+                .filter(m => {
+                    const num = m.numero_matricula.replace(/[^0-9Xx]/g, '')
+                    return num.length === 10 && m.curso_id
+                })
                 .map(m => ({
-                    numero_matricula: m.numero_matricula.replace(/\D/g, ''),
+                    numero_matricula: m.numero_matricula.replace(/[^0-9Xx]/g, '').toUpperCase(),
                     curso_id: parseInt(m.curso_id),
                     data_entrada: m.data_entrada,
                     data_saida: m.data_saida || null,

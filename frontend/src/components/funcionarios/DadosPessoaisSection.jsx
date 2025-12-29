@@ -60,14 +60,16 @@ export default function DadosPessoaisSection({
                     value={formData.data_nascimento}
                     onChange={(e) => onFieldChange('data_nascimento', e.target.value)}
                 />
-                <Input
-                    label="E-mail"
-                    type="email"
-                    placeholder="joao.silva@email.com"
-                    value={formData.email}
-                    onChange={(e) => onFieldChange('email', e.target.value)}
-                    autoComplete="off"
-                />
+                <div className="md:col-span-2">
+                    <Input
+                        label="E-mail"
+                        type="email"
+                        placeholder="joao.silva@email.com"
+                        value={formData.email}
+                        onChange={(e) => onFieldChange('email', e.target.value)}
+                        autoComplete="off"
+                    />
+                </div>
                 <Input
                     label="Telefone"
                     placeholder="(19) 99999-9999"

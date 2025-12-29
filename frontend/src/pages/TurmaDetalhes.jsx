@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { Loading } from '../components/ui'
 import BulkUploadModal from '../components/modals/BulkUploadModal'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
 // Hooks
-import { useTurma, useDisciplinasTurma, useRepresentantesTurma } from '../hooks'
+import { useTurma, useDisciplinasTurma, useRepresentantesTurma, useEstudantesTurma } from '../hooks'
 
 // Componentes de domínio
 import {
@@ -27,10 +27,11 @@ import {
  */
 export default function TurmaDetalhes() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { id } = useParams()
 
   // Estados locais de UI
-  const [activeTab, setActiveTab] = useState('disciplinas')
+  const [activeTab, setActiveTab] = useState(location.state?.tab || 'disciplinas')
   const [showUploadModal, setShowUploadModal] = useState(false)
 
   // Hook para dados da turma
@@ -46,6 +47,9 @@ export default function TurmaDetalhes() {
     activeTab === 'representantes',
     reloadTurma
   )
+
+  // Hook para estudantes (ativo apenas quando tab = 'estudantes')
+  const estudantes = useEstudantesTurma(id, turma, activeTab === 'estudantes', reloadTurma)
 
   // Loading inicial
   if (loading) {
@@ -64,7 +68,7 @@ export default function TurmaDetalhes() {
   const tabCounters = {
     disciplinas: Object.keys(disciplinas.disciplinasVinculadas).length,
     representantes: turma?.professores_representantes_details?.length || 0,
-    estudantes: 0,
+    estudantes: turma?.estudantes_count || 0,
   }
 
   return (
@@ -126,7 +130,16 @@ export default function TurmaDetalhes() {
       )}
 
       {activeTab === 'estudantes' && (
-        <TurmaEstudantes />
+        <TurmaEstudantes
+          estudantesElegiveis={estudantes.estudantesElegiveis}
+          estudantesEnturmados={estudantes.estudantesEnturmados}
+          loading={estudantes.loading}
+          saving={estudantes.saving}
+          dataEntrada={estudantes.dataEntrada}
+          onDataEntradaChange={estudantes.setDataEntrada}
+          onEnturmar={estudantes.enturmarEstudantes}
+          onRemoveEstudante={estudantes.removeEstudante}
+        />
       )}
 
       {/* Modal de Upload */}

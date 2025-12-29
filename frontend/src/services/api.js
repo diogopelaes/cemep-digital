@@ -228,6 +228,9 @@ export const academicAPI = {
     list: (params) => api.get('/academic/matriculas-turma/', { params }),
     create: (data) => api.post('/academic/matriculas-turma/', data),
     update: (id, data) => api.patch(`/academic/matriculas-turma/${id}/`, data),
+    delete: (id) => api.delete(`/academic/matriculas-turma/${id}/`),
+    estudantesElegiveis: (turmaId) => api.get('/academic/matriculas-turma/estudantes-elegiveis/', { params: { turma_id: turmaId } }),
+    enturmarLote: (data) => api.post('/academic/matriculas-turma/enturmar-lote/', data),
   },
 }
 

@@ -39,7 +39,8 @@ export default function TurmaRepresentantes({
                             label: p.nome_completo,
                             subLabel: p.apelido
                         }))}
-                        placeholder="Pesquise por nome ou apelido..."
+                        placeholder="Pesquise por nome ou apelido... (Enter para confirmar)"
+                        disabled={saving}
                     />
 
                     {/* Lista dos representantes selecionados */}
