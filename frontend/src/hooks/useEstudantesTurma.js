@@ -97,15 +97,16 @@ export function useEstudantesTurma(turmaId, turma, isActive = true, onUpdate = n
         try {
             await academicAPI.matriculasTurma.delete(matriculaTurmaId)
             toast.success('Estudante removido da turma')
-            if (onUpdate) onUpdate()
-            await loadEstudantes()
+
+            // Atualiza lista local removendo o item para evitar reload
+            setEstudantesEnturmados(prev => prev.filter(item => item.id !== matriculaTurmaId))
         } catch (error) {
             console.error('Erro ao remover:', error)
             toast.error('Erro ao remover estudante da turma')
         } finally {
             setSaving(false)
         }
-    }, [loadEstudantes, onUpdate])
+    }, [])
 
     return {
         estudantesElegiveis,

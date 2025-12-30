@@ -13,10 +13,10 @@ export function useTurma(turmaId) {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    const loadTurma = useCallback(async () => {
+    const loadTurma = useCallback(async (showLoading = true) => {
         if (!turmaId) return
 
-        setLoading(true)
+        if (showLoading) setLoading(true)
         setError(null)
 
         try {
@@ -26,16 +26,16 @@ export function useTurma(turmaId) {
             setError(err)
             toast.error('Erro ao carregar turma')
         } finally {
-            setLoading(false)
+            if (showLoading) setLoading(false)
         }
     }, [turmaId])
 
     useEffect(() => {
-        loadTurma()
+        loadTurma(true)
     }, [loadTurma])
 
     const reloadTurma = useCallback(() => {
-        return loadTurma()
+        return loadTurma(false)
     }, [loadTurma])
 
     return {

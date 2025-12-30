@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { HiUserGroup, HiX, HiAcademicCap, HiUser } from 'react-icons/hi'
+import { HiUserGroup, HiTrash, HiAcademicCap, HiUser, HiCheck, HiX } from 'react-icons/hi'
 import { Card, Loading, MultiCombobox, DateInput } from '../ui'
-import Table, { TableHead, TableBody, TableRow, TableCell, TableEmpty } from '../ui/Table'
+import Table, { TableHead, TableBody, TableRow, TableCell, TableHeader, TableEmpty } from '../ui/Table'
 import { formatDateBR } from '../../utils/date'
 
 /**
@@ -20,11 +20,17 @@ export default function TurmaEstudantes({
 }) {
     const location = useLocation()
     const [selecionados, setSelecionados] = useState([])
+    const [confirmingRemove, setConfirmingRemove] = useState(null)
 
     const handleEnturmar = async () => {
         if (selecionados.length === 0) return
         await onEnturmar(selecionados)
         setSelecionados([])
+    }
+
+    const handleConfirmRemove = async (id) => {
+        await onRemoveEstudante(id)
+        setConfirmingRemove(null)
     }
 
     // Formata CPF para exibição
@@ -99,13 +105,13 @@ export default function TurmaEstudantes({
                             </h3>
                             <Table>
                                 <TableHead>
-                                    <tr>
-                                        <th className="text-left py-3 px-4">Nome</th>
-                                        <th className="text-left py-3 px-4">CPF</th>
-                                        <th className="text-left py-3 px-4">Email</th>
-                                        <th className="text-left py-3 px-4">Data Nasc.</th>
-                                        <th className="text-right py-3 px-4">Ações</th>
-                                    </tr>
+                                    <TableRow>
+                                        <TableHeader>Nome</TableHeader>
+                                        <TableHeader>CPF</TableHeader>
+                                        <TableHeader>Email</TableHeader>
+                                        <TableHeader>Data Nasc.</TableHeader>
+                                        <TableHeader className="w-20 text-right">Ações</TableHeader>
+                                    </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {estudantesEnturmados.map(mt => {
@@ -168,15 +174,36 @@ export default function TurmaEstudantes({
                                                     </span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <div className="flex items-center justify-end">
+                                                    <div className="relative flex items-center justify-end">
+                                                        {/* Trash button - always rendered */}
                                                         <button
-                                                            onClick={() => onRemoveEstudante(mt.id)}
-                                                            className="p-2 rounded-lg hover:bg-danger-500/10 text-danger-600 transition-colors"
-                                                            title="Remover da turma"
+                                                            onClick={() => setConfirmingRemove(mt.id)}
+                                                            className={`p-2 text-danger-600 hover:bg-danger-50 rounded-lg transition-all duration-200 ${confirmingRemove === mt.id ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                                                             disabled={saving}
                                                         >
-                                                            <HiX className="h-5 w-5" />
+                                                            <HiTrash className="h-5 w-5" />
                                                         </button>
+
+                                                        {/* Confirmation overlay - slides in from right */}
+                                                        <div className={`absolute right-0 flex items-center gap-2 bg-white dark:bg-slate-800 px-2 py-1 rounded-lg shadow-lg border border-slate-200 dark:border-slate-600 transition-all duration-200 ${confirmingRemove === mt.id ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}>
+                                                            <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">Remover?</span>
+                                                            <button
+                                                                onClick={() => handleConfirmRemove(mt.id)}
+                                                                className="p-1.5 rounded-md bg-danger-600 hover:bg-danger-700 text-white transition-colors"
+                                                                title="Confirmar"
+                                                                disabled={saving}
+                                                            >
+                                                                <HiCheck className="h-4 w-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setConfirmingRemove(null)}
+                                                                className="p-1.5 rounded-md bg-slate-200 hover:bg-slate-300 dark:bg-slate-600 dark:hover:bg-slate-500 text-slate-600 dark:text-slate-200 transition-colors"
+                                                                title="Cancelar"
+                                                                disabled={saving}
+                                                            >
+                                                                <HiX className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </TableCell>
                                             </TableRow>
