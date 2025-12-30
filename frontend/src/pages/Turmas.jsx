@@ -6,7 +6,7 @@ import {
 } from '../components/ui'
 import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil, HiCheckCircle, HiXCircle, HiUpload } from 'react-icons/hi'
 import BulkUploadModal from '../components/modals/BulkUploadModal'
-import { coreAPI } from '../services/api'
+import { coreAPI, academicAPI } from '../services/api'
 import { getNomenclaturaLabel } from '../data'
 import toast from 'react-hot-toast'
 
@@ -18,6 +18,7 @@ export default function Turmas() {
   const [anoLetivo, setAnoLetivo] = useState(null)
   const [filtroAtivo, setFiltroAtivo] = useState('')
   const [showUploadModal, setShowUploadModal] = useState(false)
+  const [showEnturmarModal, setShowEnturmarModal] = useState(false)
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
@@ -129,6 +130,9 @@ export default function Turmas() {
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <Button variant="secondary" icon={HiUserGroup} onClick={() => setShowEnturmarModal(true)}>
+            Enturmar Estudantes
+          </Button>
           <Button variant="secondary" icon={HiUpload} onClick={() => setShowUploadModal(true)}>
             Cadastro de Turmas em massa
           </Button>
@@ -315,6 +319,41 @@ export default function Turmas() {
             <li>Todos os campos são obrigatórios.</li>
             <li><strong>SIGLA_CURSO</strong> deve corresponder a um curso existente.</li>
             <li><strong>NOMENCLATURA</strong>: SÉRIE, ANO ou MÓDULO.</li>
+          </ul>
+        }
+      />
+
+      {/* Modal de Enturmar Estudantes em Massa */}
+      <BulkUploadModal
+        isOpen={showEnturmarModal}
+        onClose={() => setShowEnturmarModal(false)}
+        title="Enturmar Estudantes em Massa"
+        onUpload={async (formData) => {
+          const response = await academicAPI.matriculasTurma.importarArquivo(formData)
+          return response
+        }}
+        onDownloadTemplate={async () => {
+          try {
+            const response = await academicAPI.matriculasTurma.downloadModelo()
+            const url = window.URL.createObjectURL(new Blob([response.data]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'modelo_enturmacao.xlsx')
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+          } catch (error) {
+            console.error(error)
+            toast.error('Erro ao baixar o modelo.')
+          }
+        }}
+        instructions={
+          <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
+            <li>Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong>.</li>
+            <li><strong>MATRICULA</strong>: Número da matrícula CEMEP.</li>
+            <li><strong>TURMA</strong>: Código da turma (ex: 1A, 2B).</li>
+            <li><strong>CURSO</strong>: Sigla do curso (ex: INFO, ENF).</li>
+            <li><strong>DATA_ENTRADA</strong>: (Opcional) Data no formato dd/mm/aaaa.</li>
           </ul>
         }
       />

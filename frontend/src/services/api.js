@@ -239,6 +239,10 @@ export const academicAPI = {
     delete: (id) => api.delete(`/academic/matriculas-turma/${id}/`),
     estudantesElegiveis: (turmaId) => api.get('/academic/matriculas-turma/estudantes-elegiveis/', { params: { turma_id: turmaId } }),
     enturmarLote: (data) => api.post('/academic/matriculas-turma/enturmar-lote/', data),
+    importarArquivo: (formData) => api.post('/academic/matriculas-turma/importar-arquivo/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    downloadModelo: () => api.get('/academic/matriculas-turma/download-modelo/', { responseType: 'blob' }),
   },
 }
 
