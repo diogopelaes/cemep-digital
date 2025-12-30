@@ -266,6 +266,7 @@ class MatriculaCEMEP(models.Model):
         verbose_name = 'Matrícula CEMEP'
         verbose_name_plural = 'Matrículas CEMEP'
         ordering = ['-data_entrada']
+        unique_together = ['estudante', 'curso']
     
     def __str__(self):
         return f"{self.numero_matricula} - {self.estudante} ({self.curso.sigla})"
@@ -317,6 +318,24 @@ class MatriculaTurma(models.Model):
         verbose_name = 'Matrícula na Turma'
         verbose_name_plural = 'Matrículas nas Turmas'
         ordering = ['-turma__ano_letivo', 'matricula_cemep__estudante__usuario__first_name']
+        unique_together = ['matricula_cemep', 'turma']
+    
+    def clean(self):
+        """Validações de integridade da matrícula na turma."""
+        # 1. Valida que o curso da matrícula CEMEP é o mesmo da turma
+        if hasattr(self, 'matricula_cemep') and hasattr(self, 'turma'):
+            if self.matricula_cemep.curso != self.turma.curso:
+                raise ValidationError(
+                    f"O curso da matrícula CEMEP ({self.matricula_cemep.curso.sigla}) "
+                    f"não coincide com o curso da turma ({self.turma.curso.sigla})."
+                )
+        
+        # 2. Valida que a data de saída não é anterior à data de entrada
+        if self.data_entrada and self.data_saida:
+            if self.data_saida < self.data_entrada:
+                raise ValidationError(
+                    'A data de saída não pode ser anterior à data de entrada.'
+                )
     
     def save(self, *args, **kwargs):
         # Status automático: CURSANDO se data_saida vazia
