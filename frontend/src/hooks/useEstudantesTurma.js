@@ -95,18 +95,26 @@ export function useEstudantesTurma(turmaId, turma, isActive = true, onUpdate = n
     const removeEstudante = useCallback(async (matriculaTurmaId) => {
         setSaving(true)
         try {
+            // Encontra o estudante antes de remover para poder adicionar de volta aos elegíveis
+            const removido = estudantesEnturmados.find(item => item.id === matriculaTurmaId)
+
             await academicAPI.matriculasTurma.delete(matriculaTurmaId)
             toast.success('Estudante removido da turma')
 
-            // Atualiza lista local removendo o item para evitar reload
+            // Remove da lista de enturmados
             setEstudantesEnturmados(prev => prev.filter(item => item.id !== matriculaTurmaId))
+
+            // Adiciona de volta aos elegíveis se encontrou o estudante
+            if (removido?.matricula_cemep) {
+                setEstudantesElegiveis(prev => [...prev, removido.matricula_cemep])
+            }
         } catch (error) {
             console.error('Erro ao remover:', error)
             toast.error('Erro ao remover estudante da turma')
         } finally {
             setSaving(false)
         }
-    }, [])
+    }, [estudantesEnturmados])
 
     return {
         estudantesElegiveis,

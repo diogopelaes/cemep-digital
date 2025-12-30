@@ -130,7 +130,7 @@ export default function Turmas() {
         </div>
         <div className="flex items-center gap-4">
           <Button variant="secondary" icon={HiUpload} onClick={() => setShowUploadModal(true)}>
-            Cadastro em massa
+            Cadastro de Turmas em massa
           </Button>
           <Button icon={HiPlus} onClick={() => navigate('/turmas/novo')}>
             Nova Turma

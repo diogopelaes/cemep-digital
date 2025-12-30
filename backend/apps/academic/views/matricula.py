@@ -39,8 +39,10 @@ class MatriculaTurmaViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.
     def estudantes_elegiveis(self, request):
         """
         Retorna estudantes elegíveis para uma turma específica.
-        Filtro: MatriculaCEMEP com status=MATRICULADO e curso=turma.curso,
-        excluindo estudantes já enturmados nesta turma.
+        
+        Regras:
+        1. MatriculaCEMEP com status=MATRICULADO e curso=turma.curso
+        2. Não pode ter MatriculaTurma em NENHUMA turma do mesmo curso (evita duplicidade)
         """
         turma_id = request.query_params.get('turma_id')
         if not turma_id:
@@ -51,15 +53,17 @@ class MatriculaTurmaViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.
         except Turma.DoesNotExist:
             return Response({'detail': 'Turma não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
         
-        # Estudantes já enturmados nesta turma
-        matriculas_existentes = MatriculaTurma.objects.filter(turma=turma).values_list('matricula_cemep_id', flat=True)
+        # Estudantes já enturmados em QUALQUER turma do mesmo curso
+        matriculas_em_turmas_do_curso = MatriculaTurma.objects.filter(
+            turma__curso=turma.curso
+        ).values_list('matricula_cemep_id', flat=True)
         
-        # Estudantes elegíveis: MATRICULADO no mesmo curso e não enturmados
+        # Estudantes elegíveis: MATRICULADO no mesmo curso e não enturmados em nenhuma turma desse curso
         matriculas_elegiveis = MatriculaCEMEP.objects.filter(
             status=MatriculaCEMEP.Status.MATRICULADO,
             curso=turma.curso
         ).exclude(
-            numero_matricula__in=matriculas_existentes
+            numero_matricula__in=matriculas_em_turmas_do_curso
         ).select_related('estudante__usuario').order_by('estudante__usuario__first_name')
         
         serializer = MatriculaCEMEPSerializer(matriculas_elegiveis, many=True)
@@ -94,9 +98,14 @@ class MatriculaTurmaViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.
             try:
                 matricula_cemep = MatriculaCEMEP.objects.get(numero_matricula=matricula_id)
                 
-                # Verifica se já está enturmado
-                if MatriculaTurma.objects.filter(turma=turma, matricula_cemep=matricula_cemep).exists():
-                    errors.append(f'{matricula_cemep.estudante} já está enturmado.')
+                # Regra 1: MatriculaCEMEP deve ser do mesmo curso da turma
+                if matricula_cemep.curso != turma.curso:
+                    errors.append(f'{matricula_cemep.estudante} não está matriculado no curso {turma.curso}.')
+                    continue
+                
+                # Regra 2: Não pode estar enturmado em NENHUMA turma do mesmo curso
+                if MatriculaTurma.objects.filter(turma__curso=turma.curso, matricula_cemep=matricula_cemep).exists():
+                    errors.append(f'{matricula_cemep.estudante} já está enturmado em uma turma deste curso.')
                     continue
                 
                 mt = MatriculaTurma.objects.create(
