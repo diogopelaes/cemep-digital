@@ -10,7 +10,10 @@ from apps.users.permissions import GestaoWriteFuncionarioReadMixin
 
 
 class PeriodoTrabalhoViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
-    """ViewSet de Períodos de Trabalho. Leitura: Funcionários | Escrita: Gestão"""
+    """
+    ViewSet para PeriodoTrabalho.
+    Leitura: Gestão, Secretaria, Professor, Monitor | Escrita: Gestão
+    """
     queryset = PeriodoTrabalho.objects.select_related('funcionario').all()
     serializer_class = PeriodoTrabalhoSerializer
     filter_backends = [DjangoFilterBackend]

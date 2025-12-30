@@ -19,7 +19,10 @@ from apps.users.permissions import GestaoSecretariaMixin
 from rest_framework.filters import OrderingFilter
 
 class TurmaViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
-    """ViewSet de Turmas. Leitura: Gestão/Secretaria | Escrita: Gestão/Secretaria"""
+    """
+    ViewSet para Turma.
+    Leitura: Gestão / Secretaria | Escrita: Gestão / Secretaria
+    """
     queryset = Turma.objects.select_related('curso').prefetch_related('professores_representantes__usuario').all()
     serializer_class = TurmaSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]

@@ -10,7 +10,10 @@ from apps.users.permissions import GestaoWriteFuncionarioReadMixin
 
 
 class ProfessorDisciplinaTurmaViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
-    """ViewSet de Professor-Disciplina-Turma. Leitura: Funcionários | Escrita: Gestão"""
+    """
+    ViewSet para ProfessorDisciplinaTurma.
+    Leitura: Gestão, Secretaria, Professor, Monitor | Escrita: Gestão
+    """
     queryset = ProfessorDisciplinaTurma.objects.select_related(
         'professor__usuario', 'disciplina_turma__disciplina', 'disciplina_turma__turma'
     ).all()

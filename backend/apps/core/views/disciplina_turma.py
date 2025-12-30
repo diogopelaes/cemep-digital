@@ -16,7 +16,10 @@ from apps.users.permissions import GestaoSecretariaMixin
 
 
 class DisciplinaTurmaViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
-    """ViewSet de Disciplinas por Turma. Leitura: Gestão/Secretaria | Escrita: Gestão/Secretaria"""
+    """
+    ViewSet para DisciplinaTurma.
+    Leitura: Gestão / Secretaria | Escrita: Gestão / Secretaria
+    """
     queryset = DisciplinaTurma.objects.select_related('disciplina', 'turma').all()
     serializer_class = DisciplinaTurmaSerializer
     filter_backends = [DjangoFilterBackend]

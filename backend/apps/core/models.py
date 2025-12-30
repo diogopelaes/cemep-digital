@@ -413,3 +413,101 @@ class AnoLetivo(models.Model):
     
     def __str__(self):
         return f"{self.ano}"
+
+
+class HorarioAula(models.Model):
+    """Horário de aula de referência (grades horárias)."""
+    
+    class DiaSemana(models.IntegerChoices):
+        SEGUNDA = 0, 'Segunda-feira'
+        TERCA = 1, 'Terça-feira'
+        QUARTA = 2, 'Quarta-feira'
+        QUINTA = 3, 'Quinta-feira'
+        SEXTA = 4, 'Sexta-feira'
+        SABADO = 5, 'Sábado'
+        DOMINGO = 6, 'Domingo'
+
+    ano_letivo = models.ForeignKey(
+        AnoLetivo,
+        on_delete=models.CASCADE,
+        related_name='horarios_aula',
+        verbose_name='Ano Letivo'
+    )
+    numero = models.PositiveSmallIntegerField(verbose_name='Número da aula')
+    dia_semana = models.PositiveSmallIntegerField(
+        choices=DiaSemana.choices,
+        verbose_name='Dia da semana'
+    )
+    hora_inicio = models.TimeField(verbose_name='Hora de início')
+    hora_fim = models.TimeField(verbose_name='Hora de fim')
+    
+    class Meta:
+        verbose_name = 'Horário de Aula'
+        verbose_name_plural = 'Horários de Aula'
+        ordering = ['dia_semana', 'hora_inicio']
+        unique_together = ['ano_letivo', 'dia_semana', 'hora_inicio']
+
+    def clean(self):
+        if self.hora_inicio and self.hora_fim and self.hora_inicio >= self.hora_fim:
+            raise ValidationError('A hora de início não pode ser posterior ou igual à hora de fim.')
+            
+    def save(self, *args, **kwargs):
+        # Define um número temporário se for novo, para evitar erros de validação
+        if not self.pk and not self.numero:
+            self.numero = 999 
+            
+        super().save(*args, **kwargs)
+        
+        # Reordena todos os horários do mesmo dia/ano
+        horarios = HorarioAula.objects.filter(
+            ano_letivo=self.ano_letivo,
+            dia_semana=self.dia_semana
+        ).order_by('hora_inicio')
+        
+        for index, horario in enumerate(horarios, start=1):
+            if horario.numero != index:
+                # Usa update para evitar recursão infinita ao chamar save()
+                HorarioAula.objects.filter(pk=horario.pk).update(numero=index)
+
+    def __str__(self):
+        return f"{self.get_dia_semana_display()} - {self.numero}ª Aula ({self.hora_inicio.strftime('%H:%M')} - {self.hora_fim.strftime('%H:%M')})"
+
+
+class GradeHoraria(models.Model):
+    """Grade horária vinculando turmas, horários e disciplinas."""
+    turma = models.ForeignKey(
+        Turma, 
+        on_delete=models.CASCADE, 
+        related_name='grades_horarias', 
+        verbose_name='Turma'
+    )
+    horario_aula = models.ForeignKey(
+        HorarioAula, 
+        on_delete=models.CASCADE, 
+        related_name='grades_horarias', 
+        verbose_name='Horário de Aula'
+    )
+    disciplina = models.ForeignKey(
+        Disciplina, 
+        on_delete=models.CASCADE, 
+        related_name='grades_horarias', 
+        verbose_name='Disciplina'
+    )
+
+    class Meta:
+        verbose_name = 'Grade Horária'
+        verbose_name_plural = 'Grades Horárias'
+        unique_together = ['turma', 'horario_aula']
+        ordering = ['horario_aula__dia_semana', 'horario_aula__hora_inicio']
+
+    def clean(self):
+        # Validação: O ano letivo do horário deve ser o mesmo da turma
+        if hasattr(self, 'turma') and hasattr(self, 'horario_aula'):
+            if self.turma.ano_letivo != self.horario_aula.ano_letivo.ano:
+                raise ValidationError(
+                    f"O ano letivo da turma ({self.turma.ano_letivo}) "
+                    f"não coincide com o do horário ({self.horario_aula.ano_letivo.ano})."
+                )
+
+    def __str__(self):
+        return f"{self.turma.nome_completo} - {self.horario_aula} - {self.disciplina.sigla}"    

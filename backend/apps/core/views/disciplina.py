@@ -17,7 +17,10 @@ from apps.users.permissions import GestaoWritePublicReadMixin
 
 
 class DisciplinaViewSet(GestaoWritePublicReadMixin, viewsets.ModelViewSet):
-    """ViewSet de Disciplinas. Leitura: Todos autenticados | Escrita: Gestão"""
+    """
+    ViewSet para Disciplina.
+    Leitura: Público (Autenticado) | Escrita: Gestão
+    """
     queryset = Disciplina.objects.all()
     serializer_class = DisciplinaSerializer
     filter_backends = [DjangoFilterBackend]

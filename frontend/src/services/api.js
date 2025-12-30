@@ -197,6 +197,14 @@ export const coreAPI = {
     update: (id, data) => api.patch(`/core/atribuicoes/${id}/`, data),
     delete: (id) => api.delete(`/core/atribuicoes/${id}/`),
   },
+  // Horários de Aula
+  horariosAula: {
+    list: (params) => api.get('/core/horarios-aula/', { params }),
+    get: (id) => api.get(`/core/horarios-aula/${id}/`),
+    create: (data) => api.post('/core/horarios-aula/', data),
+    update: (id, data) => api.patch(`/core/horarios-aula/${id}/`, data),
+    delete: (id) => api.delete(`/core/horarios-aula/${id}/`),
+  },
 }
 
 export const academicAPI = {

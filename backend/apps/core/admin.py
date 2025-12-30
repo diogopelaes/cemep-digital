@@ -5,7 +5,7 @@ from django.contrib import admin
 from .models import (
     Funcionario, PeriodoTrabalho, Disciplina, Curso, Turma,
     DisciplinaTurma, ProfessorDisciplinaTurma, Habilidade,
-    AnoLetivo, DiaLetivoExtra, DiaNaoLetivo
+    AnoLetivo, DiaLetivoExtra, DiaNaoLetivo, HorarioAula, GradeHoraria
 )
 
 
@@ -63,8 +63,9 @@ class DisciplinaTurmaAdmin(admin.ModelAdmin):
 
 @admin.register(ProfessorDisciplinaTurma)
 class ProfessorDisciplinaTurmaAdmin(admin.ModelAdmin):
-    list_display = ['professor', 'disciplina_turma']
-    list_filter = ['disciplina_turma__turma__ano_letivo']
+    list_display = ['professor', 'disciplina_turma', 'tipo']
+    list_filter = ['tipo', 'disciplina_turma__turma__ano_letivo']
+    search_fields = ['professor__usuario__first_name', 'professor__usuario__last_name', 'disciplina_turma__disciplina__nome']
 
 
 
@@ -94,5 +95,40 @@ class DiaNaoLetivoAdmin(admin.ModelAdmin):
 class AnoLetivoAdmin(admin.ModelAdmin):
     list_display = ['ano', 'is_active', 'total_dias_letivos']
     list_filter = ['is_active']
+    fieldsets = (
+        (None, {
+            'fields': ('ano', 'is_active')
+        }),
+        ('1º Bimestre', {
+            'fields': (('data_inicio_1bim', 'data_fim_1bim'),)
+        }),
+        ('2º Bimestre', {
+            'fields': (('data_inicio_2bim', 'data_fim_2bim'),)
+        }),
+        ('3º Bimestre', {
+            'fields': (('data_inicio_3bim', 'data_fim_3bim'),)
+        }),
+        ('4º Bimestre', {
+            'fields': (('data_inicio_4bim', 'data_fim_4bim'),)
+        }),
+        ('Calendário Especial', {
+            'fields': ('dias_letivos_extras', 'dias_nao_letivos')
+        }),
+    )
+    filter_horizontal = ['dias_letivos_extras', 'dias_nao_letivos']
+
+
+@admin.register(HorarioAula)
+class HorarioAulaAdmin(admin.ModelAdmin):
+    list_display = ['ano_letivo', 'dia_semana', 'numero', 'hora_inicio', 'hora_fim']
+    list_filter = ['ano_letivo', 'dia_semana']
+    ordering = ['ano_letivo', 'dia_semana', 'hora_inicio']
+
+
+@admin.register(GradeHoraria)
+class GradeHorariaAdmin(admin.ModelAdmin):
+    list_display = ['turma', 'horario_aula', 'disciplina']
+    list_filter = ['turma__ano_letivo', 'turma__curso', 'horario_aula__dia_semana']
+    search_fields = ['turma__numero', 'turma__letra', 'disciplina__nome']
 
 

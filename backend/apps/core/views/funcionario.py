@@ -27,7 +27,10 @@ from apps.users.utils import send_credentials_email
 
 
 class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
-    """ViewSet de Funcionários. Leitura: Funcionários | Escrita: Gestão"""
+    """
+    ViewSet para Funcionario.
+    Leitura: Gestão, Secretaria, Professor, Monitor | Escrita: Gestão
+    """
     queryset = Funcionario.objects.select_related('usuario').all()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['usuario__tipo_usuario', 'usuario__is_active']

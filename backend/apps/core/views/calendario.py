@@ -6,6 +6,10 @@ from apps.core.serializers import AnoLetivoSerializer, DiaLetivoExtraSerializer,
 from apps.users.permissions import GestaoWritePublicReadMixin
 
 class AnoLetivoViewSet(GestaoWritePublicReadMixin, viewsets.ModelViewSet):
+    """
+    ViewSet para AnoLetivo.
+    Leitura: Público (Autenticado) | Escrita: Gestão
+    """
     queryset = AnoLetivo.objects.all()
     serializer_class = AnoLetivoSerializer
     pagination_class = None

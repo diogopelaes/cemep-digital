@@ -23,6 +23,7 @@ from .calendario import (
     DiaNaoLetivoSerializer
 )
 from .habilidade import HabilidadeSerializer
+from .horario_aula import HorarioAulaSerializer
 
 
 __all__ = [
@@ -40,4 +41,5 @@ __all__ = [
     'DiaLetivoExtraSerializer',
     'DiaNaoLetivoSerializer',
     'HabilidadeSerializer',
+    'HorarioAulaSerializer',
 ]

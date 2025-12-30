@@ -10,7 +10,10 @@ from apps.users.permissions import GestaoWriteFuncionarioReadMixin
 
 
 class HabilidadeViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
-    """ViewSet de Habilidades. Leitura: Funcionários | Escrita: Gestão"""
+    """
+    ViewSet para Habilidade.
+    Leitura: Gestão, Secretaria, Professor, Monitor | Escrita: Gestão
+    """
     queryset = Habilidade.objects.select_related('disciplina').all()
     serializer_class = HabilidadeSerializer
     filter_backends = [DjangoFilterBackend]

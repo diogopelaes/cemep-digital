@@ -1,16 +1,34 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { HiCalendar, HiUserGroup, HiAcademicCap } from 'react-icons/hi'
+import { HiCalendar, HiUserGroup, HiAcademicCap, HiClock } from 'react-icons/hi'
 import CalendarioTab from '../components/configuracoes/CalendarioTab'
+import HorarioAulaTab from '../components/configuracoes/HorarioAulaTab'
+import { coreAPI } from '../services/api'
 
 export default function Configuracoes() {
     const [searchParams] = useSearchParams()
     const [activeTab, setActiveTab] = useState(() => {
         return searchParams.get('tab') || 'calendario'
     })
+    const [hasActiveCalendar, setHasActiveCalendar] = useState(false)
+
+    useEffect(() => {
+        checkCalendar()
+    }, [])
+
+    const checkCalendar = async () => {
+        try {
+            const { data } = await coreAPI.anosLetivos.list()
+            const lista = Array.isArray(data) ? data : (data.results || [])
+            if (lista.length > 0) setHasActiveCalendar(true)
+        } catch (e) {
+            console.error(e)
+        }
+    }
 
     const tabs = [
         { id: 'calendario', label: 'Calendário', icon: HiCalendar },
+        ...(hasActiveCalendar ? [{ id: 'horarios', label: 'Horários de Aula', icon: HiClock }] : []),
         { id: 'professores', label: 'Controle de Professores', icon: HiAcademicCap },
         { id: 'estudantes', label: 'Controle - Estudantes/Responsáveis', icon: HiUserGroup },
     ]
@@ -32,8 +50,8 @@ export default function Configuracoes() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex items-center gap-2 px-4 py-3 font-medium transition-colors border-b-2 -mb-px whitespace-nowrap ${isActive
-                                    ? 'text-primary-600 border-primary-500'
-                                    : 'text-slate-500 border-transparent hover:text-slate-700 dark:hover:text-slate-300'
+                                ? 'text-primary-600 border-primary-500'
+                                : 'text-slate-500 border-transparent hover:text-slate-700 dark:hover:text-slate-300'
                                 }`}
                         >
                             <Icon className="h-5 w-5" />
@@ -46,6 +64,7 @@ export default function Configuracoes() {
             {/* Tab Content */}
             <div className="glass p-6 rounded-2xl min-h-[400px]">
                 {activeTab === 'calendario' && <CalendarioTab />}
+                {activeTab === 'horarios' && hasActiveCalendar && <HorarioAulaTab />}
 
                 {activeTab === 'professores' && (
                     <div className="text-center py-12 text-slate-500 dark:text-slate-400">

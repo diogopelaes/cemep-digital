@@ -17,7 +17,10 @@ from apps.users.permissions import GestaoSecretariaMixin
 
 
 class CursoViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
-    """ViewSet de Cursos. Leitura: Gestão/Secretaria | Escrita: Gestão/Secretaria"""
+    """
+    ViewSet para Curso.
+    Leitura: Gestão / Secretaria | Escrita: Gestão / Secretaria
+    """
     queryset = Curso.objects.all()
     serializer_class = CursoSerializer
     filter_backends = [DjangoFilterBackend]
