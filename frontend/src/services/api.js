@@ -77,6 +77,9 @@ export const authAPI = {
   me: () => api.get('/users/me/'),
   updateMe: (data) => api.put('/users/update_me/', data),
   changePassword: (data) => api.post('/users/change_password/', data),
+  // Djoser Password Reset
+  resetPassword: (data) => axios.post('/api/v1/auth/users/reset_password/', data),
+  resetPasswordConfirm: (data) => axios.post('/api/v1/auth/users/reset_password_confirm/', data),
 }
 
 export const usersAPI = {

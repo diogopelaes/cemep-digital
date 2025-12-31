@@ -1,0 +1,160 @@
+SEGURANÇA – DJANGO REST FRAMEWORK + REACT (VITE)
+==============================================
+
+------------------------------------------------
+1. FUNDAMENTAL (OBRIGATÓRIO EM PRODUÇÃO)
+------------------------------------------------
+
+1.1 Autenticação e Autorização
+- Utilizar JWT com tempo de vida curto
+  - ACCESS_TOKEN_LIFETIME entre 5 e 15 minutos
+  - REFRESH_TOKEN_LIFETIME controlado
+- Aplicar permissões em todas as views
+  - IsAuthenticated
+  - Permissões customizadas por papel (role-based)
+- Nunca confiar em permissões ou validações feitas no frontend
+
+1.2 Proteção de Credenciais
+- Nunca versionar:
+  - SECRET_KEY
+  - Tokens
+  - Senhas
+  - Credenciais de banco
+- Utilizar variáveis de ambiente (.env)
+- Usar chaves diferentes por ambiente (dev, staging, prod)
+- Rotacionar segredos periodicamente
+
+1.3 CORS e CSRF
+- Definir explicitamente os domínios permitidos
+- Nunca habilitar CORS_ALLOW_ALL_ORIGINS em produção
+- Para uso de cookies:
+  - CSRF_COOKIE_SECURE = True
+  - CSRF_TRUSTED_ORIGINS configurado corretamente
+
+1.4 HTTPS Obrigatório
+- Aplicação sempre atrás de HTTPS
+- Ativar:
+  - SECURE_SSL_REDIRECT = True
+  - SESSION_COOKIE_SECURE = True
+  - CSRF_COOKIE_SECURE = True
+
+1.5 Upload de Arquivos
+- Validar:
+  - Tipo MIME
+  - Extensão do arquivo
+  - Tamanho máximo
+- Nunca executar arquivos enviados
+- Não servir uploads diretamente
+- Armazenar uploads fora do diretório público
+
+1.6 Rate Limiting (Anti-bruteforce)
+- Aplicar limite de requisições em:
+  - Login
+  - Reset de senha
+  - Endpoints sensíveis
+- Utilizar throttling do DRF
+
+1.7 Erros e Debug
+- Em produção:
+  - DEBUG = False
+- Nunca expor:
+  - Stacktrace
+  - Queries SQL
+  - Caminhos internos do servidor
+
+
+------------------------------------------------
+2. MELHORES PRÁTICAS (NÍVEL PROFISSIONAL)
+------------------------------------------------
+
+2.1 Headers de Segurança
+- HSTS habilitado
+- Bloqueio de iframes (X_FRAME_OPTIONS = DENY)
+- Proteção contra MIME sniffing
+- Proteção básica contra XSS
+
+2.2 JWT Mais Seguro
+- Usar refresh tokens rotativos
+- Invalidar tokens antigos automaticamente
+- Armazenar tokens preferencialmente em:
+  - Cookies HttpOnly
+- Evitar localStorage para JWT
+
+2.3 Controle de Acesso por Objeto (IDOR)
+- Validar se o usuário é dono do recurso
+- Filtrar querysets pelo usuário autenticado
+- Nunca confiar apenas no ID recebido pela URL
+
+2.4 Hardening do Django
+- Remover apps não utilizados
+- Definir ALLOWED_HOSTS explicitamente
+- Configurar corretamente SECURE_PROXY_SSL_HEADER quando usar proxy
+
+2.5 Banco de Dados
+- Usuário do PostgreSQL sem privilégios de superuser
+- Conexão com SSL
+- Backups criptografados
+- Evitar uso de SQL cru (raw queries)
+
+2.6 Logs e Auditoria
+- Registrar:
+  - Login
+  - Logout
+  - Alterações críticas
+- Nunca registrar:
+  - Senhas
+  - Tokens
+  - Dados sensíveis
+- Utilizar níveis de log apropriados (INFO, WARNING, ERROR)
+
+2.7 Segurança no Frontend (React + Vite)
+- Nunca confiar em validações do frontend
+- Proteger rotas por estado de autenticação
+- Validar permissões sempre no backend
+- Evitar:
+  - eval
+  - dangerouslySetInnerHTML
+
+2.8 Dependências
+- Manter dependências sempre atualizadas
+- Executar scanners de vulnerabilidade:
+  - pip-audit
+  - npm audit
+
+2.9 Separação de Ambientes
+- Utilizar arquivos de configuração separados:
+  - .env.dev
+  - .env.staging
+  - .env.prod
+- Bancos de dados distintos por ambiente
+- Chaves e tokens distintos
+
+2.10 Proteção contra Enumeração
+- Mensagens de erro genéricas
+  - “Usuário ou senha inválidos”
+- Tempo de resposta similar para erros e sucessos
+
+2.11 Reset de Senha
+- Tokens de uso único
+- Tokens com expiração curta
+- Registro de tentativas
+- Fluxo claro de invalidação
+
+
+------------------------------------------------
+3. CHECKLIST RÁPIDO DE SEGURANÇA
+------------------------------------------------
+
+- UUID como chave primária
+- JWT com expiração curta
+- HTTPS ativo
+- CORS restrito
+- Rate limiting configurado
+- DEBUG desativado
+- Permissões por objeto
+- Upload de arquivos seguro
+- Logs sem dados sensíveis
+
+------------------------------------------------
+FIM DO DOCUMENTO
+------------------------------------------------

@@ -10,9 +10,9 @@ Sistema de gestão escolar desenvolvido sob medida para o **CEMEP - Centro Munic
 
 | Camada | Stack |
 |--------|-------|
-| **Backend** | Python 3.14, Django 4, DRF, PostgreSQL 18, JWT, Uvicorn |
+| **Backend** | Python 3.12+, Django 5, DRF, PostgreSQL 16+, JWT, Uvicorn |
 | **Frontend** | React 18, Vite, TailwindCSS, React Router, Axios |
-| **Infra** | Caddy (reverse proxy + SSL), VPS Hostinger |
+| **Infra** | Caddy (reverse proxy + SSL), VPS Ubuntu |
 
 ---
 
@@ -54,9 +54,16 @@ cemep-digital/
 ## 🔧 Início Rápido
 
 ### Pré-requisitos
-- Python 3.14+
+- Python 3.12+
 - Node.js 20+
-- PostgreSQL 17+
+- PostgreSQL 16+
+
+### Configuração de Ambiente
+
+```powershell
+# Gerar arquivo .env a partir do JSON
+.\setup-env-dev.ps1
+```
 
 ### Opção 1: Script Automático (Recomendado)
 
@@ -153,10 +160,12 @@ npm run dev                      # Iniciar dev server
 
 ## 🔒 Segurança
 
-- **Autenticação JWT** com access/refresh tokens
+- **Autenticação JWT** com access/refresh tokens (rotação automática)
+- **Rate Limiting** - 100 req/h anônimo, 1000 req/h autenticado
 - **Permissões por perfil** via Mixins no backend
-- **Arquivos protegidos** (fotos, atestados, anexos)
-- **CORS configurado** para domínios específicos
+- **SSL/HSTS** obrigatório em produção
+- **Cookies seguros** (CSRF e Session)
+- **Variáveis de ambiente** para todas as credenciais
 - **Senhas criptografadas** com Django hasher
 
 ---

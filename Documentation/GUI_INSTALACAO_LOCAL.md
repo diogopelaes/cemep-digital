@@ -12,38 +12,29 @@ Instale **antes de qualquer coisa**:
 - Download: https://git-scm.com/download/win
 - Durante a instalação, mantenha as opções padrão.
 
-Verificação:
 ```powershell
 git --version
 ```
 
 ---
 
-### 2. Python 3.14.x (64 bits)
+### 2. Python 3.12+ (64 bits)
 - Download: https://www.python.org/downloads/windows/
-- Escolha **Python 3.14.x – Windows installer (64-bit)**
 
 ⚠️ Durante a instalação:
 - Marque **Add Python to PATH**
-- Escolha **Install for all users** (recomendado)
+- Escolha **Install for all users**
 
-Verificação:
 ```powershell
 py --version
 ```
 
-Saída esperada:
-```
-Python 3.14.x
-```
-
 ---
 
-### 3. Node.js 24.x
+### 3. Node.js 20 LTS
 - Download: https://nodejs.org/en/download/
 - Escolha **Windows Installer (.msi) – 64-bit**
 
-Verificação:
 ```powershell
 node --version
 npm --version
@@ -51,17 +42,14 @@ npm --version
 
 ---
 
-### 4. PostgreSQL 18
+### 4. PostgreSQL 16+
 - Download: https://www.postgresql.org/download/windows/
-- Escolha **PostgreSQL 18**
 
 Durante a instalação:
 - Usuário: `postgres`
 - Senha: `f&0(iO1F,15w`
 - Porta: `5432`
-- Locale: Default
 
-Verificação:
 ```powershell
 psql --version
 ```
@@ -72,28 +60,13 @@ psql --version
 
 Permitir execução de scripts locais:
 
-Abra o PowerShell **como usuário normal** e execute:
-
 ```powershell
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
-```
-
-Verificação:
-```powershell
-Get-ExecutionPolicy -List
 ```
 
 ---
 
 ## Clonar o Repositório
-
-Escolha um diretório de trabalho, por exemplo:
-
-```powershell
-C:\Projects
-```
-
-Execute:
 
 ```powershell
 cd C:\Projects
@@ -101,38 +74,48 @@ git clone https://github.com/diogopelaes/cemep-digital.git
 cd cemep-digital
 ```
 
-Estrutura esperada:
+---
 
+## Configurar Ambiente de Desenvolvimento
+
+### Opção 1: Script Automático (Recomendado)
+
+Execute o script que configura as variáveis de ambiente a partir do JSON:
+
+```powershell
+.\setup-env-dev.ps1
 ```
-cemep-digital/
-├─ backend/
-├─ frontend/
-├─ .venv/
+
+Este script:
+- Lê `env.development.json`
+- Gera o arquivo `backend\.env` automaticamente
+
+### Opção 2: Manual
+
+Crie o arquivo `backend\.env` manualmente:
+
+```env
+DEBUG=true
+SECRET_KEY=django-insecure-dev-key
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+DB_NAME=cemep_digital
+DB_USER=postgres
+DB_PASSWORD=f&0(iO1F,15w
+DB_HOST=localhost
+DB_PORT=5432
+
+FRONTEND_URL=http://localhost:5173
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 ```
 
 ---
 
-## Criar e Ativar Ambiente Virtual Python
+## Criar Ambiente Virtual Python
 
 ```powershell
-cd backend
-py -m venv ..\.venv
-..\.venv\Scripts\Activate.ps1
-```
-
-Confirmação:
-```powershell
-where python
-```
-
-Deve apontar para `.venv`.
-
----
-
-## Atualizar pip
-
-```powershell
-py -m pip install --upgrade pip
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
 ---
@@ -140,6 +123,8 @@ py -m pip install --upgrade pip
 ## Instalar Dependências do Backend
 
 ```powershell
+cd backend
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
@@ -147,27 +132,13 @@ pip install -r requirements.txt
 
 ## Criar Banco de Dados PostgreSQL
 
-Acesse o PostgreSQL:
-
 ```powershell
 psql -U postgres
 ```
 
-Execute:
-
 ```sql
 CREATE DATABASE cemep_digital;
 \q
-```
-
-Configuração usada pelo Django:
-
-```text
-NAME: cemep_digital
-USER: postgres
-PASSWORD: f&0(iO1F,15w
-HOST: localhost
-PORT: 5432
 ```
 
 ---
@@ -189,65 +160,60 @@ py manage.py createsuperuser
 
 ---
 
-## Ajustar Script start-app.ps1
-
-Arquivo:
-```
-backend/Documentation/start-app.ps1
-```
-
-Confirme ou ajuste:
+## Instalar Dependências do Frontend
 
 ```powershell
-$PROJECT_ROOT = "C:\Projects\cemep-digital"
+cd ..\frontend
+npm install
 ```
-
-Verifique se os caminhos existem:
-- backend
-- frontend
-- .venv\Scripts\Activate.ps1
 
 ---
 
 ## Executar a Aplicação
 
+### Script Rápido (Recomendado)
+
 ```powershell
-cd backend\Documentation
-.\start-app.ps1
+cd C:\Projects\cemep-digital
+.\start-dev.ps1
 ```
 
-O script irá:
-- Abrir uma janela com o **backend Django**
-- Abrir outra janela com o **frontend Vite/React**
+### Manual
+
+Terminal 1 (Backend):
+```powershell
+cd C:\Projects\cemep-digital
+.\.venv\Scripts\Activate.ps1
+cd backend
+py manage.py runserver
+```
+
+Terminal 2 (Frontend):
+```powershell
+cd C:\Projects\cemep-digital\frontend
+npm run dev
+```
 
 ---
 
-## Scripts de Utilidade (Raiz do Projeto)
+## Scripts Disponíveis
 
-Existem scripts no diretório raiz (`C:\Projects\cemep-digital`) para facilitar o desenvolvimento:
+| Script | Descrição |
+|--------|-----------|
+| `setup-env-dev.ps1` | Configura variáveis de ambiente para desenvolvimento |
+| `start-dev.ps1` | Inicia backend e frontend simultaneamente |
+| `reset-db.ps1` | Limpa e recria o banco de dados |
 
-### 1. Resetar Banco de Dados (`reset-db.ps1`)
-Este script automatiza o processo de limpeza e recriação do ambiente:
-1.  Exclui o banco de dados local `cemep_digital`.
-2.  Limpa todos os arquivos de migração antigos (exceto `__init__.py`).
-3.  Recria o banco de dados.
-4.  Executa novas migrações (`makemigrations` e `migrate`).
-5.  Cria um superusuário padrão:
-    - **Usuário:** `diogo`
-    - **Senha:** `123`
+---
 
-**Uso:**
-```powershell
-.\reset-db.ps1
-```
+## Arquivos de Configuração
 
-### 2. Iniciar Ambiente de Desenvolvimento (`start-dev.ps1`)
-Este script inicia simultaneamente o servidor do Backend e do Frontend em janelas separadas do PowerShell, facilitando o início rápido do trabalho.
-
-**Uso:**
-```powershell
-.\start-dev.ps1
-```
+| Arquivo | Descrição |
+|---------|-----------|
+| `env.development.json` | Configurações de desenvolvimento |
+| `env.production.json` | Template para produção |
+| `institutional_config.json` | Dados institucionais do sistema **(obrigatório)** |
+| `backend\.env` | Variáveis de ambiente (gerado pelo script) |
 
 ---
 
@@ -256,6 +222,26 @@ Este script inicia simultaneamente o servidor do Backend e do Frontend em janela
 - Frontend: http://localhost:5173/
 - Backend API: http://localhost:8000/
 - Admin Django: http://localhost:8000/admin/
+
+---
+
+## Testar Envio de Email (Desenvolvimento)
+
+Por padrão, emails são exibidos no **console do Django** em vez de serem enviados.
+
+Para testar com SMTP real, edite `env.development.json`:
+
+```json
+{
+    "email": {
+        "backend": "django.core.mail.backends.smtp.EmailBackend",
+        "host": "smtp.gmail.com",
+        ...
+    }
+}
+```
+
+E execute novamente `.\setup-env-dev.ps1`.
 
 ---
 

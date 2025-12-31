@@ -16,6 +16,7 @@ urlpatterns = [
     
     # API Routes
     path('api/v1/', include([
+        path('auth/', include('djoser.urls')),
         path('users/', include('apps.users.urls')),
         path('core/', include('apps.core.urls')),
         path('academic/', include('apps.academic.urls')),

@@ -3,6 +3,7 @@ Django settings for CEMEP Digital project.
 """
 
 import os
+import json
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -13,13 +14,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables
 load_dotenv(BASE_DIR / '.env')
 
+# Carrega configurações institucionais do JSON (obrigatório)
+try:
+    with open(BASE_DIR.parent / 'institutional_config.json', 'r', encoding='utf-8') as f:
+        INSTITUTIONAL_DATA = json.load(f)
+except Exception as e:
+    raise Exception(f"ERRO CRÍTICO: Não foi possível carregar 'institutional_config.json'. "
+                    f"Este arquivo é obrigatório para o funcionamento do sistema. Detalhes: {e}")
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-key-change-in-production')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',') if os.getenv('ALLOWED_HOSTS') else []
 
 # Application definition
 INSTALLED_APPS = [
@@ -31,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Third-party apps
     'rest_framework',
+    'djoser',
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
@@ -82,12 +92,12 @@ ASGI_APPLICATION = 'core_project.asgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'cemep_digital'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'f&0(iO1F,15w'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5432'),
-        'ATOMIC_REQUESTS': True,  # Transações atômicas por padrão
+        'ATOMIC_REQUESTS': True,
     }
 }
 
@@ -135,59 +145,61 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    # Rate Limiting (proteção contra brute force)
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/hour',
+        'user': '1000/hour',
+    }
 }
 
 # Simple JWT Configuration
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=8),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+# Djoser Configuration (Password Reset)
+# Extrai domínio da URL do sistema (remove http:// ou https://)
+_site_url = INSTITUTIONAL_DATA['system']['site_url']
+_domain = _site_url.replace('https://', '').replace('http://', '')
+
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': 'redefinir-senha/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': False,
+    'DOMAIN': _domain,
+    'SITE_NAME': INSTITUTIONAL_DATA['system']['name'],
+    'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': False,
+    'SERIALIZERS': {
+        'user_create': 'apps.users.serializers.UserCreateSerializer',
+        'user': 'apps.users.serializers.UserSerializer',
+        'current_user': 'apps.users.serializers.UserSerializer',
+    },
+    'EMAIL': {
+        'password_reset': 'apps.users.email.PasswordResetEmail',
+    },
+}
+
 # CORS Configuration
-CORS_ALLOWED_ORIGINS = [
-    os.getenv('FRONTEND_URL', 'http://localhost:5173'),
-]
+CORS_ALLOWED_ORIGINS = [os.getenv('FRONTEND_URL')] if os.getenv('FRONTEND_URL') else []
 CORS_ALLOW_CREDENTIALS = True
 
-import json
 
-# Carrega configurações institucionais do JSON na raiz
-try:
-    with open(BASE_DIR.parent / 'institutional_config.json', 'r', encoding='utf-8') as f:
-        INSTITUTIONAL_DATA = json.load(f)
-except Exception as e:
-    # Fallback caso o arquivo não exista ou esteja mal formatado
-    print(f"Aviso: Não foi possível carregar institutional_config.json: {e}")
-    INSTITUTIONAL_DATA = {
-        "system": {
-            "name": "CEMEP Digital",
-            "version": "1.0.0",
-            "site_url": "https://cemep.digital"
-        },
-        "institution": {
-            "name_official": "CEMEP - Centro Municipal de Educação Profissionalizante",
-            "name_fantasy": "CEMEP",
-            "logo": {
-                "filename": "logo.jpeg",
-                "path_relative": "/logo.jpeg"
-            },
-            "contact": {
-                "email": "contato@cemep.digital"
-            }
-        }
-    }
 
 # Email Configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
+EMAIL_HOST = os.getenv('EMAIL_HOST')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'studytask@etep.com.br')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'qfxy dvhs cvvu rofx')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', f"{INSTITUTIONAL_DATA['system']['name']} <studytask@etep.com.br>")
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 # URL do site (centralizado - altere aqui para refletir em todo o sistema)
 SITE_URL = os.getenv('SITE_URL', INSTITUTIONAL_DATA['system']['site_url'])
@@ -215,4 +227,16 @@ CKEDITOR_CONFIGS = {
 
 # Silenced System Checks
 SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
+
+# Security settings para produção
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 ano
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
 

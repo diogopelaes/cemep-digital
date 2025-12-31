@@ -2,7 +2,7 @@
     "system": {
         "name": "CEMEP Digital",
         "version": "1.0.0",
-        "site_url": "https://cemep.net.br"
+        "site_url": "http://localhost:5173"
     },
     "institution": {
         "name_official": "CEMEP - Centro Municipal de Ensino Profissionalizante",

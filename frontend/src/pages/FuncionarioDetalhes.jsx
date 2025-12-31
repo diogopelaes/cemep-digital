@@ -7,7 +7,7 @@ import {
 import { InfoItem } from '../components/common'
 import {
     HiArrowLeft, HiPencil, HiPrinter, HiDownload, HiPhone, HiMail,
-    HiLocationMarker, HiCalendar, HiUser, HiIdentification, HiBriefcase, HiRefresh
+    HiLocationMarker, HiCalendar, HiUser, HiIdentification, HiBriefcase
 } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import { formatDateBR } from '../utils/date'
@@ -31,10 +31,6 @@ export default function FuncionarioDetalhes() {
     const [periodos, setPeriodos] = useState([])
     const [generatingPDF, setGeneratingPDF] = useState(false)
 
-    // Modal de Reset de Senha
-    const [modalReset, setModalReset] = useState({ open: false })
-    const [loadingReset, setLoadingReset] = useState(false)
-
     useEffect(() => {
         loadData()
     }, [id])
@@ -52,19 +48,6 @@ export default function FuncionarioDetalhes() {
             navigate('/funcionarios')
         }
         setLoading(false)
-    }
-
-    const handleResetSenha = async () => {
-        setLoadingReset(true)
-        try {
-            const response = await coreAPI.funcionarios.resetarSenha(id)
-            toast.success(response.data.message)
-            setModalReset({ open: false })
-        } catch (error) {
-            const msg = error.response?.data?.detail || 'Erro ao resetar senha'
-            toast.error(msg)
-        }
-        setLoadingReset(false)
     }
 
     const gerarPDF = async (download = true) => {
@@ -351,17 +334,6 @@ export default function FuncionarioDetalhes() {
                                 />
                             </div>
                         </div>
-
-                        <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                icon={HiRefresh}
-                                onClick={() => setModalReset({ open: true })}
-                            >
-                                Resetar Senha
-                            </Button>
-                        </div>
                     </div>
                 </div>
             </Card>
@@ -402,41 +374,6 @@ export default function FuncionarioDetalhes() {
                     <p className="text-slate-500 text-center py-4">Nenhum histórico de período encontrado.</p>
                 )}
             </Card>
-
-            {/* Modal Reset Senha */}
-            <Modal
-                isOpen={modalReset.open}
-                onClose={() => setModalReset({ open: false })}
-                title="Resetar Senha"
-                size="md"
-            >
-                <div className="space-y-4">
-                    <div className="flex items-center justify-center">
-                        <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center">
-                            <HiRefresh className="h-8 w-8 text-amber-500" />
-                        </div>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-slate-600 dark:text-slate-300">
-                            Confirmar reset de senha para este funcionário?
-                        </p>
-                        <p className="text-sm text-slate-500 mt-1">
-                            Uma nova senha será enviada para o e-mail cadastrado.
-                        </p>
-                    </div>
-                </div>
-                <ModalFooter>
-                    <Button variant="secondary" onClick={() => setModalReset({ open: false })}>Cancelar</Button>
-                    <Button
-                        variant="primary"
-                        onClick={handleResetSenha}
-                        disabled={loadingReset}
-                        className="bg-amber-500 hover:bg-amber-600 focus:ring-amber-500"
-                    >
-                        {loadingReset ? <Loading size="sm" /> : 'Confirmar'}
-                    </Button>
-                </ModalFooter>
-            </Modal>
         </div>
     )
 }
