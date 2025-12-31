@@ -63,7 +63,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     email=data.get('email', ''),
                     first_name=data['first_name'],
                     last_name='',
-                    telefone=data.get('telefone', ''),
                     tipo_usuario='ESTUDANTE'
                 )
                 user.set_password(student_password)
@@ -125,8 +124,7 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                             email=resp_email,
                             first_name=resp_nome,
                             last_name='',
-                            tipo_usuario='RESPONSAVEL',
-                            telefone=resp_telefone
+                            tipo_usuario='RESPONSAVEL'
                         )
                         resp_user.set_password(resp_password)
                         resp_user.save()
@@ -537,8 +535,6 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                 
                 if 'email' in data:
                     user.email = data['email']
-                if 'telefone' in data:
-                    user.telefone = data['telefone']
                 user.save()
                 
                 campos_estudante = [

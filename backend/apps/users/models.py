@@ -31,7 +31,6 @@ class User(AbstractUser):
         default=TipoUsuario.ESTUDANTE,
         verbose_name='Tipo de Usuário'
     )
-    telefone = models.CharField(max_length=15, blank=True, verbose_name='Telefone')
     foto = models.ImageField(upload_to=get_profile_pic_path, null=True, blank=True, verbose_name='Foto')
     dark_mode = models.BooleanField(default=False, verbose_name='Modo Escuro')
     

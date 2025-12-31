@@ -337,7 +337,6 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
             email=data.get('email', ''),
             password=password_plain,
             first_name=data['nome'],
-            telefone=data.get('telefone', ''),
             tipo_usuario=data['tipo_usuario'],
         )
         
@@ -402,7 +401,6 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
         user = funcionario.usuario
         user.first_name = data['nome']
         user.email = data.get('email', '')
-        user.telefone = data.get('telefone', '')
         user.tipo_usuario = data['tipo_usuario']
         user.save()
         
@@ -438,52 +436,3 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
         
         return Response(FuncionarioSerializer(funcionario).data)
     
-    @action(detail=True, methods=['post'], url_path='resetar-senha')
-    def resetar_senha(self, request, pk=None):
-        """
-        Reseta a senha do funcionário e envia a nova senha por e-mail.
-        """
-        funcionario = self.get_object()
-        user = funcionario.usuario
-        
-        if not user.email:
-            return Response(
-                {'detail': 'Este funcionário não possui e-mail cadastrado.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        nova_senha = secrets.token_urlsafe(9)
-        user.set_password(nova_senha)
-        user.save()
-        
-        context = {
-            'nome': user.first_name or funcionario.apelido or 'Usuário',
-            'username': user.username,
-            'password': nova_senha,
-            'site_url': settings.SITE_URL,
-            'site_name': settings.SITE_NAME,
-            'institution_name': settings.INSTITUTION_NAME,
-            'logo_url': f"{settings.SITE_URL}/static/img/{settings.INSTITUTIONAL_DATA['institution']['logo']['filename']}",
-        }
-        
-        try:
-            html_message = render_to_string('emails/password_reset_email.html', context)
-            plain_message = strip_tags(html_message)
-            
-            send_mail(
-                subject=f'{settings.SITE_NAME} - Sua Senha Foi Redefinida',
-                message=plain_message,
-                html_message=html_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,
-            )
-            
-            return Response({
-                'message': f'Senha redefinida com sucesso! Um e-mail foi enviado para {user.email}.'
-            })
-        except Exception as e:
-            return Response(
-                {'detail': f'Erro ao enviar e-mail: {str(e)}. A senha não foi alterada.'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
