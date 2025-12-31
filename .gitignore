@@ -10,7 +10,7 @@ Documentation/Frameworks/
 __pycache__/
 *.py[cod]
 *$py.class
-.env
+# .env
 .pytest_cache/
 
 # Node
