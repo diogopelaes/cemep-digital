@@ -1,0 +1,4784 @@
+--
+-- PostgreSQL database dump
+--
+
+\restrict XIHUnd3GQKFwZlZy7ViD996FieK4YqqzdSheYZEfSuuuDbeCcXfTrCEizmseb07
+
+-- Dumped from database version 18.0
+-- Dumped by pg_dump version 18.0
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+DROP DATABASE IF EXISTS cemep_digital;
+--
+-- Name: cemep_digital; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE cemep_digital WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'Portuguese_Brazil.1252';
+
+
+ALTER DATABASE cemep_digital OWNER TO postgres;
+
+\unrestrict XIHUnd3GQKFwZlZy7ViD996FieK4YqqzdSheYZEfSuuuDbeCcXfTrCEizmseb07
+\connect cemep_digital
+\restrict XIHUnd3GQKFwZlZy7ViD996FieK4YqqzdSheYZEfSuuuDbeCcXfTrCEizmseb07
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: academic_atestado; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.academic_atestado (
+    id uuid NOT NULL,
+    data_inicio timestamp with time zone NOT NULL,
+    data_fim timestamp with time zone NOT NULL,
+    protocolo_prefeitura character varying(50) NOT NULL,
+    arquivo character varying(100) NOT NULL,
+    criado_em timestamp with time zone NOT NULL,
+    criado_por_id uuid,
+    usuario_alvo_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.academic_atestado OWNER TO postgres;
+
+--
+-- Name: academic_estudante; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.academic_estudante (
+    id uuid NOT NULL,
+    cpf character varying(14) NOT NULL,
+    cin character varying(20) NOT NULL,
+    nome_social character varying(255) NOT NULL,
+    data_nascimento date NOT NULL,
+    bolsa_familia boolean NOT NULL,
+    pe_de_meia boolean NOT NULL,
+    usa_onibus boolean NOT NULL,
+    linha_onibus character varying(100) NOT NULL,
+    permissao_sair_sozinho boolean NOT NULL,
+    logradouro character varying(255) NOT NULL,
+    numero character varying(10) NOT NULL,
+    bairro character varying(100) NOT NULL,
+    cidade character varying(100) NOT NULL,
+    estado character varying(2) NOT NULL,
+    cep character varying(8) NOT NULL,
+    complemento character varying(100) NOT NULL,
+    telefone character varying(15) NOT NULL,
+    usuario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.academic_estudante OWNER TO postgres;
+
+--
+-- Name: academic_matriculacemep; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.academic_matriculacemep (
+    id uuid NOT NULL,
+    numero_matricula character varying(20) NOT NULL,
+    data_entrada date NOT NULL,
+    data_saida date,
+    status character varying(20) NOT NULL,
+    curso_id uuid NOT NULL,
+    estudante_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.academic_matriculacemep OWNER TO postgres;
+
+--
+-- Name: academic_matriculaturma; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.academic_matriculaturma (
+    id uuid NOT NULL,
+    data_entrada date NOT NULL,
+    data_saida date,
+    status character varying(20) NOT NULL,
+    matricula_cemep_id uuid NOT NULL,
+    turma_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.academic_matriculaturma OWNER TO postgres;
+
+--
+-- Name: academic_responsavel; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.academic_responsavel (
+    id uuid NOT NULL,
+    cpf character varying(14) NOT NULL,
+    telefone character varying(15) NOT NULL,
+    usuario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.academic_responsavel OWNER TO postgres;
+
+--
+-- Name: academic_responsavelestudante; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.academic_responsavelestudante (
+    id uuid NOT NULL,
+    parentesco character varying(20) NOT NULL,
+    telefone character varying(15) NOT NULL,
+    estudante_id uuid NOT NULL,
+    responsavel_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.academic_responsavelestudante OWNER TO postgres;
+
+--
+-- Name: auth_group; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auth_group (
+    id integer NOT NULL,
+    name character varying(150) NOT NULL
+);
+
+
+ALTER TABLE public.auth_group OWNER TO postgres;
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.auth_group ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.auth_group_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: auth_group_permissions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auth_group_permissions (
+    id bigint NOT NULL,
+    group_id integer NOT NULL,
+    permission_id integer NOT NULL
+);
+
+
+ALTER TABLE public.auth_group_permissions OWNER TO postgres;
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.auth_group_permissions ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.auth_group_permissions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: auth_permission; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auth_permission (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    content_type_id integer NOT NULL,
+    codename character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.auth_permission OWNER TO postgres;
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.auth_permission ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.auth_permission_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: core_anoletivo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_anoletivo (
+    id uuid NOT NULL,
+    ano smallint NOT NULL,
+    is_active boolean NOT NULL,
+    data_inicio_1bim date,
+    data_fim_1bim date,
+    data_inicio_2bim date,
+    data_fim_2bim date,
+    data_inicio_3bim date,
+    data_fim_3bim date,
+    data_inicio_4bim date,
+    data_fim_4bim date,
+    CONSTRAINT core_anoletivo_ano_check CHECK ((ano >= 0))
+);
+
+
+ALTER TABLE public.core_anoletivo OWNER TO postgres;
+
+--
+-- Name: core_anoletivo_dias_letivos_extras; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_anoletivo_dias_letivos_extras (
+    id bigint NOT NULL,
+    anoletivo_id uuid NOT NULL,
+    dialetivoextra_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_anoletivo_dias_letivos_extras OWNER TO postgres;
+
+--
+-- Name: core_anoletivo_dias_letivos_extras_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.core_anoletivo_dias_letivos_extras ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.core_anoletivo_dias_letivos_extras_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_anoletivo_dias_nao_letivos (
+    id bigint NOT NULL,
+    anoletivo_id uuid NOT NULL,
+    dianaoletivo_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_anoletivo_dias_nao_letivos OWNER TO postgres;
+
+--
+-- Name: core_anoletivo_dias_nao_letivos_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.core_anoletivo_dias_nao_letivos ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.core_anoletivo_dias_nao_letivos_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: core_curso; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_curso (
+    id uuid NOT NULL,
+    nome character varying(100) NOT NULL,
+    sigla character varying(10) NOT NULL,
+    is_active boolean NOT NULL
+);
+
+
+ALTER TABLE public.core_curso OWNER TO postgres;
+
+--
+-- Name: core_dialetivoextra; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_dialetivoextra (
+    id uuid NOT NULL,
+    data date NOT NULL,
+    descricao character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.core_dialetivoextra OWNER TO postgres;
+
+--
+-- Name: core_dianaoletivo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_dianaoletivo (
+    id uuid NOT NULL,
+    data date NOT NULL,
+    tipo character varying(30) NOT NULL,
+    descricao character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.core_dianaoletivo OWNER TO postgres;
+
+--
+-- Name: core_disciplina; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_disciplina (
+    id uuid NOT NULL,
+    nome character varying(100) NOT NULL,
+    sigla character varying(10) NOT NULL,
+    area_conhecimento character varying(20),
+    is_active boolean NOT NULL
+);
+
+
+ALTER TABLE public.core_disciplina OWNER TO postgres;
+
+--
+-- Name: core_disciplinaturma; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_disciplinaturma (
+    id uuid NOT NULL,
+    aulas_semanais smallint NOT NULL,
+    disciplina_id uuid NOT NULL,
+    turma_id uuid NOT NULL,
+    CONSTRAINT core_disciplinaturma_aulas_semanais_check CHECK ((aulas_semanais >= 0))
+);
+
+
+ALTER TABLE public.core_disciplinaturma OWNER TO postgres;
+
+--
+-- Name: core_funcionario; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_funcionario (
+    id uuid NOT NULL,
+    matricula integer NOT NULL,
+    area_atuacao character varying(100),
+    apelido character varying(50),
+    cpf character varying(14),
+    cin character varying(20) NOT NULL,
+    nome_social character varying(255) NOT NULL,
+    data_nascimento date,
+    logradouro character varying(255) NOT NULL,
+    numero character varying(10) NOT NULL,
+    bairro character varying(100) NOT NULL,
+    cidade character varying(100) NOT NULL,
+    estado character varying(2) NOT NULL,
+    cep character varying(8) NOT NULL,
+    complemento character varying(100) NOT NULL,
+    telefone character varying(15) NOT NULL,
+    data_admissao date,
+    usuario_id uuid NOT NULL,
+    CONSTRAINT core_funcionario_matricula_check CHECK ((matricula >= 0))
+);
+
+
+ALTER TABLE public.core_funcionario OWNER TO postgres;
+
+--
+-- Name: core_gradehoraria; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_gradehoraria (
+    id uuid NOT NULL,
+    disciplina_id uuid NOT NULL,
+    horario_aula_id uuid NOT NULL,
+    turma_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_gradehoraria OWNER TO postgres;
+
+--
+-- Name: core_habilidade; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_habilidade (
+    id uuid NOT NULL,
+    codigo character varying(20) NOT NULL,
+    descricao text NOT NULL,
+    is_active boolean NOT NULL,
+    disciplina_id uuid
+);
+
+
+ALTER TABLE public.core_habilidade OWNER TO postgres;
+
+--
+-- Name: core_horarioaula; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_horarioaula (
+    id uuid NOT NULL,
+    numero smallint NOT NULL,
+    dia_semana smallint NOT NULL,
+    hora_inicio time without time zone NOT NULL,
+    hora_fim time without time zone NOT NULL,
+    ano_letivo_id uuid NOT NULL,
+    CONSTRAINT core_horarioaula_dia_semana_check CHECK ((dia_semana >= 0)),
+    CONSTRAINT core_horarioaula_numero_check CHECK ((numero >= 0))
+);
+
+
+ALTER TABLE public.core_horarioaula OWNER TO postgres;
+
+--
+-- Name: core_periodotrabalho; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_periodotrabalho (
+    id uuid NOT NULL,
+    data_entrada date NOT NULL,
+    data_saida date,
+    funcionario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_periodotrabalho OWNER TO postgres;
+
+--
+-- Name: core_professordisciplinaturma; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_professordisciplinaturma (
+    id uuid NOT NULL,
+    tipo character varying(15) NOT NULL,
+    data_inicio date,
+    data_fim date,
+    disciplina_turma_id uuid NOT NULL,
+    professor_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_professordisciplinaturma OWNER TO postgres;
+
+--
+-- Name: core_turma; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_turma (
+    id uuid NOT NULL,
+    numero smallint NOT NULL,
+    letra character varying(1) NOT NULL,
+    ano_letivo smallint NOT NULL,
+    nomenclatura character varying(10) NOT NULL,
+    is_active boolean NOT NULL,
+    curso_id uuid NOT NULL,
+    CONSTRAINT core_turma_ano_letivo_check CHECK ((ano_letivo >= 0)),
+    CONSTRAINT core_turma_numero_check CHECK ((numero >= 0))
+);
+
+
+ALTER TABLE public.core_turma OWNER TO postgres;
+
+--
+-- Name: core_turma_professores_representantes; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_turma_professores_representantes (
+    id bigint NOT NULL,
+    turma_id uuid NOT NULL,
+    funcionario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_turma_professores_representantes OWNER TO postgres;
+
+--
+-- Name: core_turma_professores_representantes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.core_turma_professores_representantes ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.core_turma_professores_representantes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_admin_log; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_admin_log (
+    id integer NOT NULL,
+    action_time timestamp with time zone NOT NULL,
+    object_id text,
+    object_repr character varying(200) NOT NULL,
+    action_flag smallint NOT NULL,
+    change_message text NOT NULL,
+    content_type_id integer,
+    user_id uuid NOT NULL,
+    CONSTRAINT django_admin_log_action_flag_check CHECK ((action_flag >= 0))
+);
+
+
+ALTER TABLE public.django_admin_log OWNER TO postgres;
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.django_admin_log ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.django_admin_log_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_content_type; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_content_type (
+    id integer NOT NULL,
+    app_label character varying(100) NOT NULL,
+    model character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.django_content_type OWNER TO postgres;
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.django_content_type ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.django_content_type_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_migrations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_migrations (
+    id bigint NOT NULL,
+    app character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    applied timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.django_migrations OWNER TO postgres;
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.django_migrations ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.django_migrations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_session; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_session (
+    session_key character varying(40) NOT NULL,
+    session_data text NOT NULL,
+    expire_date timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.django_session OWNER TO postgres;
+
+--
+-- Name: management_aviso; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_aviso (
+    id uuid NOT NULL,
+    titulo character varying(200) NOT NULL,
+    texto text NOT NULL,
+    data_aviso timestamp with time zone NOT NULL,
+    criador_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_aviso OWNER TO postgres;
+
+--
+-- Name: management_aviso_destinatarios; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_aviso_destinatarios (
+    id bigint NOT NULL,
+    aviso_id uuid NOT NULL,
+    user_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_aviso_destinatarios OWNER TO postgres;
+
+--
+-- Name: management_aviso_destinatarios_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.management_aviso_destinatarios ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.management_aviso_destinatarios_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: management_avisoanexo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_avisoanexo (
+    id uuid NOT NULL,
+    arquivo character varying(100) NOT NULL,
+    descricao character varying(100) NOT NULL,
+    aviso_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_avisoanexo OWNER TO postgres;
+
+--
+-- Name: management_avisovisualizacao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_avisovisualizacao (
+    id uuid NOT NULL,
+    visualizado boolean NOT NULL,
+    data_visualizacao timestamp with time zone,
+    aviso_id uuid NOT NULL,
+    usuario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_avisovisualizacao OWNER TO postgres;
+
+--
+-- Name: management_notificacaohtpc; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_notificacaohtpc (
+    id uuid NOT NULL,
+    visualizado boolean NOT NULL,
+    data_visualizacao timestamp with time zone,
+    funcionario_id uuid NOT NULL,
+    reuniao_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_notificacaohtpc OWNER TO postgres;
+
+--
+-- Name: management_notificacaotarefa; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_notificacaotarefa (
+    id uuid NOT NULL,
+    visualizado boolean NOT NULL,
+    data_visualizacao timestamp with time zone,
+    funcionario_id uuid NOT NULL,
+    tarefa_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_notificacaotarefa OWNER TO postgres;
+
+--
+-- Name: management_reuniaohtpc; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_reuniaohtpc (
+    id uuid NOT NULL,
+    data_reuniao timestamp with time zone NOT NULL,
+    pauta text NOT NULL,
+    ata text NOT NULL,
+    data_registro timestamp with time zone NOT NULL,
+    quem_registrou_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_reuniaohtpc OWNER TO postgres;
+
+--
+-- Name: management_reuniaohtpc_presentes; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_reuniaohtpc_presentes (
+    id bigint NOT NULL,
+    reuniaohtpc_id uuid NOT NULL,
+    funcionario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_reuniaohtpc_presentes OWNER TO postgres;
+
+--
+-- Name: management_reuniaohtpc_presentes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.management_reuniaohtpc_presentes ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.management_reuniaohtpc_presentes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: management_reuniaohtpcanexo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_reuniaohtpcanexo (
+    id uuid NOT NULL,
+    arquivo character varying(100) NOT NULL,
+    descricao character varying(100) NOT NULL,
+    reuniao_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_reuniaohtpcanexo OWNER TO postgres;
+
+--
+-- Name: management_tarefa; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_tarefa (
+    id uuid NOT NULL,
+    titulo character varying(200) NOT NULL,
+    descricao text NOT NULL,
+    prazo timestamp with time zone NOT NULL,
+    concluido boolean NOT NULL,
+    data_conclusao timestamp with time zone,
+    data_cadastro timestamp with time zone NOT NULL,
+    criador_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_tarefa OWNER TO postgres;
+
+--
+-- Name: management_tarefa_funcionarios; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_tarefa_funcionarios (
+    id bigint NOT NULL,
+    tarefa_id uuid NOT NULL,
+    funcionario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_tarefa_funcionarios OWNER TO postgres;
+
+--
+-- Name: management_tarefa_funcionarios_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.management_tarefa_funcionarios ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.management_tarefa_funcionarios_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: management_tarefaanexo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_tarefaanexo (
+    id uuid NOT NULL,
+    arquivo character varying(100) NOT NULL,
+    descricao character varying(100) NOT NULL,
+    tarefa_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_tarefaanexo OWNER TO postgres;
+
+--
+-- Name: management_tarefaresposta; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_tarefaresposta (
+    id uuid NOT NULL,
+    texto text NOT NULL,
+    data_envio timestamp with time zone NOT NULL,
+    funcionario_id uuid NOT NULL,
+    tarefa_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_tarefaresposta OWNER TO postgres;
+
+--
+-- Name: management_tarefarespostaanexo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_tarefarespostaanexo (
+    id uuid NOT NULL,
+    arquivo character varying(100) NOT NULL,
+    descricao character varying(100) NOT NULL,
+    resposta_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_tarefarespostaanexo OWNER TO postgres;
+
+--
+-- Name: pedagogical_aula; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_aula (
+    id uuid NOT NULL,
+    data date NOT NULL,
+    conteudo text NOT NULL,
+    numero_aulas smallint NOT NULL,
+    criado_em timestamp with time zone NOT NULL,
+    professor_disciplina_turma_id uuid NOT NULL,
+    CONSTRAINT pedagogical_aula_numero_aulas_check CHECK ((numero_aulas >= 0))
+);
+
+
+ALTER TABLE public.pedagogical_aula OWNER TO postgres;
+
+--
+-- Name: pedagogical_avaliacao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_avaliacao (
+    id uuid NOT NULL,
+    valor numeric(4,2) NOT NULL,
+    tipo character varying(30) NOT NULL,
+    tipo_calculo_instrumentos character varying(20) NOT NULL,
+    professor_disciplina_turma_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_avaliacao OWNER TO postgres;
+
+--
+-- Name: pedagogical_controlevisto; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_controlevisto (
+    id uuid NOT NULL,
+    titulo character varying(100) NOT NULL,
+    data_visto timestamp with time zone NOT NULL,
+    visto boolean,
+    matricula_turma_id uuid NOT NULL,
+    professor_disciplina_turma_id uuid CONSTRAINT pedagogical_controlevisto_professor_disciplina_turma_i_not_null NOT NULL,
+    instrumento_avaliativo_id uuid
+);
+
+
+ALTER TABLE public.pedagogical_controlevisto OWNER TO postgres;
+
+--
+-- Name: pedagogical_descritorocorrenciapedagogica; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_descritorocorrenciapedagogica (
+    id uuid NOT NULL,
+    texto character varying(100) NOT NULL,
+    ativo boolean NOT NULL,
+    gestor_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_descritorocorrenciapedagogica OWNER TO postgres;
+
+--
+-- Name: pedagogical_faltas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_faltas (
+    id uuid NOT NULL,
+    aula_numero smallint NOT NULL,
+    aula_id uuid NOT NULL,
+    estudante_id uuid NOT NULL,
+    CONSTRAINT pedagogical_faltas_aula_numero_check CHECK ((aula_numero >= 0))
+);
+
+
+ALTER TABLE public.pedagogical_faltas OWNER TO postgres;
+
+--
+-- Name: pedagogical_instrumentoavaliativo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_instrumentoavaliativo (
+    id uuid NOT NULL,
+    titulo character varying(100) NOT NULL,
+    data_inicio date NOT NULL,
+    data_fim date NOT NULL,
+    usa_vistos boolean NOT NULL,
+    peso numeric(4,2) NOT NULL,
+    valor numeric(4,2) NOT NULL,
+    avaliacao_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_instrumentoavaliativo OWNER TO postgres;
+
+--
+-- Name: pedagogical_notaavaliacao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_notaavaliacao (
+    id uuid NOT NULL,
+    valor numeric(4,2),
+    avaliacao_id uuid NOT NULL,
+    matricula_turma_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_notaavaliacao OWNER TO postgres;
+
+--
+-- Name: pedagogical_notabimestral; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_notabimestral (
+    id uuid NOT NULL,
+    nota numeric(4,2) NOT NULL,
+    matricula_turma_id uuid NOT NULL,
+    professor_disciplina_turma_id uuid CONSTRAINT pedagogical_notabimestral_professor_disciplina_turma_i_not_null NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_notabimestral OWNER TO postgres;
+
+--
+-- Name: pedagogical_notainstrumentoavaliativo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_notainstrumentoavaliativo (
+    id uuid NOT NULL,
+    valor numeric(4,2),
+    instrumento_avaliativo_id uuid CONSTRAINT pedagogical_notainstrumentoa_instrumento_avaliativo_id_not_null NOT NULL,
+    matricula_turma_id uuid CONSTRAINT pedagogical_notainstrumentoavaliati_matricula_turma_id_not_null NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_notainstrumentoavaliativo OWNER TO postgres;
+
+--
+-- Name: pedagogical_notificacaorecuperacao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_notificacaorecuperacao (
+    id uuid NOT NULL,
+    visualizado boolean NOT NULL,
+    data_visualizacao timestamp with time zone,
+    estudante_id uuid NOT NULL,
+    professor_disciplina_turma_id uuid CONSTRAINT pedagogical_notificacaorecu_professor_disciplina_turma_not_null NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_notificacaorecuperacao OWNER TO postgres;
+
+--
+-- Name: pedagogical_ocorrenciapedagogica; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_ocorrenciapedagogica (
+    id uuid NOT NULL,
+    data timestamp with time zone NOT NULL,
+    autor_id uuid NOT NULL,
+    estudante_id uuid NOT NULL,
+    tipo_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_ocorrenciapedagogica OWNER TO postgres;
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_ocorrenciaresponsavelciente (
+    id uuid NOT NULL,
+    ciente boolean NOT NULL,
+    data_ciencia timestamp with time zone,
+    ocorrencia_id uuid NOT NULL,
+    responsavel_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_ocorrenciaresponsavelciente OWNER TO postgres;
+
+--
+-- Name: pedagogical_planoaula; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_planoaula (
+    id uuid NOT NULL,
+    data_inicio date NOT NULL,
+    data_fim date NOT NULL,
+    conteudo text NOT NULL,
+    criado_em timestamp with time zone NOT NULL,
+    atualizado_em timestamp with time zone NOT NULL,
+    disciplina_id uuid NOT NULL,
+    professor_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_planoaula OWNER TO postgres;
+
+--
+-- Name: pedagogical_planoaula_habilidades; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_planoaula_habilidades (
+    id bigint NOT NULL,
+    planoaula_id uuid NOT NULL,
+    habilidade_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_planoaula_habilidades OWNER TO postgres;
+
+--
+-- Name: pedagogical_planoaula_habilidades_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.pedagogical_planoaula_habilidades ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.pedagogical_planoaula_habilidades_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: pedagogical_planoaula_turmas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_planoaula_turmas (
+    id bigint NOT NULL,
+    planoaula_id uuid NOT NULL,
+    turma_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_planoaula_turmas OWNER TO postgres;
+
+--
+-- Name: pedagogical_planoaula_turmas_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.pedagogical_planoaula_turmas ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.pedagogical_planoaula_turmas_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: permanent_dadospermanenteestudante; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_dadospermanenteestudante (
+    id uuid NOT NULL,
+    cpf character varying(14) NOT NULL,
+    nome character varying(255) NOT NULL,
+    data_nascimento date,
+    telefone character varying(15) NOT NULL,
+    email character varying(254) NOT NULL,
+    endereco_completo text NOT NULL,
+    criado_em timestamp with time zone NOT NULL,
+    atualizado_em timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.permanent_dadospermanenteestudante OWNER TO postgres;
+
+--
+-- Name: permanent_dadospermanenteresponsavel; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_dadospermanenteresponsavel (
+    id uuid NOT NULL,
+    cpf character varying(14) NOT NULL,
+    nome character varying(255) NOT NULL,
+    telefone character varying(15) NOT NULL,
+    email character varying(254) NOT NULL,
+    parentesco character varying(20) NOT NULL,
+    estudante_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.permanent_dadospermanenteresponsavel OWNER TO postgres;
+
+--
+-- Name: permanent_historicoescolar; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_historicoescolar (
+    id uuid NOT NULL,
+    numero_matricula character varying(20) NOT NULL,
+    nome_curso character varying(100) NOT NULL,
+    data_entrada_cemep date NOT NULL,
+    data_saida_cemep date,
+    concluido boolean NOT NULL,
+    observacoes_gerais text NOT NULL,
+    estudante_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.permanent_historicoescolar OWNER TO postgres;
+
+--
+-- Name: permanent_historicoescolaranoletivo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_historicoescolaranoletivo (
+    id uuid NOT NULL,
+    ano_letivo smallint NOT NULL,
+    nomenclatura_turma character varying(50) NOT NULL,
+    numero_turma smallint NOT NULL,
+    letra_turma character varying(1) NOT NULL,
+    status_final character varying(20) NOT NULL,
+    descricao_status character varying(100) NOT NULL,
+    observacoes text NOT NULL,
+    historico_id uuid NOT NULL,
+    CONSTRAINT permanent_historicoescolaranoletivo_ano_letivo_check CHECK ((ano_letivo >= 0)),
+    CONSTRAINT permanent_historicoescolaranoletivo_numero_turma_check CHECK ((numero_turma >= 0))
+);
+
+
+ALTER TABLE public.permanent_historicoescolaranoletivo OWNER TO postgres;
+
+--
+-- Name: permanent_historicoescolarnotas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_historicoescolarnotas (
+    id uuid NOT NULL,
+    nome_disciplina character varying(100) NOT NULL,
+    aulas_semanais smallint NOT NULL,
+    nota_final numeric(4,2) NOT NULL,
+    frequencia_total smallint NOT NULL,
+    ano_letivo_ref_id uuid NOT NULL,
+    CONSTRAINT permanent_historicoescolarnotas_aulas_semanais_check CHECK ((aulas_semanais >= 0)),
+    CONSTRAINT permanent_historicoescolarnotas_frequencia_total_check CHECK ((frequencia_total >= 0))
+);
+
+
+ALTER TABLE public.permanent_historicoescolarnotas OWNER TO postgres;
+
+--
+-- Name: permanent_registroprontuario; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_registroprontuario (
+    id uuid NOT NULL,
+    ocorrencia_disciplinar boolean NOT NULL,
+    cpf character varying(14) NOT NULL,
+    nome_estudante character varying(255) NOT NULL,
+    autor_nome character varying(255) NOT NULL,
+    data_ocorrido timestamp with time zone NOT NULL,
+    data_registro timestamp with time zone NOT NULL,
+    descricao text NOT NULL,
+    ano_letivo smallint,
+    bimestre smallint,
+    pai_ocorrencia_id uuid,
+    CONSTRAINT permanent_registroprontuario_ano_letivo_check CHECK ((ano_letivo >= 0)),
+    CONSTRAINT permanent_registroprontuario_bimestre_check CHECK ((bimestre >= 0))
+);
+
+
+ALTER TABLE public.permanent_registroprontuario OWNER TO postgres;
+
+--
+-- Name: permanent_registroprontuarioanexo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_registroprontuarioanexo (
+    id bigint NOT NULL,
+    arquivo character varying(100) NOT NULL,
+    descricao character varying(255) NOT NULL,
+    criado_em timestamp with time zone NOT NULL,
+    registro_prontuario_id uuid CONSTRAINT permanent_registroprontuarioane_registro_prontuario_id_not_null NOT NULL
+);
+
+
+ALTER TABLE public.permanent_registroprontuarioanexo OWNER TO postgres;
+
+--
+-- Name: permanent_registroprontuarioanexo_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.permanent_registroprontuarioanexo ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.permanent_registroprontuarioanexo_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: users_user; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users_user (
+    password character varying(128) NOT NULL,
+    last_login timestamp with time zone,
+    is_superuser boolean NOT NULL,
+    username character varying(150) NOT NULL,
+    first_name character varying(150) NOT NULL,
+    last_name character varying(150) NOT NULL,
+    email character varying(254) NOT NULL,
+    is_staff boolean NOT NULL,
+    is_active boolean NOT NULL,
+    date_joined timestamp with time zone NOT NULL,
+    id uuid NOT NULL,
+    tipo_usuario character varying(20) NOT NULL,
+    foto character varying(100),
+    dark_mode boolean NOT NULL
+);
+
+
+ALTER TABLE public.users_user OWNER TO postgres;
+
+--
+-- Name: users_user_groups; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users_user_groups (
+    id bigint NOT NULL,
+    user_id uuid NOT NULL,
+    group_id integer NOT NULL
+);
+
+
+ALTER TABLE public.users_user_groups OWNER TO postgres;
+
+--
+-- Name: users_user_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.users_user_groups ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.users_user_groups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: users_user_user_permissions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users_user_user_permissions (
+    id bigint NOT NULL,
+    user_id uuid NOT NULL,
+    permission_id integer NOT NULL
+);
+
+
+ALTER TABLE public.users_user_user_permissions OWNER TO postgres;
+
+--
+-- Name: users_user_user_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.users_user_user_permissions ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.users_user_user_permissions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Data for Name: academic_atestado; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.academic_atestado (id, data_inicio, data_fim, protocolo_prefeitura, arquivo, criado_em, criado_por_id, usuario_alvo_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: academic_estudante; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.academic_estudante (id, cpf, cin, nome_social, data_nascimento, bolsa_familia, pe_de_meia, usa_onibus, linha_onibus, permissao_sair_sozinho, logradouro, numero, bairro, cidade, estado, cep, complemento, telefone, usuario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: academic_matriculacemep; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.academic_matriculacemep (id, numero_matricula, data_entrada, data_saida, status, curso_id, estudante_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: academic_matriculaturma; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.academic_matriculaturma (id, data_entrada, data_saida, status, matricula_cemep_id, turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: academic_responsavel; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.academic_responsavel (id, cpf, telefone, usuario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: academic_responsavelestudante; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.academic_responsavelestudante (id, parentesco, telefone, estudante_id, responsavel_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: auth_group; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.auth_group (id, name) FROM stdin;
+\.
+
+
+--
+-- Data for Name: auth_group_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.auth_group_permissions (id, group_id, permission_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: auth_permission; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
+1	Can add log entry	1	add_logentry
+2	Can change log entry	1	change_logentry
+3	Can delete log entry	1	delete_logentry
+4	Can view log entry	1	view_logentry
+5	Can add permission	3	add_permission
+6	Can change permission	3	change_permission
+7	Can delete permission	3	delete_permission
+8	Can view permission	3	view_permission
+9	Can add group	2	add_group
+10	Can change group	2	change_group
+11	Can delete group	2	delete_group
+12	Can view group	2	view_group
+13	Can add content type	4	add_contenttype
+14	Can change content type	4	change_contenttype
+15	Can delete content type	4	delete_contenttype
+16	Can view content type	4	view_contenttype
+17	Can add session	5	add_session
+18	Can change session	5	change_session
+19	Can delete session	5	delete_session
+20	Can view session	5	view_session
+21	Can add Usuário	6	add_user
+22	Can change Usuário	6	change_user
+23	Can delete Usuário	6	delete_user
+24	Can view Usuário	6	view_user
+25	Can add Curso	8	add_curso
+26	Can change Curso	8	change_curso
+27	Can delete Curso	8	delete_curso
+28	Can view Curso	8	view_curso
+29	Can add Dia Letivo Extra	9	add_dialetivoextra
+30	Can change Dia Letivo Extra	9	change_dialetivoextra
+31	Can delete Dia Letivo Extra	9	delete_dialetivoextra
+32	Can view Dia Letivo Extra	9	view_dialetivoextra
+33	Can add Dia Não Letivo	10	add_dianaoletivo
+34	Can change Dia Não Letivo	10	change_dianaoletivo
+35	Can delete Dia Não Letivo	10	delete_dianaoletivo
+36	Can view Dia Não Letivo	10	view_dianaoletivo
+37	Can add Funcionário	13	add_funcionario
+38	Can change Funcionário	13	change_funcionario
+39	Can delete Funcionário	13	delete_funcionario
+40	Can view Funcionário	13	view_funcionario
+41	Can add Grade Horária	14	add_gradehoraria
+42	Can change Grade Horária	14	change_gradehoraria
+43	Can delete Grade Horária	14	delete_gradehoraria
+44	Can view Grade Horária	14	view_gradehoraria
+45	Can add Habilidade	15	add_habilidade
+46	Can change Habilidade	15	change_habilidade
+47	Can delete Habilidade	15	delete_habilidade
+48	Can view Habilidade	15	view_habilidade
+49	Can add Horário de Aula	16	add_horarioaula
+50	Can change Horário de Aula	16	change_horarioaula
+51	Can delete Horário de Aula	16	delete_horarioaula
+52	Can view Horário de Aula	16	view_horarioaula
+53	Can add Período de Trabalho	17	add_periodotrabalho
+54	Can change Período de Trabalho	17	change_periodotrabalho
+55	Can delete Período de Trabalho	17	delete_periodotrabalho
+56	Can view Período de Trabalho	17	view_periodotrabalho
+57	Can add Atribuição de Professor	18	add_professordisciplinaturma
+58	Can change Atribuição de Professor	18	change_professordisciplinaturma
+59	Can delete Atribuição de Professor	18	delete_professordisciplinaturma
+60	Can view Atribuição de Professor	18	view_professordisciplinaturma
+61	Can add Turma	19	add_turma
+62	Can change Turma	19	change_turma
+63	Can delete Turma	19	delete_turma
+64	Can view Turma	19	view_turma
+65	Can add Ano Letivo	7	add_anoletivo
+66	Can change Ano Letivo	7	change_anoletivo
+67	Can delete Ano Letivo	7	delete_anoletivo
+68	Can view Ano Letivo	7	view_anoletivo
+69	Can add Disciplina	11	add_disciplina
+70	Can change Disciplina	11	change_disciplina
+71	Can delete Disciplina	11	delete_disciplina
+72	Can view Disciplina	11	view_disciplina
+73	Can add Disciplina da Turma	12	add_disciplinaturma
+74	Can change Disciplina da Turma	12	change_disciplinaturma
+75	Can delete Disciplina da Turma	12	delete_disciplinaturma
+76	Can view Disciplina da Turma	12	view_disciplinaturma
+77	Can add Atestado	20	add_atestado
+78	Can change Atestado	20	change_atestado
+79	Can delete Atestado	20	delete_atestado
+80	Can view Atestado	20	view_atestado
+81	Can add Estudante	21	add_estudante
+82	Can change Estudante	21	change_estudante
+83	Can delete Estudante	21	delete_estudante
+84	Can view Estudante	21	view_estudante
+85	Can add Matrícula CEMEP	22	add_matriculacemep
+86	Can change Matrícula CEMEP	22	change_matriculacemep
+87	Can delete Matrícula CEMEP	22	delete_matriculacemep
+88	Can view Matrícula CEMEP	22	view_matriculacemep
+89	Can add Matrícula na Turma	23	add_matriculaturma
+90	Can change Matrícula na Turma	23	change_matriculaturma
+91	Can delete Matrícula na Turma	23	delete_matriculaturma
+92	Can view Matrícula na Turma	23	view_matriculaturma
+93	Can add Responsável	24	add_responsavel
+94	Can change Responsável	24	change_responsavel
+95	Can delete Responsável	24	delete_responsavel
+96	Can view Responsável	24	view_responsavel
+97	Can add Vínculo Responsável-Estudante	25	add_responsavelestudante
+98	Can change Vínculo Responsável-Estudante	25	change_responsavelestudante
+99	Can delete Vínculo Responsável-Estudante	25	delete_responsavelestudante
+100	Can view Vínculo Responsável-Estudante	25	view_responsavelestudante
+101	Can add Aula	26	add_aula
+102	Can change Aula	26	change_aula
+103	Can delete Aula	26	delete_aula
+104	Can view Aula	26	view_aula
+105	Can add Avaliação	27	add_avaliacao
+106	Can change Avaliação	27	change_avaliacao
+107	Can delete Avaliação	27	delete_avaliacao
+108	Can view Avaliação	27	view_avaliacao
+109	Can add Tipo de Ocorrência	29	add_descritorocorrenciapedagogica
+110	Can change Tipo de Ocorrência	29	change_descritorocorrenciapedagogica
+111	Can delete Tipo de Ocorrência	29	delete_descritorocorrenciapedagogica
+112	Can view Tipo de Ocorrência	29	view_descritorocorrenciapedagogica
+113	Can add Instrumento Avaliativo	31	add_instrumentoavaliativo
+114	Can change Instrumento Avaliativo	31	change_instrumentoavaliativo
+115	Can delete Instrumento Avaliativo	31	delete_instrumentoavaliativo
+116	Can view Instrumento Avaliativo	31	view_instrumentoavaliativo
+117	Can add Notificação de Recuperação	35	add_notificacaorecuperacao
+118	Can change Notificação de Recuperação	35	change_notificacaorecuperacao
+119	Can delete Notificação de Recuperação	35	delete_notificacaorecuperacao
+120	Can view Notificação de Recuperação	35	view_notificacaorecuperacao
+121	Can add Ocorrência Pedagógica	36	add_ocorrenciapedagogica
+122	Can change Ocorrência Pedagógica	36	change_ocorrenciapedagogica
+123	Can delete Ocorrência Pedagógica	36	delete_ocorrenciapedagogica
+124	Can view Ocorrência Pedagógica	36	view_ocorrenciapedagogica
+125	Can add Plano de Aula	38	add_planoaula
+126	Can change Plano de Aula	38	change_planoaula
+127	Can delete Plano de Aula	38	delete_planoaula
+128	Can view Plano de Aula	38	view_planoaula
+129	Can add Falta	30	add_faltas
+130	Can change Falta	30	change_faltas
+131	Can delete Falta	30	delete_faltas
+132	Can view Falta	30	view_faltas
+133	Can add Visto	28	add_controlevisto
+134	Can change Visto	28	change_controlevisto
+135	Can delete Visto	28	delete_controlevisto
+136	Can view Visto	28	view_controlevisto
+137	Can add Nota de Avaliação	32	add_notaavaliacao
+138	Can change Nota de Avaliação	32	change_notaavaliacao
+139	Can delete Nota de Avaliação	32	delete_notaavaliacao
+140	Can view Nota de Avaliação	32	view_notaavaliacao
+141	Can add Nota Bimestral	33	add_notabimestral
+142	Can change Nota Bimestral	33	change_notabimestral
+143	Can delete Nota Bimestral	33	delete_notabimestral
+144	Can view Nota Bimestral	33	view_notabimestral
+145	Can add Nota de Instrumento Avaliativo	34	add_notainstrumentoavaliativo
+146	Can change Nota de Instrumento Avaliativo	34	change_notainstrumentoavaliativo
+147	Can delete Nota de Instrumento Avaliativo	34	delete_notainstrumentoavaliativo
+148	Can view Nota de Instrumento Avaliativo	34	view_notainstrumentoavaliativo
+149	Can add Ciência de Ocorrência	37	add_ocorrenciaresponsavelciente
+150	Can change Ciência de Ocorrência	37	change_ocorrenciaresponsavelciente
+151	Can delete Ciência de Ocorrência	37	delete_ocorrenciaresponsavelciente
+152	Can view Ciência de Ocorrência	37	view_ocorrenciaresponsavelciente
+153	Can add Anexo do Aviso	40	add_avisoanexo
+154	Can change Anexo do Aviso	40	change_avisoanexo
+155	Can delete Anexo do Aviso	40	delete_avisoanexo
+156	Can view Anexo do Aviso	40	view_avisoanexo
+157	Can add Visualização de Aviso	41	add_avisovisualizacao
+158	Can change Visualização de Aviso	41	change_avisovisualizacao
+159	Can delete Visualização de Aviso	41	delete_avisovisualizacao
+160	Can view Visualização de Aviso	41	view_avisovisualizacao
+161	Can add Notificação de HTPC	42	add_notificacaohtpc
+162	Can change Notificação de HTPC	42	change_notificacaohtpc
+163	Can delete Notificação de HTPC	42	delete_notificacaohtpc
+164	Can view Notificação de HTPC	42	view_notificacaohtpc
+165	Can add Notificação de Tarefa	43	add_notificacaotarefa
+166	Can change Notificação de Tarefa	43	change_notificacaotarefa
+167	Can delete Notificação de Tarefa	43	delete_notificacaotarefa
+168	Can view Notificação de Tarefa	43	view_notificacaotarefa
+169	Can add Reunião HTPC	44	add_reuniaohtpc
+170	Can change Reunião HTPC	44	change_reuniaohtpc
+171	Can delete Reunião HTPC	44	delete_reuniaohtpc
+172	Can view Reunião HTPC	44	view_reuniaohtpc
+173	Can add Anexo de HTPC	45	add_reuniaohtpcanexo
+174	Can change Anexo de HTPC	45	change_reuniaohtpcanexo
+175	Can delete Anexo de HTPC	45	delete_reuniaohtpcanexo
+176	Can view Anexo de HTPC	45	view_reuniaohtpcanexo
+177	Can add Tarefa	46	add_tarefa
+178	Can change Tarefa	46	change_tarefa
+179	Can delete Tarefa	46	delete_tarefa
+180	Can view Tarefa	46	view_tarefa
+181	Can add Anexo da Tarefa	47	add_tarefaanexo
+182	Can change Anexo da Tarefa	47	change_tarefaanexo
+183	Can delete Anexo da Tarefa	47	delete_tarefaanexo
+184	Can view Anexo da Tarefa	47	view_tarefaanexo
+185	Can add Resposta da Tarefa	48	add_tarefaresposta
+186	Can change Resposta da Tarefa	48	change_tarefaresposta
+187	Can delete Resposta da Tarefa	48	delete_tarefaresposta
+188	Can view Resposta da Tarefa	48	view_tarefaresposta
+189	Can add Anexo da Resposta	49	add_tarefarespostaanexo
+190	Can change Anexo da Resposta	49	change_tarefarespostaanexo
+191	Can delete Anexo da Resposta	49	delete_tarefarespostaanexo
+192	Can view Anexo da Resposta	49	view_tarefarespostaanexo
+193	Can add Aviso	39	add_aviso
+194	Can change Aviso	39	change_aviso
+195	Can delete Aviso	39	delete_aviso
+196	Can view Aviso	39	view_aviso
+197	Can add Dados Permanentes do Estudante	50	add_dadospermanenteestudante
+198	Can change Dados Permanentes do Estudante	50	change_dadospermanenteestudante
+199	Can delete Dados Permanentes do Estudante	50	delete_dadospermanenteestudante
+200	Can view Dados Permanentes do Estudante	50	view_dadospermanenteestudante
+201	Can add Dados Permanentes do Responsável	51	add_dadospermanenteresponsavel
+202	Can change Dados Permanentes do Responsável	51	change_dadospermanenteresponsavel
+203	Can delete Dados Permanentes do Responsável	51	delete_dadospermanenteresponsavel
+204	Can view Dados Permanentes do Responsável	51	view_dadospermanenteresponsavel
+205	Can add Histórico Escolar	52	add_historicoescolar
+206	Can change Histórico Escolar	52	change_historicoescolar
+207	Can delete Histórico Escolar	52	delete_historicoescolar
+208	Can view Histórico Escolar	52	view_historicoescolar
+209	Can add Histórico por Ano Letivo	53	add_historicoescolaranoletivo
+210	Can change Histórico por Ano Letivo	53	change_historicoescolaranoletivo
+211	Can delete Histórico por Ano Letivo	53	delete_historicoescolaranoletivo
+212	Can view Histórico por Ano Letivo	53	view_historicoescolaranoletivo
+213	Can add Nota Final do Histórico	54	add_historicoescolarnotas
+214	Can change Nota Final do Histórico	54	change_historicoescolarnotas
+215	Can delete Nota Final do Histórico	54	delete_historicoescolarnotas
+216	Can view Nota Final do Histórico	54	view_historicoescolarnotas
+217	Can add Registro de Prontuário	55	add_registroprontuario
+218	Can change Registro de Prontuário	55	change_registroprontuario
+219	Can delete Registro de Prontuário	55	delete_registroprontuario
+220	Can view Registro de Prontuário	55	view_registroprontuario
+221	Can add Anexo de Registro Prontuário	56	add_registroprontuarioanexo
+222	Can change Anexo de Registro Prontuário	56	change_registroprontuarioanexo
+223	Can delete Anexo de Registro Prontuário	56	delete_registroprontuarioanexo
+224	Can view Anexo de Registro Prontuário	56	view_registroprontuarioanexo
+\.
+
+
+--
+-- Data for Name: core_anoletivo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_anoletivo (id, ano, is_active, data_inicio_1bim, data_fim_1bim, data_inicio_2bim, data_fim_2bim, data_inicio_3bim, data_fim_3bim, data_inicio_4bim, data_fim_4bim) FROM stdin;
+a5f8c071-db65-430a-ae38-ed4eb0b9f301	2026	t	2026-01-26	2026-04-11	2026-04-13	2026-06-20	2026-07-20	2026-09-26	2026-10-05	2026-12-16
+\.
+
+
+--
+-- Data for Name: core_anoletivo_dias_letivos_extras; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_anoletivo_dias_letivos_extras (id, anoletivo_id, dialetivoextra_id) FROM stdin;
+3	a5f8c071-db65-430a-ae38-ed4eb0b9f301	5477616e-9037-426e-b462-ef3072eb54c9
+4	a5f8c071-db65-430a-ae38-ed4eb0b9f301	d35e8f1b-29c3-44c4-a19d-1fbf320f3c4e
+\.
+
+
+--
+-- Data for Name: core_anoletivo_dias_nao_letivos; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_anoletivo_dias_nao_letivos (id, anoletivo_id, dianaoletivo_id) FROM stdin;
+2	a5f8c071-db65-430a-ae38-ed4eb0b9f301	2f4bc39c-1996-4b84-99bd-cfd69afdd3c0
+3	a5f8c071-db65-430a-ae38-ed4eb0b9f301	16bd58af-40ce-43ae-ac52-42d127f5c512
+4	a5f8c071-db65-430a-ae38-ed4eb0b9f301	54f35191-9bf8-4aa4-abd7-210b61a9b965
+5	a5f8c071-db65-430a-ae38-ed4eb0b9f301	76474a0e-0b09-46b7-b526-7e10b63bd232
+6	a5f8c071-db65-430a-ae38-ed4eb0b9f301	4934b6c2-21a4-4cc7-8c19-a8361cb86e71
+7	a5f8c071-db65-430a-ae38-ed4eb0b9f301	3247d65d-9241-4283-aa9c-864b20ec5a19
+8	a5f8c071-db65-430a-ae38-ed4eb0b9f301	a18872c0-9dc4-4415-8dc4-4edf317a4193
+9	a5f8c071-db65-430a-ae38-ed4eb0b9f301	c25bb7c2-1cf4-4e9b-9045-2a6c75a96a99
+10	a5f8c071-db65-430a-ae38-ed4eb0b9f301	5399506d-8f67-4238-b101-315aac0df00b
+11	a5f8c071-db65-430a-ae38-ed4eb0b9f301	d0f7ec7c-fe77-4cf6-9fc6-9003d7c6c396
+\.
+
+
+--
+-- Data for Name: core_curso; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_curso (id, nome, sigla, is_active) FROM stdin;
+\.
+
+
+--
+-- Data for Name: core_dialetivoextra; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_dialetivoextra (id, data, descricao) FROM stdin;
+5477616e-9037-426e-b462-ef3072eb54c9	2026-03-22	
+d35e8f1b-29c3-44c4-a19d-1fbf320f3c4e	2026-09-13	
+\.
+
+
+--
+-- Data for Name: core_dianaoletivo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_dianaoletivo (id, data, tipo, descricao) FROM stdin;
+2f4bc39c-1996-4b84-99bd-cfd69afdd3c0	2026-01-01	FERIADO	
+16bd58af-40ce-43ae-ac52-42d127f5c512	2026-02-16	FERIADO	
+54f35191-9bf8-4aa4-abd7-210b61a9b965	2026-02-17	FERIADO	
+76474a0e-0b09-46b7-b526-7e10b63bd232	2026-04-03	FERIADO	
+4934b6c2-21a4-4cc7-8c19-a8361cb86e71	2026-04-21	FERIADO	
+3247d65d-9241-4283-aa9c-864b20ec5a19	2026-05-01	FERIADO	
+a18872c0-9dc4-4415-8dc4-4edf317a4193	2026-06-19	FERIADO	
+c25bb7c2-1cf4-4e9b-9045-2a6c75a96a99	2026-09-07	FERIADO	
+5399506d-8f67-4238-b101-315aac0df00b	2026-10-12	FERIADO	
+d0f7ec7c-fe77-4cf6-9fc6-9003d7c6c396	2026-11-02	FERIADO	
+\.
+
+
+--
+-- Data for Name: core_disciplina; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_disciplina (id, nome, sigla, area_conhecimento, is_active) FROM stdin;
+\.
+
+
+--
+-- Data for Name: core_disciplinaturma; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_disciplinaturma (id, aulas_semanais, disciplina_id, turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: core_funcionario; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_funcionario (id, matricula, area_atuacao, apelido, cpf, cin, nome_social, data_nascimento, logradouro, numero, bairro, cidade, estado, cep, complemento, telefone, data_admissao, usuario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: core_gradehoraria; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_gradehoraria (id, disciplina_id, horario_aula_id, turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: core_habilidade; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_habilidade (id, codigo, descricao, is_active, disciplina_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: core_horarioaula; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_horarioaula (id, numero, dia_semana, hora_inicio, hora_fim, ano_letivo_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: core_periodotrabalho; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_periodotrabalho (id, data_entrada, data_saida, funcionario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: core_professordisciplinaturma; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_professordisciplinaturma (id, tipo, data_inicio, data_fim, disciplina_turma_id, professor_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: core_turma; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_turma (id, numero, letra, ano_letivo, nomenclatura, is_active, curso_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: core_turma_professores_representantes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_turma_professores_representantes (id, turma_id, funcionario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: django_content_type; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_content_type (id, app_label, model) FROM stdin;
+1	admin	logentry
+2	auth	group
+3	auth	permission
+4	contenttypes	contenttype
+5	sessions	session
+6	users	user
+7	core	anoletivo
+8	core	curso
+9	core	dialetivoextra
+10	core	dianaoletivo
+11	core	disciplina
+12	core	disciplinaturma
+13	core	funcionario
+14	core	gradehoraria
+15	core	habilidade
+16	core	horarioaula
+17	core	periodotrabalho
+18	core	professordisciplinaturma
+19	core	turma
+20	academic	atestado
+21	academic	estudante
+22	academic	matriculacemep
+23	academic	matriculaturma
+24	academic	responsavel
+25	academic	responsavelestudante
+26	pedagogical	aula
+27	pedagogical	avaliacao
+28	pedagogical	controlevisto
+29	pedagogical	descritorocorrenciapedagogica
+30	pedagogical	faltas
+31	pedagogical	instrumentoavaliativo
+32	pedagogical	notaavaliacao
+33	pedagogical	notabimestral
+34	pedagogical	notainstrumentoavaliativo
+35	pedagogical	notificacaorecuperacao
+36	pedagogical	ocorrenciapedagogica
+37	pedagogical	ocorrenciaresponsavelciente
+38	pedagogical	planoaula
+39	management	aviso
+40	management	avisoanexo
+41	management	avisovisualizacao
+42	management	notificacaohtpc
+43	management	notificacaotarefa
+44	management	reuniaohtpc
+45	management	reuniaohtpcanexo
+46	management	tarefa
+47	management	tarefaanexo
+48	management	tarefaresposta
+49	management	tarefarespostaanexo
+50	permanent	dadospermanenteestudante
+51	permanent	dadospermanenteresponsavel
+52	permanent	historicoescolar
+53	permanent	historicoescolaranoletivo
+54	permanent	historicoescolarnotas
+55	permanent	registroprontuario
+56	permanent	registroprontuarioanexo
+\.
+
+
+--
+-- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_migrations (id, app, name, applied) FROM stdin;
+1	contenttypes	0001_initial	2025-12-31 09:57:09.885534-03
+2	contenttypes	0002_remove_content_type_name	2025-12-31 09:57:09.89805-03
+3	auth	0001_initial	2025-12-31 09:57:09.946335-03
+4	auth	0002_alter_permission_name_max_length	2025-12-31 09:57:09.952522-03
+5	auth	0003_alter_user_email_max_length	2025-12-31 09:57:09.95658-03
+6	auth	0004_alter_user_username_opts	2025-12-31 09:57:09.962606-03
+7	auth	0005_alter_user_last_login_null	2025-12-31 09:57:09.96862-03
+8	auth	0006_require_contenttypes_0002	2025-12-31 09:57:09.970833-03
+9	auth	0007_alter_validators_add_error_messages	2025-12-31 09:57:09.975328-03
+10	auth	0008_alter_user_username_max_length	2025-12-31 09:57:09.980851-03
+11	auth	0009_alter_user_last_name_max_length	2025-12-31 09:57:09.986431-03
+12	auth	0010_alter_group_name_max_length	2025-12-31 09:57:10.007464-03
+13	auth	0011_update_proxy_permissions	2025-12-31 09:57:10.014926-03
+14	auth	0012_alter_user_first_name_max_length	2025-12-31 09:57:10.021598-03
+15	users	0001_initial	2025-12-31 09:57:10.068968-03
+16	core	0001_initial	2025-12-31 09:57:10.168457-03
+17	academic	0001_initial	2025-12-31 09:57:10.201177-03
+18	academic	0002_initial	2025-12-31 09:57:10.327351-03
+19	admin	0001_initial	2025-12-31 09:57:10.350075-03
+20	admin	0002_logentry_remove_auto_add	2025-12-31 09:57:10.358873-03
+21	admin	0003_logentry_add_action_flag_choices	2025-12-31 09:57:10.368937-03
+22	core	0002_initial	2025-12-31 09:57:10.588358-03
+23	management	0001_initial	2025-12-31 09:57:10.657307-03
+24	management	0002_initial	2025-12-31 09:57:11.178587-03
+25	pedagogical	0001_initial	2025-12-31 09:57:11.756977-03
+26	permanent	0001_initial	2025-12-31 09:57:11.85113-03
+27	sessions	0001_initial	2025-12-31 09:57:11.862974-03
+\.
+
+
+--
+-- Data for Name: django_session; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_aviso; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_aviso (id, titulo, texto, data_aviso, criador_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_aviso_destinatarios; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_aviso_destinatarios (id, aviso_id, user_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_avisoanexo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_avisoanexo (id, arquivo, descricao, aviso_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_avisovisualizacao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_avisovisualizacao (id, visualizado, data_visualizacao, aviso_id, usuario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_notificacaohtpc; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_notificacaohtpc (id, visualizado, data_visualizacao, funcionario_id, reuniao_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_notificacaotarefa; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_notificacaotarefa (id, visualizado, data_visualizacao, funcionario_id, tarefa_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_reuniaohtpc; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_reuniaohtpc (id, data_reuniao, pauta, ata, data_registro, quem_registrou_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_reuniaohtpc_presentes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_reuniaohtpc_presentes (id, reuniaohtpc_id, funcionario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_reuniaohtpcanexo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_reuniaohtpcanexo (id, arquivo, descricao, reuniao_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_tarefa; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_tarefa (id, titulo, descricao, prazo, concluido, data_conclusao, data_cadastro, criador_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_tarefa_funcionarios; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_tarefa_funcionarios (id, tarefa_id, funcionario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_tarefaanexo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_tarefaanexo (id, arquivo, descricao, tarefa_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_tarefaresposta; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_tarefaresposta (id, texto, data_envio, funcionario_id, tarefa_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_tarefarespostaanexo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_tarefarespostaanexo (id, arquivo, descricao, resposta_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_aula; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_aula (id, data, conteudo, numero_aulas, criado_em, professor_disciplina_turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_avaliacao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_avaliacao (id, valor, tipo, tipo_calculo_instrumentos, professor_disciplina_turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_controlevisto; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_controlevisto (id, titulo, data_visto, visto, matricula_turma_id, professor_disciplina_turma_id, instrumento_avaliativo_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_descritorocorrenciapedagogica; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_descritorocorrenciapedagogica (id, texto, ativo, gestor_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_faltas; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_faltas (id, aula_numero, aula_id, estudante_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_instrumentoavaliativo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_instrumentoavaliativo (id, titulo, data_inicio, data_fim, usa_vistos, peso, valor, avaliacao_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_notaavaliacao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_notaavaliacao (id, valor, avaliacao_id, matricula_turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_notabimestral; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_notabimestral (id, nota, matricula_turma_id, professor_disciplina_turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_notainstrumentoavaliativo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_notainstrumentoavaliativo (id, valor, instrumento_avaliativo_id, matricula_turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_notificacaorecuperacao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_notificacaorecuperacao (id, visualizado, data_visualizacao, estudante_id, professor_disciplina_turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_ocorrenciapedagogica; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_ocorrenciapedagogica (id, data, autor_id, estudante_id, tipo_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_ocorrenciaresponsavelciente; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_ocorrenciaresponsavelciente (id, ciente, data_ciencia, ocorrencia_id, responsavel_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_planoaula; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_planoaula (id, data_inicio, data_fim, conteudo, criado_em, atualizado_em, disciplina_id, professor_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_planoaula_habilidades; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_planoaula_habilidades (id, planoaula_id, habilidade_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_planoaula_turmas; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_planoaula_turmas (id, planoaula_id, turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_dadospermanenteestudante; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_dadospermanenteestudante (id, cpf, nome, data_nascimento, telefone, email, endereco_completo, criado_em, atualizado_em) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_dadospermanenteresponsavel; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_dadospermanenteresponsavel (id, cpf, nome, telefone, email, parentesco, estudante_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_historicoescolar; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_historicoescolar (id, numero_matricula, nome_curso, data_entrada_cemep, data_saida_cemep, concluido, observacoes_gerais, estudante_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_historicoescolaranoletivo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_historicoescolaranoletivo (id, ano_letivo, nomenclatura_turma, numero_turma, letra_turma, status_final, descricao_status, observacoes, historico_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_historicoescolarnotas; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_historicoescolarnotas (id, nome_disciplina, aulas_semanais, nota_final, frequencia_total, ano_letivo_ref_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_registroprontuario; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_registroprontuario (id, ocorrencia_disciplinar, cpf, nome_estudante, autor_nome, data_ocorrido, data_registro, descricao, ano_letivo, bimestre, pai_ocorrencia_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_registroprontuarioanexo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_registroprontuarioanexo (id, arquivo, descricao, criado_em, registro_prontuario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: users_user; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users_user (password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined, id, tipo_usuario, foto, dark_mode) FROM stdin;
+pbkdf2_sha256$1200000$5EyUUPZr4dVOoXBp4fWXG9$AGa1Trmz6MHJ6ndd/eBd+LxiXYpFC4mJXa0/MYcdHTE=	\N	t	diogo			diogopelaes@gmail.com	t	t	2025-12-31 09:57:13.245769-03	fe64a29b-cc6c-45f6-a0b1-c5c2fd093fc2	GESTAO		f
+\.
+
+
+--
+-- Data for Name: users_user_groups; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users_user_groups (id, user_id, group_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: users_user_user_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users_user_user_permissions (id, user_id, permission_id) FROM stdin;
+\.
+
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.auth_group_id_seq', 1, false);
+
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
+
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.auth_permission_id_seq', 224, true);
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.core_anoletivo_dias_letivos_extras_id_seq', 4, true);
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.core_anoletivo_dias_nao_letivos_id_seq', 11, true);
+
+
+--
+-- Name: core_turma_professores_representantes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.core_turma_professores_representantes_id_seq', 1, false);
+
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.django_admin_log_id_seq', 1, false);
+
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.django_content_type_id_seq', 56, true);
+
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 27, true);
+
+
+--
+-- Name: management_aviso_destinatarios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.management_aviso_destinatarios_id_seq', 1, false);
+
+
+--
+-- Name: management_reuniaohtpc_presentes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.management_reuniaohtpc_presentes_id_seq', 1, false);
+
+
+--
+-- Name: management_tarefa_funcionarios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.management_tarefa_funcionarios_id_seq', 1, false);
+
+
+--
+-- Name: pedagogical_planoaula_habilidades_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pedagogical_planoaula_habilidades_id_seq', 1, false);
+
+
+--
+-- Name: pedagogical_planoaula_turmas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pedagogical_planoaula_turmas_id_seq', 1, false);
+
+
+--
+-- Name: permanent_registroprontuarioanexo_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.permanent_registroprontuarioanexo_id_seq', 1, false);
+
+
+--
+-- Name: users_user_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_user_groups_id_seq', 1, false);
+
+
+--
+-- Name: users_user_user_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_user_user_permissions_id_seq', 1, false);
+
+
+--
+-- Name: academic_atestado academic_atestado_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_atestado
+    ADD CONSTRAINT academic_atestado_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: academic_estudante academic_estudante_cpf_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_estudante
+    ADD CONSTRAINT academic_estudante_cpf_key UNIQUE (cpf);
+
+
+--
+-- Name: academic_estudante academic_estudante_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_estudante
+    ADD CONSTRAINT academic_estudante_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: academic_estudante academic_estudante_usuario_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_estudante
+    ADD CONSTRAINT academic_estudante_usuario_id_key UNIQUE (usuario_id);
+
+
+--
+-- Name: academic_matriculacemep academic_matriculacemep_estudante_id_curso_id_e693898d_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculacemep
+    ADD CONSTRAINT academic_matriculacemep_estudante_id_curso_id_e693898d_uniq UNIQUE (estudante_id, curso_id);
+
+
+--
+-- Name: academic_matriculacemep academic_matriculacemep_numero_matricula_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculacemep
+    ADD CONSTRAINT academic_matriculacemep_numero_matricula_key UNIQUE (numero_matricula);
+
+
+--
+-- Name: academic_matriculacemep academic_matriculacemep_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculacemep
+    ADD CONSTRAINT academic_matriculacemep_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: academic_matriculaturma academic_matriculaturma_matricula_cemep_id_turma_0c8af67a_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculaturma
+    ADD CONSTRAINT academic_matriculaturma_matricula_cemep_id_turma_0c8af67a_uniq UNIQUE (matricula_cemep_id, turma_id);
+
+
+--
+-- Name: academic_matriculaturma academic_matriculaturma_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculaturma
+    ADD CONSTRAINT academic_matriculaturma_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: academic_responsavel academic_responsavel_cpf_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavel
+    ADD CONSTRAINT academic_responsavel_cpf_key UNIQUE (cpf);
+
+
+--
+-- Name: academic_responsavel academic_responsavel_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavel
+    ADD CONSTRAINT academic_responsavel_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: academic_responsavel academic_responsavel_usuario_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavel
+    ADD CONSTRAINT academic_responsavel_usuario_id_key UNIQUE (usuario_id);
+
+
+--
+-- Name: academic_responsavelestudante academic_responsavelestu_responsavel_id_estudante_c0b18ca7_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavelestudante
+    ADD CONSTRAINT academic_responsavelestu_responsavel_id_estudante_c0b18ca7_uniq UNIQUE (responsavel_id, estudante_id);
+
+
+--
+-- Name: academic_responsavelestudante academic_responsavelestudante_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavelestudante
+    ADD CONSTRAINT academic_responsavelestudante_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_group auth_group_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group
+    ADD CONSTRAINT auth_group_name_key UNIQUE (name);
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_permission_id_0cd325b0_uniq UNIQUE (group_id, permission_id);
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_group auth_group_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group
+    ADD CONSTRAINT auth_group_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_permission auth_permission_content_type_id_codename_01ab375a_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_content_type_id_codename_01ab375a_uniq UNIQUE (content_type_id, codename);
+
+
+--
+-- Name: auth_permission auth_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_anoletivo core_anoletivo_ano_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo
+    ADD CONSTRAINT core_anoletivo_ano_key UNIQUE (ano);
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras core_anoletivo_dias_leti_anoletivo_id_dialetivoex_9720edaa_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_letivos_extras
+    ADD CONSTRAINT core_anoletivo_dias_leti_anoletivo_id_dialetivoex_9720edaa_uniq UNIQUE (anoletivo_id, dialetivoextra_id);
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras core_anoletivo_dias_letivos_extras_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_letivos_extras
+    ADD CONSTRAINT core_anoletivo_dias_letivos_extras_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos core_anoletivo_dias_nao__anoletivo_id_dianaoletiv_1c4d1942_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_nao_letivos
+    ADD CONSTRAINT core_anoletivo_dias_nao__anoletivo_id_dianaoletiv_1c4d1942_uniq UNIQUE (anoletivo_id, dianaoletivo_id);
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos core_anoletivo_dias_nao_letivos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_nao_letivos
+    ADD CONSTRAINT core_anoletivo_dias_nao_letivos_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_anoletivo core_anoletivo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo
+    ADD CONSTRAINT core_anoletivo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_curso core_curso_nome_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_curso
+    ADD CONSTRAINT core_curso_nome_key UNIQUE (nome);
+
+
+--
+-- Name: core_curso core_curso_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_curso
+    ADD CONSTRAINT core_curso_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_curso core_curso_sigla_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_curso
+    ADD CONSTRAINT core_curso_sigla_key UNIQUE (sigla);
+
+
+--
+-- Name: core_dialetivoextra core_dialetivoextra_data_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_dialetivoextra
+    ADD CONSTRAINT core_dialetivoextra_data_key UNIQUE (data);
+
+
+--
+-- Name: core_dialetivoextra core_dialetivoextra_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_dialetivoextra
+    ADD CONSTRAINT core_dialetivoextra_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_dianaoletivo core_dianaoletivo_data_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_dianaoletivo
+    ADD CONSTRAINT core_dianaoletivo_data_key UNIQUE (data);
+
+
+--
+-- Name: core_dianaoletivo core_dianaoletivo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_dianaoletivo
+    ADD CONSTRAINT core_dianaoletivo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_disciplina core_disciplina_nome_sigla_cfba4fd5_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_disciplina
+    ADD CONSTRAINT core_disciplina_nome_sigla_cfba4fd5_uniq UNIQUE (nome, sigla);
+
+
+--
+-- Name: core_disciplina core_disciplina_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_disciplina
+    ADD CONSTRAINT core_disciplina_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_disciplinaturma core_disciplinaturma_disciplina_id_turma_id_81fe966e_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_disciplinaturma
+    ADD CONSTRAINT core_disciplinaturma_disciplina_id_turma_id_81fe966e_uniq UNIQUE (disciplina_id, turma_id);
+
+
+--
+-- Name: core_disciplinaturma core_disciplinaturma_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_disciplinaturma
+    ADD CONSTRAINT core_disciplinaturma_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_funcionario core_funcionario_cpf_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_funcionario
+    ADD CONSTRAINT core_funcionario_cpf_key UNIQUE (cpf);
+
+
+--
+-- Name: core_funcionario core_funcionario_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_funcionario
+    ADD CONSTRAINT core_funcionario_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_funcionario core_funcionario_usuario_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_funcionario
+    ADD CONSTRAINT core_funcionario_usuario_id_key UNIQUE (usuario_id);
+
+
+--
+-- Name: core_funcionario core_funcionario_usuario_id_matricula_cfb6ab95_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_funcionario
+    ADD CONSTRAINT core_funcionario_usuario_id_matricula_cfb6ab95_uniq UNIQUE (usuario_id, matricula);
+
+
+--
+-- Name: core_gradehoraria core_gradehoraria_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_gradehoraria
+    ADD CONSTRAINT core_gradehoraria_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_gradehoraria core_gradehoraria_turma_id_horario_aula_id_1c9a54ea_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_gradehoraria
+    ADD CONSTRAINT core_gradehoraria_turma_id_horario_aula_id_1c9a54ea_uniq UNIQUE (turma_id, horario_aula_id);
+
+
+--
+-- Name: core_habilidade core_habilidade_codigo_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_habilidade
+    ADD CONSTRAINT core_habilidade_codigo_key UNIQUE (codigo);
+
+
+--
+-- Name: core_habilidade core_habilidade_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_habilidade
+    ADD CONSTRAINT core_habilidade_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_horarioaula core_horarioaula_ano_letivo_id_dia_semana_a1a489e0_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_horarioaula
+    ADD CONSTRAINT core_horarioaula_ano_letivo_id_dia_semana_a1a489e0_uniq UNIQUE (ano_letivo_id, dia_semana, hora_inicio);
+
+
+--
+-- Name: core_horarioaula core_horarioaula_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_horarioaula
+    ADD CONSTRAINT core_horarioaula_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_periodotrabalho core_periodotrabalho_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_periodotrabalho
+    ADD CONSTRAINT core_periodotrabalho_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_professordisciplinaturma core_professordisciplinaturma_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_professordisciplinaturma
+    ADD CONSTRAINT core_professordisciplinaturma_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_turma core_turma_numero_letra_ano_letivo_curso_id_5eb491fa_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma
+    ADD CONSTRAINT core_turma_numero_letra_ano_letivo_curso_id_5eb491fa_uniq UNIQUE (numero, letra, ano_letivo, curso_id);
+
+
+--
+-- Name: core_turma core_turma_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma
+    ADD CONSTRAINT core_turma_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_turma_professores_representantes core_turma_professores_r_turma_id_funcionario_id_de1cccc2_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma_professores_representantes
+    ADD CONSTRAINT core_turma_professores_r_turma_id_funcionario_id_de1cccc2_uniq UNIQUE (turma_id, funcionario_id);
+
+
+--
+-- Name: core_turma_professores_representantes core_turma_professores_representantes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma_professores_representantes
+    ADD CONSTRAINT core_turma_professores_representantes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_content_type django_content_type_app_label_model_76bd3d3b_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_content_type
+    ADD CONSTRAINT django_content_type_app_label_model_76bd3d3b_uniq UNIQUE (app_label, model);
+
+
+--
+-- Name: django_content_type django_content_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_content_type
+    ADD CONSTRAINT django_content_type_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_migrations
+    ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_session django_session_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_session
+    ADD CONSTRAINT django_session_pkey PRIMARY KEY (session_key);
+
+
+--
+-- Name: management_aviso_destinatarios management_aviso_destinatarios_aviso_id_user_id_96e1b7ac_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_aviso_destinatarios
+    ADD CONSTRAINT management_aviso_destinatarios_aviso_id_user_id_96e1b7ac_uniq UNIQUE (aviso_id, user_id);
+
+
+--
+-- Name: management_aviso_destinatarios management_aviso_destinatarios_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_aviso_destinatarios
+    ADD CONSTRAINT management_aviso_destinatarios_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_aviso management_aviso_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_aviso
+    ADD CONSTRAINT management_aviso_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_avisoanexo management_avisoanexo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_avisoanexo
+    ADD CONSTRAINT management_avisoanexo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_avisovisualizacao management_avisovisualizacao_aviso_id_usuario_id_fa7ea6ab_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_avisovisualizacao
+    ADD CONSTRAINT management_avisovisualizacao_aviso_id_usuario_id_fa7ea6ab_uniq UNIQUE (aviso_id, usuario_id);
+
+
+--
+-- Name: management_avisovisualizacao management_avisovisualizacao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_avisovisualizacao
+    ADD CONSTRAINT management_avisovisualizacao_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_notificacaohtpc management_notificacaoht_reuniao_id_funcionario_i_1d59b0d9_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaohtpc
+    ADD CONSTRAINT management_notificacaoht_reuniao_id_funcionario_i_1d59b0d9_uniq UNIQUE (reuniao_id, funcionario_id);
+
+
+--
+-- Name: management_notificacaohtpc management_notificacaohtpc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaohtpc
+    ADD CONSTRAINT management_notificacaohtpc_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_notificacaotarefa management_notificacaota_tarefa_id_funcionario_id_1ac10f51_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaotarefa
+    ADD CONSTRAINT management_notificacaota_tarefa_id_funcionario_id_1ac10f51_uniq UNIQUE (tarefa_id, funcionario_id);
+
+
+--
+-- Name: management_notificacaotarefa management_notificacaotarefa_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaotarefa
+    ADD CONSTRAINT management_notificacaotarefa_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_reuniaohtpc_presentes management_reuniaohtpc_p_reuniaohtpc_id_funcionar_f649c41d_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpc_presentes
+    ADD CONSTRAINT management_reuniaohtpc_p_reuniaohtpc_id_funcionar_f649c41d_uniq UNIQUE (reuniaohtpc_id, funcionario_id);
+
+
+--
+-- Name: management_reuniaohtpc management_reuniaohtpc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpc
+    ADD CONSTRAINT management_reuniaohtpc_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_reuniaohtpc_presentes management_reuniaohtpc_presentes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpc_presentes
+    ADD CONSTRAINT management_reuniaohtpc_presentes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_reuniaohtpcanexo management_reuniaohtpcanexo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpcanexo
+    ADD CONSTRAINT management_reuniaohtpcanexo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_tarefa_funcionarios management_tarefa_funcio_tarefa_id_funcionario_id_000938f5_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefa_funcionarios
+    ADD CONSTRAINT management_tarefa_funcio_tarefa_id_funcionario_id_000938f5_uniq UNIQUE (tarefa_id, funcionario_id);
+
+
+--
+-- Name: management_tarefa_funcionarios management_tarefa_funcionarios_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefa_funcionarios
+    ADD CONSTRAINT management_tarefa_funcionarios_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_tarefa management_tarefa_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefa
+    ADD CONSTRAINT management_tarefa_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_tarefaanexo management_tarefaanexo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefaanexo
+    ADD CONSTRAINT management_tarefaanexo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_tarefaresposta management_tarefaresposta_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefaresposta
+    ADD CONSTRAINT management_tarefaresposta_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_tarefarespostaanexo management_tarefarespostaanexo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefarespostaanexo
+    ADD CONSTRAINT management_tarefarespostaanexo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_aula pedagogical_aula_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_aula
+    ADD CONSTRAINT pedagogical_aula_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_aula pedagogical_aula_professor_disciplina_tur_59f44b30_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_aula
+    ADD CONSTRAINT pedagogical_aula_professor_disciplina_tur_59f44b30_uniq UNIQUE (professor_disciplina_turma_id, data);
+
+
+--
+-- Name: pedagogical_avaliacao pedagogical_avaliacao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_avaliacao
+    ADD CONSTRAINT pedagogical_avaliacao_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_avaliacao pedagogical_avaliacao_professor_disciplina_tur_6e3b4402_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_avaliacao
+    ADD CONSTRAINT pedagogical_avaliacao_professor_disciplina_tur_6e3b4402_uniq UNIQUE (professor_disciplina_turma_id, tipo);
+
+
+--
+-- Name: pedagogical_controlevisto pedagogical_controlevist_matricula_turma_id_profe_f078c861_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_controlevisto
+    ADD CONSTRAINT pedagogical_controlevist_matricula_turma_id_profe_f078c861_uniq UNIQUE (matricula_turma_id, professor_disciplina_turma_id, titulo);
+
+
+--
+-- Name: pedagogical_controlevisto pedagogical_controlevisto_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_controlevisto
+    ADD CONSTRAINT pedagogical_controlevisto_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_descritorocorrenciapedagogica pedagogical_descritorocorrenciapedagogica_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_descritorocorrenciapedagogica
+    ADD CONSTRAINT pedagogical_descritorocorrenciapedagogica_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_faltas pedagogical_faltas_aula_id_estudante_id_aul_f1073a2e_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_faltas
+    ADD CONSTRAINT pedagogical_faltas_aula_id_estudante_id_aul_f1073a2e_uniq UNIQUE (aula_id, estudante_id, aula_numero);
+
+
+--
+-- Name: pedagogical_faltas pedagogical_faltas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_faltas
+    ADD CONSTRAINT pedagogical_faltas_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_instrumentoavaliativo pedagogical_instrumentoavaliativo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_instrumentoavaliativo
+    ADD CONSTRAINT pedagogical_instrumentoavaliativo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_notaavaliacao pedagogical_notaavaliaca_avaliacao_id_matricula_t_855334ed_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notaavaliacao
+    ADD CONSTRAINT pedagogical_notaavaliaca_avaliacao_id_matricula_t_855334ed_uniq UNIQUE (avaliacao_id, matricula_turma_id);
+
+
+--
+-- Name: pedagogical_notaavaliacao pedagogical_notaavaliacao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notaavaliacao
+    ADD CONSTRAINT pedagogical_notaavaliacao_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_notabimestral pedagogical_notabimestra_matricula_turma_id_profe_0b860eb8_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notabimestral
+    ADD CONSTRAINT pedagogical_notabimestra_matricula_turma_id_profe_0b860eb8_uniq UNIQUE (matricula_turma_id, professor_disciplina_turma_id);
+
+
+--
+-- Name: pedagogical_notabimestral pedagogical_notabimestral_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notabimestral
+    ADD CONSTRAINT pedagogical_notabimestral_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_notainstrumentoavaliativo pedagogical_notainstrume_instrumento_avaliativo_i_c0e14627_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notainstrumentoavaliativo
+    ADD CONSTRAINT pedagogical_notainstrume_instrumento_avaliativo_i_c0e14627_uniq UNIQUE (instrumento_avaliativo_id, matricula_turma_id);
+
+
+--
+-- Name: pedagogical_notainstrumentoavaliativo pedagogical_notainstrumentoavaliativo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notainstrumentoavaliativo
+    ADD CONSTRAINT pedagogical_notainstrumentoavaliativo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_notificacaorecuperacao pedagogical_notificacaorecuperacao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notificacaorecuperacao
+    ADD CONSTRAINT pedagogical_notificacaorecuperacao_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica pedagogical_ocorrenciapedagogica_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciapedagogica
+    ADD CONSTRAINT pedagogical_ocorrenciapedagogica_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente pedagogical_ocorrenciare_responsavel_id_ocorrenci_d90b5924_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciaresponsavelciente
+    ADD CONSTRAINT pedagogical_ocorrenciare_responsavel_id_ocorrenci_d90b5924_uniq UNIQUE (responsavel_id, ocorrencia_id);
+
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente pedagogical_ocorrenciaresponsavelciente_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciaresponsavelciente
+    ADD CONSTRAINT pedagogical_ocorrenciaresponsavelciente_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_planoaula_habilidades pedagogical_planoaula_ha_planoaula_id_habilidade__7ba2559c_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_habilidades
+    ADD CONSTRAINT pedagogical_planoaula_ha_planoaula_id_habilidade__7ba2559c_uniq UNIQUE (planoaula_id, habilidade_id);
+
+
+--
+-- Name: pedagogical_planoaula_habilidades pedagogical_planoaula_habilidades_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_habilidades
+    ADD CONSTRAINT pedagogical_planoaula_habilidades_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_planoaula pedagogical_planoaula_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula
+    ADD CONSTRAINT pedagogical_planoaula_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_planoaula_turmas pedagogical_planoaula_tu_planoaula_id_turma_id_07abf25a_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_turmas
+    ADD CONSTRAINT pedagogical_planoaula_tu_planoaula_id_turma_id_07abf25a_uniq UNIQUE (planoaula_id, turma_id);
+
+
+--
+-- Name: pedagogical_planoaula_turmas pedagogical_planoaula_turmas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_turmas
+    ADD CONSTRAINT pedagogical_planoaula_turmas_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_dadospermanenteestudante permanent_dadospermanenteestudante_cpf_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_dadospermanenteestudante
+    ADD CONSTRAINT permanent_dadospermanenteestudante_cpf_key UNIQUE (cpf);
+
+
+--
+-- Name: permanent_dadospermanenteestudante permanent_dadospermanenteestudante_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_dadospermanenteestudante
+    ADD CONSTRAINT permanent_dadospermanenteestudante_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_dadospermanenteresponsavel permanent_dadospermanenteresponsavel_cpf_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_dadospermanenteresponsavel
+    ADD CONSTRAINT permanent_dadospermanenteresponsavel_cpf_key UNIQUE (cpf);
+
+
+--
+-- Name: permanent_dadospermanenteresponsavel permanent_dadospermanenteresponsavel_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_dadospermanenteresponsavel
+    ADD CONSTRAINT permanent_dadospermanenteresponsavel_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_historicoescolaranoletivo permanent_historicoescol_historico_id_ano_letivo_5ba46114_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolaranoletivo
+    ADD CONSTRAINT permanent_historicoescol_historico_id_ano_letivo_5ba46114_uniq UNIQUE (historico_id, ano_letivo);
+
+
+--
+-- Name: permanent_historicoescolar permanent_historicoescolar_estudante_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolar
+    ADD CONSTRAINT permanent_historicoescolar_estudante_id_key UNIQUE (estudante_id);
+
+
+--
+-- Name: permanent_historicoescolar permanent_historicoescolar_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolar
+    ADD CONSTRAINT permanent_historicoescolar_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_historicoescolaranoletivo permanent_historicoescolaranoletivo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolaranoletivo
+    ADD CONSTRAINT permanent_historicoescolaranoletivo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_historicoescolarnotas permanent_historicoescolarnotas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolarnotas
+    ADD CONSTRAINT permanent_historicoescolarnotas_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_registroprontuario permanent_registroprontuario_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_registroprontuario
+    ADD CONSTRAINT permanent_registroprontuario_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_registroprontuarioanexo permanent_registroprontuarioanexo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_registroprontuarioanexo
+    ADD CONSTRAINT permanent_registroprontuarioanexo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_user_groups users_user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_groups
+    ADD CONSTRAINT users_user_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_user_groups users_user_groups_user_id_group_id_b88eab82_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_groups
+    ADD CONSTRAINT users_user_groups_user_id_group_id_b88eab82_uniq UNIQUE (user_id, group_id);
+
+
+--
+-- Name: users_user users_user_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user
+    ADD CONSTRAINT users_user_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_user_user_permissions users_user_user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_user_permissions
+    ADD CONSTRAINT users_user_user_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_user_user_permissions users_user_user_permissions_user_id_permission_id_43338c45_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_user_permissions
+    ADD CONSTRAINT users_user_user_permissions_user_id_permission_id_43338c45_uniq UNIQUE (user_id, permission_id);
+
+
+--
+-- Name: users_user users_user_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user
+    ADD CONSTRAINT users_user_username_key UNIQUE (username);
+
+
+--
+-- Name: academic_atestado_criado_por_id_1ec83eaa; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_atestado_criado_por_id_1ec83eaa ON public.academic_atestado USING btree (criado_por_id);
+
+
+--
+-- Name: academic_atestado_usuario_alvo_id_e5053ddb; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_atestado_usuario_alvo_id_e5053ddb ON public.academic_atestado USING btree (usuario_alvo_id);
+
+
+--
+-- Name: academic_estudante_cpf_59369532_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_estudante_cpf_59369532_like ON public.academic_estudante USING btree (cpf varchar_pattern_ops);
+
+
+--
+-- Name: academic_matriculacemep_curso_id_1d70f539; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_matriculacemep_curso_id_1d70f539 ON public.academic_matriculacemep USING btree (curso_id);
+
+
+--
+-- Name: academic_matriculacemep_estudante_id_099ea42a; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_matriculacemep_estudante_id_099ea42a ON public.academic_matriculacemep USING btree (estudante_id);
+
+
+--
+-- Name: academic_matriculacemep_numero_matricula_9f241c94_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_matriculacemep_numero_matricula_9f241c94_like ON public.academic_matriculacemep USING btree (numero_matricula varchar_pattern_ops);
+
+
+--
+-- Name: academic_matriculaturma_matricula_cemep_id_e921d770; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_matriculaturma_matricula_cemep_id_e921d770 ON public.academic_matriculaturma USING btree (matricula_cemep_id);
+
+
+--
+-- Name: academic_matriculaturma_turma_id_b8dafc46; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_matriculaturma_turma_id_b8dafc46 ON public.academic_matriculaturma USING btree (turma_id);
+
+
+--
+-- Name: academic_responsavel_cpf_e4018ebe_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_responsavel_cpf_e4018ebe_like ON public.academic_responsavel USING btree (cpf varchar_pattern_ops);
+
+
+--
+-- Name: academic_responsavelestudante_estudante_id_bac00c0e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_responsavelestudante_estudante_id_bac00c0e ON public.academic_responsavelestudante USING btree (estudante_id);
+
+
+--
+-- Name: academic_responsavelestudante_responsavel_id_1b66ff12; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_responsavelestudante_responsavel_id_1b66ff12 ON public.academic_responsavelestudante USING btree (responsavel_id);
+
+
+--
+-- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_group_name_a6ea08ec_like ON public.auth_group USING btree (name varchar_pattern_ops);
+
+
+--
+-- Name: auth_group_permissions_group_id_b120cbf9; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_group_permissions_group_id_b120cbf9 ON public.auth_group_permissions USING btree (group_id);
+
+
+--
+-- Name: auth_group_permissions_permission_id_84c5c92e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_group_permissions_permission_id_84c5c92e ON public.auth_group_permissions USING btree (permission_id);
+
+
+--
+-- Name: auth_permission_content_type_id_2f476e4b; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_permission_content_type_id_2f476e4b ON public.auth_permission USING btree (content_type_id);
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras_anoletivo_id_3ae79300; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_anoletivo_dias_letivos_extras_anoletivo_id_3ae79300 ON public.core_anoletivo_dias_letivos_extras USING btree (anoletivo_id);
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras_dialetivoextra_id_557a1463; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_anoletivo_dias_letivos_extras_dialetivoextra_id_557a1463 ON public.core_anoletivo_dias_letivos_extras USING btree (dialetivoextra_id);
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos_anoletivo_id_a42bc54a; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_anoletivo_dias_nao_letivos_anoletivo_id_a42bc54a ON public.core_anoletivo_dias_nao_letivos USING btree (anoletivo_id);
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos_dianaoletivo_id_d7c593db; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_anoletivo_dias_nao_letivos_dianaoletivo_id_d7c593db ON public.core_anoletivo_dias_nao_letivos USING btree (dianaoletivo_id);
+
+
+--
+-- Name: core_curso_nome_994746c5_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_curso_nome_994746c5_like ON public.core_curso USING btree (nome varchar_pattern_ops);
+
+
+--
+-- Name: core_curso_sigla_8dace4b8_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_curso_sigla_8dace4b8_like ON public.core_curso USING btree (sigla varchar_pattern_ops);
+
+
+--
+-- Name: core_disciplinaturma_disciplina_id_e924a909; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_disciplinaturma_disciplina_id_e924a909 ON public.core_disciplinaturma USING btree (disciplina_id);
+
+
+--
+-- Name: core_disciplinaturma_turma_id_ca8b9173; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_disciplinaturma_turma_id_ca8b9173 ON public.core_disciplinaturma USING btree (turma_id);
+
+
+--
+-- Name: core_funcionario_cpf_6876030f_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_funcionario_cpf_6876030f_like ON public.core_funcionario USING btree (cpf varchar_pattern_ops);
+
+
+--
+-- Name: core_gradehoraria_disciplina_id_8f2a8982; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_gradehoraria_disciplina_id_8f2a8982 ON public.core_gradehoraria USING btree (disciplina_id);
+
+
+--
+-- Name: core_gradehoraria_horario_aula_id_fd2ce14b; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_gradehoraria_horario_aula_id_fd2ce14b ON public.core_gradehoraria USING btree (horario_aula_id);
+
+
+--
+-- Name: core_gradehoraria_turma_id_727da9b6; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_gradehoraria_turma_id_727da9b6 ON public.core_gradehoraria USING btree (turma_id);
+
+
+--
+-- Name: core_habilidade_codigo_7d425937_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_habilidade_codigo_7d425937_like ON public.core_habilidade USING btree (codigo varchar_pattern_ops);
+
+
+--
+-- Name: core_habilidade_disciplina_id_4e464227; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_habilidade_disciplina_id_4e464227 ON public.core_habilidade USING btree (disciplina_id);
+
+
+--
+-- Name: core_horarioaula_ano_letivo_id_f60146b2; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_horarioaula_ano_letivo_id_f60146b2 ON public.core_horarioaula USING btree (ano_letivo_id);
+
+
+--
+-- Name: core_periodotrabalho_funcionario_id_50ce0870; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_periodotrabalho_funcionario_id_50ce0870 ON public.core_periodotrabalho USING btree (funcionario_id);
+
+
+--
+-- Name: core_professordisciplinaturma_disciplina_turma_id_91091248; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_professordisciplinaturma_disciplina_turma_id_91091248 ON public.core_professordisciplinaturma USING btree (disciplina_turma_id);
+
+
+--
+-- Name: core_professordisciplinaturma_professor_id_43b30907; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_professordisciplinaturma_professor_id_43b30907 ON public.core_professordisciplinaturma USING btree (professor_id);
+
+
+--
+-- Name: core_turma_curso_id_3be244ac; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_turma_curso_id_3be244ac ON public.core_turma USING btree (curso_id);
+
+
+--
+-- Name: core_turma_professores_representantes_funcionario_id_7a07fc74; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_turma_professores_representantes_funcionario_id_7a07fc74 ON public.core_turma_professores_representantes USING btree (funcionario_id);
+
+
+--
+-- Name: core_turma_professores_representantes_turma_id_a50d824e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_turma_professores_representantes_turma_id_a50d824e ON public.core_turma_professores_representantes USING btree (turma_id);
+
+
+--
+-- Name: django_admin_log_content_type_id_c4bce8eb; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_admin_log_content_type_id_c4bce8eb ON public.django_admin_log USING btree (content_type_id);
+
+
+--
+-- Name: django_admin_log_user_id_c564eba6; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_admin_log_user_id_c564eba6 ON public.django_admin_log USING btree (user_id);
+
+
+--
+-- Name: django_session_expire_date_a5c62663; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_session_expire_date_a5c62663 ON public.django_session USING btree (expire_date);
+
+
+--
+-- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_session_session_key_c0390e0f_like ON public.django_session USING btree (session_key varchar_pattern_ops);
+
+
+--
+-- Name: management_aviso_criador_id_9a68bd6c; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_aviso_criador_id_9a68bd6c ON public.management_aviso USING btree (criador_id);
+
+
+--
+-- Name: management_aviso_destinatarios_aviso_id_145c8d68; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_aviso_destinatarios_aviso_id_145c8d68 ON public.management_aviso_destinatarios USING btree (aviso_id);
+
+
+--
+-- Name: management_aviso_destinatarios_user_id_c6e7aac2; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_aviso_destinatarios_user_id_c6e7aac2 ON public.management_aviso_destinatarios USING btree (user_id);
+
+
+--
+-- Name: management_avisoanexo_aviso_id_57d552a1; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_avisoanexo_aviso_id_57d552a1 ON public.management_avisoanexo USING btree (aviso_id);
+
+
+--
+-- Name: management_avisovisualizacao_aviso_id_d790d3ff; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_avisovisualizacao_aviso_id_d790d3ff ON public.management_avisovisualizacao USING btree (aviso_id);
+
+
+--
+-- Name: management_avisovisualizacao_usuario_id_a09d066e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_avisovisualizacao_usuario_id_a09d066e ON public.management_avisovisualizacao USING btree (usuario_id);
+
+
+--
+-- Name: management_notificacaohtpc_funcionario_id_c52be426; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_notificacaohtpc_funcionario_id_c52be426 ON public.management_notificacaohtpc USING btree (funcionario_id);
+
+
+--
+-- Name: management_notificacaohtpc_reuniao_id_b17766c2; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_notificacaohtpc_reuniao_id_b17766c2 ON public.management_notificacaohtpc USING btree (reuniao_id);
+
+
+--
+-- Name: management_notificacaotarefa_funcionario_id_2a07f22e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_notificacaotarefa_funcionario_id_2a07f22e ON public.management_notificacaotarefa USING btree (funcionario_id);
+
+
+--
+-- Name: management_notificacaotarefa_tarefa_id_aa1f4780; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_notificacaotarefa_tarefa_id_aa1f4780 ON public.management_notificacaotarefa USING btree (tarefa_id);
+
+
+--
+-- Name: management_reuniaohtpc_presentes_funcionario_id_496fe539; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_reuniaohtpc_presentes_funcionario_id_496fe539 ON public.management_reuniaohtpc_presentes USING btree (funcionario_id);
+
+
+--
+-- Name: management_reuniaohtpc_presentes_reuniaohtpc_id_e5439d2e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_reuniaohtpc_presentes_reuniaohtpc_id_e5439d2e ON public.management_reuniaohtpc_presentes USING btree (reuniaohtpc_id);
+
+
+--
+-- Name: management_reuniaohtpc_quem_registrou_id_621368dc; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_reuniaohtpc_quem_registrou_id_621368dc ON public.management_reuniaohtpc USING btree (quem_registrou_id);
+
+
+--
+-- Name: management_reuniaohtpcanexo_reuniao_id_3a8a9698; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_reuniaohtpcanexo_reuniao_id_3a8a9698 ON public.management_reuniaohtpcanexo USING btree (reuniao_id);
+
+
+--
+-- Name: management_tarefa_criador_id_4901be8f; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefa_criador_id_4901be8f ON public.management_tarefa USING btree (criador_id);
+
+
+--
+-- Name: management_tarefa_funcionarios_funcionario_id_81a43c3c; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefa_funcionarios_funcionario_id_81a43c3c ON public.management_tarefa_funcionarios USING btree (funcionario_id);
+
+
+--
+-- Name: management_tarefa_funcionarios_tarefa_id_1b4fd1c4; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefa_funcionarios_tarefa_id_1b4fd1c4 ON public.management_tarefa_funcionarios USING btree (tarefa_id);
+
+
+--
+-- Name: management_tarefaanexo_tarefa_id_3e316151; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefaanexo_tarefa_id_3e316151 ON public.management_tarefaanexo USING btree (tarefa_id);
+
+
+--
+-- Name: management_tarefaresposta_funcionario_id_14bad833; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefaresposta_funcionario_id_14bad833 ON public.management_tarefaresposta USING btree (funcionario_id);
+
+
+--
+-- Name: management_tarefaresposta_tarefa_id_750b6388; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefaresposta_tarefa_id_750b6388 ON public.management_tarefaresposta USING btree (tarefa_id);
+
+
+--
+-- Name: management_tarefarespostaanexo_resposta_id_c53702e5; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefarespostaanexo_resposta_id_c53702e5 ON public.management_tarefarespostaanexo USING btree (resposta_id);
+
+
+--
+-- Name: pedagogical_aula_professor_disciplina_turma_id_45ce1ebb; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_aula_professor_disciplina_turma_id_45ce1ebb ON public.pedagogical_aula USING btree (professor_disciplina_turma_id);
+
+
+--
+-- Name: pedagogical_avaliacao_professor_disciplina_turma_id_d6581024; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_avaliacao_professor_disciplina_turma_id_d6581024 ON public.pedagogical_avaliacao USING btree (professor_disciplina_turma_id);
+
+
+--
+-- Name: pedagogical_controlevisto_instrumento_avaliativo_id_1837df71; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_controlevisto_instrumento_avaliativo_id_1837df71 ON public.pedagogical_controlevisto USING btree (instrumento_avaliativo_id);
+
+
+--
+-- Name: pedagogical_controlevisto_matricula_turma_id_60d3df7b; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_controlevisto_matricula_turma_id_60d3df7b ON public.pedagogical_controlevisto USING btree (matricula_turma_id);
+
+
+--
+-- Name: pedagogical_controlevisto_professor_disciplina_turma_93b5e757; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_controlevisto_professor_disciplina_turma_93b5e757 ON public.pedagogical_controlevisto USING btree (professor_disciplina_turma_id);
+
+
+--
+-- Name: pedagogical_descritorocorrenciapedagogica_gestor_id_7d075a73; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_descritorocorrenciapedagogica_gestor_id_7d075a73 ON public.pedagogical_descritorocorrenciapedagogica USING btree (gestor_id);
+
+
+--
+-- Name: pedagogical_faltas_aula_id_3fc456ba; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_faltas_aula_id_3fc456ba ON public.pedagogical_faltas USING btree (aula_id);
+
+
+--
+-- Name: pedagogical_faltas_estudante_id_cacf9e7c; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_faltas_estudante_id_cacf9e7c ON public.pedagogical_faltas USING btree (estudante_id);
+
+
+--
+-- Name: pedagogical_instrumentoavaliativo_avaliacao_id_f9ee5536; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_instrumentoavaliativo_avaliacao_id_f9ee5536 ON public.pedagogical_instrumentoavaliativo USING btree (avaliacao_id);
+
+
+--
+-- Name: pedagogical_notaavaliacao_avaliacao_id_541388b3; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notaavaliacao_avaliacao_id_541388b3 ON public.pedagogical_notaavaliacao USING btree (avaliacao_id);
+
+
+--
+-- Name: pedagogical_notaavaliacao_matricula_turma_id_3061c106; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notaavaliacao_matricula_turma_id_3061c106 ON public.pedagogical_notaavaliacao USING btree (matricula_turma_id);
+
+
+--
+-- Name: pedagogical_notabimestral_matricula_turma_id_710e9fa7; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notabimestral_matricula_turma_id_710e9fa7 ON public.pedagogical_notabimestral USING btree (matricula_turma_id);
+
+
+--
+-- Name: pedagogical_notabimestral_professor_disciplina_turma_800de48d; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notabimestral_professor_disciplina_turma_800de48d ON public.pedagogical_notabimestral USING btree (professor_disciplina_turma_id);
+
+
+--
+-- Name: pedagogical_notainstrument_instrumento_avaliativo_id_5df6482d; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notainstrument_instrumento_avaliativo_id_5df6482d ON public.pedagogical_notainstrumentoavaliativo USING btree (instrumento_avaliativo_id);
+
+
+--
+-- Name: pedagogical_notainstrument_matricula_turma_id_1aa0de08; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notainstrument_matricula_turma_id_1aa0de08 ON public.pedagogical_notainstrumentoavaliativo USING btree (matricula_turma_id);
+
+
+--
+-- Name: pedagogical_notificacaorec_professor_disciplina_turma_67a2ca65; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notificacaorec_professor_disciplina_turma_67a2ca65 ON public.pedagogical_notificacaorecuperacao USING btree (professor_disciplina_turma_id);
+
+
+--
+-- Name: pedagogical_notificacaorecuperacao_estudante_id_3d9a2b58; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notificacaorecuperacao_estudante_id_3d9a2b58 ON public.pedagogical_notificacaorecuperacao USING btree (estudante_id);
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica_autor_id_959a9a6f; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_ocorrenciapedagogica_autor_id_959a9a6f ON public.pedagogical_ocorrenciapedagogica USING btree (autor_id);
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica_estudante_id_4c3be7f4; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_ocorrenciapedagogica_estudante_id_4c3be7f4 ON public.pedagogical_ocorrenciapedagogica USING btree (estudante_id);
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica_tipo_id_bf9e428c; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_ocorrenciapedagogica_tipo_id_bf9e428c ON public.pedagogical_ocorrenciapedagogica USING btree (tipo_id);
+
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente_ocorrencia_id_a0779f60; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_ocorrenciaresponsavelciente_ocorrencia_id_a0779f60 ON public.pedagogical_ocorrenciaresponsavelciente USING btree (ocorrencia_id);
+
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente_responsavel_id_eaa3f2d6; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_ocorrenciaresponsavelciente_responsavel_id_eaa3f2d6 ON public.pedagogical_ocorrenciaresponsavelciente USING btree (responsavel_id);
+
+
+--
+-- Name: pedagogical_planoaula_disciplina_id_6203c6ae; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_planoaula_disciplina_id_6203c6ae ON public.pedagogical_planoaula USING btree (disciplina_id);
+
+
+--
+-- Name: pedagogical_planoaula_habilidades_habilidade_id_e78fd94c; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_planoaula_habilidades_habilidade_id_e78fd94c ON public.pedagogical_planoaula_habilidades USING btree (habilidade_id);
+
+
+--
+-- Name: pedagogical_planoaula_habilidades_planoaula_id_87c1d53d; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_planoaula_habilidades_planoaula_id_87c1d53d ON public.pedagogical_planoaula_habilidades USING btree (planoaula_id);
+
+
+--
+-- Name: pedagogical_planoaula_professor_id_81dc1fb6; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_planoaula_professor_id_81dc1fb6 ON public.pedagogical_planoaula USING btree (professor_id);
+
+
+--
+-- Name: pedagogical_planoaula_turmas_planoaula_id_3a17c7da; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_planoaula_turmas_planoaula_id_3a17c7da ON public.pedagogical_planoaula_turmas USING btree (planoaula_id);
+
+
+--
+-- Name: pedagogical_planoaula_turmas_turma_id_baa02398; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_planoaula_turmas_turma_id_baa02398 ON public.pedagogical_planoaula_turmas USING btree (turma_id);
+
+
+--
+-- Name: permanent_dadospermanenteestudante_cpf_0448c7fa_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_dadospermanenteestudante_cpf_0448c7fa_like ON public.permanent_dadospermanenteestudante USING btree (cpf varchar_pattern_ops);
+
+
+--
+-- Name: permanent_dadospermanenteresponsavel_cpf_df6ec16d_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_dadospermanenteresponsavel_cpf_df6ec16d_like ON public.permanent_dadospermanenteresponsavel USING btree (cpf varchar_pattern_ops);
+
+
+--
+-- Name: permanent_dadospermanenteresponsavel_estudante_id_6711e4a2; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_dadospermanenteresponsavel_estudante_id_6711e4a2 ON public.permanent_dadospermanenteresponsavel USING btree (estudante_id);
+
+
+--
+-- Name: permanent_historicoescolaranoletivo_historico_id_4e976066; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_historicoescolaranoletivo_historico_id_4e976066 ON public.permanent_historicoescolaranoletivo USING btree (historico_id);
+
+
+--
+-- Name: permanent_historicoescolarnotas_ano_letivo_ref_id_9940c1ac; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_historicoescolarnotas_ano_letivo_ref_id_9940c1ac ON public.permanent_historicoescolarnotas USING btree (ano_letivo_ref_id);
+
+
+--
+-- Name: permanent_registroprontuar_registro_prontuario_id_b6e90955; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_registroprontuar_registro_prontuario_id_b6e90955 ON public.permanent_registroprontuarioanexo USING btree (registro_prontuario_id);
+
+
+--
+-- Name: permanent_registroprontuario_cpf_43d7f443; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_registroprontuario_cpf_43d7f443 ON public.permanent_registroprontuario USING btree (cpf);
+
+
+--
+-- Name: permanent_registroprontuario_cpf_43d7f443_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_registroprontuario_cpf_43d7f443_like ON public.permanent_registroprontuario USING btree (cpf varchar_pattern_ops);
+
+
+--
+-- Name: permanent_registroprontuario_pai_ocorrencia_id_971a9543; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_registroprontuario_pai_ocorrencia_id_971a9543 ON public.permanent_registroprontuario USING btree (pai_ocorrencia_id);
+
+
+--
+-- Name: users_user_groups_group_id_9afc8d0e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_user_groups_group_id_9afc8d0e ON public.users_user_groups USING btree (group_id);
+
+
+--
+-- Name: users_user_groups_user_id_5f6f5a90; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_user_groups_user_id_5f6f5a90 ON public.users_user_groups USING btree (user_id);
+
+
+--
+-- Name: users_user_user_permissions_permission_id_0b93982e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_user_user_permissions_permission_id_0b93982e ON public.users_user_user_permissions USING btree (permission_id);
+
+
+--
+-- Name: users_user_user_permissions_user_id_20aca447; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_user_user_permissions_user_id_20aca447 ON public.users_user_user_permissions USING btree (user_id);
+
+
+--
+-- Name: users_user_username_06e46fe6_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_user_username_06e46fe6_like ON public.users_user USING btree (username varchar_pattern_ops);
+
+
+--
+-- Name: academic_atestado academic_atestado_criado_por_id_1ec83eaa_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_atestado
+    ADD CONSTRAINT academic_atestado_criado_por_id_1ec83eaa_fk_users_user_id FOREIGN KEY (criado_por_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_atestado academic_atestado_usuario_alvo_id_e5053ddb_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_atestado
+    ADD CONSTRAINT academic_atestado_usuario_alvo_id_e5053ddb_fk_users_user_id FOREIGN KEY (usuario_alvo_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_estudante academic_estudante_usuario_id_fb0d4a0b_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_estudante
+    ADD CONSTRAINT academic_estudante_usuario_id_fb0d4a0b_fk_users_user_id FOREIGN KEY (usuario_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_matriculacemep academic_matriculace_estudante_id_099ea42a_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculacemep
+    ADD CONSTRAINT academic_matriculace_estudante_id_099ea42a_fk_academic_ FOREIGN KEY (estudante_id) REFERENCES public.academic_estudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_matriculacemep academic_matriculacemep_curso_id_1d70f539_fk_core_curso_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculacemep
+    ADD CONSTRAINT academic_matriculacemep_curso_id_1d70f539_fk_core_curso_id FOREIGN KEY (curso_id) REFERENCES public.core_curso(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_matriculaturma academic_matriculatu_matricula_cemep_id_e921d770_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculaturma
+    ADD CONSTRAINT academic_matriculatu_matricula_cemep_id_e921d770_fk_academic_ FOREIGN KEY (matricula_cemep_id) REFERENCES public.academic_matriculacemep(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_matriculaturma academic_matriculaturma_turma_id_b8dafc46_fk_core_turma_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculaturma
+    ADD CONSTRAINT academic_matriculaturma_turma_id_b8dafc46_fk_core_turma_id FOREIGN KEY (turma_id) REFERENCES public.core_turma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_responsavelestudante academic_responsavel_estudante_id_bac00c0e_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavelestudante
+    ADD CONSTRAINT academic_responsavel_estudante_id_bac00c0e_fk_academic_ FOREIGN KEY (estudante_id) REFERENCES public.academic_estudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_responsavelestudante academic_responsavel_responsavel_id_1b66ff12_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavelestudante
+    ADD CONSTRAINT academic_responsavel_responsavel_id_1b66ff12_fk_academic_ FOREIGN KEY (responsavel_id) REFERENCES public.academic_responsavel(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_responsavel academic_responsavel_usuario_id_234fac3d_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavel
+    ADD CONSTRAINT academic_responsavel_usuario_id_234fac3d_fk_users_user_id FOREIGN KEY (usuario_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissio_permission_id_84c5c92e_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_b120cbf9_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_content_type_id_2f476e4b_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras core_anoletivo_dias__anoletivo_id_3ae79300_fk_core_anol; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_letivos_extras
+    ADD CONSTRAINT core_anoletivo_dias__anoletivo_id_3ae79300_fk_core_anol FOREIGN KEY (anoletivo_id) REFERENCES public.core_anoletivo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos core_anoletivo_dias__anoletivo_id_a42bc54a_fk_core_anol; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_nao_letivos
+    ADD CONSTRAINT core_anoletivo_dias__anoletivo_id_a42bc54a_fk_core_anol FOREIGN KEY (anoletivo_id) REFERENCES public.core_anoletivo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras core_anoletivo_dias__dialetivoextra_id_557a1463_fk_core_dial; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_letivos_extras
+    ADD CONSTRAINT core_anoletivo_dias__dialetivoextra_id_557a1463_fk_core_dial FOREIGN KEY (dialetivoextra_id) REFERENCES public.core_dialetivoextra(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos core_anoletivo_dias__dianaoletivo_id_d7c593db_fk_core_dian; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_nao_letivos
+    ADD CONSTRAINT core_anoletivo_dias__dianaoletivo_id_d7c593db_fk_core_dian FOREIGN KEY (dianaoletivo_id) REFERENCES public.core_dianaoletivo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_disciplinaturma core_disciplinaturma_disciplina_id_e924a909_fk_core_disc; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_disciplinaturma
+    ADD CONSTRAINT core_disciplinaturma_disciplina_id_e924a909_fk_core_disc FOREIGN KEY (disciplina_id) REFERENCES public.core_disciplina(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_disciplinaturma core_disciplinaturma_turma_id_ca8b9173_fk_core_turma_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_disciplinaturma
+    ADD CONSTRAINT core_disciplinaturma_turma_id_ca8b9173_fk_core_turma_id FOREIGN KEY (turma_id) REFERENCES public.core_turma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_funcionario core_funcionario_usuario_id_13720693_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_funcionario
+    ADD CONSTRAINT core_funcionario_usuario_id_13720693_fk_users_user_id FOREIGN KEY (usuario_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_gradehoraria core_gradehoraria_disciplina_id_8f2a8982_fk_core_disciplina_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_gradehoraria
+    ADD CONSTRAINT core_gradehoraria_disciplina_id_8f2a8982_fk_core_disciplina_id FOREIGN KEY (disciplina_id) REFERENCES public.core_disciplina(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_gradehoraria core_gradehoraria_horario_aula_id_fd2ce14b_fk_core_hora; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_gradehoraria
+    ADD CONSTRAINT core_gradehoraria_horario_aula_id_fd2ce14b_fk_core_hora FOREIGN KEY (horario_aula_id) REFERENCES public.core_horarioaula(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_gradehoraria core_gradehoraria_turma_id_727da9b6_fk_core_turma_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_gradehoraria
+    ADD CONSTRAINT core_gradehoraria_turma_id_727da9b6_fk_core_turma_id FOREIGN KEY (turma_id) REFERENCES public.core_turma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_habilidade core_habilidade_disciplina_id_4e464227_fk_core_disciplina_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_habilidade
+    ADD CONSTRAINT core_habilidade_disciplina_id_4e464227_fk_core_disciplina_id FOREIGN KEY (disciplina_id) REFERENCES public.core_disciplina(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_horarioaula core_horarioaula_ano_letivo_id_f60146b2_fk_core_anoletivo_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_horarioaula
+    ADD CONSTRAINT core_horarioaula_ano_letivo_id_f60146b2_fk_core_anoletivo_id FOREIGN KEY (ano_letivo_id) REFERENCES public.core_anoletivo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_periodotrabalho core_periodotrabalho_funcionario_id_50ce0870_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_periodotrabalho
+    ADD CONSTRAINT core_periodotrabalho_funcionario_id_50ce0870_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_professordisciplinaturma core_professordiscip_disciplina_turma_id_91091248_fk_core_disc; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_professordisciplinaturma
+    ADD CONSTRAINT core_professordiscip_disciplina_turma_id_91091248_fk_core_disc FOREIGN KEY (disciplina_turma_id) REFERENCES public.core_disciplinaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_professordisciplinaturma core_professordiscip_professor_id_43b30907_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_professordisciplinaturma
+    ADD CONSTRAINT core_professordiscip_professor_id_43b30907_fk_core_func FOREIGN KEY (professor_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_turma core_turma_curso_id_3be244ac_fk_core_curso_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma
+    ADD CONSTRAINT core_turma_curso_id_3be244ac_fk_core_curso_id FOREIGN KEY (curso_id) REFERENCES public.core_curso(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_turma_professores_representantes core_turma_professor_funcionario_id_7a07fc74_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma_professores_representantes
+    ADD CONSTRAINT core_turma_professor_funcionario_id_7a07fc74_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_turma_professores_representantes core_turma_professor_turma_id_a50d824e_fk_core_turm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma_professores_representantes
+    ADD CONSTRAINT core_turma_professor_turma_id_a50d824e_fk_core_turm FOREIGN KEY (turma_id) REFERENCES public.core_turma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_content_type_id_c4bce8eb_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_users_user_id FOREIGN KEY (user_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_aviso management_aviso_criador_id_9a68bd6c_fk_core_funcionario_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_aviso
+    ADD CONSTRAINT management_aviso_criador_id_9a68bd6c_fk_core_funcionario_id FOREIGN KEY (criador_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_aviso_destinatarios management_aviso_des_aviso_id_145c8d68_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_aviso_destinatarios
+    ADD CONSTRAINT management_aviso_des_aviso_id_145c8d68_fk_managemen FOREIGN KEY (aviso_id) REFERENCES public.management_aviso(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_aviso_destinatarios management_aviso_des_user_id_c6e7aac2_fk_users_use; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_aviso_destinatarios
+    ADD CONSTRAINT management_aviso_des_user_id_c6e7aac2_fk_users_use FOREIGN KEY (user_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_avisoanexo management_avisoanexo_aviso_id_57d552a1_fk_management_aviso_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_avisoanexo
+    ADD CONSTRAINT management_avisoanexo_aviso_id_57d552a1_fk_management_aviso_id FOREIGN KEY (aviso_id) REFERENCES public.management_aviso(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_avisovisualizacao management_avisovisu_aviso_id_d790d3ff_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_avisovisualizacao
+    ADD CONSTRAINT management_avisovisu_aviso_id_d790d3ff_fk_managemen FOREIGN KEY (aviso_id) REFERENCES public.management_aviso(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_avisovisualizacao management_avisovisu_usuario_id_a09d066e_fk_users_use; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_avisovisualizacao
+    ADD CONSTRAINT management_avisovisu_usuario_id_a09d066e_fk_users_use FOREIGN KEY (usuario_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_notificacaotarefa management_notificac_funcionario_id_2a07f22e_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaotarefa
+    ADD CONSTRAINT management_notificac_funcionario_id_2a07f22e_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_notificacaohtpc management_notificac_funcionario_id_c52be426_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaohtpc
+    ADD CONSTRAINT management_notificac_funcionario_id_c52be426_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_notificacaohtpc management_notificac_reuniao_id_b17766c2_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaohtpc
+    ADD CONSTRAINT management_notificac_reuniao_id_b17766c2_fk_managemen FOREIGN KEY (reuniao_id) REFERENCES public.management_reuniaohtpc(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_notificacaotarefa management_notificac_tarefa_id_aa1f4780_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaotarefa
+    ADD CONSTRAINT management_notificac_tarefa_id_aa1f4780_fk_managemen FOREIGN KEY (tarefa_id) REFERENCES public.management_tarefa(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_reuniaohtpc_presentes management_reuniaoht_funcionario_id_496fe539_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpc_presentes
+    ADD CONSTRAINT management_reuniaoht_funcionario_id_496fe539_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_reuniaohtpc management_reuniaoht_quem_registrou_id_621368dc_fk_users_use; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpc
+    ADD CONSTRAINT management_reuniaoht_quem_registrou_id_621368dc_fk_users_use FOREIGN KEY (quem_registrou_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_reuniaohtpcanexo management_reuniaoht_reuniao_id_3a8a9698_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpcanexo
+    ADD CONSTRAINT management_reuniaoht_reuniao_id_3a8a9698_fk_managemen FOREIGN KEY (reuniao_id) REFERENCES public.management_reuniaohtpc(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_reuniaohtpc_presentes management_reuniaoht_reuniaohtpc_id_e5439d2e_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpc_presentes
+    ADD CONSTRAINT management_reuniaoht_reuniaohtpc_id_e5439d2e_fk_managemen FOREIGN KEY (reuniaohtpc_id) REFERENCES public.management_reuniaohtpc(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefa management_tarefa_criador_id_4901be8f_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefa
+    ADD CONSTRAINT management_tarefa_criador_id_4901be8f_fk_users_user_id FOREIGN KEY (criador_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefa_funcionarios management_tarefa_fu_funcionario_id_81a43c3c_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefa_funcionarios
+    ADD CONSTRAINT management_tarefa_fu_funcionario_id_81a43c3c_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefa_funcionarios management_tarefa_fu_tarefa_id_1b4fd1c4_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefa_funcionarios
+    ADD CONSTRAINT management_tarefa_fu_tarefa_id_1b4fd1c4_fk_managemen FOREIGN KEY (tarefa_id) REFERENCES public.management_tarefa(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefaanexo management_tarefaane_tarefa_id_3e316151_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefaanexo
+    ADD CONSTRAINT management_tarefaane_tarefa_id_3e316151_fk_managemen FOREIGN KEY (tarefa_id) REFERENCES public.management_tarefa(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefaresposta management_tarefares_funcionario_id_14bad833_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefaresposta
+    ADD CONSTRAINT management_tarefares_funcionario_id_14bad833_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefarespostaanexo management_tarefares_resposta_id_c53702e5_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefarespostaanexo
+    ADD CONSTRAINT management_tarefares_resposta_id_c53702e5_fk_managemen FOREIGN KEY (resposta_id) REFERENCES public.management_tarefaresposta(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefaresposta management_tarefares_tarefa_id_750b6388_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefaresposta
+    ADD CONSTRAINT management_tarefares_tarefa_id_750b6388_fk_managemen FOREIGN KEY (tarefa_id) REFERENCES public.management_tarefa(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_aula pedagogical_aula_professor_disciplina_45ce1ebb_fk_core_prof; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_aula
+    ADD CONSTRAINT pedagogical_aula_professor_disciplina_45ce1ebb_fk_core_prof FOREIGN KEY (professor_disciplina_turma_id) REFERENCES public.core_professordisciplinaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_avaliacao pedagogical_avaliaca_professor_disciplina_d6581024_fk_core_prof; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_avaliacao
+    ADD CONSTRAINT pedagogical_avaliaca_professor_disciplina_d6581024_fk_core_prof FOREIGN KEY (professor_disciplina_turma_id) REFERENCES public.core_professordisciplinaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_controlevisto pedagogical_controle_instrumento_avaliati_1837df71_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_controlevisto
+    ADD CONSTRAINT pedagogical_controle_instrumento_avaliati_1837df71_fk_pedagogic FOREIGN KEY (instrumento_avaliativo_id) REFERENCES public.pedagogical_instrumentoavaliativo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_controlevisto pedagogical_controle_matricula_turma_id_60d3df7b_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_controlevisto
+    ADD CONSTRAINT pedagogical_controle_matricula_turma_id_60d3df7b_fk_academic_ FOREIGN KEY (matricula_turma_id) REFERENCES public.academic_matriculaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_controlevisto pedagogical_controle_professor_disciplina_93b5e757_fk_core_prof; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_controlevisto
+    ADD CONSTRAINT pedagogical_controle_professor_disciplina_93b5e757_fk_core_prof FOREIGN KEY (professor_disciplina_turma_id) REFERENCES public.core_professordisciplinaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_descritorocorrenciapedagogica pedagogical_descrito_gestor_id_7d075a73_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_descritorocorrenciapedagogica
+    ADD CONSTRAINT pedagogical_descrito_gestor_id_7d075a73_fk_core_func FOREIGN KEY (gestor_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_faltas pedagogical_faltas_aula_id_3fc456ba_fk_pedagogical_aula_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_faltas
+    ADD CONSTRAINT pedagogical_faltas_aula_id_3fc456ba_fk_pedagogical_aula_id FOREIGN KEY (aula_id) REFERENCES public.pedagogical_aula(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_faltas pedagogical_faltas_estudante_id_cacf9e7c_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_faltas
+    ADD CONSTRAINT pedagogical_faltas_estudante_id_cacf9e7c_fk_academic_ FOREIGN KEY (estudante_id) REFERENCES public.academic_estudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_instrumentoavaliativo pedagogical_instrume_avaliacao_id_f9ee5536_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_instrumentoavaliativo
+    ADD CONSTRAINT pedagogical_instrume_avaliacao_id_f9ee5536_fk_pedagogic FOREIGN KEY (avaliacao_id) REFERENCES public.pedagogical_avaliacao(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notaavaliacao pedagogical_notaaval_avaliacao_id_541388b3_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notaavaliacao
+    ADD CONSTRAINT pedagogical_notaaval_avaliacao_id_541388b3_fk_pedagogic FOREIGN KEY (avaliacao_id) REFERENCES public.pedagogical_avaliacao(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notaavaliacao pedagogical_notaaval_matricula_turma_id_3061c106_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notaavaliacao
+    ADD CONSTRAINT pedagogical_notaaval_matricula_turma_id_3061c106_fk_academic_ FOREIGN KEY (matricula_turma_id) REFERENCES public.academic_matriculaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notabimestral pedagogical_notabime_matricula_turma_id_710e9fa7_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notabimestral
+    ADD CONSTRAINT pedagogical_notabime_matricula_turma_id_710e9fa7_fk_academic_ FOREIGN KEY (matricula_turma_id) REFERENCES public.academic_matriculaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notabimestral pedagogical_notabime_professor_disciplina_800de48d_fk_core_prof; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notabimestral
+    ADD CONSTRAINT pedagogical_notabime_professor_disciplina_800de48d_fk_core_prof FOREIGN KEY (professor_disciplina_turma_id) REFERENCES public.core_professordisciplinaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notainstrumentoavaliativo pedagogical_notainst_instrumento_avaliati_5df6482d_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notainstrumentoavaliativo
+    ADD CONSTRAINT pedagogical_notainst_instrumento_avaliati_5df6482d_fk_pedagogic FOREIGN KEY (instrumento_avaliativo_id) REFERENCES public.pedagogical_instrumentoavaliativo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notainstrumentoavaliativo pedagogical_notainst_matricula_turma_id_1aa0de08_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notainstrumentoavaliativo
+    ADD CONSTRAINT pedagogical_notainst_matricula_turma_id_1aa0de08_fk_academic_ FOREIGN KEY (matricula_turma_id) REFERENCES public.academic_matriculaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notificacaorecuperacao pedagogical_notifica_estudante_id_3d9a2b58_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notificacaorecuperacao
+    ADD CONSTRAINT pedagogical_notifica_estudante_id_3d9a2b58_fk_academic_ FOREIGN KEY (estudante_id) REFERENCES public.academic_estudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notificacaorecuperacao pedagogical_notifica_professor_disciplina_67a2ca65_fk_core_prof; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notificacaorecuperacao
+    ADD CONSTRAINT pedagogical_notifica_professor_disciplina_67a2ca65_fk_core_prof FOREIGN KEY (professor_disciplina_turma_id) REFERENCES public.core_professordisciplinaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica pedagogical_ocorrenc_autor_id_959a9a6f_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciapedagogica
+    ADD CONSTRAINT pedagogical_ocorrenc_autor_id_959a9a6f_fk_core_func FOREIGN KEY (autor_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica pedagogical_ocorrenc_estudante_id_4c3be7f4_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciapedagogica
+    ADD CONSTRAINT pedagogical_ocorrenc_estudante_id_4c3be7f4_fk_academic_ FOREIGN KEY (estudante_id) REFERENCES public.academic_estudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente pedagogical_ocorrenc_ocorrencia_id_a0779f60_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciaresponsavelciente
+    ADD CONSTRAINT pedagogical_ocorrenc_ocorrencia_id_a0779f60_fk_pedagogic FOREIGN KEY (ocorrencia_id) REFERENCES public.pedagogical_ocorrenciapedagogica(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente pedagogical_ocorrenc_responsavel_id_eaa3f2d6_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciaresponsavelciente
+    ADD CONSTRAINT pedagogical_ocorrenc_responsavel_id_eaa3f2d6_fk_academic_ FOREIGN KEY (responsavel_id) REFERENCES public.academic_responsavel(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica pedagogical_ocorrenc_tipo_id_bf9e428c_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciapedagogica
+    ADD CONSTRAINT pedagogical_ocorrenc_tipo_id_bf9e428c_fk_pedagogic FOREIGN KEY (tipo_id) REFERENCES public.pedagogical_descritorocorrenciapedagogica(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_planoaula pedagogical_planoaul_disciplina_id_6203c6ae_fk_core_disc; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula
+    ADD CONSTRAINT pedagogical_planoaul_disciplina_id_6203c6ae_fk_core_disc FOREIGN KEY (disciplina_id) REFERENCES public.core_disciplina(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_planoaula_habilidades pedagogical_planoaul_habilidade_id_e78fd94c_fk_core_habi; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_habilidades
+    ADD CONSTRAINT pedagogical_planoaul_habilidade_id_e78fd94c_fk_core_habi FOREIGN KEY (habilidade_id) REFERENCES public.core_habilidade(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_planoaula_turmas pedagogical_planoaul_planoaula_id_3a17c7da_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_turmas
+    ADD CONSTRAINT pedagogical_planoaul_planoaula_id_3a17c7da_fk_pedagogic FOREIGN KEY (planoaula_id) REFERENCES public.pedagogical_planoaula(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_planoaula_habilidades pedagogical_planoaul_planoaula_id_87c1d53d_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_habilidades
+    ADD CONSTRAINT pedagogical_planoaul_planoaula_id_87c1d53d_fk_pedagogic FOREIGN KEY (planoaula_id) REFERENCES public.pedagogical_planoaula(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_planoaula pedagogical_planoaul_professor_id_81dc1fb6_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula
+    ADD CONSTRAINT pedagogical_planoaul_professor_id_81dc1fb6_fk_core_func FOREIGN KEY (professor_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_planoaula_turmas pedagogical_planoaula_turmas_turma_id_baa02398_fk_core_turma_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_turmas
+    ADD CONSTRAINT pedagogical_planoaula_turmas_turma_id_baa02398_fk_core_turma_id FOREIGN KEY (turma_id) REFERENCES public.core_turma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: permanent_dadospermanenteresponsavel permanent_dadosperma_estudante_id_6711e4a2_fk_permanent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_dadospermanenteresponsavel
+    ADD CONSTRAINT permanent_dadosperma_estudante_id_6711e4a2_fk_permanent FOREIGN KEY (estudante_id) REFERENCES public.permanent_dadospermanenteestudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: permanent_historicoescolarnotas permanent_historicoe_ano_letivo_ref_id_9940c1ac_fk_permanent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolarnotas
+    ADD CONSTRAINT permanent_historicoe_ano_letivo_ref_id_9940c1ac_fk_permanent FOREIGN KEY (ano_letivo_ref_id) REFERENCES public.permanent_historicoescolaranoletivo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: permanent_historicoescolar permanent_historicoe_estudante_id_3b3f4b9d_fk_permanent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolar
+    ADD CONSTRAINT permanent_historicoe_estudante_id_3b3f4b9d_fk_permanent FOREIGN KEY (estudante_id) REFERENCES public.permanent_dadospermanenteestudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: permanent_historicoescolaranoletivo permanent_historicoe_historico_id_4e976066_fk_permanent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolaranoletivo
+    ADD CONSTRAINT permanent_historicoe_historico_id_4e976066_fk_permanent FOREIGN KEY (historico_id) REFERENCES public.permanent_historicoescolar(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: permanent_registroprontuario permanent_registropr_pai_ocorrencia_id_971a9543_fk_permanent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_registroprontuario
+    ADD CONSTRAINT permanent_registropr_pai_ocorrencia_id_971a9543_fk_permanent FOREIGN KEY (pai_ocorrencia_id) REFERENCES public.permanent_registroprontuario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: permanent_registroprontuarioanexo permanent_registropr_registro_prontuario__b6e90955_fk_permanent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_registroprontuarioanexo
+    ADD CONSTRAINT permanent_registropr_registro_prontuario__b6e90955_fk_permanent FOREIGN KEY (registro_prontuario_id) REFERENCES public.permanent_registroprontuario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: users_user_groups users_user_groups_group_id_9afc8d0e_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_groups
+    ADD CONSTRAINT users_user_groups_group_id_9afc8d0e_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: users_user_groups users_user_groups_user_id_5f6f5a90_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_groups
+    ADD CONSTRAINT users_user_groups_user_id_5f6f5a90_fk_users_user_id FOREIGN KEY (user_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: users_user_user_permissions users_user_user_perm_permission_id_0b93982e_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_user_permissions
+    ADD CONSTRAINT users_user_user_perm_permission_id_0b93982e_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: users_user_user_permissions users_user_user_permissions_user_id_20aca447_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_user_permissions
+    ADD CONSTRAINT users_user_user_permissions_user_id_20aca447_fk_users_user_id FOREIGN KEY (user_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+\unrestrict XIHUnd3GQKFwZlZy7ViD996FieK4YqqzdSheYZEfSuuuDbeCcXfTrCEizmseb07
+
