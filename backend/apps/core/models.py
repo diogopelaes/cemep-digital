@@ -228,11 +228,17 @@ class Turma(UUIDModel):
         unique_together = ['numero', 'letra', 'ano_letivo', 'curso']
     
     def __str__(self):
-        return f"{self.numero}º {self.get_nomenclatura_display()} {self.letra} - {self.ano_letivo}"
+        return self.nome_completo
+    
+    @property
+    def nome(self):
+        if self.nomenclatura == 'SERIE':
+            return f"{self.numero}ª {self.get_nomenclatura_display()} {self.letra}"
+        return f"{self.numero}º {self.get_nomenclatura_display()} {self.letra}"
     
     @property
     def nome_completo(self):
-        return f"{self.numero}º {self.get_nomenclatura_display()} {self.letra} - {self.curso.sigla} ({self.ano_letivo})"
+        return f"{self.nome} - {self.curso.sigla} - {self.ano_letivo}"
 
 
 class DisciplinaTurma(UUIDModel):

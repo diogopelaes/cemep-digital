@@ -108,6 +108,8 @@ export function useEstudantesTurma(turmaId, turma, isActive = true, onUpdate = n
             if (removido?.matricula_cemep) {
                 setEstudantesElegiveis(prev => [...prev, removido.matricula_cemep])
             }
+
+            if (onUpdate) onUpdate()
         } catch (error) {
             console.error('Erro ao remover:', error)
             toast.error('Erro ao remover estudante da turma')

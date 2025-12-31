@@ -189,6 +189,9 @@ export const coreAPI = {
     importarArquivo: (formData) => api.post('/core/disciplinas-turma/importar-arquivo/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
+    importarEmMassa: (formData) => api.post('/core/disciplinas-turma/importar-em-massa/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
     downloadModelo: () => api.get('/core/disciplinas-turma/download-modelo/', { responseType: 'blob' }),
   },
   // Atribuição de Aulas (Professor -> Disciplina/Turma)

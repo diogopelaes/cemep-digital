@@ -14,16 +14,17 @@ const sizes = {
   lg: 'px-8 py-4 text-lg',
 }
 
-const Button = forwardRef(({ 
-  children, 
-  variant = 'primary', 
+const Button = forwardRef(({
+  children,
+  variant = 'primary',
   size = 'md',
   className = '',
   loading = false,
   disabled = false,
   icon: Icon,
   iconPosition = 'left',
-  ...props 
+  type = 'button',
+  ...props
 }, ref) => {
   const baseClasses = variants[variant] || variants.primary
   const sizeClasses = sizes[size] || sizes.md
@@ -31,6 +32,7 @@ const Button = forwardRef(({
   return (
     <button
       ref={ref}
+      type={type}
       className={`${baseClasses} ${sizeClasses} ${className} inline-flex items-center justify-center gap-2`}
       disabled={disabled || loading}
       {...props}

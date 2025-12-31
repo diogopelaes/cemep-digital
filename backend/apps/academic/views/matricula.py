@@ -63,7 +63,7 @@ class MatriculaTurmaViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.
             status=MatriculaCEMEP.Status.MATRICULADO,
             curso=turma.curso
         ).exclude(
-            numero_matricula__in=matriculas_em_turmas_do_curso
+            id__in=matriculas_em_turmas_do_curso
         ).select_related('estudante__usuario').order_by('estudante__usuario__first_name')
         
         serializer = MatriculaCEMEPSerializer(matriculas_elegiveis, many=True)

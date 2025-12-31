@@ -126,7 +126,7 @@ export default function TurmaForm() {
 
           // Pergunta se quer editar a existente
           const confirmar = window.confirm(
-            `Já existe a turma "${turmaExistente.numero}º ${turmaExistente.letra}" para este curso e ano.\n\nDeseja abrir a turma existente?`
+            `Já existe a turma "${turmaExistente.nome}" para este curso e ano.\n\nDeseja abrir a turma existente?`
           )
 
           if (confirmar) {

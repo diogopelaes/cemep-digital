@@ -14,6 +14,7 @@ class TurmaSerializer(serializers.ModelSerializer):
         source='curso',
         write_only=True
     )
+    nome = serializers.CharField(read_only=True)
     nome_completo = serializers.CharField(read_only=True)
     disciplinas_count = serializers.SerializerMethodField()
     estudantes_count = serializers.SerializerMethodField()
@@ -32,7 +33,7 @@ class TurmaSerializer(serializers.ModelSerializer):
         model = Turma
         fields = [
             'id', 'numero', 'letra', 'ano_letivo', 'nomenclatura',
-            'curso', 'curso_id', 'nome_completo', 'disciplinas_count', 'estudantes_count',
+            'curso', 'curso_id', 'nome', 'nome_completo', 'disciplinas_count', 'estudantes_count',
             'professores_representantes', 'professores_representantes_details', 'is_active'
         ]
     
