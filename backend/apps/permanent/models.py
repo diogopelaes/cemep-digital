@@ -3,17 +3,17 @@ App Permanent - Histórico e Registros Imutáveis
 Usa CPF como PK para garantir sobrevivência dos dados após expurgo.
 """
 from django.db import models
-from apps.core.models import Parentesco
+from apps.core.models import Parentesco, UUIDModel
 from apps.core.validators import validate_cpf, clean_digits
 from ckeditor.fields import RichTextField
 
 
-class DadosPermanenteEstudante(models.Model):
+class DadosPermanenteEstudante(UUIDModel):
     """Dados permanentes do estudante identificados por CPF."""
     
     cpf = models.CharField(
         max_length=14, 
-        primary_key=True, 
+        unique=True, 
         verbose_name='CPF',
         validators=[validate_cpf]
     )
@@ -63,7 +63,7 @@ class DadosPermanenteEstudante(models.Model):
         return self.telefone
 
 
-class DadosPermanenteResponsavel(models.Model):
+class DadosPermanenteResponsavel(UUIDModel):
     """Dados permanentes do responsável vinculado a um estudante."""
     
     estudante = models.ForeignKey(
@@ -73,7 +73,7 @@ class DadosPermanenteResponsavel(models.Model):
     )
     cpf = models.CharField(
         max_length=14, 
-        primary_key=True, 
+        unique=True, 
         verbose_name='CPF',
         validators=[validate_cpf]
     )
@@ -124,7 +124,7 @@ class DadosPermanenteResponsavel(models.Model):
         return self.telefone
 
 
-class HistoricoEscolar(models.Model):
+class HistoricoEscolar(UUIDModel):
     """Histórico escolar do estudante."""
     
     estudante = models.OneToOneField(
@@ -147,7 +147,7 @@ class HistoricoEscolar(models.Model):
         return f"Histórico de {self.estudante.nome}"
 
 
-class HistoricoEscolarAnoLetivo(models.Model):
+class HistoricoEscolarAnoLetivo(UUIDModel):
     """Detalhes do histórico por ano letivo."""
     
     STATUS_CHOICES = [
@@ -182,7 +182,7 @@ class HistoricoEscolarAnoLetivo(models.Model):
         return f"{self.historico.estudante.nome} - {self.ano_letivo}"
 
 
-class HistoricoEscolarNotas(models.Model):
+class HistoricoEscolarNotas(UUIDModel):
     """Notas finais por disciplina no ano letivo."""
     
     ano_letivo_ref = models.ForeignKey(
@@ -207,7 +207,7 @@ class HistoricoEscolarNotas(models.Model):
         return f"{self.nome_disciplina} - {self.nota_final}"
 
 
-class RegistroProntuario(models.Model):
+class RegistroProntuario(UUIDModel):
     """Registro do prontuário."""
 
     ocorrencia_disciplinar = models.BooleanField(default=True, verbose_name='Ocorrência Disciplinar')

@@ -140,7 +140,7 @@ export function useDisciplinasTurma(turmaId, turma, isActive = true, pageSize = 
             try {
                 const response = await coreAPI.disciplinasTurma.create({
                     disciplina_id: disciplinaId,
-                    turma_id: parseInt(turmaId),
+                    turma_id: turmaId,
                     aulas_semanais: parseInt(aulas),
                 })
 

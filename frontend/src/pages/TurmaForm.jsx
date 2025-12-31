@@ -81,9 +81,10 @@ export default function TurmaForm() {
     e.preventDefault()
 
     // Validações
+    // Validações
     const numero = parseInt(formData.numero)
     const anoLetivo = parseInt(formData.ano_letivo)
-    const cursoId = parseInt(formData.curso_id)
+    const cursoId = formData.curso_id
 
     if (!numero || isNaN(numero)) {
       toast.error('Informe o número da turma')
@@ -100,7 +101,7 @@ export default function TurmaForm() {
       return
     }
 
-    if (!cursoId || isNaN(cursoId)) {
+    if (!cursoId) {
       toast.error('Selecione um curso')
       return
     }

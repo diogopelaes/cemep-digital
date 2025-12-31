@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { coreAPI } from '../../services/api'
 import { toast } from 'react-hot-toast'
-import { Modal, Input } from '../ui'
+import { Modal, Input, Button } from '../ui'
 
 export default function IniciarAnoModal({ isOpen, onClose, onSuccess }) {
     const [ano, setAno] = useState(new Date().getFullYear() + 1)
@@ -14,7 +14,8 @@ export default function IniciarAnoModal({ isOpen, onClose, onSuccess }) {
         try {
             // Verifica se já existe
             const { data: anosExistentes } = await coreAPI.anosLetivos.list()
-            const anoExiste = anosExistentes.find(a => a.ano === parseInt(ano))
+            const lista = Array.isArray(anosExistentes) ? anosExistentes : (anosExistentes.results || [])
+            const anoExiste = lista.find(a => a.ano === parseInt(ano))
 
             if (anoExiste) {
                 toast.error(`O ano letivo de ${ano} já existe!`)
@@ -39,7 +40,7 @@ export default function IniciarAnoModal({ isOpen, onClose, onSuccess }) {
             title="Iniciar Ano Letivo"
         >
             <form onSubmit={handleSubmit} className="space-y-4">
-                <p className="text-slate-600 dark:text-slate-300">
+                <p className="text-slate-600 dark:text-slate-400">
                     Informe o ano para iniciar o calendário escolar.
                 </p>
 
@@ -53,23 +54,23 @@ export default function IniciarAnoModal({ isOpen, onClose, onSuccess }) {
                     max={2100}
                 />
 
-                <div className="flex justify-end space-x-3 mt-6">
-                    <button
+                <div className="flex justify-end gap-3 mt-6">
+                    <Button
                         type="button"
+                        variant="secondary"
                         onClick={onClose}
-                        className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors"
                     >
                         Cancelar
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
-                        disabled={loading}
-                        className="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors"
+                        loading={loading}
                     >
-                        {loading ? 'Criando...' : 'Criar Calendário'}
-                    </button>
+                        Criar Calendário
+                    </Button>
                 </div>
             </form>
         </Modal>
     )
 }
+

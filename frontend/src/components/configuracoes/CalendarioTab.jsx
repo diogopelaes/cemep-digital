@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { coreAPI } from '../../services/api'
-import { HiPlus, HiCalendar, HiCheckCircle, HiRefresh } from 'react-icons/hi'
-import { Loading, Badge, Modal, Button } from '../ui'
+import { HiPlus, HiCalendar, HiRefresh, HiCheckCircle } from 'react-icons/hi'
+import { Loading, Badge, Modal, Button, Card } from '../ui'
 import IniciarAnoModal from './IniciarAnoModal'
 import CalendarioDetalhes from '../../pages/CalendarioDetalhes'
 
 export default function CalendarioTab() {
-    const navigate = useNavigate()
     const [anos, setAnos] = useState([])
     const [selectedAno, setSelectedAno] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -42,7 +40,6 @@ export default function CalendarioTab() {
         const novaLista = [novoAno, ...anos].sort((a, b) => b.ano - a.ano)
         setAnos(novaLista)
         setSelectedAno(novoAno)
-        // No longer navigating away, just updating view
     }
 
     if (loading) return <Loading />
@@ -54,26 +51,26 @@ export default function CalendarioTab() {
                 <div className="flex justify-between items-center">
                     <div>
                         <h2 className="text-xl font-semibold text-slate-800 dark:text-white">Calendário Escolar</h2>
-                        <p className="text-slate-500 text-sm">Nenhum ano letivo iniciado.</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Nenhum ano letivo iniciado.</p>
                     </div>
-                    <button
+                    <Button
                         onClick={() => setShowIniciarModal(true)}
-                        className="flex items-center space-x-2 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"
+                        icon={HiPlus}
                     >
-                        <HiPlus className="w-5 h-5" />
-                        <span>Iniciar Ano Letivo</span>
-                    </button>
+                        Iniciar Ano Letivo
+                    </Button>
                 </div>
 
-                <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                    <p className="text-slate-500">Comece iniciando um novo ano letivo para gerenciar o calendário.</p>
-                    <button
+                <Card className="text-center py-12 bg-slate-50 dark:bg-slate-800/50">
+                    <p className="text-slate-500 dark:text-slate-400">Comece iniciando um novo ano letivo para gerenciar o calendário.</p>
+                    <Button
+                        variant="ghost"
                         onClick={() => setShowIniciarModal(true)}
-                        className="mt-4 text-brand-600 hover:text-brand-700 font-medium"
+                        className="mt-4"
                     >
                         Iniciar Agora
-                    </button>
-                </div>
+                    </Button>
+                </Card>
 
                 <IniciarAnoModal
                     isOpen={showIniciarModal}
@@ -87,7 +84,7 @@ export default function CalendarioTab() {
     return (
         <div className="space-y-6">
             {/* Header com Trocar Calendário */}
-            <div className="flex justify-end items-center">
+            <div className="flex justify-end items-center gap-2">
                 <Button
                     variant="secondary"
                     size="sm"
@@ -97,7 +94,6 @@ export default function CalendarioTab() {
                     Trocar Calendário
                 </Button>
                 <Button
-                    className="ml-2"
                     size="sm"
                     icon={HiPlus}
                     onClick={() => setShowIniciarModal(true)}
@@ -123,7 +119,7 @@ export default function CalendarioTab() {
                 title="Selecionar Ano Letivo"
                 size="md"
             >
-                <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-2">
+                <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
                     {anos.map(ano => (
                         <button
                             key={ano.ano}
@@ -131,20 +127,39 @@ export default function CalendarioTab() {
                                 setSelectedAno(ano)
                                 setShowTrocarModal(false)
                             }}
-                            className={`w - full flex items - center justify - between p - 4 rounded - xl border transition - all
+                            className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left
                             ${selectedAno?.ano === ano.ano
-                                    ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20'
-                                    : 'border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-700'
+                                    ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-900/20'
+                                    : 'border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-700 bg-white dark:bg-slate-800'
                                 }
-`}
+                            `}
                         >
                             <div className="flex items-center gap-3">
-                                <HiCalendar className={`w - 5 h - 5 ${selectedAno?.ano === ano.ano ? 'text-brand-600' : 'text-slate-400'} `} />
-                                <span className={`font - medium ${selectedAno?.ano === ano.ano ? 'text-brand-700 dark:text-brand-300' : 'text-slate-700 dark:text-slate-300'} `}>
-                                    {ano.ano}
-                                </span>
+                                <div className={`p-2 rounded-lg ${selectedAno?.ano === ano.ano ? 'bg-primary-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}`}>
+                                    <HiCalendar className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <span className={`font-bold text-lg ${selectedAno?.ano === ano.ano ? 'text-primary-700 dark:text-primary-300' : 'text-slate-700 dark:text-slate-300'}`}>
+                                        {ano.ano}
+                                    </span>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        {ano.is_active ? 'Ano Letivo Corrente' : 'Ano Letivo'}
+                                    </p>
+                                </div>
                             </div>
-                            {ano.is_active && <Badge variant="success">Ativo</Badge>}
+                            <div className="flex items-center gap-2">
+                                {ano.is_active && (
+                                    <Badge variant="success">
+                                        <div className="flex items-center gap-1">
+                                            <HiCheckCircle className="w-3 h-3" />
+                                            Ativo
+                                        </div>
+                                    </Badge>
+                                )}
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedAno?.ano === ano.ano ? 'border-primary-500 bg-primary-500' : 'border-slate-300 dark:border-slate-600'}`}>
+                                    {selectedAno?.ano === ano.ano && <div className="w-2 h-2 rounded-full bg-white" />}
+                                </div>
+                            </div>
                         </button>
                     ))}
                 </div>
@@ -158,3 +173,4 @@ export default function CalendarioTab() {
         </div>
     )
 }
+

@@ -171,7 +171,7 @@ _site_url = INSTITUTIONAL_DATA['system']['site_url']
 _domain = _site_url.replace('https://', '').replace('http://', '')
 
 DJOSER = {
-    'PASSWORD_RESET_CONFIRM_URL': 'redefinir-senha/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': '/redefinir-senha/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': False,
     'DOMAIN': _domain,
     'SITE_NAME': INSTITUTIONAL_DATA['system']['name'],

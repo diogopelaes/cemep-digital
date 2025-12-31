@@ -49,6 +49,23 @@ $FRONTEND_COMMAND = "npm run dev"
 
 
 # ============================================================
+# CARREGAR VARIÁVEIS DE AMBIENTE (.env)
+# ============================================================
+$DOTENV_PATH = Join-Path $BACKEND_PATH ".env"
+if (Test-Path $DOTENV_PATH) {
+    Get-Content $DOTENV_PATH | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object {
+        $name, $value = $_.Split('=', 2)
+        $name = $name.Trim()
+        $value = $value.Trim()
+        if ($name) {
+            [System.Environment]::SetEnvironmentVariable($name, $value)
+        }
+    }
+}
+
+
+
+# ============================================================
 # INICIAR BACKEND (NOVA JANELA DO POWERSHELL)
 # ============================================================
 Start-Process powershell -ArgumentList @(

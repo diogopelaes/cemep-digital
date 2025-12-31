@@ -1,11 +1,20 @@
 """
 App Core - Cadastros Base (Funcionários, Cursos, Turmas, Disciplinas, Calendário)
 """
+import uuid
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from ckeditor.fields import RichTextField
 from .validators import validate_cpf
+
+
+class UUIDModel(models.Model):
+    """Classe base para usar UUID como chave primária."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    class Meta:
+        abstract = True
 
 
 class Parentesco(models.TextChoices):
@@ -19,7 +28,7 @@ class Parentesco(models.TextChoices):
     OUTRO = 'OUTRO', 'Outro'
 
 
-class Funcionario(models.Model):
+class Funcionario(UUIDModel):
     """Funcionário vinculado a um usuário do sistema."""
     
     usuario = models.OneToOneField(
@@ -86,7 +95,7 @@ class Funcionario(models.Model):
         return self.usuario.get_full_name()
 
 
-class PeriodoTrabalho(models.Model):
+class PeriodoTrabalho(UUIDModel):
     """Período de trabalho de um funcionário (permite múltiplos períodos)."""
     
     funcionario = models.ForeignKey(
@@ -133,7 +142,7 @@ class PeriodoTrabalho(models.Model):
         return f"{self.funcionario} ({self.data_entrada.strftime('%d/%m/%Y')} - {saida})"
 
 
-class Disciplina(models.Model):
+class Disciplina(UUIDModel):
     """Disciplina do currículo escolar."""
     
     class AreaConhecimento(models.TextChoices):
@@ -166,7 +175,7 @@ class Disciplina(models.Model):
         return f"{self.nome} ({self.sigla})"
 
 
-class Curso(models.Model):
+class Curso(UUIDModel):
     """Curso oferecido pela escola."""
     
     nome = models.CharField(max_length=100, unique=True, verbose_name='Nome')
@@ -182,7 +191,7 @@ class Curso(models.Model):
         return f"{self.nome} ({self.sigla})"
 
 
-class Turma(models.Model):
+class Turma(UUIDModel):
     """Turma de estudantes."""
     
     class Nomenclatura(models.TextChoices):
@@ -226,7 +235,7 @@ class Turma(models.Model):
         return f"{self.numero}º {self.get_nomenclatura_display()} {self.letra} - {self.curso.sigla} ({self.ano_letivo})"
 
 
-class DisciplinaTurma(models.Model):
+class DisciplinaTurma(UUIDModel):
     """Vínculo entre Disciplina e Turma com carga horária."""
     
     disciplina = models.ForeignKey(
@@ -250,7 +259,7 @@ class DisciplinaTurma(models.Model):
         return f"{self.disciplina.sigla} - {self.turma} ({self.aulas_semanais} aulas/sem)"
 
 
-class ProfessorDisciplinaTurma(models.Model):
+class ProfessorDisciplinaTurma(UUIDModel):
     """Vínculo entre Professor e Disciplina/Turma (atribuição de aulas).
     
     Permite múltiplos professores por disciplina-turma (ex: professor titular + substituto).
@@ -300,7 +309,7 @@ class ProfessorDisciplinaTurma(models.Model):
         return f"{self.professor.usuario.get_full_name()} ({tipo}) - {self.disciplina_turma}"
 
 
-class Habilidade(models.Model):
+class Habilidade(UUIDModel):
 
     """Habilidades BNCC ou internas por disciplina."""
     
@@ -324,7 +333,7 @@ class Habilidade(models.Model):
         return f"{self.codigo} - {self.descricao[:50]}..."
 
 
-class DiaLetivoExtra(models.Model):
+class DiaLetivoExtra(UUIDModel):
     """Dia letivo extra. Sábado, Domingo ou feriado que se torna letivo."""
     data = models.DateField(unique=True, verbose_name='Data do Dia Letivo')
     descricao = models.CharField(max_length=255, blank=True, verbose_name='Motivo/Descrição')
@@ -338,7 +347,7 @@ class DiaLetivoExtra(models.Model):
         return f"{self.data.strftime('%d/%m/%Y')}"
 
 
-class DiaNaoLetivo(models.Model):
+class DiaNaoLetivo(UUIDModel):
     """Dia não letivo. Feriados ou ponto facultativo. Não precisa registrar sábado ou domingo."""
     
     class Tipo(models.TextChoices):
@@ -368,9 +377,9 @@ class DiaNaoLetivo(models.Model):
         return f"{self.data.strftime('%d/%m/%Y')} - {self.get_tipo_display()}"
 
 
-class AnoLetivo(models.Model):
+class AnoLetivo(UUIDModel):
     """Ano letivo escolar."""
-    ano = models.PositiveSmallIntegerField(primary_key=True, verbose_name='Ano')
+    ano = models.PositiveSmallIntegerField(unique=True, verbose_name='Ano')
     is_active = models.BooleanField(default=True, verbose_name='Ativa')
     data_inicio_1bim = models.DateField(null=True, blank=True, verbose_name='Data de Início do 1º Bimestre')
     data_fim_1bim = models.DateField(null=True, blank=True, verbose_name='Data de Fim do 1º Bimestre')
@@ -415,7 +424,7 @@ class AnoLetivo(models.Model):
         return f"{self.ano}"
 
 
-class HorarioAula(models.Model):
+class HorarioAula(UUIDModel):
     """Horário de aula de referência (grades horárias)."""
     
     class DiaSemana(models.IntegerChoices):
@@ -473,7 +482,7 @@ class HorarioAula(models.Model):
         return f"{self.get_dia_semana_display()} - {self.numero}ª Aula ({self.hora_inicio.strftime('%H:%M')} - {self.hora_fim.strftime('%H:%M')})"
 
 
-class GradeHoraria(models.Model):
+class GradeHoraria(UUIDModel):
     """Grade horária vinculando turmas, horários e disciplinas."""
     turma = models.ForeignKey(
         Turma, 

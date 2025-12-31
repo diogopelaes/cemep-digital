@@ -17,6 +17,6 @@ class HorarioAulaViewSet(GestaoWritePublicReadMixin, viewsets.ModelViewSet):
     pagination_class = None  # Desabilita paginação - retorna todos os registros
     
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['ano_letivo', 'dia_semana', 'numero']
+    filterset_fields = ['ano_letivo', 'ano_letivo__ano', 'dia_semana', 'numero']
     ordering_fields = ['dia_semana', 'hora_inicio', 'numero']
     ordering = ['dia_semana', 'hora_inicio']

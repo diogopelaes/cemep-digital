@@ -148,35 +148,35 @@ export default function CalendarioDetalhes({ className, ano: anoProp, showBackBu
                     return (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div className="space-y-2 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
-                                <p className="font-semibold text-brand-600">1º Bimestre</p>
+                                <p className="font-semibold text-primary-600">1º Bimestre</p>
                                 <p className="text-sm">Início: <span className="font-medium text-slate-700 dark:text-slate-300">{formatDateBR(anoLetivo.data_inicio_1bim)}</span></p>
                                 <p className="text-sm">Fim: <span className="font-medium text-slate-700 dark:text-slate-300">{formatDateBR(anoLetivo.data_fim_1bim)}</span></p>
                                 {bim1 !== null && (
-                                    <p className="text-sm font-bold text-brand-600 pt-1">{bim1} dias letivos</p>
+                                    <p className="text-sm font-bold text-primary-600 pt-1">{bim1} dias letivos</p>
                                 )}
                             </div>
                             <div className="space-y-2 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
-                                <p className="font-semibold text-brand-600">2º Bimestre</p>
+                                <p className="font-semibold text-primary-600">2º Bimestre</p>
                                 <p className="text-sm">Início: <span className="font-medium text-slate-700 dark:text-slate-300">{formatDateBR(anoLetivo.data_inicio_2bim)}</span></p>
                                 <p className="text-sm">Fim: <span className="font-medium text-slate-700 dark:text-slate-300">{formatDateBR(anoLetivo.data_fim_2bim)}</span></p>
                                 {bim2 !== null && (
-                                    <p className="text-sm font-bold text-brand-600 pt-1">{bim2} dias letivos</p>
+                                    <p className="text-sm font-bold text-primary-600 pt-1">{bim2} dias letivos</p>
                                 )}
                             </div>
                             <div className="space-y-2 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
-                                <p className="font-semibold text-brand-600">3º Bimestre</p>
+                                <p className="font-semibold text-primary-600">3º Bimestre</p>
                                 <p className="text-sm">Início: <span className="font-medium text-slate-700 dark:text-slate-300">{formatDateBR(anoLetivo.data_inicio_3bim)}</span></p>
                                 <p className="text-sm">Fim: <span className="font-medium text-slate-700 dark:text-slate-300">{formatDateBR(anoLetivo.data_fim_3bim)}</span></p>
                                 {bim3 !== null && (
-                                    <p className="text-sm font-bold text-brand-600 pt-1">{bim3} dias letivos</p>
+                                    <p className="text-sm font-bold text-primary-600 pt-1">{bim3} dias letivos</p>
                                 )}
                             </div>
                             <div className="space-y-2 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
-                                <p className="font-semibold text-brand-600">4º Bimestre</p>
+                                <p className="font-semibold text-primary-600">4º Bimestre</p>
                                 <p className="text-sm">Início: <span className="font-medium text-slate-700 dark:text-slate-300">{formatDateBR(anoLetivo.data_inicio_4bim)}</span></p>
                                 <p className="text-sm">Fim: <span className="font-medium text-slate-700 dark:text-slate-300">{formatDateBR(anoLetivo.data_fim_4bim)}</span></p>
                                 {bim4 !== null && (
-                                    <p className="text-sm font-bold text-brand-600 pt-1">{bim4} dias letivos</p>
+                                    <p className="text-sm font-bold text-primary-600 pt-1">{bim4} dias letivos</p>
                                 )}
                             </div>
                         </div>
@@ -266,7 +266,7 @@ export default function CalendarioDetalhes({ className, ano: anoProp, showBackBu
                         <TableBody>
                             {eventos.dias_nao_letivos.map(dia => (
                                 <TableRow key={dia.id}>
-                                    <TableCell className="font-medium text-brand-600">{getBimestre(dia.data)}</TableCell>
+                                    <TableCell className="font-medium text-primary-600">{getBimestre(dia.data)}</TableCell>
                                     <TableCell>{formatDateBR(dia.data)}</TableCell>
                                     <TableCell>
                                         <Badge variant="warning">{TIPOS_DIA_NAO_LETIVO[dia.tipo] || dia.tipo}</Badge>
@@ -308,7 +308,7 @@ export default function CalendarioDetalhes({ className, ano: anoProp, showBackBu
                         <TableBody>
                             {eventos.dias_letivos_extras.map(dia => (
                                 <TableRow key={dia.id}>
-                                    <TableCell className="font-medium text-brand-600">{getBimestre(dia.data)}</TableCell>
+                                    <TableCell className="font-medium text-primary-600">{getBimestre(dia.data)}</TableCell>
                                     <TableCell>{formatDateBR(dia.data)}</TableCell>
                                     <TableCell className="capitalize">
                                         {new Date(dia.data).toLocaleDateString('pt-BR', { weekday: 'long' })}

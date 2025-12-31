@@ -4,12 +4,12 @@ App Pedagogical - Diário de Classe, Notas, Faltas, Ocorrências, Recuperação
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
-from apps.core.models import Funcionario, Disciplina, DisciplinaTurma, Turma, Habilidade, ProfessorDisciplinaTurma
+from apps.core.models import Funcionario, Disciplina, DisciplinaTurma, UUIDModel, Turma, Habilidade, ProfessorDisciplinaTurma
 from apps.academic.models import Estudante, MatriculaTurma, Responsavel
 from ckeditor.fields import RichTextField
 
 
-class PlanoAula(models.Model):
+class PlanoAula(UUIDModel):
     """Plano de aula do professor para uma ou mais turmas."""
     
     professor = models.ForeignKey(
@@ -46,7 +46,7 @@ class PlanoAula(models.Model):
         return f"{self.professor} - {self.disciplina} ({self.data_inicio} a {self.data_fim})"
 
 
-class Aula(models.Model):
+class Aula(UUIDModel):
     """Registro de aula (diário de classe)."""
     
     professor_disciplina_turma = models.ForeignKey(
@@ -73,7 +73,7 @@ class Aula(models.Model):
         return f"{self.professor_disciplina_turma} - {self.data.strftime('%d/%m/%Y')}"
 
 
-class Faltas(models.Model):
+class Faltas(UUIDModel):
     """Registro de falta individual de um estudante em uma aula."""
     
     aula = models.ForeignKey(
@@ -101,7 +101,7 @@ class Faltas(models.Model):
         return f"{self.estudante} - Falta na aula {self.aula_numero} ({self.aula.data})"
 
 
-class DescritorOcorrenciaPedagogica(models.Model):
+class DescritorOcorrenciaPedagogica(UUIDModel):
     """Tipos de ocorrências pedagógicas cadastradas pelo gestor."""
     
     gestor = models.ForeignKey(
@@ -121,7 +121,7 @@ class DescritorOcorrenciaPedagogica(models.Model):
         return self.texto
 
 
-class OcorrenciaPedagogica(models.Model):
+class OcorrenciaPedagogica(UUIDModel):
     """Ocorrência pedagógica de um estudante (não permanente)."""
     
     estudante = models.ForeignKey(
@@ -150,7 +150,7 @@ class OcorrenciaPedagogica(models.Model):
         return f"{self.estudante} - {self.tipo} ({self.data.strftime('%d/%m/%Y')})"
 
 
-class OcorrenciaResponsavelCiente(models.Model):
+class OcorrenciaResponsavelCiente(UUIDModel):
     """Registro de ciência do responsável sobre uma ocorrência."""
     
     responsavel = models.ForeignKey(
@@ -176,7 +176,7 @@ class OcorrenciaResponsavelCiente(models.Model):
         return f"{self.responsavel} - {self.ocorrencia} ({status})"
 
 
-class Avaliacao(models.Model):
+class Avaliacao(UUIDModel):
     """Avaliação de uma disciplina em uma turma para um bimestre."""
 
     professor_disciplina_turma = models.ForeignKey(
@@ -263,7 +263,7 @@ class Avaliacao(models.Model):
                 )
 
 
-class InstrumentoAvaliativo(models.Model):
+class InstrumentoAvaliativo(UUIDModel):
     """Instrumento avaliativo pertencente a uma avaliação."""
 
     avaliacao = models.ForeignKey(
@@ -337,7 +337,7 @@ class InstrumentoAvaliativo(models.Model):
                     )
     
 
-class ControleVisto(models.Model):
+class ControleVisto(UUIDModel):
     """Registro de visto de um estudante, opcionalmente vinculado a um instrumento."""
     
     matricula_turma = models.ForeignKey(
@@ -379,7 +379,7 @@ class ControleVisto(models.Model):
         return f"{self.titulo} - {status}"
 
 
-class NotaInstrumentoAvaliativo(models.Model):
+class NotaInstrumentoAvaliativo(UUIDModel):
     """Nota de um estudante em um instrumento avaliativo."""
     
     instrumento_avaliativo = models.ForeignKey(
@@ -443,7 +443,7 @@ class NotaInstrumentoAvaliativo(models.Model):
         return (porcentagem * self.instrumento_avaliativo.valor).quantize(Decimal('0.01'))
 
 
-class NotaAvaliacao(models.Model):
+class NotaAvaliacao(UUIDModel):
     """Nota de um estudante em uma avaliação (calculada a partir dos instrumentos)."""
     
     avaliacao = models.ForeignKey(
@@ -508,7 +508,7 @@ class NotaAvaliacao(models.Model):
         return None
 
 
-class NotaBimestral(models.Model):
+class NotaBimestral(UUIDModel):
     """Nota bimestral de um estudante em uma disciplina."""
     
     matricula_turma = models.ForeignKey(
@@ -539,7 +539,7 @@ class NotaBimestral(models.Model):
         return f"{self.matricula_turma} - {self.professor_disciplina_turma.disciplina_turma.disciplina}"
 
 
-class NotificacaoRecuperacao(models.Model):
+class NotificacaoRecuperacao(UUIDModel):
     """Notificação de recuperação para estudante/responsável."""
     estudante = models.ForeignKey(
         Estudante,

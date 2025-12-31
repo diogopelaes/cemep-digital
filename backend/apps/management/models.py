@@ -3,7 +3,7 @@ App Management - Tarefas, HTPC, Avisos
 """
 from django.db import models
 from django.conf import settings
-from apps.core.models import Funcionario
+from apps.core.models import Funcionario, UUIDModel
 from ckeditor.fields import RichTextField
 
 from datetime import datetime
@@ -35,7 +35,7 @@ def get_anexo_path(instance, filename):
     return f"{base_folder}/{username}/{date_path}/{filename}"
 
 
-class Tarefa(models.Model):
+class Tarefa(UUIDModel):
     """Tarefa atribuída a funcionários."""
     
     titulo = models.CharField(max_length=200, verbose_name='Título')
@@ -66,7 +66,7 @@ class Tarefa(models.Model):
 
 
 
-class TarefaAnexo(models.Model):
+class TarefaAnexo(UUIDModel):
     """Anexo de uma tarefa (arquivo)."""
     
     tarefa = models.ForeignKey(
@@ -86,7 +86,7 @@ class TarefaAnexo(models.Model):
 
 
 
-class TarefaResposta(models.Model):
+class TarefaResposta(UUIDModel):
     """Resposta de um funcionário a uma tarefa."""
     
     tarefa = models.ForeignKey(
@@ -112,7 +112,7 @@ class TarefaResposta(models.Model):
 
 
 
-class TarefaRespostaAnexo(models.Model):
+class TarefaRespostaAnexo(UUIDModel):
     """Anexo da resposta da tarefa."""
     
     resposta = models.ForeignKey(
@@ -132,7 +132,7 @@ class TarefaRespostaAnexo(models.Model):
 
 
 
-class NotificacaoTarefa(models.Model):
+class NotificacaoTarefa(UUIDModel):
     """Notificação de tarefa para funcionário."""
     
     tarefa = models.ForeignKey(
@@ -157,7 +157,7 @@ class NotificacaoTarefa(models.Model):
         return f"{self.funcionario} - {self.tarefa}"
 
 
-class ReuniaoHTPC(models.Model):
+class ReuniaoHTPC(UUIDModel):
     """Reunião de HTPC (Hora de Trabalho Pedagógico Coletivo)."""
     
     data_reuniao = models.DateTimeField(verbose_name='Data da Reunião')
@@ -186,7 +186,7 @@ class ReuniaoHTPC(models.Model):
 
 
 
-class ReuniaoHTPCAnexo(models.Model):
+class ReuniaoHTPCAnexo(UUIDModel):
     """Anexos da reunião de HTPC (lista de presença, slides, etc)."""
     
     reuniao = models.ForeignKey(
@@ -206,7 +206,7 @@ class ReuniaoHTPCAnexo(models.Model):
 
 
 
-class NotificacaoHTPC(models.Model):
+class NotificacaoHTPC(UUIDModel):
     """Notificação de HTPC para funcionário."""
     
     reuniao = models.ForeignKey(
@@ -231,7 +231,7 @@ class NotificacaoHTPC(models.Model):
         return f"{self.funcionario} - {self.reuniao}"
 
 
-class Aviso(models.Model):
+class Aviso(UUIDModel):
     """Aviso/comunicado para usuários."""
     
     titulo = models.CharField(max_length=200, verbose_name='Título')
@@ -259,7 +259,7 @@ class Aviso(models.Model):
 
 
 
-class AvisoAnexo(models.Model):
+class AvisoAnexo(UUIDModel):
     """Anexo de um aviso."""
     
     aviso = models.ForeignKey(
@@ -279,7 +279,7 @@ class AvisoAnexo(models.Model):
 
 
 
-class AvisoVisualizacao(models.Model):
+class AvisoVisualizacao(UUIDModel):
     """Registro de visualização de aviso."""
     
     aviso = models.ForeignKey(

@@ -32,9 +32,9 @@ export default function HorarioAulaTab() {
             if (ativo) {
                 setActiveAno(ativo)
                 // Fetch horarios for this ano
-                const { data: horariosData } = await coreAPI.horariosAula.list({ ano_letivo: ativo.ano })
+                const { data: horariosData } = await coreAPI.horariosAula.list({ ano_letivo__ano: ativo.ano })
                 const horariosArray = Array.isArray(horariosData) ? horariosData : (horariosData.results || [])
-                console.log('HorarioAulaTab - Horarios recebidos:', horariosArray)
+
                 setHorarios(horariosArray)
             }
         } catch (error) {
@@ -60,7 +60,7 @@ export default function HorarioAulaTab() {
             <div className="flex justify-between items-center">
                 <div>
                     <h2 className="text-xl font-semibold text-slate-800 dark:text-white flex items-center gap-2">
-                        <HiClock className="text-brand-600" />
+                        <HiClock className="text-primary-600" />
                         Horários de Aula - {activeAno.ano}
                     </h2>
                     <p className="text-slate-500 text-sm">

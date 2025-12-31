@@ -4,12 +4,12 @@ App Academic - Vida Escolar (Estudantes, Matrículas, Responsáveis)
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from apps.core.models import Parentesco, Curso, Turma
+from apps.core.models import Parentesco, Curso, Turma, UUIDModel
 from apps.core.validators import validate_cpf, clean_digits
 import re
 
 
-class Estudante(models.Model):
+class Estudante(UUIDModel):
     """Estudante vinculado a um usuário do sistema."""
     
     usuario = models.OneToOneField(
@@ -19,7 +19,7 @@ class Estudante(models.Model):
     )
     cpf = models.CharField(
         max_length=14, 
-        primary_key=True, 
+        unique=True, 
         verbose_name='CPF',
         validators=[validate_cpf]
     )
@@ -100,7 +100,7 @@ class Estudante(models.Model):
         return self.telefone
 
 
-class Responsavel(models.Model):
+class Responsavel(UUIDModel):
     """Responsável por um ou mais estudantes."""
     
     usuario = models.OneToOneField(
@@ -110,7 +110,7 @@ class Responsavel(models.Model):
     )
     cpf = models.CharField(
         max_length=14, 
-        primary_key=True, 
+        unique=True, 
         verbose_name='CPF',
         validators=[validate_cpf]
     )
@@ -159,7 +159,7 @@ class Responsavel(models.Model):
         return self.telefone
 
 
-class ResponsavelEstudante(models.Model):
+class ResponsavelEstudante(UUIDModel):
     """Tabela intermediária para relacionar Responsável e Estudante com parentesco."""
     
     responsavel = models.ForeignKey(Responsavel, on_delete=models.CASCADE)
@@ -226,7 +226,7 @@ def validate_matricula_digits(value):
             raise ValidationError('A matrícula deve conter apenas números (e opcionalmente X no final).')
 
 
-class MatriculaCEMEP(models.Model):
+class MatriculaCEMEP(UUIDModel):
     """Matrícula central do estudante no CEMEP."""
     
     class Status(models.TextChoices):
@@ -238,7 +238,7 @@ class MatriculaCEMEP(models.Model):
     
     numero_matricula = models.CharField(
         max_length=20,
-        primary_key=True,
+        unique=True,
         verbose_name='Número da Matrícula',
         validators=[validate_matricula_digits],
         help_text='Números, podendo terminar com X. Só pode ser inserido por Gestão ou Secretaria.'
@@ -285,7 +285,7 @@ class MatriculaCEMEP(models.Model):
         return f"{self.numero_matricula[:3]}.{self.numero_matricula[3:6]}.{self.numero_matricula[6:9]}-{self.numero_matricula[9:]}"
 
 
-class MatriculaTurma(models.Model):
+class MatriculaTurma(UUIDModel):
     """Enturmação - vínculo do estudante com uma turma específica."""
     
     class Status(models.TextChoices):
@@ -347,7 +347,7 @@ class MatriculaTurma(models.Model):
         return f"{self.matricula_cemep.estudante} - {self.turma}"
 
 
-class Atestado(models.Model):
+class Atestado(UUIDModel):
     """Atestado médico de um usuário."""
     
     usuario_alvo = models.ForeignKey(

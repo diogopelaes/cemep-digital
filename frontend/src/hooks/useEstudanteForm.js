@@ -437,7 +437,7 @@ export function useEstudanteForm(cpfParam, navigate) {
                 })
                 .map(m => ({
                     numero_matricula: m.numero_matricula.replace(/[^0-9Xx]/g, '').toUpperCase(),
-                    curso_id: parseInt(m.curso_id),
+                    curso_id: m.curso_id,
                     data_entrada: m.data_entrada,
                     data_saida: m.data_saida || null,
                     status: m.status

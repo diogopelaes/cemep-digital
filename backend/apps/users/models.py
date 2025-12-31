@@ -2,6 +2,7 @@
 App Users - Gestão de Acesso e Perfis
 """
 import os
+import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.text import get_valid_filename
@@ -17,6 +18,8 @@ def get_profile_pic_path(instance, filename):
 class User(AbstractUser):
     """Modelo customizado de usuário com perfis e preferências."""
     
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class TipoUsuario(models.TextChoices):
         GESTAO = 'GESTAO', 'Gestão'
         SECRETARIA = 'SECRETARIA', 'Secretaria'
