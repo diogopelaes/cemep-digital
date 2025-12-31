@@ -88,14 +88,7 @@ export default function Login() {
           </Button>
         </form>
 
-        <div className="mt-6 text-center">
-          <Link
-            to="/recuperar-senha"
-            className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
-          >
-            Esqueceu sua senha?
-          </Link>
-        </div>
+
       </Card>
 
       {/* Footer */}

@@ -35,9 +35,7 @@ export default function Funcionarios() {
   const [loadingPeriodos, setLoadingPeriodos] = useState(false)
   const [novoPeriodo, setNovoPeriodo] = useState({ data_entrada: '', data_saida: '' })
 
-  // Modal de Reset de Senha
-  const [modalReset, setModalReset] = useState({ open: false, funcionario: null })
-  const [loadingReset, setLoadingReset] = useState(false)
+
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
@@ -95,29 +93,7 @@ export default function Funcionarios() {
     }
   }
 
-  // === Lógica de Reset de Senha ===
-  const handleOpenResetModal = (funcionario) => {
-    setModalReset({ open: true, funcionario })
-  }
 
-  const handleCloseResetModal = () => {
-    setModalReset({ open: false, funcionario: null })
-  }
-
-  const handleResetSenha = async () => {
-    if (!modalReset.funcionario) return
-
-    setLoadingReset(true)
-    try {
-      const response = await coreAPI.funcionarios.resetarSenha(modalReset.funcionario.id)
-      toast.success(response.data.message)
-      handleCloseResetModal()
-    } catch (error) {
-      const msg = error.response?.data?.detail || 'Erro ao resetar senha'
-      toast.error(msg)
-    }
-    setLoadingReset(false)
-  }
 
   // === Lógica de Períodos ===
   const handleOpenPeriodosModal = async (funcionario) => {
@@ -414,13 +390,7 @@ export default function Funcionarios() {
                     >
                       <HiCalendar className="h-5 w-5" />
                     </button>
-                    <button
-                      onClick={() => handleOpenResetModal(func)}
-                      className="p-2 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 text-amber-600 dark:text-amber-400"
-                      title="Resetar Senha"
-                    >
-                      <HiRefresh className="h-5 w-5" />
-                    </button>
+
                   </div>
                 </TableCell>
               </TableRow>
@@ -518,64 +488,7 @@ export default function Funcionarios() {
         </ModalFooter>
       </Modal>
 
-      {/* Modal de Confirmação de Reset de Senha */}
-      <Modal
-        isOpen={modalReset.open}
-        onClose={handleCloseResetModal}
-        title="Resetar Senha"
-        size="md"
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center">
-              <HiRefresh className="h-8 w-8 text-amber-500" />
-            </div>
-          </div>
 
-          <div className="text-center">
-            <p className="text-slate-600 dark:text-slate-300">
-              Você está prestes a resetar a senha de:
-            </p>
-            <p className="text-xl font-semibold text-slate-800 dark:text-white mt-2">
-              {modalReset.funcionario?.nome_completo || modalReset.funcionario?.usuario?.first_name}
-            </p>
-            <p className="text-sm text-slate-500 mt-1">
-              {modalReset.funcionario?.usuario?.email}
-            </p>
-          </div>
-
-          <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
-            <p className="text-sm text-amber-800 dark:text-amber-200 text-center">
-              <strong>Atenção:</strong> Uma nova senha será gerada automaticamente e enviada
-              para o e-mail cadastrado do funcionário.
-            </p>
-          </div>
-        </div>
-
-        <ModalFooter>
-          <Button variant="secondary" onClick={handleCloseResetModal}>
-            Cancelar
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleResetSenha}
-            disabled={loadingReset}
-            className="bg-amber-500 hover:bg-amber-600 focus:ring-amber-500"
-          >
-            {loadingReset ? (
-              <>
-                <Loading size="sm" />
-                Resetando...
-              </>
-            ) : (
-              <>
-                <HiRefresh className="h-5 w-5" />
-                Confirmar Reset
-              </>
-            )}
-          </Button>
-        </ModalFooter>
-      </Modal>
 
       <BulkUploadModal
         isOpen={showUploadModal}

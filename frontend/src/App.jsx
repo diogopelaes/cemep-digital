@@ -5,7 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 
 // Pages
 import Login from './pages/Login'
-import RecuperarSenha from './pages/RecuperarSenha'
+import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Estudantes from './pages/Estudantes'
 import EstudanteForm from './pages/EstudanteForm'
@@ -38,7 +38,7 @@ function App() {
       {/* Auth Routes */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
-        <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+        <Route path="/login" element={<Login />} />
       </Route>
 
       {/* Protected Routes */}

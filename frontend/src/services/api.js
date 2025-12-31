@@ -77,7 +77,6 @@ export const authAPI = {
   me: () => api.get('/users/me/'),
   updateMe: (data) => api.put('/users/update_me/', data),
   changePassword: (data) => api.post('/users/change_password/', data),
-  resetPassword: (data) => axios.post('/api/v1/users/password-reset/', data),
 }
 
 export const usersAPI = {
@@ -99,7 +98,7 @@ export const coreAPI = {
     atualizarCompleto: (id, data) => api.put(`/core/funcionarios/${id}/atualizar-completo/`, data),
     update: (id, data) => api.patch(`/core/funcionarios/${id}/`, data),
     delete: (id) => api.delete(`/core/funcionarios/${id}/`),
-    resetarSenha: (id) => api.post(`/core/funcionarios/${id}/resetar-senha/`),
+    delete: (id) => api.delete(`/core/funcionarios/${id}/`),
     toggleAtivo: (id) => api.post(`/core/funcionarios/${id}/toggle-ativo/`),
     uploadFile: (formData) => api.post('/core/funcionarios/importar-arquivo/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
