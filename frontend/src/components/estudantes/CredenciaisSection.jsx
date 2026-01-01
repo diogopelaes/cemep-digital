@@ -31,7 +31,7 @@ export default function CredenciaisSection({
                     <input
                         type="text"
                         name="estudante_login"
-                        placeholder="CPF do estudante"
+                        placeholder="E-mail do estudante"
                         value={formData.username}
                         onChange={(e) => onFieldChange('username', e.target.value.toLowerCase().replace(/\s+/g, ''))}
                         className="input"
@@ -44,7 +44,7 @@ export default function CredenciaisSection({
                         required
                     />
                     <p className="text-xs text-slate-500 mt-1">
-                        Preenchido automaticamente com o CPF
+                        Preenchido automaticamente com o E-mail
                     </p>
                 </div>
                 <div>

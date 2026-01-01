@@ -9,12 +9,12 @@ import toast from 'react-hot-toast'
  * Hook para gerenciar o formulário de estudante
  * Centraliza toda lógica de estado, validação e submissão
  * 
- * @param {string} cpfParam - CPF do estudante (para edição)
+ * @param {string} idParam - ID (UUID) do estudante (para edição)
  * @param {Function} navigate - Função de navegação
  * @returns {Object} Estado e handlers do formulário
  */
-export function useEstudanteForm(cpfParam, navigate) {
-    const isEditing = !!cpfParam
+export function useEstudanteForm(idParam, navigate) {
+    const isEditing = !!idParam
 
     const [loading, setLoading] = useState(isEditing)
     const [saving, setSaving] = useState(false)
@@ -105,20 +105,20 @@ export function useEstudanteForm(cpfParam, navigate) {
                 password: generatePassword()
             }))
         }
-    }, [cpfParam])
+    }, [idParam])
 
-    // Auto-gerar username com base no CPF
+    // Auto-gerar username com base no email
     useEffect(() => {
-        if (!isEditing && formData.cpf) {
-            const cpfNumbers = formData.cpf.replace(/\D/g, '')
-            if (cpfNumbers.length === 11) {
+        if (!isEditing && formData.email) {
+            const emailTrimmed = formData.email.trim().toLowerCase()
+            if (emailTrimmed.includes('@')) {
                 setFormData(prev => ({
                     ...prev,
-                    username: cpfNumbers
+                    username: emailTrimmed
                 }))
             }
         }
-    }, [formData.cpf, isEditing])
+    }, [formData.email, isEditing])
 
     // Validar CPF em tempo real
     useEffect(() => {
@@ -141,8 +141,8 @@ export function useEstudanteForm(cpfParam, navigate) {
     const loadEstudante = async () => {
         try {
             const [respEstudante, respProntuario] = await Promise.all([
-                academicAPI.estudantes.get(cpfParam),
-                academicAPI.estudantes.prontuario(cpfParam)
+                academicAPI.estudantes.get(idParam),
+                academicAPI.estudantes.prontuario(idParam)
             ])
             const est = respEstudante.data
             const prontuario = respProntuario.data
@@ -315,6 +315,11 @@ export function useEstudanteForm(cpfParam, navigate) {
             return false
         }
 
+        if (!formData.email.trim() || !formData.email.includes('@')) {
+            toast.error('E-mail do estudante é obrigatório')
+            return false
+        }
+
         const cpfNumbers = formData.cpf.replace(/\D/g, '')
         if (cpfNumbers.length !== 11) {
             toast.error('CPF deve ter 11 dígitos')
@@ -475,22 +480,23 @@ export function useEstudanteForm(cpfParam, navigate) {
 
             let response
             if (isEditing) {
-                response = await academicAPI.estudantes.update(cpfParam, payload)
+                response = await academicAPI.estudantes.atualizarCompleto(idParam, payload)
             } else {
-                response = await academicAPI.estudantes.create(payload)
+                response = await academicAPI.estudantes.criarCompleto(payload)
             }
+
+            // Obtém o ID do estudante (para edição usa idParam, para criação usa response)
+            const estudanteId = isEditing ? idParam : response.data.id
 
             // Upload de foto se houver
             if (fotoBlob) {
                 const formDataFoto = new FormData()
                 formDataFoto.append('foto', fotoBlob, 'foto.jpg')
-                const cpfToUse = isEditing ? cpfParam : cpfNumbers
-                await academicAPI.estudantes.uploadFoto(cpfToUse, formDataFoto)
+                await academicAPI.estudantes.uploadFoto(estudanteId, formDataFoto)
             }
 
             toast.success(isEditing ? 'Estudante atualizado!' : 'Estudante cadastrado!')
-            const cpfTarget = isEditing ? cpfParam : cpfNumbers
-            navigate(`/estudantes/${cpfTarget}`)
+            navigate(`/estudantes/${estudanteId}`)
         } catch (error) {
             console.error('Erro ao salvar:', error)
             const msg = error.response?.data?.detail ||
@@ -499,7 +505,7 @@ export function useEstudanteForm(cpfParam, navigate) {
             toast.error(msg)
         }
         setSaving(false)
-    }, [formData, responsaveis, matriculas, fotoBlob, isEditing, cpfParam, navigate, validate])
+    }, [formData, responsaveis, matriculas, fotoBlob, isEditing, idParam, navigate, validate])
 
     return {
         // Estado

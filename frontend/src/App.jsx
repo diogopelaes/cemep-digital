@@ -78,10 +78,10 @@ function App() {
         <Route path="/estudantes/novo" element={
           <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><EstudanteForm /></ProtectedRoute>
         } />
-        <Route path="/estudantes/:cpf" element={
+        <Route path="/estudantes/:id" element={
           <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><EstudanteDetalhes /></ProtectedRoute>
         } />
-        <Route path="/estudantes/:cpf/editar" element={
+        <Route path="/estudantes/:id/editar" element={
           <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><EstudanteForm /></ProtectedRoute>
         } />
         <Route path="/disciplinas" element={

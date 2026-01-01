@@ -131,7 +131,7 @@ export default function TurmaEstudantes({
                                                     <div className="flex items-center gap-3">
                                                         <div className="flex items-center gap-3">
                                                             <Link
-                                                                to={`/estudantes/${estudante.cpf}`}
+                                                                to={`/estudantes/${estudante.id}`}
                                                                 state={{ from: location.pathname, tab: 'estudantes' }}
                                                                 className="flex items-center gap-3 group/link"
                                                             >

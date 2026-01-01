@@ -5,6 +5,7 @@ ENV/
 
 # Project Specific
 Documentation/Frameworks/
+media/
 
 # Python
 __pycache__/

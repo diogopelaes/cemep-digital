@@ -15,16 +15,16 @@ class ResponsavelEstudanteInline(admin.TabularInline):
 
 @admin.register(Estudante)
 class EstudanteAdmin(admin.ModelAdmin):
-    list_display = ['usuario', 'cpf', 'nome_social', 'data_nascimento', 'bolsa_familia']
+    list_display = ['usuario', 'cpf', 'cin', 'nome_social', 'data_nascimento', 'bolsa_familia']
     list_filter = ['bolsa_familia', 'pe_de_meia', 'usa_onibus']
-    search_fields = ['usuario__first_name', 'usuario__last_name', 'cpf', 'nome_social']
+    search_fields = ['usuario__first_name', 'usuario__last_name', 'cpf', 'cin', 'nome_social']
     inlines = [ResponsavelEstudanteInline]
 
 
 @admin.register(Responsavel)
 class ResponsavelAdmin(admin.ModelAdmin):
-    list_display = ['usuario']
-    search_fields = ['usuario__first_name', 'usuario__last_name', 'usuario__email']
+    list_display = ['usuario', 'cpf', 'telefone']
+    search_fields = ['usuario__first_name', 'usuario__last_name', 'usuario__email', 'cpf']
     inlines = [ResponsavelEstudanteInline]
 
 

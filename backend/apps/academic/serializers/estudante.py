@@ -16,7 +16,7 @@ class EstudanteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Estudante
         fields = [
-            'cpf', 'usuario', 'cpf_formatado', 'cin', 'nome_social', 'nome_exibicao',
+            'id', 'cpf', 'usuario', 'cpf_formatado', 'cin', 'nome_social', 'nome_exibicao',
             'data_nascimento',
             'bolsa_familia', 'pe_de_meia', 'usa_onibus', 'linha_onibus',
             'permissao_sair_sozinho',

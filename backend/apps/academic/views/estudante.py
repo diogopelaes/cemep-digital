@@ -26,6 +26,7 @@ from apps.users.utils import send_credentials_email
 class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
     """ViewSet de Estudantes. CRU: Gestão/Secretaria | Delete: Bloqueado"""
     queryset = Estudante.objects.select_related('usuario').all()
+    # lookup_field padrão = 'pk' (UUID) - funciona para todos, inclusive sem CPF
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['bolsa_familia', 'pe_de_meia', 'usa_onibus']
     search_fields = ['usuario__first_name', 'usuario__last_name', 'cpf', 'nome_social']
@@ -44,7 +45,8 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
         User = get_user_model()
         data = request.data
         
-        required_fields = ['username', 'password', 'first_name', 'cpf', 
+        # CPF agora é opcional (para dados legados)
+        required_fields = ['username', 'password', 'first_name',
                           'data_nascimento', 'logradouro', 'numero', 'bairro', 'cep']
         for field in required_fields:
             if not data.get(field):
@@ -70,7 +72,7 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                 
                 estudante = Estudante.objects.create(
                     usuario=user,
-                    cpf=data['cpf'],
+                    cpf=data.get('cpf') or None,  # CPF opcional
                     cin=data.get('cin', ''),
                     nome_social=data.get('nome_social', ''),
                     data_nascimento=data['data_nascimento'],
@@ -217,7 +219,7 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
             df.columns = [c.strip().upper() for c in df.columns]
             
             # Campos obrigatórios
-            required = ['NOME_COMPLETO', 'EMAIL', 'CPF', 'DATA_NASCIMENTO']
+            required = ['NOME_COMPLETO', 'EMAIL', 'DATA_NASCIMENTO']
             missing = [c for c in required if c not in df.columns]
             if missing:
                 return Response({'detail': f'Colunas obrigatórias faltando: {", ".join(missing)}'}, status=400)
@@ -253,29 +255,34 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     cpf_raw = str(row.get('CPF', '')).strip()
                     
                     # 1. Validação Obrigatória
-                    # User requested only NOME, EMAIL, CPF, DATA_NASCIMENTO as mandatory
-                    required_row = ['NOME_COMPLETO', 'EMAIL', 'CPF', 'DATA_NASCIMENTO']
+                    # User requested only NOME, EMAIL, DATA_NASCIMENTO as mandatory
+                    required_row = ['NOME_COMPLETO', 'EMAIL', 'DATA_NASCIMENTO']
                     missing_row = [c for c in required_row if not str(row.get(c, '')).strip()]
                     
                     if missing_row:
                          errors.append(f"Linha {line} ({nome or 'Sem Nome'}): Campos obrigatórios faltando: {', '.join(missing_row)}")
                          continue
                     
-                    cpf_clean = clean_digits(cpf_raw).zfill(11)
+                    cpf_clean = None
+                    if cpf_raw:
+                        digits = clean_digits(cpf_raw)
+                        if digits:
+                            cpf_clean = digits.zfill(11)
+
                     data_nasc_parsed = parse_date(row.get('DATA_NASCIMENTO'))
                     
                     if not data_nasc_parsed:
                         errors.append(f"Linha {line} ({nome}): Data de Nascimento '{row.get('DATA_NASCIMENTO')}' inválida. Use DD/MM/AAAA.")
                         continue
 
-                    # 1.1 Verificação de Unicidade Rigorosa (Email e Username/CPF)
-                    # Username será o CPF
-                    if User.objects.filter(email=email).exclude(username=cpf_clean).exists():
-                         errors.append(f"Linha {line} ({nome}): Atributo 'Email' com valor '{email}' já está em uso por outro usuário. Ignorado.")
-                         continue
+                    # 1.1 Verificação de Unicidade Rigorosa (Username será o Email)
+                    # Username será o email
+                    username = email.lower().strip()
                     
-                    # Se usuário existe com outro username mas mesmo CPF (teoricamente username==cpf, mas...)
-                    # Aqui assumimos username=cpf.
+                    # Verifica se já existe outro usuário com esse email/username
+                    if User.objects.filter(username=username).exclude(email=email).exists():
+                         errors.append(f"Linha {line} ({nome}): Atributo 'Email' com valor '{email}' já está em uso como username por outro usuário. Ignorado.")
+                         continue
 
                     # 1.2 Validação de Tamanho de Campos (CEP) e Defaults para Endereço
                     # Se não vier, usamos padrão. Endereço é obrigatório no model, então usamos placeholder.
@@ -295,7 +302,7 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                     should_update_password = False
                     
                     try:
-                        user = User.objects.get(username=cpf_clean)
+                        user = User.objects.get(username=username)
                         # Se usuário existe, não mudamos senha a menos que explícito? 
                         # Na regra do user: "senha (se estiver em branco deve ser gerada uma aleatória)"
                         # Geralmente em update se senha ta em branco mantemos a antiga.
@@ -321,7 +328,7 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                         }
                         
                         user, user_created = User.objects.update_or_create(
-                            username=cpf_clean,
+                            username=username,
                             defaults=user_defaults
                         )
                         
@@ -362,9 +369,11 @@ class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
                         # Se for update, a data_nascimento já está nos defaults acima e será atualizada.
                         # Não precisamos mais do fallback manual aqui pois validamos no início do loop.
 
+                        estudante_defaults['cpf'] = cpf_clean
+
                         estudante, est_created = Estudante.objects.update_or_create(
-                            cpf=cpf_clean,
-                            defaults={**estudante_defaults, 'usuario': user}
+                            usuario=user,
+                            defaults=estudante_defaults
                         )
                         
                         if est_created:

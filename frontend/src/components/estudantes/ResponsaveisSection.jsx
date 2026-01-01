@@ -1,5 +1,6 @@
 import { Button, Input, Select } from '../ui'
 import { formatCPF, formatTelefone } from '../../utils/formatters'
+import { validateCPF } from '../../utils/validators'
 import { PARENTESCOS } from '../../data'
 
 /**
@@ -12,6 +13,16 @@ export default function ResponsaveisSection({
     onRemove,
     onUpdate,
 }) {
+    // Calcula erro de CPF para cada responsável
+    const getCpfError = (cpf) => {
+        if (!cpf) return ''
+        const cpfNumbers = cpf.replace(/\D/g, '')
+        if (cpfNumbers.length === 11) {
+            return validateCPF(cpf) ? '' : 'CPF Inválido'
+        }
+        return ''
+    }
+
     return (
         <div>
             <div className="flex items-center justify-between mb-4">
@@ -82,6 +93,7 @@ export default function ResponsaveisSection({
                                 }}
                                 maxLength={14}
                                 autoComplete="off"
+                                error={getCpfError(resp.cpf)}
                             />
                             <Input
                                 label="Telefone"

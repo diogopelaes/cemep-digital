@@ -19,13 +19,13 @@ class UserAdmin(BaseUserAdmin):
     
     fieldsets = BaseUserAdmin.fieldsets + (
         ('Informações CEMEP', {
-            'fields': ('tipo_usuario', 'telefone', 'foto', 'dark_mode')
+            'fields': ('tipo_usuario', 'foto', 'dark_mode')
         }),
     )
     
     add_fieldsets = BaseUserAdmin.add_fieldsets + (
         ('Informações CEMEP', {
-            'fields': ('tipo_usuario', 'telefone')
+            'fields': ('tipo_usuario',)
         }),
     )
 

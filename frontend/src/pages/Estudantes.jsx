@@ -56,16 +56,16 @@ export default function Estudantes() {
   }
 
   const handleView = (estudante) => {
-    navigate(`/estudantes/${estudante.cpf}`)
+    navigate(`/estudantes/${estudante.id}`)
   }
 
-  const handleGeneratePDF = async (cpf) => {
-    setGeneratingPDF(cpf)
+  const handleGeneratePDF = async (id) => {
+    setGeneratingPDF(id)
     try {
       // Carrega dados completos e prontuário
       const [respEstudante, respProntuario] = await Promise.all([
-        academicAPI.estudantes.get(cpf),
-        academicAPI.estudantes.prontuario(cpf)
+        academicAPI.estudantes.get(id),
+        academicAPI.estudantes.prontuario(id)
       ])
       const estudante = respEstudante.data
       const prontuario = respProntuario.data
@@ -272,7 +272,7 @@ export default function Estudantes() {
         <TableBody>
           {estudantes.length > 0 ? (
             estudantes.map((estudante) => (
-              <TableRow key={estudante.cpf}>
+              <TableRow key={estudante.id}>
                 <TableCell>
                   <div className="flex items-center gap-3 group">
                     <button
@@ -327,12 +327,12 @@ export default function Estudantes() {
                 <TableCell>
                   <div className="flex items-center justify-end">
                     <button
-                      onClick={() => handleGeneratePDF(estudante.cpf)}
-                      disabled={generatingPDF === estudante.cpf}
+                      onClick={() => handleGeneratePDF(estudante.id)}
+                      disabled={generatingPDF === estudante.id}
                       className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 disabled:opacity-50"
                       title="Gerar PDF"
                     >
-                      {generatingPDF === estudante.cpf ? (
+                      {generatingPDF === estudante.id ? (
                         <Loading size="sm" />
                       ) : (
                         <FaFilePdf className="h-5 w-5" />
@@ -394,7 +394,7 @@ export default function Estudantes() {
         instructions={
           <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
             <li>Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong>.</li>
-            <li><strong>CPF</strong> será usado como Nome de Usuário (valida unicidade).</li>
+            <li><strong>EMAIL</strong> será usado como Nome de Usuário (Login).</li>
             <li>Colunas Obrigatórias do Estudante: <strong>NOME_COMPLETO, EMAIL, CPF, DATA_NASCIMENTO</strong>.</li>
             <li>Se a <strong>SENHA</strong> estiver vazia, uma aleatória será gerada (para novos usuários).</li>
             <li>Campos Booleanos: <strong>BOLSA_FAMILIA, PE_DE_MEIA, SAIDA_SOZINHO</strong>. Use <strong>Sim</strong> ou <strong>Não</strong>.</li>

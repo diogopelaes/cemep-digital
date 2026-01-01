@@ -8,7 +8,10 @@ def clean_digits(value):
     return re.sub(r'\D', '', str(value))
 
 def validate_cpf(value):
-    """Valida se o CPF é válido."""
+    """Valida se o CPF é válido. Permite valores vazios para campos opcionais."""
+    if not value:
+        return  # Permite CPF vazio quando o campo é opcional
+    
     cpf = clean_digits(value)
     
     if len(cpf) != 11:

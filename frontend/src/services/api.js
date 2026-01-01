@@ -213,19 +213,19 @@ export const coreAPI = {
 }
 
 export const academicAPI = {
-  // Estudantes
+  // Estudantes (usa ID/UUID como identificador, não CPF)
   estudantes: {
     list: (params) => api.get('/academic/estudantes/', { params }),
-    get: (cpf) => api.get(`/academic/estudantes/${cpf}/`),
+    get: (id) => api.get(`/academic/estudantes/${id}/`),
     create: (data) => api.post('/academic/estudantes/', data),
     criarCompleto: (data) => api.post('/academic/estudantes/criar-completo/', data),
-    atualizarCompleto: (cpf, data) => api.put(`/academic/estudantes/${cpf}/atualizar-completo/`, data),
-    update: (cpf, data) => api.patch(`/academic/estudantes/${cpf}/`, data),
-    prontuario: (cpf) => api.get(`/academic/estudantes/${cpf}/prontuario/`),
-    uploadFoto: (cpf, formData) => api.post(`/academic/estudantes/${cpf}/upload-foto/`, formData, {
+    atualizarCompleto: (id, data) => api.put(`/academic/estudantes/${id}/atualizar-completo/`, data),
+    update: (id, data) => api.patch(`/academic/estudantes/${id}/`, data),
+    prontuario: (id) => api.get(`/academic/estudantes/${id}/prontuario/`),
+    uploadFoto: (id, formData) => api.post(`/academic/estudantes/${id}/upload-foto/`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
-    removerFoto: (cpf) => api.delete(`/academic/estudantes/${cpf}/remover-foto/`),
+    removerFoto: (id) => api.delete(`/academic/estudantes/${id}/remover-foto/`),
     uploadFile: (formData) => api.post('/academic/estudantes/importar-arquivo/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),

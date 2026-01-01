@@ -26,10 +26,10 @@ import {
  */
 export default function EstudanteForm() {
     const navigate = useNavigate()
-    const { cpf: cpfParam } = useParams()
+    const { id: idParam } = useParams()
 
     // Hook que gerencia todo estado e lógica do formulário
-    const form = useEstudanteForm(cpfParam, navigate)
+    const form = useEstudanteForm(idParam, navigate)
 
     if (form.loading) {
         return (
@@ -143,12 +143,13 @@ export default function EstudanteForm() {
                                     autoComplete="off"
                                 />
                                 <Input
-                                    label="E-mail"
+                                    label="E-mail *"
                                     type="email"
                                     placeholder="email@exemplo.com"
                                     value={form.formData.email}
                                     onChange={(e) => form.updateField('email', e.target.value)}
                                     autoComplete="off"
+                                    required
                                 />
                             </div>
                         </div>

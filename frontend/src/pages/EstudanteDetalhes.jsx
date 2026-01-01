@@ -23,7 +23,7 @@ import toast from 'react-hot-toast'
 export default function EstudanteDetalhes() {
     const navigate = useNavigate()
     const location = useLocation()
-    const { cpf } = useParams()
+    const { id } = useParams()
 
     const [loading, setLoading] = useState(true)
     const [estudante, setEstudante] = useState(null)
@@ -32,13 +32,13 @@ export default function EstudanteDetalhes() {
 
     useEffect(() => {
         loadEstudante()
-    }, [cpf])
+    }, [id])
 
     const loadEstudante = async () => {
         try {
             const [respEstudante, respProntuario] = await Promise.all([
-                academicAPI.estudantes.get(cpf),
-                academicAPI.estudantes.prontuario(cpf)
+                academicAPI.estudantes.get(id),
+                academicAPI.estudantes.prontuario(id)
             ])
             setEstudante(respEstudante.data)
             setProntuario(respProntuario.data)
@@ -266,7 +266,7 @@ export default function EstudanteDetalhes() {
                     </Button>
                     <Button
                         icon={HiPencil}
-                        onClick={() => navigate(`/estudantes/${cpf}/editar`)}
+                        onClick={() => navigate(`/estudantes/${id}/editar`)}
                     >
                         Editar
                     </Button>

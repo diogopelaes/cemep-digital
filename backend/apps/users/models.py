@@ -9,10 +9,14 @@ from django.utils.text import get_valid_filename
 
 
 def get_profile_pic_path(instance, filename):
+    """
+    Gera o caminho da foto de perfil usando um UUID aleatório.
+    Não expõe o ID do usuário na URL por segurança.
+    """
     ext = os.path.splitext(filename)[1]
-    safe_username = get_valid_filename(instance.username)
-    new_filename = f'{safe_username}{ext}'
-    return f'profile_pics/{instance.username}/{new_filename}'
+    # Gera um UUID aleatório para cada upload - não expõe o ID do usuário
+    random_uuid = str(uuid.uuid4())
+    return f'profile_pics/{random_uuid}{ext}'
 
 
 class User(AbstractUser):

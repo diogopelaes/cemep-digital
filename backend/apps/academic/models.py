@@ -19,9 +19,12 @@ class Estudante(UUIDModel):
     )
     cpf = models.CharField(
         max_length=14, 
-        unique=True, 
+        unique=True,
+        blank=True,
+        null=True,
         verbose_name='CPF',
-        validators=[validate_cpf]
+        validators=[validate_cpf],
+        help_text='Opcional para dados legados. Único quando preenchido.'
     )
     cin = models.CharField(max_length=20, verbose_name='CIN', blank=True)
     nome_social = models.CharField(max_length=255, blank=True, verbose_name='Nome Social')
