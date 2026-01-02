@@ -96,7 +96,11 @@ class MatriculaTurmaViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.
         
         for matricula_id in matriculas_ids:
             try:
-                matricula_cemep = MatriculaCEMEP.objects.get(numero_matricula=matricula_id)
+                # Limpa e formata o ID da matrícula (remove chars especiais e põe X em maiúsculo)
+                import re
+                clean_id = re.sub(r'[^0-9Xx]', '', str(matricula_id)).upper()
+                
+                matricula_cemep = MatriculaCEMEP.objects.get(numero_matricula=clean_id)
                 
                 # Regra 1: MatriculaCEMEP deve ser do mesmo curso da turma
                 if matricula_cemep.curso != turma.curso:
@@ -220,7 +224,7 @@ class MatriculaTurmaViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.
                 
                 # Busca matrícula CEMEP
                 try:
-                    matricula_cemep = MatriculaCEMEP.objects.get(numero_matricula=matricula_num)
+                    matricula_cemep = MatriculaCEMEP.objects.get(numero_matricula__iexact=matricula_num)
                 except MatriculaCEMEP.DoesNotExist:
                     errors.append(f'Linha {linha}: Matrícula "{matricula_num}" não encontrada.')
                     continue

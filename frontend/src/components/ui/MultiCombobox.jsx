@@ -30,11 +30,14 @@ export default function MultiCombobox({
     const filteredOptions = query === ''
         ? options
         : options.filter((opt) => {
-            const search = query.toLowerCase()
-            return (
-                opt.label.toLowerCase().includes(search) ||
-                (opt.subLabel && opt.subLabel.toLowerCase().includes(search))
-            )
+            // Função para normalizar strings: remove tudo que não for letra ou número e converte para minúsculo
+            const normalize = (str) => String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+
+            const search = normalize(query)
+            const labelNorm = normalize(opt.label)
+            const subLabelNorm = normalize(opt.subLabel)
+
+            return labelNorm.includes(search) || subLabelNorm.includes(search)
         })
 
     const selectedOptions = options.filter(opt => value.includes(opt.value))
