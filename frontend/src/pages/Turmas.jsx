@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import {
   Card, Button, Select, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading, Pagination,
   DropdownMenu, DropdownItem
 } from '../components/ui'
-import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil, HiCheckCircle, HiXCircle, HiUpload } from 'react-icons/hi'
+import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil, HiCheckCircle, HiXCircle, HiUpload, HiTable } from 'react-icons/hi'
 import BulkUploadModal from '../components/modals/BulkUploadModal'
 import BulkAssociateDisciplinasModal from '../components/modals/BulkAssociateDisciplinasModal'
 import { coreAPI, academicAPI } from '../services/api'
@@ -159,14 +159,7 @@ export default function Turmas() {
           {anosDisponiveis.length > 0 && (
             <Card key="filtro-ano" hover={false}>
               <div className="flex items-center gap-4">
-                <div className="w-40">
-                  <Select
-                    label="Ano Letivo"
-                    value={anoLetivo}
-                    onChange={handleAnoChange}
-                    options={anosDisponiveis.map(ano => ({ value: ano, label: ano.toString() }))}
-                  />
-                </div>
+                {/* Ano Letivo Filter Removed */}
                 <div className="w-40">
                   <Select
                     label="Status"
@@ -198,6 +191,7 @@ export default function Turmas() {
                   <TableHeader>Curso</TableHeader>
                   <TableHeader>Estudantes</TableHeader>
                   <TableHeader>Disciplinas</TableHeader>
+                  <TableHeader>Grade</TableHeader>
                   <TableHeader>Status</TableHeader>
                 </TableRow>
               </TableHead>
@@ -237,16 +231,34 @@ export default function Turmas() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1 text-sm text-slate-500">
+                        <Link
+                          to={`/turmas/${turma.id}`}
+                          state={{ tab: 'estudantes' }}
+                          className="flex items-center gap-1 text-sm text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                        >
                           <HiUserGroup className="h-4 w-4" />
                           <span>{turma.estudantes_count || 0}</span>
-                        </div>
+                        </Link>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1 text-sm text-slate-500">
+                        <Link
+                          to={`/turmas/${turma.id}`}
+                          state={{ tab: 'disciplinas' }}
+                          className="flex items-center gap-1 text-sm text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                        >
                           <HiBookOpen className="h-4 w-4" />
                           <span>{turma.disciplinas_count || 0}</span>
-                        </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          to={`/turmas/${turma.id}`}
+                          state={{ tab: 'gradeHoraria' }}
+                          className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
+                          title="Grade Horária"
+                        >
+                          <HiTable className="h-5 w-5" />
+                        </Link>
                       </TableCell>
                       <TableCell>
                         <button
