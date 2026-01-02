@@ -32,8 +32,7 @@ export default function TurmaTabs({ activeTab, onChangeTab, counters = {} }) {
         {
             key: 'gradeHoraria',
             label: 'Grade Horária',
-            icon: HiTable,
-            count: counters.gradeHoraria ?? 0
+            icon: HiTable
         },
     ]
 
@@ -54,12 +53,15 @@ export default function TurmaTabs({ activeTab, onChangeTab, counters = {} }) {
                     >
                         <Icon className="h-5 w-5" />
                         {tab.label}
-                        <Badge variant={isActive ? 'primary' : 'default'}>
-                            {tab.count}
-                        </Badge>
+                        {tab.count !== undefined && (
+                            <Badge variant={isActive ? 'primary' : 'default'}>
+                                {tab.count}
+                            </Badge>
+                        )}
                     </button>
                 )
             })}
+
         </div>
     )
 }

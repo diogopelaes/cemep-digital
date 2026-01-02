@@ -10,6 +10,9 @@ import { useAuth } from '../../contexts/AuthContext'
 /**
  * Componente container da aba "Grade Horária" em TurmaDetalhes.
  * 
+ * Carrega dados de edição em uma única requisição via endpoint consolidado.
+ * Exibe a grade horária da turma atual e também de turmas relacionadas.
+ * 
  * @param {Object} props
  * @param {Object} props.turma - Dados da turma
  */
@@ -17,9 +20,12 @@ export default function TurmaGradeHoraria({ turma }) {
     const { user } = useAuth()
     const [view, setView] = useState('detalhes') // 'detalhes' or 'form'
     const [loading, setLoading] = useState(true)
+
+    // Dados retornados do endpoint consolidado
+    const [turmas, setTurmas] = useState([])
+    const [disciplinas, setDisciplinas] = useState([])
     const [grades, setGrades] = useState([])
     const [horariosAula, setHorariosAula] = useState([])
-    const [disciplinas, setDisciplinas] = useState([])
 
     const isGestao = user?.tipo_usuario === 'GESTAO'
 
@@ -33,26 +39,13 @@ export default function TurmaGradeHoraria({ turma }) {
         try {
             setLoading(true)
 
-            // Busca grades horárias da turma
-            const { data: gradesData } = await coreAPI.gradesHorarias.list({ turma: turma.id })
-            const gradesArray = Array.isArray(gradesData) ? gradesData : (gradesData.results || [])
-            setGrades(gradesArray)
+            // Requisição única para todos os dados
+            const { data } = await coreAPI.gradesHorarias.dadosEdicao(turma.id)
 
-            // Busca horários de aula do ano letivo da turma
-            const { data: horariosData } = await coreAPI.horariosAula.list({ ano_letivo__ano: turma.ano_letivo })
-            const horariosArray = Array.isArray(horariosData) ? horariosData : (horariosData.results || [])
-            setHorariosAula(horariosArray)
-
-            // Busca disciplinas vinculadas à turma
-            const { data: disciplinasData } = await coreAPI.disciplinasTurma.list({ turma: turma.id })
-            const disciplinasArray = Array.isArray(disciplinasData) ? disciplinasData : (disciplinasData.results || [])
-            // Extrai apenas os dados da disciplina
-            const disciplinasVinculadas = disciplinasArray.map(dt => dt.disciplina_details || {
-                id: dt.disciplina,
-                nome: `Disciplina ${dt.disciplina}`,
-                sigla: '?'
-            })
-            setDisciplinas(disciplinasVinculadas)
+            setTurmas(data.turmas || [])
+            setDisciplinas(data.disciplinas || [])
+            setGrades(data.grades || [])
+            setHorariosAula(data.horarios_aula || [])
 
         } catch (error) {
             console.error('Erro ao carregar grade horária:', error)
@@ -61,6 +54,35 @@ export default function TurmaGradeHoraria({ turma }) {
             setLoading(false)
         }
     }
+
+    // Prepara dados para o componente de detalhes (compatibilidade)
+    const gradesParaDetalhes = grades.map(g => {
+        const horario = horariosAula.find(h => h.id === g.horario_aula)
+        const disciplina = disciplinas.find(d => d.id === g.disciplina)
+        const turmaInfo = turmas.find(t => t.id === g.turma)
+
+        return {
+            ...g,
+            horario_aula_details: horario ? {
+                id: horario.id,
+                numero: horario.numero,
+                dia_semana: horario.dia_semana,
+                dia_semana_display: horario.dia_semana_display,
+                hora_inicio: horario.hora_inicio,
+                hora_fim: horario.hora_fim,
+            } : null,
+            disciplina_details: disciplina ? {
+                id: disciplina.id,
+                nome: disciplina.nome,
+                sigla: disciplina.sigla,
+            } : null,
+            turma_info: turmaInfo ? {
+                id: turmaInfo.id,
+                nome: turmaInfo.nome,
+                curso_sigla: turmaInfo.curso_sigla,
+            } : null,
+        }
+    })
 
     if (loading) {
         return (
@@ -93,6 +115,11 @@ export default function TurmaGradeHoraria({ turma }) {
                     <h2 className="text-xl font-semibold text-slate-800 dark:text-white flex items-center gap-2">
                         <HiTable className="text-primary-600" />
                         Grade Horária
+                        {turmas.length > 1 && (
+                            <span className="text-sm font-normal text-slate-500 ml-2">
+                                ({turmas.length} turmas)
+                            </span>
+                        )}
                     </h2>
                     <p className="text-slate-500 text-sm">
                         Visualize ou edite a distribuição de disciplinas por horário.
@@ -107,15 +134,16 @@ export default function TurmaGradeHoraria({ turma }) {
 
             {view === 'detalhes' ? (
                 <GradeHorariaDetalhes
-                    grades={grades}
+                    grades={gradesParaDetalhes}
                     horariosAula={horariosAula}
                 />
             ) : (
                 <GradeHorariaForm
-                    turma={turma}
+                    turmaId={turma.id}
+                    turmas={turmas}
+                    disciplinas={disciplinas}
                     grades={grades}
                     horariosAula={horariosAula}
-                    disciplinas={disciplinas}
                     onCancel={() => setView('detalhes')}
                     onSuccess={() => {
                         setView('detalhes')

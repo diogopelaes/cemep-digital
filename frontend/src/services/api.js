@@ -217,7 +217,10 @@ export const coreAPI = {
     create: (data) => api.post('/core/grades-horarias/', data),
     update: (id, data) => api.patch(`/core/grades-horarias/${id}/`, data),
     delete: (id) => api.delete(`/core/grades-horarias/${id}/`),
+    dadosEdicao: (turmaId) => api.get('/core/grades-horarias/dados_edicao/', { params: { turma_id: turmaId } }),
+    salvarLote: (data) => api.post('/core/grades-horarias/salvar_lote/', data),
   },
+
   // Ano Letivo Selecionado (preferência do usuário)
   anoLetivoSelecionado: {
     get: () => api.get('/core/ano-letivo-selecionado/'),
