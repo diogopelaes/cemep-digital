@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from django.db import transaction
 
-from apps.core.models import GradeHoraria, Turma, DisciplinaTurma, HorarioAula
+from apps.core.models import GradeHoraria, Turma, DisciplinaTurma, HorarioAula, ProfessorDisciplinaTurma
 from apps.core.serializers import GradeHorariaSerializer
 from apps.users.permissions import GestaoWritePublicReadMixin, AnoLetivoFilterMixin
 
@@ -39,7 +39,7 @@ class GradeHorariaViewSet(AnoLetivoFilterMixin, GestaoWritePublicReadMixin, view
         
         Retorna:
             turmas: Lista de turmas (atual + relacionadas por numero/letra/ano_letivo)
-            disciplinas: Lista de disciplinas de todas as turmas (com turma_id e curso_sigla)
+            disciplinas: Lista de disciplinas de todas as turmas (com turma_id, curso_sigla e professor)
             grades: Lista de grades existentes de todas as turmas
             horarios_aula: Lista de horários do ano letivo
         """
@@ -63,19 +63,49 @@ class GradeHorariaViewSet(AnoLetivoFilterMixin, GestaoWritePublicReadMixin, view
         turmas_list = [t for t in turmas_relacionadas if t.id == turma.id]
         turmas_list.extend([t for t in turmas_relacionadas if t.id != turma.id])
         
-        # Busca disciplinas de todas as turmas (via DisciplinaTurma)
+        # Busca disciplinas de todas as turmas (via DisciplinaTurma) com prefetch de professores
         disciplinas_turma = DisciplinaTurma.objects.filter(
             turma__in=turmas_list
-        ).select_related('disciplina', 'turma', 'turma__curso')
+        ).select_related('disciplina', 'turma', 'turma__curso').prefetch_related('professores__professor')
         
         disciplinas = []
+        disciplinas = []
         for dt in disciplinas_turma:
+            # Busca professor seguindo as regras:
+            # 1. Ativos (data_fim vazia) primeiro
+            # 2. Ordem de prioridade: TITULAR > SUBSTITUTO > AUXILIAR
+            professor_nome = '-'
+            
+            professores = dt.professores.all()
+            
+            # Ordenação manual no Python já que os dados estão em memória (prefetch)
+            def sort_key(p):
+                # Peso para data_fim (0 = ativa/vazia, 1 = inativa/preenchida)
+                peso_data = 0 if p.data_fim is None else 1
+                
+                # Peso para tipo (0 = TITULAR, 1 = SUBSTITUTO, 2 = AUXILIAR)
+                peso_tipo = 3 # Default
+                if p.tipo == ProfessorDisciplinaTurma.TipoProfessor.TITULAR:
+                    peso_tipo = 0
+                elif p.tipo == ProfessorDisciplinaTurma.TipoProfessor.SUBSTITUTO:
+                    peso_tipo = 1
+                elif p.tipo == ProfessorDisciplinaTurma.TipoProfessor.AUXILIAR:
+                    peso_tipo = 2
+                    
+                return (peso_data, peso_tipo)
+            
+            professores_sorted = sorted(professores, key=sort_key)
+            
+            if professores_sorted:
+                professor_nome = professores_sorted[0].professor.get_apelido()
+
             disciplinas.append({
                 'id': str(dt.disciplina.id),
                 'nome': dt.disciplina.nome,
                 'sigla': dt.disciplina.sigla,
                 'turma_id': str(dt.turma.id),
                 'curso_sigla': dt.turma.curso.sigla,
+                'professor_nome': professor_nome,
             })
         
         # Busca grades existentes de todas as turmas

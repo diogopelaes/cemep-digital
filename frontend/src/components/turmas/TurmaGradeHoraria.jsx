@@ -75,6 +75,7 @@ export default function TurmaGradeHoraria({ turma }) {
                 id: disciplina.id,
                 nome: disciplina.nome,
                 sigla: disciplina.sigla,
+                professor_nome: disciplina.professor_nome,
             } : null,
             turma_info: turmaInfo ? {
                 id: turmaInfo.id,

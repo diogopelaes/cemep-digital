@@ -126,14 +126,21 @@ export default function GradeHorariaDetalhes({ grades = [], horariosAula = [] })
                                                     {disciplinas.map((item, idx) => (
                                                         <div
                                                             key={idx}
-                                                            className="flex items-center gap-1.5 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700"
+                                                            className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700"
                                                         >
-                                                            <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
-                                                                {item.disciplina?.sigla}
-                                                            </span>
-                                                            {temMultiplasTurmas && item.turma_info?.curso_sigla && (
-                                                                <span className="text-[10px] font-medium text-slate-400 bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">
-                                                                    {item.turma_info.curso_sigla}
+                                                            <div className="flex items-center gap-1.5">
+                                                                <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
+                                                                    {item.disciplina?.sigla}
+                                                                </span>
+                                                                {temMultiplasTurmas && item.turma_info?.curso_sigla && (
+                                                                    <span className="text-[10px] font-medium text-slate-400 bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">
+                                                                        {item.turma_info.curso_sigla}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            {item.disciplina?.professor_nome && (
+                                                                <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                                                                    {item.disciplina.professor_nome}
                                                                 </span>
                                                             )}
                                                         </div>

@@ -86,7 +86,7 @@ class Funcionario(UUIDModel):
 
     def get_apelido(self):
         if self.apelido:
-            return f"({self.apelido})"
+            return f"{self.apelido}"
         return self.usuario.get_full_name().split(' ')[0]
     
     def __str__(self):
