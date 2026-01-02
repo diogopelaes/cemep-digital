@@ -488,13 +488,64 @@ class HorarioAula(UUIDModel):
         return f"{self.get_dia_semana_display()} - {self.numero}ª Aula ({self.hora_inicio.strftime('%H:%M')} - {self.hora_fim.strftime('%H:%M')})"
 
 
-class GradeHoraria(UUIDModel):
-    """Grade horária vinculando turmas, horários e disciplinas."""
+class GradeHorariaValidade(UUIDModel):
+    """
+    Grade horária com validade (Agrupador de grades por período).
+    Define um período de vigência para uma grade de aulas de uma turma.
+    """
     turma = models.ForeignKey(
         Turma, 
         on_delete=models.CASCADE, 
-        related_name='grades_horarias', 
+        related_name='validades_grade', 
         verbose_name='Turma'
+    )
+    data_inicio = models.DateField(verbose_name='Data de início')
+    data_fim = models.DateField(verbose_name='Data de fim')
+
+    class Meta:
+        verbose_name = 'Vigência de Grade Horária'
+        verbose_name_plural = 'Vigências de Grade Horária'
+        ordering = ['turma', '-data_inicio']
+
+    def clean(self):
+        """Validações de datas e sobreposição."""
+        if self.data_inicio and self.data_fim:
+            if self.data_inicio >= self.data_fim:
+                raise ValidationError('A data de início deve ser estritamente menor que a data de fim.')
+            
+            if self.turma_id:
+                # Valida ano letivo
+                if self.data_inicio.year != self.turma.ano_letivo or self.data_fim.year != self.turma.ano_letivo:
+                    raise ValidationError(f'As datas devem pertencer ao ano letivo da turma ({self.turma.ano_letivo}).')
+
+                # Verifica sobreposição com outras vigências da mesma turma
+                sobreposicoes = GradeHorariaValidade.objects.filter(
+                    turma=self.turma,
+                    data_inicio__lte=self.data_fim,
+                    data_fim__gte=self.data_inicio
+                )
+                if self.pk:
+                    sobreposicoes = sobreposicoes.exclude(pk=self.pk)
+                
+                if sobreposicoes.exists():
+                    raise ValidationError('Já existe uma vigência de grade horária para este período.')
+
+    def __str__(self):
+        return f"{self.turma} ({self.data_inicio.strftime('%d/%m')} a {self.data_fim.strftime('%d/%m')})"
+
+
+class GradeHoraria(UUIDModel):
+    """
+    Item da grade horária (Aula específica em um dia/hora).
+    Vincula-se a uma vigência (GradeHorariaValidade).
+    """
+    validade = models.ForeignKey(
+        GradeHorariaValidade,
+        on_delete=models.CASCADE,
+        related_name='itens_grade',
+        null=True,
+        blank=True,
+        verbose_name='Vigência'
     )
     horario_aula = models.ForeignKey(
         HorarioAula, 
@@ -510,22 +561,23 @@ class GradeHoraria(UUIDModel):
     )
 
     class Meta:
-        verbose_name = 'Grade Horária'
-        verbose_name_plural = 'Grades Horárias'
-        unique_together = ['turma', 'horario_aula']
+        verbose_name = 'Item de Grade Horária'
+        verbose_name_plural = 'Itens de Grade Horária'
+        unique_together = ['validade', 'horario_aula']
         ordering = ['horario_aula__dia_semana', 'horario_aula__hora_inicio']
 
     def clean(self):
-        # Validação: O ano letivo do horário deve ser o mesmo da turma
-        if hasattr(self, 'turma') and hasattr(self, 'horario_aula'):
-            if self.turma.ano_letivo != self.horario_aula.ano_letivo.ano:
-                raise ValidationError(
-                    f"O ano letivo da turma ({self.turma.ano_letivo}) "
-                    f"não coincide com o do horário ({self.horario_aula.ano_letivo.ano})."
-                )
+        """Valida que o horário pertence ao mesmo ano da turma."""
+        if self.validade_id and self.horario_aula_id:
+            # A turma vem da validade
+            ano_turma = self.validade.turma.ano_letivo
+            ano_horario = self.horario_aula.ano_letivo.ano
+            
+            if ano_turma != ano_horario:
+                raise ValidationError(f'O horário de aula ({ano_horario}) deve ser do mesmo ano letivo da turma ({ano_turma}).')
 
     def __str__(self):
-        return f"{self.turma.nome_completo} - {self.horario_aula} - {self.disciplina.sigla}"    
+        return f"{self.validade.turma} - {self.horario_aula} - {self.disciplina.sigla}"
 
 
 class AnoLetivoSelecionado(UUIDModel):

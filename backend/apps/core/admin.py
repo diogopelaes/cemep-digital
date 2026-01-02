@@ -5,7 +5,8 @@ from django.contrib import admin
 from .models import (
     Funcionario, PeriodoTrabalho, Disciplina, Curso, Turma,
     DisciplinaTurma, ProfessorDisciplinaTurma, Habilidade,
-    AnoLetivo, DiaLetivoExtra, DiaNaoLetivo, HorarioAula, GradeHoraria
+    AnoLetivo, DiaLetivoExtra, DiaNaoLetivo, HorarioAula, GradeHoraria,
+    GradeHorariaValidade
 )
 
 
@@ -125,10 +126,17 @@ class HorarioAulaAdmin(admin.ModelAdmin):
     ordering = ['ano_letivo', 'dia_semana', 'hora_inicio']
 
 
+@admin.register(GradeHorariaValidade)
+class GradeHorariaValidadeAdmin(admin.ModelAdmin):
+    list_display = ['turma', 'data_inicio', 'data_fim']
+    list_filter = ['turma__ano_letivo', 'turma__curso']
+    search_fields = ['turma__numero', 'turma__letra']
+
+
 @admin.register(GradeHoraria)
 class GradeHorariaAdmin(admin.ModelAdmin):
-    list_display = ['turma', 'horario_aula', 'disciplina']
-    list_filter = ['turma__ano_letivo', 'turma__curso', 'horario_aula__dia_semana']
-    search_fields = ['turma__numero', 'turma__letra', 'disciplina__nome']
+    list_display = ['validade', 'horario_aula', 'disciplina']
+    list_filter = ['validade__turma__ano_letivo', 'validade__turma__curso', 'horario_aula__dia_semana']
+    search_fields = ['validade__turma__numero', 'validade__turma__letra', 'disciplina__nome']
 
 

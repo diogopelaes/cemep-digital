@@ -6,7 +6,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from django.db import transaction
 
-from apps.core.models import GradeHoraria, Turma, DisciplinaTurma, HorarioAula, ProfessorDisciplinaTurma
+from django.utils import timezone
+from apps.core.models import GradeHoraria, Turma, DisciplinaTurma, HorarioAula, ProfessorDisciplinaTurma, GradeHorariaValidade
 from apps.core.serializers import GradeHorariaSerializer
 from apps.users.permissions import GestaoWritePublicReadMixin, AnoLetivoFilterMixin
 
@@ -36,14 +37,11 @@ class GradeHorariaViewSet(AnoLetivoFilterMixin, GestaoWritePublicReadMixin, view
         
         Parâmetros:
             turma_id: UUID da turma de referência
-        
-        Retorna:
-            turmas: Lista de turmas (atual + relacionadas por numero/letra/ano_letivo)
-            disciplinas: Lista de disciplinas de todas as turmas (com turma_id, curso_sigla e professor)
-            grades: Lista de grades existentes de todas as turmas
-            horarios_aula: Lista de horários do ano letivo
+            validade_id: UUID da validade específica (opcional)
         """
         turma_id = request.query_params.get('turma_id')
+        validade_id = request.query_params.get('validade_id')
+
         if not turma_id:
             return Response({'error': 'turma_id é obrigatório'}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -52,50 +50,60 @@ class GradeHorariaViewSet(AnoLetivoFilterMixin, GestaoWritePublicReadMixin, view
         except Turma.DoesNotExist:
             return Response({'error': 'Turma não encontrada'}, status=status.HTTP_404_NOT_FOUND)
         
-        # Busca turmas relacionadas (mesmo numero, letra, ano_letivo)
+        # 1. Busca Validades da Turma
+        validades = GradeHorariaValidade.objects.filter(turma=turma).order_by('-data_inicio')
+        validades_data = [{
+            'id': str(v.id),
+            'data_inicio': v.data_inicio,
+            'data_fim': v.data_fim,
+            'is_active': v.data_inicio <= timezone.now().date() <= v.data_fim
+        } for v in validades]
+
+        # 2. Define validade alvo
+        alvo_validade = None
+        if validade_id:
+            try:
+                alvo_validade = validades.get(id=validade_id)
+            except GradeHorariaValidade.DoesNotExist:
+                pass
+        
+        # Se não pediu específica, tenta a atual, senão a última criada
+        if not alvo_validade:
+            hoje = timezone.now().date()
+            alvo_validade = validades.filter(data_inicio__lte=hoje, data_fim__gte=hoje).first()
+            if not alvo_validade and validades.exists():
+                alvo_validade = validades.first()
+
+        
+        # Busca turmas relacionadas (mesmo numero, letra, ano_letivo) para carregamento de disciplinas
         turmas_relacionadas = Turma.objects.filter(
             numero=turma.numero,
             letra=turma.letra,
             ano_letivo=turma.ano_letivo
         ).select_related('curso').order_by('curso__nome')
         
-        # Ordena: turma atual primeiro
         turmas_list = [t for t in turmas_relacionadas if t.id == turma.id]
         turmas_list.extend([t for t in turmas_relacionadas if t.id != turma.id])
         
-        # Busca disciplinas de todas as turmas (via DisciplinaTurma) com prefetch de professores
+        # Busca disciplinas de todas as turmas
         disciplinas_turma = DisciplinaTurma.objects.filter(
             turma__in=turmas_list
         ).select_related('disciplina', 'turma', 'turma__curso').prefetch_related('professores__professor')
         
         disciplinas = []
-        disciplinas = []
         for dt in disciplinas_turma:
-            # Busca professor seguindo as regras:
-            # 1. Ativos (data_fim vazia) primeiro
-            # 2. Ordem de prioridade: TITULAR > SUBSTITUTO > AUXILIAR
             professor_nome = '-'
-            
             professores = dt.professores.all()
             
-            # Ordenação manual no Python já que os dados estão em memória (prefetch)
             def sort_key(p):
-                # Peso para data_fim (0 = ativa/vazia, 1 = inativa/preenchida)
                 peso_data = 0 if p.data_fim is None else 1
-                
-                # Peso para tipo (0 = TITULAR, 1 = SUBSTITUTO, 2 = AUXILIAR)
-                peso_tipo = 3 # Default
-                if p.tipo == ProfessorDisciplinaTurma.TipoProfessor.TITULAR:
-                    peso_tipo = 0
-                elif p.tipo == ProfessorDisciplinaTurma.TipoProfessor.SUBSTITUTO:
-                    peso_tipo = 1
-                elif p.tipo == ProfessorDisciplinaTurma.TipoProfessor.AUXILIAR:
-                    peso_tipo = 2
-                    
+                peso_tipo = 3
+                if p.tipo == ProfessorDisciplinaTurma.TipoProfessor.TITULAR: weight_tipo = 0
+                elif p.tipo == ProfessorDisciplinaTurma.TipoProfessor.SUBSTITUTO: weight_tipo = 1
+                elif p.tipo == ProfessorDisciplinaTurma.TipoProfessor.AUXILIAR: weight_tipo = 2
                 return (peso_data, peso_tipo)
             
             professores_sorted = sorted(professores, key=sort_key)
-            
             if professores_sorted:
                 professor_nome = professores_sorted[0].professor.get_apelido()
 
@@ -108,66 +116,86 @@ class GradeHorariaViewSet(AnoLetivoFilterMixin, GestaoWritePublicReadMixin, view
                 'professor_nome': professor_nome,
             })
         
-        # Busca grades existentes de todas as turmas
-        grades = GradeHoraria.objects.filter(
-            turma__in=turmas_list
-        ).select_related('horario_aula', 'disciplina', 'turma')
-        
+        # Busca grades APENAS se tivermos uma validade alvo
         grades_data = []
-        for g in grades:
-            grades_data.append({
-                'id': str(g.id),
-                'turma': str(g.turma.id),
-                'horario_aula': str(g.horario_aula.id),
-                'disciplina': str(g.disciplina.id),
-            })
+        if alvo_validade:
+            # Precisamos encontrar as validades correspondentes nas turmas relacionadas também
+            # Ex: se alvo_validade é da Turma A (01/02 a 30/06), precisamos da validade da Turma B com mesmas datas
+            
+            # IDs das turmas para buscar
+            ids_turmas_relacionadas = [t.id for t in turmas_list]
+
+            # Busca todas as validades das turmas relacionadas que têm AS MESMAS DATAS da alvo
+            validades_correspondentes = GradeHorariaValidade.objects.filter(
+                turma__in=ids_turmas_relacionadas,
+                data_inicio=alvo_validade.data_inicio,
+                data_fim=alvo_validade.data_fim
+            )
+
+            grades = GradeHoraria.objects.filter(
+                validade__in=validades_correspondentes
+            ).select_related('horario_aula', 'disciplina', 'validade', 'validade__turma')
+            
+            for g in grades:
+                grades_data.append({
+                    'id': str(g.id),
+                    'turma': str(g.validade.turma.id),
+                    'validade': str(g.validade.id),
+                    'horario_aula': str(g.horario_aula.id),
+                    'disciplina': str(g.disciplina.id),
+                })
         
-        # Busca horários de aula do ano letivo
+        # Busca horários de aula
         horarios = HorarioAula.objects.filter(
             ano_letivo__ano=turma.ano_letivo
         ).order_by('dia_semana', 'hora_inicio')
         
-        horarios_data = []
-        for h in horarios:
-            horarios_data.append({
-                'id': str(h.id),
-                'numero': h.numero,
-                'dia_semana': h.dia_semana,
-                'dia_semana_display': h.get_dia_semana_display(),
-                'hora_inicio': h.hora_inicio.strftime('%H:%M') if h.hora_inicio else None,
-                'hora_fim': h.hora_fim.strftime('%H:%M') if h.hora_fim else None,
-            })
+        horarios_data = [{
+            'id': str(h.id),
+            'numero': h.numero,
+            'dia_semana': h.dia_semana,
+            'dia_semana_display': h.get_dia_semana_display(),
+            'hora_inicio': h.hora_inicio.strftime('%H:%M') if h.hora_inicio else None,
+            'hora_fim': h.hora_fim.strftime('%H:%M') if h.hora_fim else None,
+        } for h in horarios]
         
-        # Monta turmas para retorno
-        turmas_data = []
-        for t in turmas_list:
-            turmas_data.append({
-                'id': str(t.id),
-                'nome': t.nome,
-                'nome_completo': t.nome_completo,
-                'curso_sigla': t.curso.sigla,
-            })
+        turmas_data = [{
+            'id': str(t.id),
+            'nome': t.nome,
+            'nome_completo': t.nome_completo,
+            'curso_sigla': t.curso.sigla,
+        } for t in turmas_list]
         
         return Response({
             'turmas': turmas_data,
             'disciplinas': disciplinas,
             'grades': grades_data,
             'horarios_aula': horarios_data,
+            'validades': validades_data,
+            'validade_selecionada': {
+                'id': str(alvo_validade.id),
+                'data_inicio': alvo_validade.data_inicio,
+                'data_fim': alvo_validade.data_fim
+            } if alvo_validade else None
         })
 
     @action(detail=False, methods=['post'])
     def salvar_lote(self, request):
         """
-        Salva grades horárias de múltiplas turmas em uma única requisição.
+        Salva grades horárias com controle de validade e turmas múltiplas.
         
-        Corpo da requisição:
-            turma_id: UUID da turma de referência
-            grades: Lista de { horario_aula: UUID, disciplina: UUID ou null }
-        
-        A turma correta para cada grade é identificada via DisciplinaTurma.
+        Fluxo:
+        1. Identifica ou Cria GradeHorariaValidade para todas as turmas envolvidas.
+        2. Remove grades anteriores dessa validade.
+        3. Insere novas grades vinculadas à validade.
         """
         turma_id = request.data.get('turma_id')
         grades_data = request.data.get('grades', [])
+        
+        # Dados para Validade
+        validade_id = request.data.get('validade_id')
+        data_inicio = request.data.get('data_inicio')
+        data_fim = request.data.get('data_fim')
         
         if not turma_id:
             return Response({'error': 'turma_id é obrigatório'}, status=status.HTTP_400_BAD_REQUEST)
@@ -185,17 +213,57 @@ class GradeHorariaViewSet(AnoLetivoFilterMixin, GestaoWritePublicReadMixin, view
         )
         turmas_ids = list(turmas_relacionadas.values_list('id', flat=True))
         
-        # Monta mapa de disciplina -> turma via DisciplinaTurma
+        # Mapa para validar qual turma a disciplina pertence
         disciplina_turma_map = {}
         for dt in DisciplinaTurma.objects.filter(turma__in=turmas_ids):
             disciplina_turma_map[str(dt.disciplina.id)] = dt.turma.id
-        
+            
         with transaction.atomic():
-            # Remove todas as grades existentes das turmas relacionadas
-            GradeHoraria.objects.filter(turma__in=turmas_ids).delete()
+            # dicionário para guardar a validade de cada turma {turma_id: validade_obj}
+            validades_map = {}
+
+            # Caso 1: Editando Validacies existentes (validade_id passada, mas precisamos achar as irmãs)
+            if validade_id:
+                try:
+                    ref_validade = GradeHorariaValidade.objects.get(id=validade_id)
+                    # Busca validades irmãs (mesmas datas, turmas relacionadas)
+                    validades_existentes = GradeHorariaValidade.objects.filter(
+                        turma__in=turmas_ids,
+                        data_inicio=ref_validade.data_inicio,
+                        data_fim=ref_validade.data_fim
+                    )
+                    for v in validades_existentes:
+                        validades_map[v.turma_id] = v
+                        
+                except GradeHorariaValidade.DoesNotExist:
+                     return Response({'error': 'Validade informada não encontrada'}, status=status.HTTP_404_NOT_FOUND)
+            
+            # Caso 2: Nova Validade ou criando irmãs faltantes
+            if not validade_id and data_inicio and data_fim:
+                # Vamos iterar sobre todas as turmas relacionadas e garantir que existe validade
+                for t in turmas_relacionadas:
+                    v, created = GradeHorariaValidade.objects.get_or_create(
+                        turma=t,
+                        data_inicio=data_inicio,
+                        data_fim=data_fim
+                    )
+                    validades_map[t.id] = v
+            
+            elif not validade_id: # Falta dados
+                 return Response({'error': 'Necessário informar validade_id ou datas de início/fim'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Garante que temos validade para todas as turmas necessárias?
+            # Se entrarmos no modo edição (validade_id), e alguma turma irmã não tiver validade, devíamos criar?
+            # Por segurança, vamos assumir que se estamos editando, usamos o que achamos.
+            
+            # Limpa grades antigas DESSAS validades
+            ids_validades = [v.id for v in validades_map.values()]
+            GradeHoraria.objects.filter(validade__in=ids_validades).delete()
             
             # Cria novas grades
             novas_grades = []
+            erros = []
+            
             for item in grades_data:
                 horario_id = item.get('horario_aula')
                 disciplina_id = item.get('disciplina')
@@ -203,17 +271,49 @@ class GradeHorariaViewSet(AnoLetivoFilterMixin, GestaoWritePublicReadMixin, view
                 if not horario_id or not disciplina_id:
                     continue
                 
-                # Identifica a turma correta para esta disciplina
-                turma_da_disciplina = disciplina_turma_map.get(disciplina_id)
-                if not turma_da_disciplina:
-                    continue  # Disciplina não vinculada a nenhuma turma
+                # Identifica a turma correta através da disciplina
+                turma_da_disciplina_id = disciplina_turma_map.get(str(disciplina_id))
+                
+                if not turma_da_disciplina_id:
+                    # Pode ser disciplina desativada ou erro frontend
+                    continue 
+
+                # Pega a validade correspondente a ESSA turma
+                validade_obj = validades_map.get(turma_da_disciplina_id)
+                
+                if not validade_obj:
+                    # Se estamos criando e por algum motivo essa turma não ganhou validade (bug?), criamos?
+                    # Ou se estamos editando e essa turma não tinha validade naquele range?
+                    # Vamos tentar criar on-the-fly se tivermos datas
+                    if data_inicio and data_fim:
+                         validade_obj, _ = GradeHorariaValidade.objects.get_or_create(
+                            turma_id=turma_da_disciplina_id,
+                            data_inicio=data_inicio,
+                            data_fim=data_fim
+                         )
+                         validades_map[turma_da_disciplina_id] = validade_obj
+                    elif validade_id:
+                         # Se veio de validade_id, usamos as datas da referencia para criar a faltando
+                         ref_val = GradeHorariaValidade.objects.get(id=validade_id)
+                         validade_obj, _ = GradeHorariaValidade.objects.get_or_create(
+                            turma_id=turma_da_disciplina_id,
+                            data_inicio=ref_val.data_inicio,
+                            data_fim=ref_val.data_fim
+                         )
+                         validades_map[turma_da_disciplina_id] = validade_obj
                 
                 novas_grades.append(GradeHoraria(
-                    turma_id=turma_da_disciplina,
+                    validade=validade_obj,
                     horario_aula_id=horario_id,
                     disciplina_id=disciplina_id
                 ))
             
             GradeHoraria.objects.bulk_create(novas_grades)
+
+        # Retorna o ID da validade principal (da turma solicitada) para redirecionamento
+        validade_principal = validades_map.get(turma.id)
         
-        return Response({'message': f'{len(novas_grades)} grades criadas com sucesso.'})
+        return Response({
+            'message': f'{len(novas_grades)} grades salvas/atualizadas.',
+            'validade_id': validade_principal.id if validade_principal else None
+        })

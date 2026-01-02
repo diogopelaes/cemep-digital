@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { HiSave, HiX } from 'react-icons/hi'
-import { Button, Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '../components/ui'
-import { coreAPI } from '../services/api'
+import { Button, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, DateInput } from '../components/ui'
+import { useGradeHoraria } from '../hooks/useGradeHoraria'
 import { toast } from 'react-hot-toast'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 const DAYS = [
     { value: 0, label: 'Segunda' },
@@ -12,57 +13,58 @@ const DAYS = [
     { value: 4, label: 'Sexta' },
 ]
 
-/**
- * Formulário para edição da grade horária.
- * Exibe um único select por slot contendo disciplinas de todas as turmas relacionadas.
- * O backend identifica a turma correta para cada disciplina ao salvar.
- * 
- * @param {Object} props
- * @param {string} props.turmaId - ID da turma de referência
- * @param {Array} props.turmas - Array de turmas relacionadas
- * @param {Array} props.disciplinas - Disciplinas de todas as turmas (com turma_id e curso_sigla)
- * @param {Array} props.grades - Grades existentes de todas as turmas
- * @param {Array} props.horariosAula - Horários de aula disponíveis
- * @param {Function} props.onCancel - Callback para cancelar
- * @param {Function} props.onSuccess - Callback após salvar com sucesso
- */
-export default function GradeHorariaForm({
-    turmaId,
-    turmas = [],
-    disciplinas = [],
-    grades = [],
-    horariosAula = [],
-    onCancel,
-    onSuccess
-}) {
+export default function GradeHorariaForm() {
+    const { id: turmaId } = useParams()
+    const location = useLocation()
+    const navigate = useNavigate()
+    const { fetchDadosEdicao, salvarGrade, loading: hookLoading } = useGradeHoraria()
+
+    // O validadeId pode vir do state da navegação
+    const validadeIdInicial = location.state?.validade_id
+
+    const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
-    // Estado local: { horario_aula_id: disciplina_id | '' }
+
+    // Dados carregados
+    const [dados, setDados] = useState(null)
     const [selections, setSelections] = useState({})
 
-    // Inicializa seleções com grades existentes
+    // Campos de Data
+    const [dataInicio, setDataInicio] = useState('')
+    const [dataFim, setDataFim] = useState('')
+
     useEffect(() => {
-        const initial = {}
-        grades.forEach(g => {
-            if (g.horario_aula) {
-                initial[g.horario_aula] = g.disciplina
+        carregarDados()
+    }, [turmaId, validadeIdInicial])
+
+    const carregarDados = async () => {
+        setLoading(true)
+        try {
+            const data = await fetchDadosEdicao(turmaId, validadeIdInicial)
+            setDados(data)
+
+            // Inicializa seleções com grades existentes
+            const initial = {}
+            if (data.grades) {
+                data.grades.forEach(g => {
+                    if (g.horario_aula) {
+                        initial[g.horario_aula] = g.disciplina
+                    }
+                })
             }
-        })
-        setSelections(initial)
-    }, [grades])
+            setSelections(initial)
 
-    // Agrupa horários por número de aula
-    const aulasPorNumero = {}
-    horariosAula.forEach(h => {
-        if (!aulasPorNumero[h.numero]) {
-            aulasPorNumero[h.numero] = {}
+            // Inicializa datas
+            if (data.validade_selecionada) {
+                setDataInicio(data.validade_selecionada.data_inicio)
+                setDataFim(data.validade_selecionada.data_fim)
+            }
+        } catch (err) {
+            // Erro tratado no hook
+        } finally {
+            setLoading(false)
         }
-        aulasPorNumero[h.numero][h.dia_semana] = h
-    })
-
-    const numerosAula = Object.keys(aulasPorNumero).map(Number).sort((a, b) => a - b)
-
-    // Verifica se há múltiplas turmas
-    const temMultiplasTurmas = turmas.length > 1
+    }
 
     const handleSelectChange = (horarioId, disciplinaId) => {
         setSelections(prev => ({
@@ -72,6 +74,11 @@ export default function GradeHorariaForm({
     }
 
     const handleSave = async () => {
+        if (!dataInicio || !dataFim) {
+            toast.error('Informe as datas de início e fim da vigência.')
+            return
+        }
+
         try {
             setSaving(true)
 
@@ -83,24 +90,64 @@ export default function GradeHorariaForm({
                     disciplina: disciplinaId
                 }))
 
-            await coreAPI.gradesHorarias.salvarLote({
+            await salvarGrade({
                 turma_id: turmaId,
+                validade_id: validadeIdInicial, // Se estiver editando uma existente
+                data_inicio: dataInicio,
+                data_fim: dataFim,
                 grades: gradesParaSalvar
             })
 
-            toast.success('Grade horária salva com sucesso!')
-            onSuccess()
+            // Retorna para detalhes
+            navigate(`/turmas/${turmaId}`, { state: { tab: 'gradeHoraria' } })
 
         } catch (error) {
-            console.error('Erro ao salvar grade horária:', error)
-            toast.error('Erro ao salvar grade horária.')
+            // Tratado no hook
         } finally {
             setSaving(false)
         }
     }
 
+    if (loading) {
+        return <div className="p-8 text-center text-slate-500">Carregando formulário...</div>
+    }
+
+    if (!dados) return null
+
+    const { horarios_aula: horariosAula = [], turmas = [], disciplinas = [] } = dados
+    const temMultiplasTurmas = turmas.length > 1
+
+    // Processa dados para tabela
+    const aulasPorNumero = {}
+    horariosAula.forEach(h => {
+        if (!aulasPorNumero[h.numero]) {
+            aulasPorNumero[h.numero] = {}
+        }
+        aulasPorNumero[h.numero][h.dia_semana] = h
+    })
+    const numerosAula = Object.keys(aulasPorNumero).map(Number).sort((a, b) => a - b)
+
     return (
         <div className="space-y-6 animate-fade-in">
+            {/* Header com Datas */}
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row gap-4 items-end">
+                <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <DateInput
+                        label="Início da Vigência"
+                        value={dataInicio}
+                        onChange={(e) => setDataInicio(e.target.value)}
+                        required
+                    />
+                    <DateInput
+                        label="Fim da Vigência"
+                        value={dataFim}
+                        onChange={(e) => setDataFim(e.target.value)}
+                        min={dataInicio}
+                        required
+                    />
+                </div>
+            </div>
+
             {/* Aviso de múltiplas turmas */}
             {temMultiplasTurmas && (
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800">
@@ -131,7 +178,6 @@ export default function GradeHorariaForm({
                         <TableBody>
                             {numerosAula.map(numero => {
                                 const horariosDia = aulasPorNumero[numero] || {}
-                                // Pega qualquer horário desse número para exibir hora
                                 const horarioRef = Object.values(horariosDia)[0]
 
                                 return (
@@ -183,7 +229,7 @@ export default function GradeHorariaForm({
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 p-4 flex justify-end gap-3 border-t border-slate-200 dark:border-slate-700">
-                    <Button variant="secondary" onClick={onCancel} icon={HiX}>
+                    <Button variant="secondary" onClick={() => navigate(`/turmas/${turmaId}`, { state: { tab: 'gradeHoraria' } })} icon={HiX}>
                         Cancelar
                     </Button>
                     <Button

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.core.models import GradeHoraria, Turma, HorarioAula
+from apps.core.models import GradeHoraria, Turma, HorarioAula, GradeHorariaValidade
 
 
 class GradeHorariaSerializer(serializers.ModelSerializer):
@@ -13,7 +13,15 @@ class GradeHorariaSerializer(serializers.ModelSerializer):
     horario_aula_details = serializers.SerializerMethodField(read_only=True)
     disciplina_details = serializers.SerializerMethodField(read_only=True)
 
-    turma = serializers.PrimaryKeyRelatedField(queryset=Turma.objects.all())
+    # Turma agora é derivada da validade (read-only para compatibilidade frontend)
+    turma = serializers.UUIDField(source='validade.turma.id', read_only=True)
+    
+    # Campo obrigatório para vincular à vigência correta
+    validade = serializers.PrimaryKeyRelatedField(
+        queryset=GradeHorariaValidade.objects.all(),
+        required=True
+    )
+    
     horario_aula = serializers.PrimaryKeyRelatedField(queryset=HorarioAula.objects.all())
 
     class Meta:
@@ -21,12 +29,13 @@ class GradeHorariaSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'turma',
+            'validade',
             'horario_aula',
             'disciplina',
             'horario_aula_details',
             'disciplina_details',
         ]
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'turma']
 
     def get_horario_aula_details(self, obj):
         if obj.horario_aula:
@@ -53,15 +62,18 @@ class GradeHorariaSerializer(serializers.ModelSerializer):
         """
         Validação customizada para garantir consistência.
         """
-        turma = data.get('turma')
+        validade = data.get('validade')
         horario_aula = data.get('horario_aula')
 
-        if turma and horario_aula:
+        if validade and horario_aula:
             # Ano letivo da turma deve coincidir com o do horário
-            if turma.ano_letivo != horario_aula.ano_letivo.ano:
+            ano_turma = validade.turma.ano_letivo
+            ano_horario = horario_aula.ano_letivo.ano
+            
+            if ano_turma != ano_horario:
                 raise serializers.ValidationError({
-                    'horario_aula': f'O ano letivo da turma ({turma.ano_letivo}) '
-                                    f'não coincide com o do horário ({horario_aula.ano_letivo.ano}).'
+                    'horario_aula': f'O ano letivo da turma ({ano_turma}) '
+                                    f'não coincide com o do horário ({ano_horario}).'
                 })
 
         return data
