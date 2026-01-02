@@ -297,7 +297,7 @@ export default function HorarioAulaForm({ anoLetivo, existingHorarios, onSuccess
 
             for (const h of previewHorarios) {
                 await coreAPI.horariosAula.create({
-                    ano_letivo: anoLetivo.ano,
+                    ano_letivo: anoLetivo.id,
                     numero: h.numero,
                     dia_semana: h.dia_semana,
                     hora_inicio: h.hora_inicio,
@@ -523,7 +523,7 @@ export default function HorarioAulaForm({ anoLetivo, existingHorarios, onSuccess
                             <Button
                                 variant="primary"
                                 onClick={handleSave}
-                                isLoading={saving}
+                                loading={saving}
                                 icon={HiSave}
                             >
                                 Confirmar e Salvar
