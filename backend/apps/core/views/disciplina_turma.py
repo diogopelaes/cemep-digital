@@ -10,7 +10,7 @@ from django.http import HttpResponse
 import io
 import pandas as pd
 
-from apps.core.models import DisciplinaTurma, Turma, Disciplina
+from apps.core.models import DisciplinaTurma, Turma, Disciplina, AnoLetivo
 from apps.core.serializers import DisciplinaTurmaSerializer
 from apps.users.permissions import GestaoSecretariaMixin
 
@@ -20,7 +20,9 @@ class DisciplinaTurmaViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
     ViewSet para DisciplinaTurma.
     Leitura: Gestão / Secretaria | Escrita: Gestão / Secretaria
     """
-    queryset = DisciplinaTurma.objects.select_related('disciplina', 'turma').all()
+    queryset = DisciplinaTurma.objects.filter(
+        turma__ano_letivo__in=AnoLetivo.objects.filter(is_active=True).values('ano')
+    ).select_related('disciplina', 'turma')
     serializer_class = DisciplinaTurmaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['disciplina', 'turma', 'turma__ano_letivo']

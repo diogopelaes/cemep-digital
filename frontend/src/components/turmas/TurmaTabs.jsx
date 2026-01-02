@@ -1,13 +1,13 @@
-import { HiBookOpen, HiStar, HiUserGroup } from 'react-icons/hi'
+import { HiBookOpen, HiStar, HiUserGroup, HiTable } from 'react-icons/hi'
 import { Badge } from '../ui'
 
 /**
  * Tabs da página TurmaDetalhes
  * 
  * @param {Object} props
- * @param {string} props.activeTab - Tab ativa ('disciplinas' | 'representantes' | 'estudantes')
+ * @param {string} props.activeTab - Tab ativa ('disciplinas' | 'representantes' | 'estudantes' | 'gradeHoraria')
  * @param {Function} props.onChangeTab - Callback quando muda de tab
- * @param {Object} props.counters - Contadores para badges { disciplinas, representantes, estudantes }
+ * @param {Object} props.counters - Contadores para badges { disciplinas, representantes, estudantes, gradeHoraria }
  */
 export default function TurmaTabs({ activeTab, onChangeTab, counters = {} }) {
     const tabs = [
@@ -29,6 +29,12 @@ export default function TurmaTabs({ activeTab, onChangeTab, counters = {} }) {
             icon: HiUserGroup,
             count: counters.estudantes ?? 0
         },
+        {
+            key: 'gradeHoraria',
+            label: 'Grade Horária',
+            icon: HiTable,
+            count: counters.gradeHoraria ?? 0
+        },
     ]
 
     return (
@@ -42,8 +48,8 @@ export default function TurmaTabs({ activeTab, onChangeTab, counters = {} }) {
                         key={tab.key}
                         onClick={() => onChangeTab(tab.key)}
                         className={`flex items-center gap-2 px-4 py-3 font-medium transition-colors border-b-2 -mb-px ${isActive
-                                ? 'text-primary-600 border-primary-500'
-                                : 'text-slate-500 border-transparent hover:text-slate-700 dark:hover:text-slate-300'
+                            ? 'text-primary-600 border-primary-500'
+                            : 'text-slate-500 border-transparent hover:text-slate-700 dark:hover:text-slate-300'
                             }`}
                     >
                         <Icon className="h-5 w-5" />

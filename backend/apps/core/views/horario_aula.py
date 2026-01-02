@@ -12,7 +12,7 @@ class HorarioAulaViewSet(GestaoWritePublicReadMixin, viewsets.ModelViewSet):
     ViewSet para HorarioAula.
     Leitura: Público (Autenticado) | Escrita: Gestão
     """
-    queryset = HorarioAula.objects.all()
+    queryset = HorarioAula.objects.filter(ano_letivo__is_active=True)
     serializer_class = HorarioAulaSerializer
     pagination_class = None  # Desabilita paginação - retorna todos os registros
     

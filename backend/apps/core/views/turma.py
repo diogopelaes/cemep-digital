@@ -11,7 +11,7 @@ from django.http import FileResponse
 import io
 import pandas as pd
 
-from apps.core.models import Turma, Curso
+from apps.core.models import Turma, Curso, AnoLetivo
 from apps.core.serializers import TurmaSerializer
 from apps.users.permissions import GestaoSecretariaMixin
 
@@ -23,7 +23,9 @@ class TurmaViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
     ViewSet para Turma.
     Leitura: Gestão / Secretaria | Escrita: Gestão / Secretaria
     """
-    queryset = Turma.objects.select_related('curso').prefetch_related('professores_representantes__usuario').all()
+    queryset = Turma.objects.filter(
+        ano_letivo__in=AnoLetivo.objects.filter(is_active=True).values('ano')
+    ).select_related('curso').prefetch_related('professores_representantes__usuario')
     serializer_class = TurmaSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['numero', 'letra', 'ano_letivo', 'curso', 'nomenclatura', 'is_active']
@@ -36,8 +38,15 @@ class TurmaViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], url_path='anos-disponiveis')
     def anos_disponiveis(self, request):
-        """Retorna a lista de anos letivos disponíveis nas turmas."""
-        anos = Turma.objects.values_list('ano_letivo', flat=True).distinct().order_by('-ano_letivo')
+        """Retorna a lista de anos letivos disponíveis nas turmas (apenas ativos)."""
+        active_years = AnoLetivo.objects.filter(is_active=True).values_list('ano', flat=True)
+        # Se quisermos apenas anos QUE TEM turmas E são ativos:
+        anos = Turma.objects.filter(ano_letivo__in=active_years).values_list('ano_letivo', flat=True).distinct().order_by('-ano_letivo')
+        # Ou se quisermos retornar o Próprio Ano Ativo mesmo que não tenha turma?
+        # O endpoint chama 'anos-disponiveis' (available years), usually implies existing data filter.
+        # But for 'creating' new data, we might need just the active year.
+        # Given the context 'anos-disponiveis' is used for Filter Dropdown in Turmas.jsx list:
+        # It makes sense to show active years.
         return Response(list(anos))
 
     @action(detail=True, methods=['post'], url_path='toggle-ativo')

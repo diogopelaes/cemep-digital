@@ -6,7 +6,7 @@ import { PageLoading } from '../components/ui/Loading'
 import { LOGO_PATH, SYSTEM_NAME, INSTITUTION_FANTASY } from '../config/constants'
 import {
   HiHome, HiUserGroup, HiAcademicCap, HiClipboardList,
-  HiCalendar, HiCog, HiLogout, HiMenu, HiX, HiSun, HiMoon,
+  HiCog, HiLogout, HiMenu, HiX, HiSun, HiMoon,
   HiBell, HiUsers, HiDocumentText, HiChartBar, HiBookOpen
 } from 'react-icons/hi'
 
@@ -19,7 +19,6 @@ const menuItems = {
     { path: '/estudantes', label: 'Estudantes', icon: HiAcademicCap },
     { path: '/disciplinas', label: 'Disciplinas', icon: HiBookOpen },
     { path: '/turmas', label: 'Turmas', icon: HiUsers },
-    { path: '/calendario', label: 'Calendário', icon: HiCalendar },
     { path: '/tarefas', label: 'Tarefas', icon: HiClipboardList },
     { path: '/avisos', label: 'Avisos', icon: HiBell },
     { path: '/relatorios', label: 'Relatórios', icon: HiChartBar },
@@ -28,7 +27,6 @@ const menuItems = {
     { path: '/dashboard', label: 'Dashboard', icon: HiHome },
     { path: '/estudantes', label: 'Estudantes', icon: HiAcademicCap },
     { path: '/turmas', label: 'Turmas', icon: HiUsers },
-    { path: '/calendario', label: 'Calendário', icon: HiCalendar },
     { path: '/avisos', label: 'Avisos', icon: HiBell },
   ],
   PROFESSOR: [

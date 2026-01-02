@@ -4,3 +4,5 @@ export { default as TurmaTabs } from './TurmaTabs'
 export { default as TurmaDisciplinas } from './TurmaDisciplinas'
 export { default as TurmaRepresentantes } from './TurmaRepresentantes'
 export { default as TurmaEstudantes } from './TurmaEstudantes'
+export { default as TurmaGradeHoraria } from './TurmaGradeHoraria'
+

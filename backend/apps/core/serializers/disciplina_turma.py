@@ -2,7 +2,7 @@
 Serializer para Disciplina-Turma
 """
 from rest_framework import serializers
-from apps.core.models import DisciplinaTurma, Disciplina, Turma
+from apps.core.models import DisciplinaTurma, Disciplina, Turma, AnoLetivo
 from .disciplina import DisciplinaSerializer
 from .turma import TurmaSerializer
 
@@ -16,7 +16,9 @@ class DisciplinaTurmaSerializer(serializers.ModelSerializer):
         write_only=True
     )
     turma_id = serializers.PrimaryKeyRelatedField(
-        queryset=Turma.objects.all(),
+        queryset=Turma.objects.filter(
+            ano_letivo__in=AnoLetivo.objects.filter(is_active=True).values('ano')
+        ),
         source='turma',
         write_only=True
     )

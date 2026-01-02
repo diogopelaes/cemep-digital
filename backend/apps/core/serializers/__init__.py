@@ -24,6 +24,7 @@ from .calendario import (
 )
 from .habilidade import HabilidadeSerializer
 from .horario_aula import HorarioAulaSerializer
+from .grade_horaria import GradeHorariaSerializer
 
 
 __all__ = [
@@ -42,4 +43,5 @@ __all__ = [
     'DiaNaoLetivoSerializer',
     'HabilidadeSerializer',
     'HorarioAulaSerializer',
+    'GradeHorariaSerializer',
 ]

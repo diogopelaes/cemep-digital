@@ -1,7 +1,10 @@
 from rest_framework import serializers
-from apps.core.models import HorarioAula
+from apps.core.models import HorarioAula, AnoLetivo
 
 class HorarioAulaSerializer(serializers.ModelSerializer):
+    ano_letivo = serializers.PrimaryKeyRelatedField(
+        queryset=AnoLetivo.objects.filter(is_active=True)
+    )
     dia_semana_display = serializers.CharField(source='get_dia_semana_display', read_only=True)
 
     class Meta:

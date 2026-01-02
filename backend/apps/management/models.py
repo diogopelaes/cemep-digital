@@ -65,7 +65,6 @@ class Tarefa(UUIDModel):
         return f"{self.titulo} (Prazo: {self.prazo.strftime('%d/%m/%Y')})"
 
 
-
 class TarefaAnexo(UUIDModel):
     """Anexo de uma tarefa (arquivo)."""
     
@@ -83,7 +82,6 @@ class TarefaAnexo(UUIDModel):
     
     def __str__(self):
         return self.descricao or self.arquivo.name
-
 
 
 class TarefaResposta(UUIDModel):
@@ -111,7 +109,6 @@ class TarefaResposta(UUIDModel):
         return f"Resposta de {self.funcionario} em {self.tarefa}"
 
 
-
 class TarefaRespostaAnexo(UUIDModel):
     """Anexo da resposta da tarefa."""
     
@@ -129,7 +126,6 @@ class TarefaRespostaAnexo(UUIDModel):
     
     def __str__(self):
         return self.descricao or self.arquivo.name
-
 
 
 class NotificacaoTarefa(UUIDModel):
@@ -185,7 +181,6 @@ class ReuniaoHTPC(UUIDModel):
         return f"HTPC - {self.data_reuniao.strftime('%d/%m/%Y %H:%M')}"
 
 
-
 class ReuniaoHTPCAnexo(UUIDModel):
     """Anexos da reunião de HTPC (lista de presença, slides, etc)."""
     
@@ -203,7 +198,6 @@ class ReuniaoHTPCAnexo(UUIDModel):
     
     def __str__(self):
         return self.descricao or self.arquivo.name
-
 
 
 class NotificacaoHTPC(UUIDModel):
@@ -258,7 +252,6 @@ class Aviso(UUIDModel):
         return f"{self.titulo} ({self.data_aviso.strftime('%d/%m/%Y')})"
 
 
-
 class AvisoAnexo(UUIDModel):
     """Anexo de um aviso."""
     
@@ -276,7 +269,6 @@ class AvisoAnexo(UUIDModel):
     
     def __str__(self):
         return self.descricao or self.arquivo.name
-
 
 
 class AvisoVisualizacao(UUIDModel):
@@ -302,4 +294,3 @@ class AvisoVisualizacao(UUIDModel):
     
     def __str__(self):
         return f"{self.usuario} - {self.aviso}"
-

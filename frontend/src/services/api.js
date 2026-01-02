@@ -210,6 +210,14 @@ export const coreAPI = {
     update: (id, data) => api.patch(`/core/horarios-aula/${id}/`, data),
     delete: (id) => api.delete(`/core/horarios-aula/${id}/`),
   },
+  // Grades Horárias (Turma <-> Horário <-> Disciplina)
+  gradesHorarias: {
+    list: (params) => api.get('/core/grades-horarias/', { params }),
+    get: (id) => api.get(`/core/grades-horarias/${id}/`),
+    create: (data) => api.post('/core/grades-horarias/', data),
+    update: (id, data) => api.patch(`/core/grades-horarias/${id}/`, data),
+    delete: (id) => api.delete(`/core/grades-horarias/${id}/`),
+  },
 }
 
 export const academicAPI = {

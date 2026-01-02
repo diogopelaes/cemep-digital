@@ -15,6 +15,7 @@ import {
   TurmaDisciplinas,
   TurmaRepresentantes,
   TurmaEstudantes,
+  TurmaGradeHoraria,
 } from '../components/turmas'
 
 /**
@@ -69,6 +70,7 @@ export default function TurmaDetalhes() {
     disciplinas: Object.keys(disciplinas.disciplinasVinculadas).length,
     representantes: turma?.professores_representantes_details?.length || 0,
     estudantes: turma?.estudantes_count || 0,
+    gradeHoraria: turma?.grades_horarias_count || 0,
   }
 
   return (
@@ -140,6 +142,10 @@ export default function TurmaDetalhes() {
           onEnturmar={estudantes.enturmarEstudantes}
           onRemoveEstudante={estudantes.removeEstudante}
         />
+      )}
+
+      {activeTab === 'gradeHoraria' && (
+        <TurmaGradeHoraria turma={turma} />
       )}
 
       {/* Modal de Upload */}
