@@ -8,6 +8,7 @@ from .views import (
     ReuniaoHTPCViewSet, NotificacaoHTPCViewSet,
     AvisoViewSet, AvisoVisualizacaoViewSet
 )
+from .views.dashboard import DashboardViewSet
 
 router = DefaultRouter()
 router.register('tarefas', TarefaViewSet)
@@ -16,8 +17,8 @@ router.register('htpc', ReuniaoHTPCViewSet)
 router.register('notificacoes-htpc', NotificacaoHTPCViewSet)
 router.register('avisos', AvisoViewSet)
 router.register('visualizacoes-avisos', AvisoVisualizacaoViewSet)
+router.register('dashboard', DashboardViewSet, basename='dashboard')
 
 urlpatterns = [
     path('', include(router.urls)),
 ]
-

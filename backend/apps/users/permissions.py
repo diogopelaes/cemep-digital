@@ -202,3 +202,27 @@ class FuncionarioMixin:
     """
     def get_permissions(self):
         return [IsFuncionario()]
+
+
+# =============================================================================
+# MIXINS PARA FILTRO POR ANO LETIVO
+# =============================================================================
+
+class AnoLetivoFilterMixin:
+    """
+    Mixin para filtrar querysets pelo ano letivo selecionado do usuário.
+    
+    Uso: Defina `ano_letivo_field` na view para especificar o campo de filtro.
+    Exemplos:
+        - 'ano_letivo' para modelo Turma (campo inteiro)
+        - 'turma__ano_letivo' para modelo DisciplinaTurma (via FK)
+        - 'ano_letivo__ano' para modelo HorarioAula (campo FK para AnoLetivo)
+    """
+    ano_letivo_field = 'ano_letivo'  # Campo padrão, sobrescreva na view
+    
+    def get_queryset(self):
+        qs = super().get_queryset()
+        ano = self.request.user.get_ano_letivo_selecionado()
+        if ano:
+            qs = qs.filter(**{self.ano_letivo_field: ano})
+        return qs

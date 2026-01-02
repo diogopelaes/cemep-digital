@@ -526,3 +526,26 @@ class GradeHoraria(UUIDModel):
 
     def __str__(self):
         return f"{self.turma.nome_completo} - {self.horario_aula} - {self.disciplina.sigla}"    
+
+
+class AnoLetivoSelecionado(UUIDModel):
+    """Ano letivo selecionado pelo usuário para visualização de dados."""
+    
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='ano_letivo_selecionado'
+    )
+    ano_letivo = models.ForeignKey(
+        AnoLetivo,
+        on_delete=models.CASCADE,
+        related_name='usuarios_selecionados',
+        verbose_name='Ano Letivo'
+    )
+
+    class Meta:
+        verbose_name = 'Ano Letivo Selecionado'
+        verbose_name_plural = 'Anos Letivos Selecionados'
+
+    def __str__(self):
+        return f"{self.usuario} - {self.ano_letivo.ano}"

@@ -218,6 +218,11 @@ export const coreAPI = {
     update: (id, data) => api.patch(`/core/grades-horarias/${id}/`, data),
     delete: (id) => api.delete(`/core/grades-horarias/${id}/`),
   },
+  // Ano Letivo Selecionado (preferência do usuário)
+  anoLetivoSelecionado: {
+    get: () => api.get('/core/ano-letivo-selecionado/'),
+    update: (anoLetivoId) => api.post('/core/ano-letivo-selecionado/', { ano_letivo_id: anoLetivoId }),
+  },
 }
 
 export const academicAPI = {
@@ -306,6 +311,10 @@ export const managementAPI = {
     list: (params) => api.get('/management/avisos/', { params }),
     create: (data) => api.post('/management/avisos/', data),
     meus: () => api.get('/management/avisos/meus_avisos/'),
+  },
+  // Dashboard
+  dashboard: {
+    estatisticas: () => api.get('/management/dashboard/estatisticas/'),
   },
 }
 

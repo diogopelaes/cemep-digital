@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.core.models import GradeHoraria, Turma, AnoLetivo, HorarioAula
+from apps.core.models import GradeHoraria, Turma, HorarioAula
 
 
 class GradeHorariaSerializer(serializers.ModelSerializer):
@@ -13,14 +13,8 @@ class GradeHorariaSerializer(serializers.ModelSerializer):
     horario_aula_details = serializers.SerializerMethodField(read_only=True)
     disciplina_details = serializers.SerializerMethodField(read_only=True)
 
-    turma = serializers.PrimaryKeyRelatedField(
-        queryset=Turma.objects.filter(
-            ano_letivo__in=AnoLetivo.objects.filter(is_active=True).values('ano')
-        )
-    )
-    horario_aula = serializers.PrimaryKeyRelatedField(
-        queryset=HorarioAula.objects.filter(ano_letivo__is_active=True)
-    )
+    turma = serializers.PrimaryKeyRelatedField(queryset=Turma.objects.all())
+    horario_aula = serializers.PrimaryKeyRelatedField(queryset=HorarioAula.objects.all())
 
     class Meta:
         model = GradeHoraria

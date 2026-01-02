@@ -3,9 +3,9 @@ import { useAuth } from '../contexts/AuthContext'
 import { Card, CardHeader, CardTitle, CardContent, Loading, Badge } from '../components/ui'
 import {
   HiUserGroup, HiAcademicCap, HiClipboardList, HiCalendar,
-  HiCheckCircle, HiClock, HiExclamationCircle
+  HiCheckCircle, HiClock, HiExclamationCircle, HiSwitchHorizontal
 } from 'react-icons/hi'
-import { managementAPI, academicAPI, coreAPI } from '../services/api'
+import { managementAPI, coreAPI } from '../services/api'
 import { formatDateBR } from '../utils/date'
 import { SYSTEM_NAME } from '../config/constants'
 
@@ -15,6 +15,9 @@ export default function Dashboard() {
   const [stats, setStats] = useState({})
   const [tarefas, setTarefas] = useState([])
   const [avisos, setAvisos] = useState([])
+  const [anoSelecionado, setAnoSelecionado] = useState(null)
+  const [anosDisponiveis, setAnosDisponiveis] = useState([])
+  const [showYearModal, setShowYearModal] = useState(false)
 
   useEffect(() => {
     loadDashboardData()
@@ -22,19 +25,34 @@ export default function Dashboard() {
 
   const loadDashboardData = async () => {
     try {
-      if (isGestao) {
-        // Carrega estatísticas - cada uma individualmente para não falhar tudo
-        try {
-          const [tarefasRes, estudantesRes, turmasRes] = await Promise.all([
-            managementAPI.tarefas.relatorio(),
-            academicAPI.estudantes.list({ page_size: 1 }),
-            coreAPI.turmas.list({ page_size: 1 }),
-          ])
+      // Carrega ano letivo selecionado
+      try {
+        const anoRes = await coreAPI.anoLetivoSelecionado.get()
+        setAnoSelecionado(anoRes.data.ano_letivo_details)
+      } catch (e) {
+        console.warn('Erro ao carregar ano letivo selecionado:', e)
+      }
 
+      // Carrega anos disponíveis (para o modal de troca)
+      try {
+        const anosRes = await coreAPI.anosLetivos.list()
+        const lista = Array.isArray(anosRes.data) ? anosRes.data : (anosRes.data.results || [])
+        setAnosDisponiveis(lista)
+      } catch (e) {
+        console.warn('Erro ao carregar anos disponíveis:', e)
+      }
+
+      if (isGestao) {
+        // Carrega estatísticas do Dashboard (já filtradas pelo ano selecionado)
+        try {
+          const estatisticasRes = await managementAPI.dashboard.estatisticas()
           setStats({
-            ...tarefasRes.data,
-            totalEstudantes: estudantesRes.data.count || 0,
-            totalTurmas: turmasRes.data.count || 0,
+            totalEstudantes: estatisticasRes.data.total_estudantes || 0,
+            totalTurmas: estatisticasRes.data.total_turmas || 0,
+            total: estatisticasRes.data.tarefas_total || 0,
+            pendentes: estatisticasRes.data.tarefas_pendentes || 0,
+            concluidas: estatisticasRes.data.tarefas_concluidas || 0,
+            atrasadas: estatisticasRes.data.tarefas_atrasadas || 0,
           })
         } catch (e) {
           console.warn('Erro ao carregar estatísticas:', e)
@@ -65,6 +83,18 @@ export default function Dashboard() {
     setLoading(false)
   }
 
+  const handleChangeYear = async (anoLetivoId) => {
+    try {
+      const res = await coreAPI.anoLetivoSelecionado.update(anoLetivoId)
+      setAnoSelecionado(res.data.ano_letivo_details)
+      setShowYearModal(false)
+      // Recarrega os dados do dashboard com o novo ano
+      window.location.reload()
+    } catch (e) {
+      console.error('Erro ao alterar ano letivo:', e)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -76,14 +106,62 @@ export default function Dashboard() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
-          Olá, {user?.first_name || user?.username}! 👋
-        </h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">
-          Bem-vindo ao {SYSTEM_NAME}
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
+            Olá, {user?.first_name || user?.username}! 👋
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            Bem-vindo ao {SYSTEM_NAME}
+          </p>
+        </div>
+
+        {/* Ano Letivo Selecionado */}
+        {anoSelecionado && (
+          <button
+            onClick={() => setShowYearModal(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-medium shadow-lg hover:shadow-xl transition-all"
+          >
+            <HiCalendar className="h-5 w-5" />
+            <span>Ano Letivo: {anoSelecionado.ano}</span>
+            <HiSwitchHorizontal className="h-4 w-4" />
+          </button>
+        )}
       </div>
+
+      {/* Modal de Troca de Ano */}
+      {showYearModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="glass rounded-2xl p-6 max-w-md w-full animate-fade-in">
+            <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4">
+              Selecionar Ano Letivo
+            </h2>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {anosDisponiveis.map((ano) => (
+                <button
+                  key={ano.id}
+                  onClick={() => handleChangeYear(ano.id)}
+                  className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors ${anoSelecionado?.id === ano.id
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-white'
+                    }`}
+                >
+                  <span className="font-medium">{ano.ano}</span>
+                  {ano.is_active && (
+                    <Badge variant="success" className="text-xs">Ativo</Badge>
+                  )}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowYearModal(false)}
+              className="mt-4 w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Stats Cards - Apenas Gestão */}
       {isGestao && (
@@ -204,7 +282,7 @@ export default function Dashboard() {
               <>
                 <QuickAccessButton to="/estudantes" icon={HiAcademicCap} label="Estudantes" color="primary" />
                 <QuickAccessButton to="/turmas" icon={HiUserGroup} label="Turmas" color="accent" />
-                <QuickAccessButton to="/calendario" icon={HiCalendar} label="Calendário" color="warning" />
+                <QuickAccessButton to="/configuracoes" icon={HiCalendar} label="Configurações" color="warning" />
                 <QuickAccessButton to="/tarefas" icon={HiClipboardList} label="Tarefas" color="success" />
               </>
             )}
@@ -262,4 +340,3 @@ function QuickAccessButton({ to, icon: Icon, label, color }) {
     </a>
   )
 }
-
