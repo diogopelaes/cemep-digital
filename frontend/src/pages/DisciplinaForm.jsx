@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Input, Select, Loading, Badge } from '../components/ui'
+import { Card, Button, Input, Select, Loading, Badge, PopConfirm } from '../components/ui'
 import { ToggleSwitch } from '../components/common'
 import { HiArrowLeft, HiSave, HiPlus, HiTrash, HiAcademicCap } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
@@ -267,13 +267,16 @@ export default function DisciplinaForm() {
                       {hab.descricao}
                     </p>
                   </div>
-                  <button
-                    onClick={() => handleDeleteHabilidade(hab.id)}
-                    className="p-2 rounded-lg hover:bg-danger-500/10 text-danger-600 transition-colors"
-                    title="Remover habilidade"
+                  <PopConfirm
+                    onConfirm={() => handleDeleteHabilidade(hab.id)}
                   >
-                    <HiTrash className="h-4 w-4" />
-                  </button>
+                    <button
+                      className="p-2 rounded-lg hover:bg-danger-500/10 text-danger-600 transition-colors"
+                      title="Remover habilidade"
+                    >
+                      <HiTrash className="h-4 w-4" />
+                    </button>
+                  </PopConfirm>
                 </div>
               ))}
             </div>

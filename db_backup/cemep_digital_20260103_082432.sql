@@ -1,0 +1,6511 @@
+--
+-- PostgreSQL database dump
+--
+
+\restrict LYSf8RWmBBFcHofu4wWUWb4DCMOXKriOkVjZh5C7vpOTA4uIlaEZ7Kmd2eXR1mu
+
+-- Dumped from database version 18.1
+-- Dumped by pg_dump version 18.1
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+DROP DATABASE IF EXISTS cemep_digital;
+--
+-- Name: cemep_digital; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE cemep_digital WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'Portuguese_Brazil.1252';
+
+
+ALTER DATABASE cemep_digital OWNER TO postgres;
+
+\unrestrict LYSf8RWmBBFcHofu4wWUWb4DCMOXKriOkVjZh5C7vpOTA4uIlaEZ7Kmd2eXR1mu
+\connect cemep_digital
+\restrict LYSf8RWmBBFcHofu4wWUWb4DCMOXKriOkVjZh5C7vpOTA4uIlaEZ7Kmd2eXR1mu
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: academic_atestado; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.academic_atestado (
+    id uuid NOT NULL,
+    data_inicio timestamp with time zone NOT NULL,
+    data_fim timestamp with time zone NOT NULL,
+    protocolo_prefeitura character varying(50) NOT NULL,
+    arquivo character varying(100) NOT NULL,
+    criado_em timestamp with time zone NOT NULL,
+    criado_por_id uuid,
+    usuario_alvo_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.academic_atestado OWNER TO postgres;
+
+--
+-- Name: academic_estudante; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.academic_estudante (
+    id uuid NOT NULL,
+    cpf character varying(14),
+    cin character varying(20) NOT NULL,
+    nome_social character varying(255) NOT NULL,
+    data_nascimento date NOT NULL,
+    bolsa_familia boolean NOT NULL,
+    pe_de_meia boolean NOT NULL,
+    usa_onibus boolean NOT NULL,
+    linha_onibus character varying(100) NOT NULL,
+    permissao_sair_sozinho boolean NOT NULL,
+    logradouro character varying(255) NOT NULL,
+    numero character varying(10) NOT NULL,
+    bairro character varying(100) NOT NULL,
+    cidade character varying(100) NOT NULL,
+    estado character varying(2) NOT NULL,
+    cep character varying(8) NOT NULL,
+    complemento character varying(100) NOT NULL,
+    telefone character varying(15) NOT NULL,
+    usuario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.academic_estudante OWNER TO postgres;
+
+--
+-- Name: academic_matriculacemep; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.academic_matriculacemep (
+    id uuid NOT NULL,
+    numero_matricula character varying(20) NOT NULL,
+    data_entrada date NOT NULL,
+    data_saida date,
+    status character varying(20) NOT NULL,
+    curso_id uuid NOT NULL,
+    estudante_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.academic_matriculacemep OWNER TO postgres;
+
+--
+-- Name: academic_matriculaturma; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.academic_matriculaturma (
+    id uuid NOT NULL,
+    data_entrada date NOT NULL,
+    data_saida date,
+    status character varying(20) NOT NULL,
+    matricula_cemep_id uuid NOT NULL,
+    turma_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.academic_matriculaturma OWNER TO postgres;
+
+--
+-- Name: academic_responsavel; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.academic_responsavel (
+    id uuid NOT NULL,
+    cpf character varying(14) NOT NULL,
+    telefone character varying(15) NOT NULL,
+    usuario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.academic_responsavel OWNER TO postgres;
+
+--
+-- Name: academic_responsavelestudante; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.academic_responsavelestudante (
+    id uuid NOT NULL,
+    parentesco character varying(20) NOT NULL,
+    telefone character varying(15) NOT NULL,
+    estudante_id uuid NOT NULL,
+    responsavel_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.academic_responsavelestudante OWNER TO postgres;
+
+--
+-- Name: auth_group; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auth_group (
+    id integer NOT NULL,
+    name character varying(150) NOT NULL
+);
+
+
+ALTER TABLE public.auth_group OWNER TO postgres;
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.auth_group ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.auth_group_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: auth_group_permissions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auth_group_permissions (
+    id bigint NOT NULL,
+    group_id integer NOT NULL,
+    permission_id integer NOT NULL
+);
+
+
+ALTER TABLE public.auth_group_permissions OWNER TO postgres;
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.auth_group_permissions ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.auth_group_permissions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: auth_permission; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auth_permission (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    content_type_id integer NOT NULL,
+    codename character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.auth_permission OWNER TO postgres;
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.auth_permission ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.auth_permission_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: core_anoletivo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_anoletivo (
+    id uuid NOT NULL,
+    ano smallint NOT NULL,
+    is_active boolean NOT NULL,
+    data_inicio_1bim date,
+    data_fim_1bim date,
+    data_inicio_2bim date,
+    data_fim_2bim date,
+    data_inicio_3bim date,
+    data_fim_3bim date,
+    data_inicio_4bim date,
+    data_fim_4bim date,
+    CONSTRAINT core_anoletivo_ano_check CHECK ((ano >= 0))
+);
+
+
+ALTER TABLE public.core_anoletivo OWNER TO postgres;
+
+--
+-- Name: core_anoletivo_dias_letivos_extras; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_anoletivo_dias_letivos_extras (
+    id bigint NOT NULL,
+    anoletivo_id uuid NOT NULL,
+    dialetivoextra_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_anoletivo_dias_letivos_extras OWNER TO postgres;
+
+--
+-- Name: core_anoletivo_dias_letivos_extras_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.core_anoletivo_dias_letivos_extras ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.core_anoletivo_dias_letivos_extras_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_anoletivo_dias_nao_letivos (
+    id bigint NOT NULL,
+    anoletivo_id uuid NOT NULL,
+    dianaoletivo_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_anoletivo_dias_nao_letivos OWNER TO postgres;
+
+--
+-- Name: core_anoletivo_dias_nao_letivos_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.core_anoletivo_dias_nao_letivos ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.core_anoletivo_dias_nao_letivos_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: core_anoletivoselecionado; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_anoletivoselecionado (
+    id uuid NOT NULL,
+    ano_letivo_id uuid NOT NULL,
+    usuario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_anoletivoselecionado OWNER TO postgres;
+
+--
+-- Name: core_curso; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_curso (
+    id uuid NOT NULL,
+    nome character varying(100) NOT NULL,
+    sigla character varying(10) NOT NULL,
+    is_active boolean NOT NULL
+);
+
+
+ALTER TABLE public.core_curso OWNER TO postgres;
+
+--
+-- Name: core_dialetivoextra; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_dialetivoextra (
+    id uuid NOT NULL,
+    data date NOT NULL,
+    descricao character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.core_dialetivoextra OWNER TO postgres;
+
+--
+-- Name: core_dianaoletivo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_dianaoletivo (
+    id uuid NOT NULL,
+    data date NOT NULL,
+    tipo character varying(30) NOT NULL,
+    descricao character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.core_dianaoletivo OWNER TO postgres;
+
+--
+-- Name: core_disciplina; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_disciplina (
+    id uuid NOT NULL,
+    nome character varying(100) NOT NULL,
+    sigla character varying(10) NOT NULL,
+    area_conhecimento character varying(20),
+    is_active boolean NOT NULL
+);
+
+
+ALTER TABLE public.core_disciplina OWNER TO postgres;
+
+--
+-- Name: core_disciplinaturma; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_disciplinaturma (
+    id uuid NOT NULL,
+    aulas_semanais smallint NOT NULL,
+    disciplina_id uuid NOT NULL,
+    turma_id uuid NOT NULL,
+    CONSTRAINT core_disciplinaturma_aulas_semanais_check CHECK ((aulas_semanais >= 0))
+);
+
+
+ALTER TABLE public.core_disciplinaturma OWNER TO postgres;
+
+--
+-- Name: core_funcionario; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_funcionario (
+    id uuid NOT NULL,
+    matricula integer NOT NULL,
+    area_atuacao character varying(100),
+    apelido character varying(50),
+    cpf character varying(14),
+    cin character varying(20) NOT NULL,
+    nome_social character varying(255) NOT NULL,
+    data_nascimento date,
+    logradouro character varying(255) NOT NULL,
+    numero character varying(10) NOT NULL,
+    bairro character varying(100) NOT NULL,
+    cidade character varying(100) NOT NULL,
+    estado character varying(2) NOT NULL,
+    cep character varying(8) NOT NULL,
+    complemento character varying(100) NOT NULL,
+    telefone character varying(15) NOT NULL,
+    data_admissao date,
+    usuario_id uuid NOT NULL,
+    CONSTRAINT core_funcionario_matricula_check CHECK ((matricula >= 0))
+);
+
+
+ALTER TABLE public.core_funcionario OWNER TO postgres;
+
+--
+-- Name: core_gradehoraria; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_gradehoraria (
+    id uuid NOT NULL,
+    disciplina_id uuid NOT NULL,
+    horario_aula_id uuid NOT NULL,
+    validade_id uuid
+);
+
+
+ALTER TABLE public.core_gradehoraria OWNER TO postgres;
+
+--
+-- Name: core_gradehorariavalidade; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_gradehorariavalidade (
+    id uuid NOT NULL,
+    data_inicio date NOT NULL,
+    data_fim date NOT NULL,
+    turma_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_gradehorariavalidade OWNER TO postgres;
+
+--
+-- Name: core_habilidade; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_habilidade (
+    id uuid NOT NULL,
+    codigo character varying(20) NOT NULL,
+    descricao text NOT NULL,
+    is_active boolean NOT NULL,
+    disciplina_id uuid
+);
+
+
+ALTER TABLE public.core_habilidade OWNER TO postgres;
+
+--
+-- Name: core_horarioaula; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_horarioaula (
+    id uuid NOT NULL,
+    numero smallint NOT NULL,
+    dia_semana smallint NOT NULL,
+    hora_inicio time without time zone NOT NULL,
+    hora_fim time without time zone NOT NULL,
+    ano_letivo_id uuid NOT NULL,
+    CONSTRAINT core_horarioaula_dia_semana_check CHECK ((dia_semana >= 0)),
+    CONSTRAINT core_horarioaula_numero_check CHECK ((numero >= 0))
+);
+
+
+ALTER TABLE public.core_horarioaula OWNER TO postgres;
+
+--
+-- Name: core_periodotrabalho; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_periodotrabalho (
+    id uuid NOT NULL,
+    data_entrada date NOT NULL,
+    data_saida date,
+    funcionario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_periodotrabalho OWNER TO postgres;
+
+--
+-- Name: core_professordisciplinaturma; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_professordisciplinaturma (
+    id uuid NOT NULL,
+    tipo character varying(15) NOT NULL,
+    data_inicio date,
+    data_fim date,
+    disciplina_turma_id uuid NOT NULL,
+    professor_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_professordisciplinaturma OWNER TO postgres;
+
+--
+-- Name: core_turma; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_turma (
+    id uuid NOT NULL,
+    numero smallint NOT NULL,
+    letra character varying(1) NOT NULL,
+    ano_letivo smallint NOT NULL,
+    nomenclatura character varying(10) NOT NULL,
+    is_active boolean NOT NULL,
+    curso_id uuid NOT NULL,
+    CONSTRAINT core_turma_ano_letivo_check CHECK ((ano_letivo >= 0)),
+    CONSTRAINT core_turma_numero_check CHECK ((numero >= 0))
+);
+
+
+ALTER TABLE public.core_turma OWNER TO postgres;
+
+--
+-- Name: core_turma_professores_representantes; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.core_turma_professores_representantes (
+    id bigint NOT NULL,
+    turma_id uuid NOT NULL,
+    funcionario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.core_turma_professores_representantes OWNER TO postgres;
+
+--
+-- Name: core_turma_professores_representantes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.core_turma_professores_representantes ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.core_turma_professores_representantes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_admin_log; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_admin_log (
+    id integer NOT NULL,
+    action_time timestamp with time zone NOT NULL,
+    object_id text,
+    object_repr character varying(200) NOT NULL,
+    action_flag smallint NOT NULL,
+    change_message text NOT NULL,
+    content_type_id integer,
+    user_id uuid NOT NULL,
+    CONSTRAINT django_admin_log_action_flag_check CHECK ((action_flag >= 0))
+);
+
+
+ALTER TABLE public.django_admin_log OWNER TO postgres;
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.django_admin_log ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.django_admin_log_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_content_type; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_content_type (
+    id integer NOT NULL,
+    app_label character varying(100) NOT NULL,
+    model character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.django_content_type OWNER TO postgres;
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.django_content_type ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.django_content_type_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_migrations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_migrations (
+    id bigint NOT NULL,
+    app character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    applied timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.django_migrations OWNER TO postgres;
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.django_migrations ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.django_migrations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_session; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_session (
+    session_key character varying(40) NOT NULL,
+    session_data text NOT NULL,
+    expire_date timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.django_session OWNER TO postgres;
+
+--
+-- Name: management_aviso; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_aviso (
+    id uuid NOT NULL,
+    titulo character varying(200) NOT NULL,
+    texto text NOT NULL,
+    data_aviso timestamp with time zone NOT NULL,
+    criador_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_aviso OWNER TO postgres;
+
+--
+-- Name: management_aviso_destinatarios; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_aviso_destinatarios (
+    id bigint NOT NULL,
+    aviso_id uuid NOT NULL,
+    user_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_aviso_destinatarios OWNER TO postgres;
+
+--
+-- Name: management_aviso_destinatarios_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.management_aviso_destinatarios ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.management_aviso_destinatarios_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: management_avisoanexo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_avisoanexo (
+    id uuid NOT NULL,
+    arquivo character varying(100) NOT NULL,
+    descricao character varying(100) NOT NULL,
+    aviso_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_avisoanexo OWNER TO postgres;
+
+--
+-- Name: management_avisovisualizacao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_avisovisualizacao (
+    id uuid NOT NULL,
+    visualizado boolean NOT NULL,
+    data_visualizacao timestamp with time zone,
+    aviso_id uuid NOT NULL,
+    usuario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_avisovisualizacao OWNER TO postgres;
+
+--
+-- Name: management_notificacaohtpc; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_notificacaohtpc (
+    id uuid NOT NULL,
+    visualizado boolean NOT NULL,
+    data_visualizacao timestamp with time zone,
+    funcionario_id uuid NOT NULL,
+    reuniao_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_notificacaohtpc OWNER TO postgres;
+
+--
+-- Name: management_notificacaotarefa; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_notificacaotarefa (
+    id uuid NOT NULL,
+    visualizado boolean NOT NULL,
+    data_visualizacao timestamp with time zone,
+    funcionario_id uuid NOT NULL,
+    tarefa_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_notificacaotarefa OWNER TO postgres;
+
+--
+-- Name: management_reuniaohtpc; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_reuniaohtpc (
+    id uuid NOT NULL,
+    data_reuniao timestamp with time zone NOT NULL,
+    pauta text NOT NULL,
+    ata text NOT NULL,
+    data_registro timestamp with time zone NOT NULL,
+    quem_registrou_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_reuniaohtpc OWNER TO postgres;
+
+--
+-- Name: management_reuniaohtpc_presentes; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_reuniaohtpc_presentes (
+    id bigint NOT NULL,
+    reuniaohtpc_id uuid NOT NULL,
+    funcionario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_reuniaohtpc_presentes OWNER TO postgres;
+
+--
+-- Name: management_reuniaohtpc_presentes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.management_reuniaohtpc_presentes ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.management_reuniaohtpc_presentes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: management_reuniaohtpcanexo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_reuniaohtpcanexo (
+    id uuid NOT NULL,
+    arquivo character varying(100) NOT NULL,
+    descricao character varying(100) NOT NULL,
+    reuniao_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_reuniaohtpcanexo OWNER TO postgres;
+
+--
+-- Name: management_tarefa; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_tarefa (
+    id uuid NOT NULL,
+    titulo character varying(200) NOT NULL,
+    descricao text NOT NULL,
+    prazo timestamp with time zone NOT NULL,
+    concluido boolean NOT NULL,
+    data_conclusao timestamp with time zone,
+    data_cadastro timestamp with time zone NOT NULL,
+    criador_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_tarefa OWNER TO postgres;
+
+--
+-- Name: management_tarefa_funcionarios; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_tarefa_funcionarios (
+    id bigint NOT NULL,
+    tarefa_id uuid NOT NULL,
+    funcionario_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_tarefa_funcionarios OWNER TO postgres;
+
+--
+-- Name: management_tarefa_funcionarios_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.management_tarefa_funcionarios ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.management_tarefa_funcionarios_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: management_tarefaanexo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_tarefaanexo (
+    id uuid NOT NULL,
+    arquivo character varying(100) NOT NULL,
+    descricao character varying(100) NOT NULL,
+    tarefa_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_tarefaanexo OWNER TO postgres;
+
+--
+-- Name: management_tarefaresposta; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_tarefaresposta (
+    id uuid NOT NULL,
+    texto text NOT NULL,
+    data_envio timestamp with time zone NOT NULL,
+    funcionario_id uuid NOT NULL,
+    tarefa_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_tarefaresposta OWNER TO postgres;
+
+--
+-- Name: management_tarefarespostaanexo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.management_tarefarespostaanexo (
+    id uuid NOT NULL,
+    arquivo character varying(100) NOT NULL,
+    descricao character varying(100) NOT NULL,
+    resposta_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.management_tarefarespostaanexo OWNER TO postgres;
+
+--
+-- Name: pedagogical_aula; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_aula (
+    id uuid NOT NULL,
+    data date NOT NULL,
+    conteudo text NOT NULL,
+    numero_aulas smallint NOT NULL,
+    criado_em timestamp with time zone NOT NULL,
+    professor_disciplina_turma_id uuid NOT NULL,
+    CONSTRAINT pedagogical_aula_numero_aulas_check CHECK ((numero_aulas >= 0))
+);
+
+
+ALTER TABLE public.pedagogical_aula OWNER TO postgres;
+
+--
+-- Name: pedagogical_avaliacao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_avaliacao (
+    id uuid NOT NULL,
+    valor numeric(4,2) NOT NULL,
+    tipo character varying(30) NOT NULL,
+    tipo_calculo_instrumentos character varying(20) NOT NULL,
+    professor_disciplina_turma_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_avaliacao OWNER TO postgres;
+
+--
+-- Name: pedagogical_controlevisto; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_controlevisto (
+    id uuid NOT NULL,
+    titulo character varying(100) NOT NULL,
+    data_visto timestamp with time zone NOT NULL,
+    visto boolean,
+    matricula_turma_id uuid NOT NULL,
+    professor_disciplina_turma_id uuid CONSTRAINT pedagogical_controlevisto_professor_disciplina_turma_i_not_null NOT NULL,
+    instrumento_avaliativo_id uuid
+);
+
+
+ALTER TABLE public.pedagogical_controlevisto OWNER TO postgres;
+
+--
+-- Name: pedagogical_descritorocorrenciapedagogica; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_descritorocorrenciapedagogica (
+    id uuid NOT NULL,
+    texto character varying(100) NOT NULL,
+    ativo boolean NOT NULL,
+    gestor_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_descritorocorrenciapedagogica OWNER TO postgres;
+
+--
+-- Name: pedagogical_faltas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_faltas (
+    id uuid NOT NULL,
+    aula_numero smallint NOT NULL,
+    aula_id uuid NOT NULL,
+    estudante_id uuid NOT NULL,
+    CONSTRAINT pedagogical_faltas_aula_numero_check CHECK ((aula_numero >= 0))
+);
+
+
+ALTER TABLE public.pedagogical_faltas OWNER TO postgres;
+
+--
+-- Name: pedagogical_instrumentoavaliativo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_instrumentoavaliativo (
+    id uuid NOT NULL,
+    titulo character varying(100) NOT NULL,
+    data_inicio date NOT NULL,
+    data_fim date NOT NULL,
+    usa_vistos boolean NOT NULL,
+    peso numeric(4,2) NOT NULL,
+    valor numeric(4,2) NOT NULL,
+    avaliacao_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_instrumentoavaliativo OWNER TO postgres;
+
+--
+-- Name: pedagogical_notaavaliacao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_notaavaliacao (
+    id uuid NOT NULL,
+    valor numeric(4,2),
+    avaliacao_id uuid NOT NULL,
+    matricula_turma_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_notaavaliacao OWNER TO postgres;
+
+--
+-- Name: pedagogical_notabimestral; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_notabimestral (
+    id uuid NOT NULL,
+    nota numeric(4,2) NOT NULL,
+    matricula_turma_id uuid NOT NULL,
+    professor_disciplina_turma_id uuid CONSTRAINT pedagogical_notabimestral_professor_disciplina_turma_i_not_null NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_notabimestral OWNER TO postgres;
+
+--
+-- Name: pedagogical_notainstrumentoavaliativo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_notainstrumentoavaliativo (
+    id uuid NOT NULL,
+    valor numeric(4,2),
+    instrumento_avaliativo_id uuid CONSTRAINT pedagogical_notainstrumentoa_instrumento_avaliativo_id_not_null NOT NULL,
+    matricula_turma_id uuid CONSTRAINT pedagogical_notainstrumentoavaliati_matricula_turma_id_not_null NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_notainstrumentoavaliativo OWNER TO postgres;
+
+--
+-- Name: pedagogical_notificacaorecuperacao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_notificacaorecuperacao (
+    id uuid NOT NULL,
+    visualizado boolean NOT NULL,
+    data_visualizacao timestamp with time zone,
+    estudante_id uuid NOT NULL,
+    professor_disciplina_turma_id uuid CONSTRAINT pedagogical_notificacaorecu_professor_disciplina_turma_not_null NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_notificacaorecuperacao OWNER TO postgres;
+
+--
+-- Name: pedagogical_ocorrenciapedagogica; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_ocorrenciapedagogica (
+    id uuid NOT NULL,
+    data timestamp with time zone NOT NULL,
+    autor_id uuid NOT NULL,
+    estudante_id uuid NOT NULL,
+    tipo_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_ocorrenciapedagogica OWNER TO postgres;
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_ocorrenciaresponsavelciente (
+    id uuid NOT NULL,
+    ciente boolean NOT NULL,
+    data_ciencia timestamp with time zone,
+    ocorrencia_id uuid NOT NULL,
+    responsavel_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_ocorrenciaresponsavelciente OWNER TO postgres;
+
+--
+-- Name: pedagogical_planoaula; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_planoaula (
+    id uuid NOT NULL,
+    data_inicio date NOT NULL,
+    data_fim date NOT NULL,
+    conteudo text NOT NULL,
+    criado_em timestamp with time zone NOT NULL,
+    atualizado_em timestamp with time zone NOT NULL,
+    disciplina_id uuid NOT NULL,
+    professor_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_planoaula OWNER TO postgres;
+
+--
+-- Name: pedagogical_planoaula_habilidades; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_planoaula_habilidades (
+    id bigint NOT NULL,
+    planoaula_id uuid NOT NULL,
+    habilidade_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_planoaula_habilidades OWNER TO postgres;
+
+--
+-- Name: pedagogical_planoaula_habilidades_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.pedagogical_planoaula_habilidades ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.pedagogical_planoaula_habilidades_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: pedagogical_planoaula_turmas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pedagogical_planoaula_turmas (
+    id bigint NOT NULL,
+    planoaula_id uuid NOT NULL,
+    turma_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.pedagogical_planoaula_turmas OWNER TO postgres;
+
+--
+-- Name: pedagogical_planoaula_turmas_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.pedagogical_planoaula_turmas ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.pedagogical_planoaula_turmas_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: permanent_dadospermanenteestudante; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_dadospermanenteestudante (
+    id uuid NOT NULL,
+    cpf character varying(14) NOT NULL,
+    nome character varying(255) NOT NULL,
+    data_nascimento date,
+    telefone character varying(15) NOT NULL,
+    email character varying(254) NOT NULL,
+    endereco_completo text NOT NULL,
+    criado_em timestamp with time zone NOT NULL,
+    atualizado_em timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.permanent_dadospermanenteestudante OWNER TO postgres;
+
+--
+-- Name: permanent_dadospermanenteresponsavel; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_dadospermanenteresponsavel (
+    id uuid NOT NULL,
+    cpf character varying(14) NOT NULL,
+    nome character varying(255) NOT NULL,
+    telefone character varying(15) NOT NULL,
+    email character varying(254) NOT NULL,
+    parentesco character varying(20) NOT NULL,
+    estudante_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.permanent_dadospermanenteresponsavel OWNER TO postgres;
+
+--
+-- Name: permanent_historicoescolar; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_historicoescolar (
+    id uuid NOT NULL,
+    numero_matricula character varying(20) NOT NULL,
+    nome_curso character varying(100) NOT NULL,
+    data_entrada_cemep date NOT NULL,
+    data_saida_cemep date,
+    concluido boolean NOT NULL,
+    observacoes_gerais text NOT NULL,
+    estudante_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.permanent_historicoescolar OWNER TO postgres;
+
+--
+-- Name: permanent_historicoescolaranoletivo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_historicoescolaranoletivo (
+    id uuid NOT NULL,
+    ano_letivo smallint NOT NULL,
+    nomenclatura_turma character varying(50) NOT NULL,
+    numero_turma smallint NOT NULL,
+    letra_turma character varying(1) NOT NULL,
+    status_final character varying(20) NOT NULL,
+    descricao_status character varying(100) NOT NULL,
+    observacoes text NOT NULL,
+    historico_id uuid NOT NULL,
+    CONSTRAINT permanent_historicoescolaranoletivo_ano_letivo_check CHECK ((ano_letivo >= 0)),
+    CONSTRAINT permanent_historicoescolaranoletivo_numero_turma_check CHECK ((numero_turma >= 0))
+);
+
+
+ALTER TABLE public.permanent_historicoescolaranoletivo OWNER TO postgres;
+
+--
+-- Name: permanent_historicoescolarnotas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_historicoescolarnotas (
+    id uuid NOT NULL,
+    nome_disciplina character varying(100) NOT NULL,
+    aulas_semanais smallint NOT NULL,
+    nota_final numeric(4,2) NOT NULL,
+    frequencia_total smallint NOT NULL,
+    ano_letivo_ref_id uuid NOT NULL,
+    CONSTRAINT permanent_historicoescolarnotas_aulas_semanais_check CHECK ((aulas_semanais >= 0)),
+    CONSTRAINT permanent_historicoescolarnotas_frequencia_total_check CHECK ((frequencia_total >= 0))
+);
+
+
+ALTER TABLE public.permanent_historicoescolarnotas OWNER TO postgres;
+
+--
+-- Name: permanent_registroprontuario; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_registroprontuario (
+    id uuid NOT NULL,
+    ocorrencia_disciplinar boolean NOT NULL,
+    cpf character varying(14) NOT NULL,
+    nome_estudante character varying(255) NOT NULL,
+    autor_nome character varying(255) NOT NULL,
+    data_ocorrido timestamp with time zone NOT NULL,
+    data_registro timestamp with time zone NOT NULL,
+    descricao text NOT NULL,
+    ano_letivo smallint,
+    bimestre smallint,
+    pai_ocorrencia_id uuid,
+    CONSTRAINT permanent_registroprontuario_ano_letivo_check CHECK ((ano_letivo >= 0)),
+    CONSTRAINT permanent_registroprontuario_bimestre_check CHECK ((bimestre >= 0))
+);
+
+
+ALTER TABLE public.permanent_registroprontuario OWNER TO postgres;
+
+--
+-- Name: permanent_registroprontuarioanexo; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.permanent_registroprontuarioanexo (
+    id bigint NOT NULL,
+    arquivo character varying(100) NOT NULL,
+    descricao character varying(255) NOT NULL,
+    criado_em timestamp with time zone NOT NULL,
+    registro_prontuario_id uuid CONSTRAINT permanent_registroprontuarioane_registro_prontuario_id_not_null NOT NULL
+);
+
+
+ALTER TABLE public.permanent_registroprontuarioanexo OWNER TO postgres;
+
+--
+-- Name: permanent_registroprontuarioanexo_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.permanent_registroprontuarioanexo ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.permanent_registroprontuarioanexo_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: users_user; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users_user (
+    password character varying(128) NOT NULL,
+    last_login timestamp with time zone,
+    is_superuser boolean NOT NULL,
+    username character varying(150) NOT NULL,
+    first_name character varying(150) NOT NULL,
+    last_name character varying(150) NOT NULL,
+    email character varying(254) NOT NULL,
+    is_staff boolean NOT NULL,
+    is_active boolean NOT NULL,
+    date_joined timestamp with time zone NOT NULL,
+    id uuid NOT NULL,
+    tipo_usuario character varying(20) NOT NULL,
+    foto character varying(100),
+    dark_mode boolean NOT NULL
+);
+
+
+ALTER TABLE public.users_user OWNER TO postgres;
+
+--
+-- Name: users_user_groups; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users_user_groups (
+    id bigint NOT NULL,
+    user_id uuid NOT NULL,
+    group_id integer NOT NULL
+);
+
+
+ALTER TABLE public.users_user_groups OWNER TO postgres;
+
+--
+-- Name: users_user_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.users_user_groups ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.users_user_groups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: users_user_user_permissions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users_user_user_permissions (
+    id bigint NOT NULL,
+    user_id uuid NOT NULL,
+    permission_id integer NOT NULL
+);
+
+
+ALTER TABLE public.users_user_user_permissions OWNER TO postgres;
+
+--
+-- Name: users_user_user_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.users_user_user_permissions ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.users_user_user_permissions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Data for Name: academic_atestado; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.academic_atestado (id, data_inicio, data_fim, protocolo_prefeitura, arquivo, criado_em, criado_por_id, usuario_alvo_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: academic_estudante; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.academic_estudante (id, cpf, cin, nome_social, data_nascimento, bolsa_familia, pe_de_meia, usa_onibus, linha_onibus, permissao_sair_sozinho, logradouro, numero, bairro, cidade, estado, cep, complemento, telefone, usuario_id) FROM stdin;
+6cc39486-d11b-4210-bbf1-3a5128e6ab8c	30546244807			2010-05-05	f	t	t		t	Rua Dom Bosco	135	Taquaral	Campinas	SP	13076060			8078bdd3-ba6a-44fa-b66c-cb3e50f4941e
+60734a7e-3511-47c0-bc1a-028e910ac972	51896964800	62.761.619-7		2009-01-26	f	t	f		f	Rua José Seixas De Queiroz	106	Jardim Calegaris	Paulinia	SP	13140107	Casa	19981578034	b9090881-9239-449e-9036-9f1f426b9921
+34c177d2-1717-4c94-9211-9be439317171	\N			2009-06-20	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			1f9dbfc5-0f9d-4f75-87d6-d998291d6016
+c209332d-1005-4cf6-ada8-4f4adce9fb11	\N			2009-07-16	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			a2b00bea-f3df-4b44-8446-e7e3a7451939
+72457469-6917-4473-880f-e5810f822a9c	41148442871	59.397.373-2		2008-09-12	f	t	f		f	Rua Vecente Martins Campos	1087	Bom Retiro   Q	Paulínia	SP	13142124		19988712925	8c5e243b-9cf0-4fa1-9903-046e51180092
+fe504fe5-b69f-47b3-8893-6a24d59d41d6	\N			2009-12-22	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			a03cc6c8-0a9a-4b27-9f18-a7b580c241eb
+785f571e-de0d-45a3-888a-5ecef242ff15	47746658865	64.987.309-0		2009-06-18	f	t	f		f	Av, Nelson Rubini	410	Balneário Tropical	Paulínia	SP	13144725	Bl C Ap,2	19992739640	552d0adb-d2fc-40c1-9124-d5820dcd2d96
+531d8762-16d8-45a7-8f27-0b74ab1ea071	\N			2009-05-14	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			9e4a6c24-e5ca-49cc-9cde-b720ee48e371
+61787310-8e49-4e72-b887-0c0d84234218	\N			2010-02-25	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			2853b9d2-5b54-46f3-b632-b3eb28b8ad68
+8c736a74-39a9-44f6-810f-4bc804d1f325	48354202844	57.105.596-5		2008-07-11	f	t	f		f	Não Informado	197	Saltinho	Paulinia	SP	13145507		19996779724	dc486446-afb1-488b-8ba2-e242409257d5
+2378bd40-cf6a-4413-b7ff-95a49c9c3099	\N			2010-03-18	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			f55ce735-8cdd-4a39-966f-0910e8ae6f71
+fc4ab169-7cac-4452-94c5-dbba4c3efe26	\N			2009-05-04	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			2efe83ed-fcaa-4492-8b8e-1f9893eb9f4e
+dfedda48-1c40-4487-ab11-41b6da7a2f64	54276320852	56.639.015-2		2009-05-30	f	t	f		f	Rua Izaura Gonçalves	134	Betel	Paulínia	SP	13148204		19987252334	eda369a4-b16c-4d6d-81ca-672a737ae9c6
+aa2433d3-e220-453e-a613-58a5534f07fa	54714522833	65.965.102-6		2008-08-27	f	t	f		f	Rua Paulo Mazetto	77	Bom Retiro	Paulínia	SP	13142150	Casa	19996536427	dac0af51-1522-4291-a26b-902fe5e467ac
+c7b14bf0-bb43-42d2-b7a9-0adc09e17237	\N			2009-09-27	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			329c521b-b1e3-40f6-b5d5-34ae5d71d824
+3814bf3b-cd7d-44ab-963b-fb3364902fb8	40585192820	53.013.777-X		2008-04-08	f	t	f		f	Rua Pixinguinha, Residencial Cancioneiro	108	Brasil 500	Paulínia	SP	13141072		19996417941	b693d0ac-b56e-4abc-bd8e-c6c0d07c8f3a
+b82155af-5cdd-4bf3-965e-021dd8007a03	\N			2009-11-15	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			4dbc4910-b3b2-4002-b481-f4ec47c3de5f
+0014d023-2692-41c1-97d4-513519c84e91	\N			2008-12-28	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			d8d0fe87-29bb-490e-b0bb-e0691dee7287
+6980fa61-5e31-4083-aae6-cdf1d9ddae49	51708455884	54.260.467-X		2008-07-30	f	t	f		f	Rua Nara Leão	296	Jardim Ypê	Paulínia	SP	13141232	Casa	19981449977	4956cfcc-78e0-4bf3-8c98-a4b3b6ba7974
+6b52b3c2-4230-4da3-a5d3-55b9d8f849d9	\N			2009-05-06	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			cff27364-d301-4e76-8a42-557540139876
+f1aa28bc-33ec-4d8b-951b-a5b33cc927a0	\N			2009-05-19	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			27cf6939-a3d5-465c-a669-172d4565db03
+afa21de4-8e4f-4e34-b303-b4b445c66229	\N			2009-08-20	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			ed4835cb-15ee-4ccd-8658-d3e4d07730ed
+ac251fc7-14fe-4f66-8bd3-a59eafac61df	52342211805	63.937.934-5		2008-05-02	f	t	f		f	Rua Tiburcio Cecatti	310	Jardim Flamboyant	Paulínia	SP	13142314	Casa	19992427013	0003986b-9bdc-4830-b747-89891d06e1b4
+772c0dea-f6c5-43d8-85b7-0d3707c14b7c	\N			2009-09-18	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			80c41ede-a2c1-4e98-b2f2-92568a96ad3a
+2348d19d-f5ce-4a8e-9309-02d9bac1f2fc	51161147837	53.752.907-X		2008-05-08	f	t	f		f	Av, Maria Carlos Ferreira	2648	Marieta Dian	Paulínia	SP	13145735	Lt 17	19989470457	cea11fd3-eec2-4b9b-8b24-2351cdbbdce1
+8cb14d2c-a9bd-40c0-84c1-bd21546e77b8	40772072825	63.466.813-4		2008-04-27	f	t	f		f	Rua José Carlos Poggetti	275	Pq Da Represa	Paulínia	SP	13144711		19974119561	8739faf0-4b49-45f0-8dd3-24f06fa0e489
+c3b61c9d-d879-4903-aecf-aa59f3085996	\N			2009-07-20	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			a38d1fc7-aab0-4ca8-9808-02ac4fd516b3
+9c8ae84b-d2e5-4c96-89a1-54c2ed056715	45008588818	56.034.335-8		2008-04-05	f	t	f		f	Rua Francisca Angelica De Jesus	266	Bom Retiro	Paulínia	SP	13142178		19992094981	42080e3b-df15-424a-9c63-65d95dbabe52
+144afb23-25d2-4b59-ade9-5dd2bbc37858	\N			2009-07-01	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			e8f24408-adf3-4f7d-ae2f-48ff11945c98
+7e6438c8-65c2-4f0d-b41e-c752786bc664	54313174826	64.303.056-6		2008-05-23	f	t	f		f	Rua Gildo Quaiatti	99	Parque Da Represa	Paulínia	SP	13144560	Casa	19998187914	09577acf-c018-46ba-a83e-69e3574d13a8
+585d4157-6306-4a1b-81d4-4ecc096e0d2c	\N			2009-09-08	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			7dba1164-2f11-4bbc-bb14-7d1f936254c8
+c64cf01d-ea2a-48b7-801a-c24d3ffc8078	08540530180	3.943.358/DF		2008-10-12	f	t	f		f	Rua Almirante Tamandaré	831	Jd Calegaris	Paulinia	SP	13140113	Ap 66	19998105552	771f1e6a-5a26-46da-9113-eacfcd8e7adc
+926ecd5f-750d-4c55-9cef-c69f306b46e9	\N			2010-06-11	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			00e9f13f-421d-4131-901a-3ae951066977
+39d8c697-2339-42ff-bac6-8575457e2d5d	15635078702	64.253.740-9		2008-09-15	f	t	f		f	Rua João Jordão	146	Marieta Dian	Paulínia	SP	13145730	Casa	19997661821	12d24703-a561-4028-abd9-b51c0a348fdc
+54bfbca2-d986-4593-ad9b-370475b29410	\N			2010-01-21	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			7aca0526-e0b6-4bb2-b471-f91438dfa029
+a6b59590-cff0-4c6c-bfee-2f2d68b1c84e	\N			2010-02-10	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			5d44f199-8cf5-4382-a923-98dad416ea32
+c43e5cad-46e3-4138-ad45-4c38c44e8ff2	\N			2010-05-14	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			55653e8e-66c6-4342-9d9a-626a97acf10c
+8a286b38-db7b-4729-ac69-f4ac2498ac69	\N			2009-06-15	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			5719c423-1c88-426a-b892-098753f10f1c
+0c8d5253-b966-47d2-95ab-c070029a1287	05684079032	57.364.334-9		2009-01-05	f	t	f		f	Rua Ositha Sigrist Pongeluppi	111	Morumbi	Paulinia	SP	13140751	Apto 16	19999092814	f131077f-ba9b-4ebc-aee0-f682be59c70e
+c0781393-c50c-4c41-ab3f-a74119d9a15a	\N	56.508.210-3		2009-11-16	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			146ee1f1-4710-42f7-a312-d137de9cb0b2
+3fba6119-9c19-4eb9-81fd-47f2aa247c4d	\N			2010-01-10	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			8068732b-1241-455e-bef4-3e8006e47adf
+48145b1f-5891-4385-bbba-1696a5c0daf6	\N			2009-09-03	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			05501934-1d93-44ce-8a0e-13c0843ce89f
+d24b8669-6aa6-481c-8700-8f2ed24c09dc	46847544805			2009-07-10	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			b2359ff4-8cc5-4485-ae9e-391657a7d11c
+33133cd5-18d9-41a7-b071-854ac6ec0e08	\N			2009-10-02	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			4254a5f5-85f3-4439-b8a0-0bc2d48c1ea3
+f6c28693-74b0-427b-a688-d4265fbbd44b	41497296897	58.087.143-5		2008-07-02	f	t	f		f	Av. Imperatriz Leopoldina	95	Vila Nova	Campinas	SP	13073035		19993813455	6620e3bd-e662-469f-b982-37447c671fac
+07e9a28c-3222-4b45-9d70-f8140713efd0	46957269809	58.260.026-1		2009-02-24	f	t	f		f	Rua Mato Grosso	18	José Paulino Nogueira	Paulinia	SP	13140440		1998911539	1a5204e3-a469-4a54-aaa3-0b20200b7bd7
+74418c3c-7cf9-46db-94c1-c35de81e46f8	\N			2010-05-23	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			13e4b026-1bdc-449f-a9e4-f58415a1248a
+74e89af7-2e37-451f-bb40-af9f8ab4fb4d	\N			2010-06-25	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			e1a492b8-a9ab-40b9-8caa-b674bc68c262
+669cd575-7ef0-4bb5-9f3b-8408a372bcd0	54915117812	63.336.658-4		2009-06-17	f	t	f		f	Av. Alexandre Cazelatto	378	Betel	Paulinia	SP	13148218			fc46f783-8d0d-421c-8cfc-cbcf7893ecab
+2a5d25d8-8756-408b-a221-fe7a004f7eaa	51488614873	60.990.564-8		2008-07-25	f	t	f		f	Rua Alfredo Martin Filho	32	João Aranha	Paulínia	SP	13145875	Casa	19989183406	42b6624a-0701-4097-ae6f-8e21a45c3595
+cb77df2d-d6fe-40a6-a523-8226bde92ddc	\N			2009-09-06	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			6d7f4c92-e33c-4b5d-aa99-3f8a2439429e
+97fbfee3-eaa2-4e23-b995-708aca5279f4	\N			2009-05-01	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			c4e411c6-195c-4cc8-88c8-b060c162044a
+8e27867f-8aab-417b-b3c5-ac16416e9e1e	\N			2010-04-01	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			b3d8a629-387c-4323-81b8-aa9d630371f7
+ff3b8a8f-0cbb-48ee-819d-60789f899997	\N			2009-06-24	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			ff464b8a-22c0-466d-ab78-984f6f248dbe
+6ff9e59b-6be8-4810-b1c3-db75f65168e8	\N			2009-05-16	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			999333e1-df03-4be3-87f9-de31f64a419d
+e5e88c4b-ebd0-461c-92c9-c5e4a79c311d	56820327803	59.382.994-3		2008-09-10	f	t	f		f	Rua Telemaco Paioli	267	Jardim Atibaia	Campinas	SP	13106294		19996197935	eb5ff42d-704f-40be-969d-7fe8c98ccba6
+5cfe523c-f480-40da-9f2c-ed6cc9699bb2	43815518857	59.416.059-5		2008-11-12	f	t	f		f	Rua Dr Caludio Dias Da Silva	99	Cidade Universitária	Campinas	SP	13083460		19996012900	2883c433-19a8-41b9-a9da-55757a4ab217
+7e05d197-ff66-4c26-bfcd-33bd5a0310a4	\N	67.434.462-5		2008-09-05	f	t	f		f	Rua Romana Favero Pietrobom	120	Jd Primavera	Paulinia	SP	13142388		19996718663	b452ccd2-3726-4e01-a1b1-91a36e06432b
+5a0c7be4-4c42-456a-980c-96ac8bdcd40f	51707820805	62.684.529-4		2008-05-14	f	t	f		f	Rua Paulo Mazetto	37	Bom Retiro	Paulinia	SP	13142150		19991718570	97eadef1-f609-4d89-95ba-fcad51579852
+6899009e-808c-4467-b2d2-0833a4fe4268	54951527863	64.299.876-0		2008-10-25	f	t	f		f	Rua Sebastião Martins	252	Jd Olinda	Paulinia	SP	13145074		19992699708	ba7bf953-5fd5-4bbb-b06f-ad71564288a0
+bac60549-22fa-4b20-a13e-029f2336baf0	\N			2010-01-28	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			d82eb065-6155-4578-ace1-d9166ff9c19c
+4d2dc320-93e4-43ee-aa7a-0336699c25b4	50815528876	60.903.756-0		2008-09-09	f	t	f		f	Rua José Furlan	228	Monte Alegre Ii	Paulínia	SP	13142480	Casa	19995890735	9241e414-6130-4564-b373-cbefaeb55787
+848881e9-d507-4a28-9feb-085600d0e44b	\N	60.412.998-1		2008-12-12	f	t	f		f	Av. José Alvaro Delmonte	350	Parque Brasil	Paulinia	SP	13141010		19991330616	d577acaa-ebfb-4058-ac89-7d5a16e209a4
+c617a92a-e084-48ab-86bc-2afc4bda289b	\N			2010-05-12	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			683ecf1c-8866-4f82-b373-c8cf5c63891b
+1027b1ea-d4ac-43e7-a756-d1b07f9681e0	\N			2010-06-10	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			17547b0d-81c0-4e60-8123-014e4179361d
+eec08ba1-1abb-4ffb-9748-1d0dd1eb2b08	\N	64.012.898-8		2008-06-25	f	t	f		f	Rua Edith Gatti	509	São José	Paulinia	SP	13145820		19982707559	726e4c61-34a0-4e5a-bb1c-75aa0d9e1a66
+6c477e0a-dfb8-462a-9bbb-2cbeeb6a5393	57086066818	66.262.380-0		2009-02-10	f	t	f		f	Rua Dos Estados	162	Vila Presidente Médice	Paulínia	SP	13140406	Casa	19992827251	a0d76dcd-c932-47e6-a292-2b8d1d6c25c0
+a47ac682-4ac1-4eb4-9d36-cff69ce878bb	24028201870	66.284.031-8		2008-06-28	f	t	f		f	Av Alexandre Cazelatto	2689	Betel	Paulinia	SP	13148911	Casa 31	19991462894	96086df0-8051-4909-b5f3-69c7ab51fed7
+9cf2d0fe-24d2-4c89-9eb2-e3bc87dcb806	\N			2010-02-11	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			cb04fb0d-4a0b-4563-a925-47b27bf77407
+70395872-41b5-4168-a75f-f3b6f9b882b4	\N			2010-02-05	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			26e5d500-98ed-4c41-a455-ba45de89bc35
+a999f4c7-9ca9-4bf9-add4-de9139f71cff	\N	60.721.568-9		2008-11-11	f	t	f		f	Rua Edison Pedro Motta	34	Bom Retiro	Paulinia	SP	13142217		19998116520	cbbac458-c9a1-481a-ba01-aefd3d3c2688
+28a85a5f-a543-49c0-b490-28ddabd3f60a	52966471816	54.354.467-9		2009-01-25	f	t	f		f	Rua Francisco Da Silva Brito	174	São José	Paulinia	SP	13145790	Casa		e73b287f-236f-4c8e-be54-b6efaac3d876
+afad0051-b8f3-431a-8b6e-dae6582dd46a	\N	69.768.260-9		2008-11-20	f	t	f		f	Av. Brsilia	1760	Monte Alegre	Paulinia	SP	13140526	Ap101	19996300578	07447079-39f2-4398-9150-18718af0423e
+777d4d70-44a4-4001-83dd-eae1d32f8fd1	52954305886	64.862.156-X		2009-03-30	f	t	f		f	Rua Nossa Senhora Auxiliadora	229	Nova Paulinia	Paulinia	SP	13140309		19997353948	f3b45134-002e-4064-8a54-6085e43aee59
+c3a05101-5cd4-43ec-ab59-3434da55c751	41696688809	63.576.097-6		2009-02-16	f	t	f		f	Rua Elvira Maria Grigoletto Lanza	330	Parque Brasil 500	Paulinia	SP	13141010	Casa	19991922122	e9139433-eb96-4d87-82e8-66da85d6d357
+1b38afbe-1953-42ce-a681-f8d0d0f2ccb1	\N			2009-07-20	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			091f17b9-eac5-4c74-a679-9f5f2a591121
+c18ea0cc-910a-4285-ae6e-cb58a91f87be	\N			2009-12-22	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			b668e296-767b-4a96-914b-303df8558e7d
+86bcba91-6ab6-4c5e-96e0-97660b541866	\N			2009-04-16	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			11c26ec5-0ac7-49b3-ab43-5190fd7a1e9e
+b3e0a7b4-0496-4196-9a79-2f9c16880293	\N			2009-08-18	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			401f4061-2f0e-4dc8-8f07-2e09470a87fa
+daf5eaa5-61cb-45e2-890e-8bd7843e9126	53647147800	63.146.387-2		2008-11-19	f	t	f		f	Rua Vicente Nepununcena Da Silva	1007	Bom Retiro	Paulinia	SP	13142124			abff1d82-44fe-4c4e-ab09-a6932a986732
+94886487-178a-403f-a596-edccbb767f91	51155412893	62.140.881-5		2009-02-09	f	t	f		f	Rua Dr Antonio Haddad	70	João Aranha	Paulinia	SP	13145662		19988038609	69124186-e7d5-4942-8a81-b770441e0088
+86d15c12-ba66-4ccb-8679-09e4cedd63ab	48800766862	58.477.992-6		2008-05-27	f	t	f		f	Rua Sebastião Pereira	1304	Parque Santa Barbara	Campinas	SP	13064560		1999111971	ac41471c-f32f-48c2-8187-440e1019048d
+818f03ac-3502-4bf4-bbd6-1890733438eb	\N			2010-05-17	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			19103dc7-9cd0-499b-8464-2e1d6aa7397e
+993087c2-e32e-4044-a126-11480809787e	\N			2009-07-12	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			313c0e42-b52a-4ac4-a496-fff0e028999c
+f26b9243-c5ec-4ba4-b40e-5114b333781b	54988494861	60.095.139-X		2007-12-09	f	t	f		f	Rua Antonio Duarte	17	Morro Alto	Paulinia	SP	13145392		19992099641	aaa21340-f32d-4062-97b6-c56eac7064f3
+dba2493f-ccb2-4196-9e03-e96ab05c0613	55207606832	66.683.670-X		2008-08-22	f	t	f		f	Rua Almirante Tamandaré	295	Jd Fortaleza	Paulinia	SP	13140060		19999670722	5974d74a-7591-4fcb-9932-8890c0d12c0c
+64db2998-28c0-4dfd-b63d-0da2018204b2	\N			2010-01-27	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			8b345727-9180-4ca8-ad16-76003f8780a5
+173e0dba-a8db-46a1-9731-f53427df03b3	\N			2009-10-17	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			af50bf39-c4ec-4bfb-909f-bab6bee405c2
+46306d53-04cb-46c6-86d4-b56af203cfaa	\N			2009-12-04	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			84410c31-9e2f-4a76-a13c-34bdf8eaa5eb
+a83b20d6-230b-4039-90f4-cbdda8100df9	\N			2009-07-02	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			645b83ba-cffe-43d2-893a-e9a254db7335
+1c8088b6-aa78-407e-a513-8f86bc9ce5b3	\N			2009-05-25	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			917b575e-3d7f-4f35-9ddd-5bbd84fb2c7b
+33c5e09e-b5d0-4df7-8cbf-cefd9e3b9096	54730488890	60.910.317-9		2008-05-18	f	t	f		f	Av Brasilia	2419	Vila Bressani	Paulinia	SP	13142370		19991484536	816e58d7-7511-4583-827d-8c42b6df81b1
+b6cce39f-020e-4ecf-a8b3-b0c87aa9ddd1	41253853860	62.536.101-5		2008-06-08	f	t	f		f	Rua Ignez Motta Piva	158	Jardim America	Paulínia	SP	13140699		19999084350	3dd6ef1a-5c34-4982-b04d-9aa525b1fe91
+174f5297-5e60-4bc3-9da8-5eb4bb181121	\N			2008-08-15	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			ee2d434d-a83a-4db3-a05b-0e4f4629ad6e
+3754e2a7-7684-4769-a88a-22143134f471	44031763808	55.216.169-X		2008-11-20	f	t	f		f	Rua Ada Caroline Scarano	423	São José	Paulínia	SP	13145794		19988452429	36b3b2db-ce0e-4cfc-8a10-7d7ad7b84ea0
+9ef80125-4d2c-408b-82c2-38e187d40ff9	54714757806	55.191.912-7		2008-11-29	f	t	f		f	Rua Argeo Piva	866	Morumbi	Paulinia	SP	13140762		19994461771	a4c67b8e-2ce6-4c40-8fc7-3d788f075d45
+37b2283a-7a64-42e1-a66b-b413b2bb48d5	48781972857	58.997.790-8		2008-06-05	f	t	f		f	Av, Nelson Rubini , Bl, B	410	Balneário Tropical	Paulinia	SP	13144725	Apto 22	19974031872	114e7455-dba7-4998-8363-d04e798a2680
+ce36aa30-0102-42cf-b982-0f1858ef53d8	49619091817	59.770.823-X		2008-07-04	f	t	f		f	Av. João De Souza Filho	149	Morro Alto	Paulínia	SP	13145386		19984282908	865b8f66-0476-4aef-903f-50c76f4ca684
+1faeaa05-b33e-467b-9de1-a0da62af46e1	\N			2009-08-29	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			25a6e71c-89e5-4a35-ac26-7ec79b8e2093
+2a854ff6-0653-4ac6-98ee-2ade6adff6db	\N			2009-10-02	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			1e84a77f-58a5-459c-8c45-6c34bddeab46
+1774386e-c009-4830-9006-5df39e01bb41	\N			2009-11-03	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			e6b4b2e8-3861-4677-94a8-926b1ee1661a
+532a99e5-3c1d-4cd6-bb96-293c21646a37	\N			2009-05-04	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			58888f00-6a83-4661-b283-032745e1c3e3
+04beeadd-3e17-4612-866f-67d152c5cbc5	\N			2009-09-05	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			c3450eae-6fa5-4efb-ab2d-d2388e9921be
+6b9ebaa2-6711-401e-b41b-ca0826c750dd	54946643842	63.318.817-7		2009-02-08	f	t	f		f	Rua Regina B. Perissinotto	423	São José	Paulinia	SP	13145776	Casa	19994697859	77d49c59-3063-4b35-b8b0-19d64e1ae3c5
+97106fcf-4c84-4160-9398-5810301143ef	46488747819	55.375.579-3		2008-12-19	f	t	f		f	Rua Jordalino Antonio Breda	123	Jd Nossa Senhora Aparecida	Paulínia	SP	00000000		19995897344	7abd721a-1c13-4fbd-ad86-574c9859e263
+29d3038a-e02e-4991-8b39-3dd8794bc608	\N			2009-04-16	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			4d3d1ba1-3700-41f6-baf1-e9e2f34e27f8
+d7fd87a7-d9d3-438c-bd0b-6b65106a3dd6	02967208280	58.287.114-1		2008-09-30	f	t	f		f	Rua Blecaute	52	Bela Vista	Paulinia	SP	13145024	Casa	19996488649	bd9db399-5953-4863-9e57-a98be6409d41
+acd56f49-40a4-4510-8d71-52aea1fd2683	\N			2009-10-12	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			22f6a4a3-1999-4ac9-b8d4-87a171801224
+8316aac3-0719-496f-82b9-d53d12e13ba1	\N			2010-01-31	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			ceca08a5-ca4e-42d1-a450-440ec3d92ab2
+844f0a78-4449-4608-bc0f-c45850f4d53f	\N			2010-01-16	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			d528f26a-fc32-48ca-98ba-84aa8ccadc5c
+4783fc59-da31-4649-88da-22f41b031ca3	\N			2009-07-15	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			0dad555e-957e-4b01-a22a-ffdd3f9cef69
+f0323609-4e5f-45f4-8fb2-c51898fb2cf1	48198133828	58.464.323-8		2008-05-09	f	t	f		f	Rua Maria Antonia Barreto	165	Res Pazzetti	Paulínia	SP	13145556		19981860233	1f59849a-838f-4d4b-bfcc-5047f903248f
+8698303c-f5a4-4229-a13c-33c0483938cb	49192553818	59.379.554-4		2008-06-09	f	t	f		f	Rua Maria Gina Da Silva	254	Pq Bom Retiro	Paulinia	SP	13142182		19998737065	5b7b94af-64b3-4a3a-8aa1-46aba906c68d
+781dd1d4-b88f-4126-b0e2-8bc514c45c09	\N			2009-09-28	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			feef97a6-0ab6-44e4-bd1d-b7e759af0462
+568a5215-dd76-4679-86b5-2a1a7acc70b7	54559864810	69.078.397-8		2008-11-26	f	t	f		f	Rua Alagoas	136	Recanto Das Águas	Paulinia	SP	13159899		19982534144	083d59e9-3d64-424e-a504-bc161943d208
+40b8a9ce-41b0-4060-b9db-fca29d2b1546	54488690840	56.412.919-7		2009-01-07	f	t	f		f	Rua Albano Ferreira De Souza	283	Marieta Dian	Paulinia	SP	13145739			bda9815d-8b90-444b-b333-7344b9568e38
+cb7a566b-4435-46ae-ad0e-d8d6da2d279a	\N			2010-01-14	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			a41dd7c2-4ac9-4bef-ba4e-4fe2fe77e365
+4a00eba4-5f83-4aaa-a6e7-87f12e209c5a	\N			2010-01-28	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			1dd63807-db1c-441b-9b42-d15e70c04650
+da218df0-e665-4670-8364-dc40ab75e4f6	54895573893	58.405137-2		2008-12-17	f	t	f		f	Rua José Mota	84	Jd Monte Alegre	Paulínia	SP	13142488		19982662686	3bd9681d-1bd5-481b-8560-3eb54a68308a
+7c0112ce-7c39-46a1-a07a-ff7ed08794fd	54107360873	56.326.141-9		2009-03-03	f	t	f		f	Rua Deolinda Merone	100	Okinawa	Paulinia	SP	13141022		19997970252	8381501a-1f02-497b-bd09-b0e4b63335ba
+cb6eddce-9644-40d3-af5f-95404515825d	\N	55.628.512-8		2008-11-26	f	t	f		f	Rua Dom Pedro	169	Vila Bressani	Paulínia	SP	13140480		19996413005	4bb76a5a-70c0-4f91-9724-cf6889ea3877
+abc018aa-fc0a-49cb-bf1f-b6c802358217	41996752804	58.861.265-0		2008-02-02	f	t	f		f	Rua Pedro Mendes Sobrinho	20	Brasil 500	Paulínia	SP	13141051	Casa	19997643961	74b8ea22-2fe1-491e-a8a6-fd7cabb57a1b
+b52c2236-6fd0-4534-8aa5-6a7341a045d0	\N			2010-10-05	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			8e7e0561-8fd4-4c3e-9009-33ad1b3c1d6a
+7f02b9ee-bf10-45fb-9505-c88980f4277e	53168745871	69.479.050-3		2008-09-21	f	t	f		f	Rua Angelo Varandas	500	Santa Terezinha	Paulinia	SP	13140802	Casa	19999810953	5dd12b97-4a30-4489-980e-a825750218cb
+3642494c-5ebd-4a2f-a024-a7df6dd76c2e	54520038863	66.419.258-0		2008-10-16	f	t	f		f	Rua Expedicionário Armando De Miranda	42	Jardim Leonor	Paulinia	SP	13145264	Casa	19994795953	ec89b232-3727-4e00-9691-66342eb61a83
+81451546-f9ca-45b9-96b9-6d15bf44d2fd	\N			2010-03-26	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			56ae2b7f-db75-4a1a-aa01-c3bda9b6d659
+3861e8c2-f836-4b58-89c4-4e2e9b73f5a5	\N			2010-06-12	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			828ea03b-9c89-475d-841a-8584d6f0dad6
+fc57e68c-4d5d-4a41-bc57-49784208608b	\N			2009-12-13	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			d9903284-2c9b-4a2e-959b-65c8d4a66adb
+f6a0233f-6a85-4beb-b40f-87c0b4c42385	56006609878	69.514.252-5		2009-01-11	f	t	f		f	Rua Maria Adelaide Alves Caetano	61	Bom Retiro	Paulinia	SP	13142200	Casa	19993412741	57b4030d-2ed3-411d-8239-b1d22bc88d2f
+91e26d9d-2ed4-4cd3-a947-0381060c1981	\N			2009-12-18	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			f65dcaa5-adeb-48ed-b05c-e07ba96024d0
+1032b3ac-1bbd-415d-b795-13034bf39cec	\N	58.231.556-6		2008-09-21	f	t	f		f	Av Presidente Juscelino Kubitschek	901	Pq Brasil 500	Paulínia	SP	13141130		19974046998	5356efbd-2de2-42d4-9d03-34ac4136e76a
+0ec99cf3-19bd-414a-9b09-acd23f128534	55977903820	65.159.336-0		2008-11-28	f	t	f		f	Rua Adalberto Luis Rosario	205	Bom Retiro	Paulinia	SP	13142096		19991820888	6f5aae83-8c86-4d5a-a622-8a4eff71135c
+3c120ffe-17c2-4d2e-9484-0c6509408afa	\N			2009-06-26	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			bce51e9c-b070-4dbf-bf58-0d28aaaa0f2f
+b48f4ec4-bf2e-4416-9ea7-925f75f60fd1	54322515827	66.435.135-9		2008-04-16	f	t	f		f	Rua Angelo Mussato	142	Parque Bom Retiro	Paulínia	SP	13142120	Casa	19982357235	190debb8-2963-4d41-86f1-309206077b7a
+6fb1aaf1-16cb-49d0-bd3d-e729f842e27b	06987053359	3.829.658/PI		2009-03-11	f	t	f		f	Rua Ramon Pinto Villares	73	São José	Paulínia	SP	13145853		19998130941	ecd1af05-d742-4ba9-bf71-0aa4959ce937
+bc463d1f-61c1-468b-a6ac-161444171ebb	\N			2009-04-20	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			e7fb3543-50f3-4f53-9752-fe057dedf146
+c54d0d9d-6561-4eaa-9779-0881435d62ca	\N			2010-03-07	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			838044f5-fba2-4c5f-9acb-89e0883148b2
+e0e03160-a86c-414c-b976-deac7ba848ac	56260272898	65.498.755-5		2008-04-28	f	t	f		f	Rua Mario Giordano	147	Jd America	Paulínia	SP	13140614		19993304230	30d4411e-2d6b-4d9b-8b66-4ad96e4feec2
+ced16928-95eb-4809-9ab6-b5b7faf21712	54524316833	65.139.007-2		2008-05-21	f	t	f		f	Rua Regina Berton Perissinoto	420	São José	Paulinia	SP	13145776	Casa	19988087612	8569eb83-d6da-426f-aec5-2ca77df79b19
+22beeeb6-a51d-4ae1-a187-893f03efab7e	\N			2009-07-01	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			9bf06e22-57ed-4dcc-9161-8b8d9533c460
+8f64201c-3800-48c7-bb5d-7e47e6c86aa7	\N			2010-06-01	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			fae96661-c2ea-4f9d-9e31-5b7dedb4ac1a
+76e68da9-cf25-4523-9381-1c2dfa983109	53573718817	63.886.298-X		2009-01-27	f	t	f		f	Rua Antonio José Mota	396	Residencial Viacava	Paulínia	SP	13145839		19995407661	f1a4a4d1-17f7-4c93-b5d8-ee9c76c0d6b7
+0f2c18ed-3bbc-4bca-b347-134f3fae9fec	\N			2009-08-21	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			5a47a696-9dcb-4731-acd5-4cc2f915e0bb
+9eec5304-d5b5-4ac8-adf3-524eeeb6d0e8	44034964820	67.312.254-3		2009-03-30	f	t	f		f	Rua Admilson José Bolonhese	568	Cjh Z Vedovella	Paulínia	SP	13142194		19982687128	b354da12-f4b4-44dd-881b-bc22b1353184
+ee5c32a3-6cb4-4913-886e-1b7bd8ac53c2	43779886898	55.189.038-6		2009-01-20	f	t	f		f	Rua Portugal	196	Vila Bressani	Paulínia	SP	13140502	Casa	19981499643	1f2f0cb4-fcf2-4179-ad55-2b295b40b81d
+7594fcf1-6b33-4d44-80f0-9fab62f990ec	13338845677	67.481.395-9		2008-12-01	f	t	f		f	Av João Vieira	799	João Aranha	Paulínia	SP	13145754		19991526731	efcc4045-f789-43f9-b43d-18c32c8d6521
+f1684eda-23bd-46ff-a8a2-89cf19255712	50269580875	56.789.766-2		2009-02-10	f	t	f		f	Av Alexandre Cazelatto	378	Betel	Paulínia	SP	13148218		19971000456	ff7d9f9a-6f64-4d86-b5d8-9d6ca7e5fb8f
+ee060a44-647d-432b-b083-edc28c1326cc	48997300806	64.761.164-8		2008-11-25	f	t	f		f	Rua Américo Quintal	171	Ouro Negro	Paulinia	SP	13145143		19996490023	04e9508a-dcce-4304-814e-a866352c6760
+14c772aa-32cf-42ea-9e74-2181802e4401	\N			2009-10-21	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			d70ce22d-cd7c-42eb-9cb6-d18462802a3a
+cd0b1753-0bcc-496a-a519-33871e97c8d0	49285936857	62.772.561-2		2009-01-15	f	t	f		f	Rua Fernando Roberto Botasso	180	Betel	Paulinia	SP	13148263	Casa	19971593003	6a38d88c-12a9-4784-b233-d45c90a74a26
+83022341-b75f-4f15-b4dd-c2d4f620faa8	54112564880	66.496.329-8		2008-07-07	f	t	f		f	Rua Paulo Mazetto	142	Bom Retiro	Paulínia	SP	13142150		19987710794	f4b71ef3-235c-49df-ae35-4015a7e418a0
+859619c0-d573-448f-a6f6-3bfc92731279	50442773803	62.055.032-6		2008-04-30	f	t	f		f	Rua Das Rosas	129	Presidente Medice	Paulínia	SP	13140400		19995561977	0c69f55c-301c-4cce-af4f-2a09508324cb
+f94440f1-1cf7-43a3-a81b-235f623ea103	53961194890	53228198-6		2008-07-12	f	t	f		f	Rua Ortencio Padovani	65	São José	Paulínia	SP	13140000		1998558845	026bdd52-aaa3-4cab-857b-0b9f1dc0c601
+cadc0ad5-5b3c-486c-938b-5c298b26d00d	\N			2010-03-09	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			9f7c2f3b-c9ae-44a4-83c0-3209a18a95cf
+996300de-79ba-43e6-b6d4-cbb04a7f3571	45887531851	66.599.375-4		2009-02-20	f	t	f		f	Rua Valdir Dos Santos	104	Jd Alto Da Boa Vista	Paulinia	SP	13140032		19994642286	05436e9b-2716-41e2-8667-0fba732a8c09
+55a2b49b-4654-4de7-8eac-5a25d6229ac8	\N			2010-03-14	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			4e7fd19d-6832-45ac-bb2e-190072270e93
+d9bebb9f-ea60-41b8-b662-185e3fa62a00	\N			2009-10-22	f	t	f		f	Não Informado	S/N	Não Informado	Paulínia	SP	00000000			5308e24c-2ff8-4354-973b-bf93e610eb0e
+\.
+
+
+--
+-- Data for Name: academic_matriculacemep; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.academic_matriculacemep (id, numero_matricula, data_entrada, data_saida, status, curso_id, estudante_id) FROM stdin;
+6cb034d7-6cfc-4d42-b463-747dc59e7bdc	6666666666	2026-01-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	6cc39486-d11b-4210-bbf1-3a5128e6ab8c
+dd3d9045-eced-492f-823a-e234f1e66f21	1120696070	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	60734a7e-3511-47c0-bc1a-028e910ac972
+151a19bd-d910-4131-b599-78506b70a62b	1107523540	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	34c177d2-1717-4c94-9211-9be439317171
+2fb26595-2020-4037-9c18-40c7e352587c	1096099159	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	c209332d-1005-4cf6-ada8-4f4adce9fb11
+6c7da0f0-94b7-47d3-82be-760a2415e30b	1109478793	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	72457469-6917-4473-880f-e5810f822a9c
+88dfd20b-a13f-411a-8844-c5c170213ab2	1129170236	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	fe504fe5-b69f-47b3-8893-6a24d59d41d6
+be39cacd-4eae-4203-ab71-43007f616a47	1114354788	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	785f571e-de0d-45a3-888a-5ecef242ff15
+031d5870-2298-426d-a4c9-faf3454f8316	1111279305	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	531d8762-16d8-45a7-8f27-0b74ab1ea071
+7a322399-5369-4b06-a5a1-f7a8160855a6	1132092905	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	61787310-8e49-4e72-b887-0c0d84234218
+eff41f30-d9a1-4b4c-8220-4529b7d730a1	1122762239	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	8c736a74-39a9-44f6-810f-4bc804d1f325
+202a79f4-0c46-4441-90ef-b794ecd3f175	156837649	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	2378bd40-cf6a-4413-b7ff-95a49c9c3099
+cfcc0fd3-3b5c-472e-98c8-a43095e5c687	109499649X	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	fc4ab169-7cac-4452-94c5-dbba4c3efe26
+38d9858d-927f-4d45-b2b1-ac326970ed4f	1122260064	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	dfedda48-1c40-4487-ab11-41b6da7a2f64
+e3f977f5-094a-4c8e-b528-548199c83962	1086191195	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	aa2433d3-e220-453e-a613-58a5534f07fa
+46bf1601-4cc5-40da-a952-a8d017b1abd8	1129545635	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	c7b14bf0-bb43-42d2-b7a9-0adc09e17237
+17b2bb85-41c8-4144-9e7f-e8e01fb43a20	1085294535	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	3814bf3b-cd7d-44ab-963b-fb3364902fb8
+1508e1e7-5b9c-497b-9c01-349f55d26f89	1122464721	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	b82155af-5cdd-4bf3-965e-021dd8007a03
+704f1396-0a1d-43a2-b766-041c988bb0e9	1095392074	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	0014d023-2692-41c1-97d4-513519c84e91
+904e9ee6-ba06-4845-8685-02ef575e63ce	1148878634	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	6980fa61-5e31-4083-aae6-cdf1d9ddae49
+34627fe0-e694-46e5-b3ec-2fedb4201bb5	1095961615	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	6b52b3c2-4230-4da3-a5d3-55b9d8f849d9
+3d801d89-772d-44f0-a9d6-529a453b3896	1133461153	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	f1aa28bc-33ec-4d8b-951b-a5b33cc927a0
+ca06f68e-3c2a-491d-8515-c7e6ab7d8c4f	1241879345	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	afa21de4-8e4f-4e34-b303-b4b445c66229
+960d63fe-a6c6-4c78-b924-3d78b223ee3c	1112462909	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	ac251fc7-14fe-4f66-8bd3-a59eafac61df
+b95edb0d-977f-4f74-a9f0-97ccea8e5590	1099071574	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	772c0dea-f6c5-43d8-85b7-0d3707c14b7c
+a0b3e0dc-1c6d-41ea-9818-0fa6ba9f2cde	1085337340	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	2348d19d-f5ce-4a8e-9309-02d9bac1f2fc
+6ec39cf8-0b2f-47a1-869c-4879bf956ab7	1084364141	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	8cb14d2c-a9bd-40c0-84c1-bd21546e77b8
+a8379270-7c56-4556-bd84-09b3f53a56e9	1129978928	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	c3b61c9d-d879-4903-aecf-aa59f3085996
+2a10b618-beb2-4ca9-85d2-aa46eed9c047	108514768X	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	9c8ae84b-d2e5-4c96-89a1-54c2ed056715
+7349a812-11d0-4ef7-9dc8-a205bff1ee7c	1121786303	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	144afb23-25d2-4b59-ade9-5dd2bbc37858
+341777cf-0729-4ece-bc0c-cf21ad138f3e	1095377978	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	7e6438c8-65c2-4f0d-b41e-c752786bc664
+fc19503c-4b92-435e-a8c5-7a9e772f7706	1098971486	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	585d4157-6306-4a1b-81d4-4ecc096e0d2c
+750039e2-3a54-44ca-aa08-c98d409337f4	1233398970	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	c64cf01d-ea2a-48b7-801a-c24d3ffc8078
+d1eed4ab-0fe7-4255-95a3-52eee8744966	1235774983	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	926ecd5f-750d-4c55-9cef-c69f306b46e9
+fb03cf2f-7682-450e-b3d3-3d7d58b9f576	1126902056	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	39d8c697-2339-42ff-bac6-8575457e2d5d
+5853b8dc-775c-4e83-b136-f539f8dfae93	1253919227	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	54bfbca2-d986-4593-ad9b-370475b29410
+46de180f-2c7b-42a4-907f-523b78fc90df	1253919229	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	a6b59590-cff0-4c6c-bfee-2f2d68b1c84e
+32b11c91-866d-45b8-a4f6-6366e2778a07	1120085809	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	c43e5cad-46e3-4138-ad45-4c38c44e8ff2
+29696864-2f06-4d9b-b709-2a828f12a97c	1105920781	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	8a286b38-db7b-4729-ac69-f4ac2498ac69
+e30b41e4-a2ef-4dd8-a188-442aff7793d6	1141361966	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	0c8d5253-b966-47d2-95ab-c070029a1287
+40832ae3-a273-4fb1-8a20-f788f7d1de44	1117073075	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	c0781393-c50c-4c41-ab3f-a74119d9a15a
+bb193bcb-ff66-4b6c-afcf-62564a54129e	1120410186	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	3fba6119-9c19-4eb9-81fd-47f2aa247c4d
+42945355-5701-41e9-b118-3cb24df823c0	1121322359	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	48145b1f-5891-4385-bbba-1696a5c0daf6
+5dfa602b-8d11-4c73-ae09-4d861641165c	1117139128	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	d24b8669-6aa6-481c-8700-8f2ed24c09dc
+559f2677-ecc3-43fb-ac5d-b61866c49c9d	1100229176	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	33133cd5-18d9-41a7-b071-854ac6ec0e08
+cbf429d1-fdac-46d9-a4d5-5fd827dbc963	1121889840	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	f6c28693-74b0-427b-a688-d4265fbbd44b
+e571b0a3-e072-4618-9cbe-161d902123f8	1095156019	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	07e9a28c-3222-4b45-9d70-f8140713efd0
+bdad1586-5885-48fe-a8d4-abaaa7240485	112845936X	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	74418c3c-7cf9-46db-94c1-c35de81e46f8
+bd1dc072-3f8e-4454-86d8-8e261adda266	113755874X	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	74e89af7-2e37-451f-bb40-af9f8ab4fb4d
+4edc8540-30cd-40af-9acf-c6a7b1901ee1	1121938863	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	669cd575-7ef0-4bb5-9f3b-8408a372bcd0
+25ae0b53-ddf8-4bc2-bef5-72d40c302787	1121207492	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	2a5d25d8-8756-408b-a221-fe7a004f7eaa
+2aba1c14-4f75-4125-86ab-a4264d6f687f	1104891700	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	cb77df2d-d6fe-40a6-a523-8226bde92ddc
+33cea8ed-ca75-4082-88cc-eed9b1056e01	1096195197	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	97fbfee3-eaa2-4e23-b995-708aca5279f4
+e38bc457-a5de-47a0-87f4-c92117a02117	1251396343	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	8e27867f-8aab-417b-b3c5-ac16416e9e1e
+c7d017e6-ad29-4b3f-8a5e-6e82c85a841d	1096099251	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	ff3b8a8f-0cbb-48ee-819d-60789f899997
+a33cccf4-55d6-4a1d-a484-2ccd52017448	1105562517	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	6ff9e59b-6be8-4810-b1c3-db75f65168e8
+606db5e1-aa00-43ef-96df-ea88eedfd56e	1108815807	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	e5e88c4b-ebd0-461c-92c9-c5e4a79c311d
+14d20d84-922b-4576-a5c6-e956fe952292	114794345X	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	5cfe523c-f480-40da-9f2c-ed6cc9699bb2
+edb1fbcf-3c49-49fc-93d3-8f0faebcd5d8	1106295377	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	7e05d197-ff66-4c26-bfcd-33bd5a0310a4
+a5de02be-13e7-479b-b072-08a02129574d	1090598634	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	5a0c7be4-4c42-456a-980c-96ac8bdcd40f
+ce8e6319-4058-42b2-8dca-7a9aea66357b	1090937192	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	6899009e-808c-4467-b2d2-0833a4fe4268
+61c912dc-d5f1-4ca5-9f26-dafb311af9c6	1211185801	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	bac60549-22fa-4b20-a13e-029f2336baf0
+a9131103-222d-4acf-95dd-8f4cb983e4ac	1154079478	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	4d2dc320-93e4-43ee-aa7a-0336699c25b4
+7a697088-ff81-4dec-ba27-f65dce23a9e7	1146543979	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	848881e9-d507-4a28-9feb-085600d0e44b
+b2573a47-dfd7-4432-8a95-6d9e05519e16	1134359585	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	c617a92a-e084-48ab-86bc-2afc4bda289b
+5008c8e0-1e61-420c-8899-cbc9179ecea3	1130211034	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	1027b1ea-d4ac-43e7-a756-d1b07f9681e0
+21acc748-f589-4eb4-a42b-e04cefb26474	1101203729	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	eec08ba1-1abb-4ffb-9748-1d0dd1eb2b08
+d4bac841-6b0f-4ab1-81a4-05b341007467	1096196876	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	6c477e0a-dfb8-462a-9bbb-2cbeeb6a5393
+ab3493dc-9498-48ab-898c-3b783af96a6b	112915340X	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	a47ac682-4ac1-4eb4-9d36-cff69ce878bb
+a73febe9-0565-4e74-a847-86255b888270	1106296953	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	9cf2d0fe-24d2-4c89-9eb2-e3bc87dcb806
+dabb72be-1d58-4f83-a622-637ca05cf682	111127082X	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	70395872-41b5-4168-a75f-f3b6f9b882b4
+e22af666-e92d-410d-a1d0-c17c8e6061bf	1090939383	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	a999f4c7-9ca9-4bf9-add4-de9139f71cff
+91d5f6d5-6c25-4728-8d2e-93ee84b5c606	1095909137	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	28a85a5f-a543-49c0-b490-28ddabd3f60a
+7bdab49e-079c-4ac0-8884-43e48cbed679	1207176291	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	afad0051-b8f3-431a-8b6e-dae6582dd46a
+9232b1ec-2685-4ab3-be83-4fd7d3373d69	1101632483	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	777d4d70-44a4-4001-83dd-eae1d32f8fd1
+6e9f67d7-93aa-40dc-b55e-97b406d0823d	1100005250	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	c3a05101-5cd4-43ec-ab59-3434da55c751
+c370b62d-be48-4f7e-b02e-9a822c3015dc	1119842001	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	1b38afbe-1953-42ce-a681-f8d0d0f2ccb1
+cb86211a-e8d5-462e-bf37-18e28540b567	1106311139	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	c18ea0cc-910a-4285-ae6e-cb58a91f87be
+c4d57603-e67b-401d-b74d-a293da8e3982	1109607313	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	86bcba91-6ab6-4c5e-96e0-97660b541866
+95064fff-6313-4dc8-9d6a-fdde8288d73c	1151324607	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	b3e0a7b4-0496-4196-9a79-2f9c16880293
+b287a456-521f-4b24-a0f5-8b5d0df8b53c	1096236552	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	daf5eaa5-61cb-45e2-890e-8bd7843e9126
+ff21877c-1152-442f-b9e9-fc2a2975afdc	1101554472	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	94886487-178a-403f-a596-edccbb767f91
+6963347b-62f3-4b36-bda5-f32e4708d700	1112007763	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	86d15c12-ba66-4ccb-8679-09e4cedd63ab
+495c2301-aa99-4b23-95b5-00607171e04a	1112321275	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	818f03ac-3502-4bf4-bbd6-1890733438eb
+916afb51-ea6d-4ce8-8f07-9c248093bf19	11051000972	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	993087c2-e32e-4044-a126-11480809787e
+7194beca-9c17-4852-a8bf-6cb48c41f40a	1105040550	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	f26b9243-c5ec-4ba4-b40e-5114b333781b
+fa222530-e104-4d45-8468-c09e56e9a3e0	1108366803	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	dba2493f-ccb2-4196-9e03-e96ab05c0613
+068e3634-7d87-4449-921a-cfe38b38ac9f	110771588X	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	64db2998-28c0-4dfd-b63d-0da2018204b2
+b0be8aa4-8401-4ece-8f9c-c9c67b9771b9	1105844651	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	173e0dba-a8db-46a1-9731-f53427df03b3
+440a4071-d1b6-4791-9a26-3ca4af3569e8	1107707493	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	46306d53-04cb-46c6-86d4-b56af203cfaa
+e1eeae44-ba04-40c0-8088-abddef78d4ef	1129385711	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	a83b20d6-230b-4039-90f4-cbdda8100df9
+09a8fbb4-28f8-41ea-a10d-a975c35f9b10	1102857889	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	1c8088b6-aa78-407e-a513-8f86bc9ce5b3
+2ef38c02-e050-4a59-a38d-a57984f0d12b	1092569996	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	33c5e09e-b5d0-4df7-8cbf-cefd9e3b9096
+7f568178-b06e-4423-ace0-517259aa8d9a	1111122313	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	b6cce39f-020e-4ecf-a8b3-b0c87aa9ddd1
+3d7f1b0e-7426-47f2-a4c5-0dd447edf282	1092323661	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	174f5297-5e60-4bc3-9da8-5eb4bb181121
+d81d70e5-f783-4c2a-9231-e429cc51696f	1104441858	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	3754e2a7-7684-4769-a88a-22143134f471
+595d62f0-9da1-4fa1-b423-dbf3d06e93b8	1096197728	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	9ef80125-4d2c-408b-82c2-38e187d40ff9
+a83ca994-6479-4b2e-9afd-9aa06d666222	1089148719	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	37b2283a-7a64-42e1-a66b-b413b2bb48d5
+415b00af-6f72-4188-9617-fe15bd19aaa6	1129779099	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	ce36aa30-0102-42cf-b982-0f1858ef53d8
+bae6ed38-4dd8-4d6b-bccf-d94012ada236	1111621159	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	1faeaa05-b33e-467b-9de1-a0da62af46e1
+f7fd17c7-a6aa-418e-bbad-f9700db05df2	1158027187	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	2a854ff6-0653-4ac6-98ee-2ade6adff6db
+0680cf11-a474-4eeb-a3b1-d4a64fe122be	1128048747	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	1774386e-c009-4830-9006-5df39e01bb41
+1668eb35-8821-405f-b3ab-9a4602f0b793	109613083X	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	532a99e5-3c1d-4cd6-bb96-293c21646a37
+5cfeb50a-66f8-4046-b7cc-d3b1aafdba81	1133370287	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	04beeadd-3e17-4612-866f-67d152c5cbc5
+32457f17-111c-4e67-9e52-10952ba8426f	1110678538	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	6b9ebaa2-6711-401e-b41b-ca0826c750dd
+f08991eb-ae66-4f9a-a712-38009f326259	1119947121	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	97106fcf-4c84-4160-9398-5810301143ef
+def5a9ed-b065-41ad-b285-314dc5e96093	1094996622	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	29d3038a-e02e-4991-8b39-3dd8794bc608
+1291dead-084c-41b2-bdcc-6637a018c2cb	1233108864	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	d7fd87a7-d9d3-438c-bd0b-6b65106a3dd6
+797c4b21-21d9-45f6-a20a-1cc581cf8708	1150601188	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	acd56f49-40a4-4510-8d71-52aea1fd2683
+5a2d834e-76ab-489e-86a9-fc2733916747	1146148380	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	8316aac3-0719-496f-82b9-d53d12e13ba1
+4d575b52-fe76-4901-a056-2f54e1f09197	1113281431	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	844f0a78-4449-4608-bc0f-c45850f4d53f
+0f30d243-2ef3-4afc-8221-c486acc389d0	1102411310	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	4783fc59-da31-4649-88da-22f41b031ca3
+0095752b-1005-490b-8255-496a9493b851	1105922959	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	f0323609-4e5f-45f4-8fb2-c51898fb2cf1
+be6a94da-9293-43cc-b59c-08b09dd6a981	1119156178	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	8698303c-f5a4-4229-a13c-33c0483938cb
+b0a2728b-d0a1-46df-9f64-1581f6102735	1120302122	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	781dd1d4-b88f-4126-b0e2-8bc514c45c09
+cba5327d-16c5-43dc-9299-1d110f5f1b81	1098925804	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	568a5215-dd76-4679-86b5-2a1a7acc70b7
+13ac6715-9dcf-4cb3-bedf-1d37b9f4c784	1121521290	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	40b8a9ce-41b0-4060-b9db-fca29d2b1546
+a25f17d7-4c75-496a-9b2d-ef545e035cc6	1132414866	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	cb7a566b-4435-46ae-ad0e-d8d6da2d279a
+27e9aee9-b11b-4b0e-b7bb-9fa1b298969d	1105918415	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	4a00eba4-5f83-4aaa-a6e7-87f12e209c5a
+ad18dc8b-5b80-4a2f-9218-dd5694626274	1091650020	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	da218df0-e665-4670-8364-dc40ab75e4f6
+0769c788-21c1-4c0c-9ece-a865e11be920	1139393224	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	7c0112ce-7c39-46a1-a07a-ff7ed08794fd
+6647f149-04e1-4ea7-b9af-1ebe82475ae0	1098553974	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	cb6eddce-9644-40d3-af5f-95404515825d
+3f9118d9-1bc3-4f97-a200-d8825d7c0e4d	1120342439	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	abc018aa-fc0a-49cb-bf1f-b6c802358217
+6c1d1ba6-f8d3-41f0-b910-6a3af72fb5fe	1099686805	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	b52c2236-6fd0-4534-8aa5-6a7341a045d0
+ad29dcc7-7acf-44bb-9183-c9b31ea04a37	1139500181	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	7f02b9ee-bf10-45fb-9505-c88980f4277e
+81af0e1e-34d7-484c-9c38-c9082f8534e4	1104606823	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	3642494c-5ebd-4a2f-a024-a7df6dd76c2e
+d1e74898-63a7-480d-b8f6-185963ee9f6f	1105966185	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	81451546-f9ca-45b9-96b9-6d15bf44d2fd
+27ac07b7-6322-4835-a7a0-5d658f6b6f12	1130829315	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	3861e8c2-f836-4b58-89c4-4e2e9b73f5a5
+34efcc7e-476e-49c1-be3e-b1d9fdde1dff	1157382447	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	fc57e68c-4d5d-4a41-bc57-49784208608b
+097426d7-51b0-495a-b717-8e16061e47a7	1129098473	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	f6a0233f-6a85-4beb-b40f-87c0b4c42385
+ec45c60b-90d5-4465-be3e-f1524307afd0	1102208383	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	91e26d9d-2ed4-4cd3-a947-0381060c1981
+64cbd3f7-22a0-4259-8947-15e541bf873f	1089608457	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	1032b3ac-1bbd-415d-b795-13034bf39cec
+998a6f4b-4486-4070-a9cb-0b994182491f	1127310525	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	0ec99cf3-19bd-414a-9b09-acd23f128534
+158e9af0-f33e-40e7-b60f-918988eb58c6	1110668909	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	3c120ffe-17c2-4d2e-9484-0c6509408afa
+ac089f04-b9b5-4268-8004-4de7e2db7d6e	1110432896	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	b48f4ec4-bf2e-4416-9ea7-925f75f60fd1
+60dcdcc1-b154-4075-a725-cc1800d78315	1215985678	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	6fb1aaf1-16cb-49d0-bd3d-e729f842e27b
+e9309989-dbd0-4384-b94c-20d9f03e6d5c	1129722399	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	bc463d1f-61c1-468b-a6ac-161444171ebb
+d8330e3d-8ae7-42b7-adbf-c6796b8fd52d	1125014817	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	c54d0d9d-6561-4eaa-9779-0881435d62ca
+ae798004-f2ee-4c64-8e54-120e9d1fccba	1105896936	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	e0e03160-a86c-414c-b976-deac7ba848ac
+4842d054-b14d-472f-b1f6-c4bb4e8302dc	1123076054	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	ced16928-95eb-4809-9ab6-b5b7faf21712
+7820f4f2-dfc6-4e46-80d4-79bb97308763	1119989061	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	22beeeb6-a51d-4ae1-a187-893f03efab7e
+14c98c92-14bd-4e5e-ba9f-3d36aa6bd9b3	1138233407	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	8f64201c-3800-48c7-bb5d-7e47e6c86aa7
+c884ee01-396a-4832-b3c4-da47c7485a72	1096029339	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	76e68da9-cf25-4523-9381-1c2dfa983109
+d2d95235-d593-471e-bd30-083c67041103	1121833512	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	0f2c18ed-3bbc-4bca-b347-134f3fae9fec
+3566f38e-50cf-4f61-b58c-1597120dfdd2	1111930442	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	9eec5304-d5b5-4ac8-adf3-524eeeb6d0e8
+ef99db42-0105-46f1-b3d6-98ec2ad43c07	1109706212	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	ee5c32a3-6cb4-4913-886e-1b7bd8ac53c2
+1962f6cb-4f50-4ac4-add5-5c85a3ec71ce	1167051270	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	7594fcf1-6b33-4d44-80f0-9fab62f990ec
+05ed6cfb-1f81-4ce9-8071-191ad2a303d4	1148596185	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	f1684eda-23bd-46ff-a8a2-89cf19255712
+9375c8d3-a7c9-4ce1-8177-e9766349a495	1095377954	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	ee060a44-647d-432b-b083-edc28c1326cc
+776a8151-97d8-4672-a907-ed8231595bb3	1099875626	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	14c772aa-32cf-42ea-9e74-2181802e4401
+9ceb08bb-fcfd-4b05-9c9d-00cab32f71cf	111105809X	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	cd0b1753-0bcc-496a-a519-33871e97c8d0
+255abd29-c0bc-41f5-99be-155d1453a907	1125723270	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	83022341-b75f-4f15-b4dd-c2d4f620faa8
+35c4771d-04a8-4531-be01-ce574da71461	1119844502	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	859619c0-d573-448f-a6f6-3bfc92731279
+48862a37-585d-41f1-922f-e15d5d6c77dd	1109247540	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	f94440f1-1cf7-43a3-a81b-235f623ea103
+991059f2-47fc-455a-b5a7-112daa228dfc	1121882985	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	cadc0ad5-5b3c-486c-938b-5c298b26d00d
+15cadd21-094f-44e2-81c7-5c9007ed8572	1122745357	2024-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	996300de-79ba-43e6-b6d4-cbb04a7f3571
+b5a0a4b0-f408-4ca5-ba7f-27bf2683bd2b	1104356363	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	55a2b49b-4654-4de7-8eac-5a25d6229ac8
+6843e8cc-d7ed-48b1-a1ff-9b8365b36138	1098949882	2025-02-01	\N	MATRICULADO	3523065c-f944-4ec5-aa45-2d7dae99c6a6	d9bebb9f-ea60-41b8-b662-185e3fa62a00
+\.
+
+
+--
+-- Data for Name: academic_matriculaturma; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.academic_matriculaturma (id, data_entrada, data_saida, status, matricula_cemep_id, turma_id) FROM stdin;
+4d3c06ce-e564-403e-bde0-17723ace42a7	2026-01-01	\N	CURSANDO	151a19bd-d910-4131-b599-78506b70a62b	60a54341-045c-4111-b081-17c8729b6304
+721676f1-cc6e-4393-9e3a-147ffbc8fc0e	2026-01-01	\N	CURSANDO	2fb26595-2020-4037-9c18-40c7e352587c	7bda7580-c6a1-413f-98c3-1e2aca805239
+5939e0bd-15e5-47ab-ac0f-45da44cbcc65	2026-01-01	\N	CURSANDO	88dfd20b-a13f-411a-8844-c5c170213ab2	60a54341-045c-4111-b081-17c8729b6304
+42623daa-9a95-4161-957c-79b015209f47	2026-01-01	\N	CURSANDO	031d5870-2298-426d-a4c9-faf3454f8316	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+aad2a98c-9083-4407-a7c0-a6e04734c3ee	2026-01-01	\N	CURSANDO	7a322399-5369-4b06-a5a1-f7a8160855a6	60a54341-045c-4111-b081-17c8729b6304
+01646cae-9676-41ba-8231-d5826b7ed9c4	2026-01-01	\N	CURSANDO	202a79f4-0c46-4441-90ef-b794ecd3f175	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+b4c58e15-0956-4171-be7f-42652aeb6a34	2026-01-01	\N	CURSANDO	cfcc0fd3-3b5c-472e-98c8-a43095e5c687	7bda7580-c6a1-413f-98c3-1e2aca805239
+a45cc832-bb9b-4e8f-bc1b-7ad2a7f738d1	2026-01-01	\N	CURSANDO	46bf1601-4cc5-40da-a952-a8d017b1abd8	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+e32de189-c04d-45ba-b2b7-d67863211b5e	2026-01-01	\N	CURSANDO	1508e1e7-5b9c-497b-9c01-349f55d26f89	7bda7580-c6a1-413f-98c3-1e2aca805239
+e2fd5983-3e5e-4625-bfe0-c08cf89f031d	2026-01-01	\N	CURSANDO	704f1396-0a1d-43a2-b766-041c988bb0e9	7bda7580-c6a1-413f-98c3-1e2aca805239
+767bb663-adb3-4aaa-8eae-a198d7f607d8	2026-01-01	\N	CURSANDO	34627fe0-e694-46e5-b3ec-2fedb4201bb5	7bda7580-c6a1-413f-98c3-1e2aca805239
+4997ff42-29a7-41f9-935a-974cafe67621	2026-01-01	\N	CURSANDO	3d801d89-772d-44f0-a9d6-529a453b3896	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+a2114ed8-b546-46b2-a37e-2d25eb482baa	2026-01-01	\N	CURSANDO	ca06f68e-3c2a-491d-8515-c7e6ab7d8c4f	7bda7580-c6a1-413f-98c3-1e2aca805239
+4eca2651-62c4-4973-95fd-f495e3ff19b3	2026-01-01	\N	CURSANDO	b95edb0d-977f-4f74-a9f0-97ccea8e5590	7bda7580-c6a1-413f-98c3-1e2aca805239
+0184c5c7-7d3d-4975-be42-cccb91272e0c	2026-01-01	\N	CURSANDO	a8379270-7c56-4556-bd84-09b3f53a56e9	7bda7580-c6a1-413f-98c3-1e2aca805239
+4f8cf1f7-57d7-4ab1-99f8-e124d78e11ce	2026-01-01	\N	CURSANDO	7349a812-11d0-4ef7-9dc8-a205bff1ee7c	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+0c7020e6-c8fd-4628-8b3e-cb39f1064304	2026-01-01	\N	CURSANDO	fc19503c-4b92-435e-a8c5-7a9e772f7706	60a54341-045c-4111-b081-17c8729b6304
+69fa84c2-22db-4a9a-9065-646d2c185319	2026-01-01	\N	CURSANDO	d1eed4ab-0fe7-4255-95a3-52eee8744966	7bda7580-c6a1-413f-98c3-1e2aca805239
+8ce022f0-baaa-4421-920d-c784a8b682b0	2026-01-01	\N	CURSANDO	5853b8dc-775c-4e83-b136-f539f8dfae93	60a54341-045c-4111-b081-17c8729b6304
+c23bbac4-0c97-4288-9cd5-461042065b23	2026-01-01	\N	CURSANDO	46de180f-2c7b-42a4-907f-523b78fc90df	60a54341-045c-4111-b081-17c8729b6304
+9e8d094f-3a60-418b-ba96-bc729c26cbb2	2026-01-01	\N	CURSANDO	32b11c91-866d-45b8-a4f6-6366e2778a07	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+1ab15634-3590-4666-a5fc-19ed81043297	2026-01-01	\N	CURSANDO	29696864-2f06-4d9b-b709-2a828f12a97c	60a54341-045c-4111-b081-17c8729b6304
+0abddbe8-83d5-41fd-ba04-79ac739c4624	2026-01-01	\N	CURSANDO	40832ae3-a273-4fb1-8a20-f788f7d1de44	7bda7580-c6a1-413f-98c3-1e2aca805239
+0035c794-bd2f-402e-88b8-cc4165572e73	2026-01-01	\N	CURSANDO	bb193bcb-ff66-4b6c-afcf-62564a54129e	7bda7580-c6a1-413f-98c3-1e2aca805239
+fd6991bb-7359-4d46-9bdb-210bc19a448a	2026-01-01	\N	CURSANDO	42945355-5701-41e9-b118-3cb24df823c0	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+760e7b0b-2dcf-412f-a934-a3a4747050f7	2026-01-01	\N	CURSANDO	5dfa602b-8d11-4c73-ae09-4d861641165c	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+a7a5d42c-26cb-4a63-978f-3c1fd72ad156	2026-01-01	\N	CURSANDO	559f2677-ecc3-43fb-ac5d-b61866c49c9d	7bda7580-c6a1-413f-98c3-1e2aca805239
+918161c4-7fba-4390-975d-a529493bc670	2026-01-01	\N	CURSANDO	bdad1586-5885-48fe-a8d4-abaaa7240485	7bda7580-c6a1-413f-98c3-1e2aca805239
+367da40f-c85f-4a29-920d-33d968436347	2026-01-01	\N	CURSANDO	bd1dc072-3f8e-4454-86d8-8e261adda266	60a54341-045c-4111-b081-17c8729b6304
+dcfbccca-fc0d-460c-baf8-8a0abf180373	2026-01-01	\N	CURSANDO	2aba1c14-4f75-4125-86ab-a4264d6f687f	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+cd01219f-d4e3-4dbb-b94f-3467ccaa734b	2026-01-01	\N	CURSANDO	33cea8ed-ca75-4082-88cc-eed9b1056e01	7bda7580-c6a1-413f-98c3-1e2aca805239
+9a24676a-e259-4284-b05f-37491a6e1767	2026-01-01	\N	CURSANDO	e38bc457-a5de-47a0-87f4-c92117a02117	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+053d7b00-b08c-4624-a28c-1874dab52972	2026-01-01	\N	CURSANDO	c7d017e6-ad29-4b3f-8a5e-6e82c85a841d	60a54341-045c-4111-b081-17c8729b6304
+bc17c919-0026-4577-8c5d-ef24b09567cc	2026-01-01	\N	CURSANDO	a33cccf4-55d6-4a1d-a484-2ccd52017448	7bda7580-c6a1-413f-98c3-1e2aca805239
+8e20f016-41bb-484a-99e9-e1e1ebd82167	2026-01-01	\N	CURSANDO	61c912dc-d5f1-4ca5-9f26-dafb311af9c6	7bda7580-c6a1-413f-98c3-1e2aca805239
+58ca1bd7-451c-4799-b134-12ad1036edbb	2026-01-01	\N	CURSANDO	b2573a47-dfd7-4432-8a95-6d9e05519e16	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+ee0d704c-5ed9-44ea-94ee-4cad52bf272b	2026-01-01	\N	CURSANDO	5008c8e0-1e61-420c-8899-cbc9179ecea3	7bda7580-c6a1-413f-98c3-1e2aca805239
+90a79e9b-7602-4209-a9fd-4122d87a8775	2026-01-01	\N	CURSANDO	a73febe9-0565-4e74-a847-86255b888270	60a54341-045c-4111-b081-17c8729b6304
+25c979ec-1cdf-4a4b-a53a-5523651abd20	2026-01-01	\N	CURSANDO	dabb72be-1d58-4f83-a622-637ca05cf682	60a54341-045c-4111-b081-17c8729b6304
+a3557e61-9319-4255-8c34-646f2a892e6d	2026-01-01	\N	CURSANDO	c370b62d-be48-4f7e-b02e-9a822c3015dc	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+346cdaac-b802-42ab-993b-e045ce65ff9d	2026-01-01	\N	CURSANDO	cb86211a-e8d5-462e-bf37-18e28540b567	7bda7580-c6a1-413f-98c3-1e2aca805239
+33118614-a0ba-46a2-aafb-117b9660769c	2026-01-01	\N	CURSANDO	c4d57603-e67b-401d-b74d-a293da8e3982	7bda7580-c6a1-413f-98c3-1e2aca805239
+bdc848ad-47b2-4646-ae75-bf5c97f88693	2026-01-01	\N	CURSANDO	95064fff-6313-4dc8-9d6a-fdde8288d73c	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+100d66a0-50a8-443e-85ff-9477673991eb	2026-01-01	\N	CURSANDO	495c2301-aa99-4b23-95b5-00607171e04a	60a54341-045c-4111-b081-17c8729b6304
+df580403-32f0-4006-81ea-a0e72842e7be	2026-01-01	\N	CURSANDO	916afb51-ea6d-4ce8-8f07-9c248093bf19	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+9301de0f-2f8d-4f52-b60c-7717c66e8809	2026-01-01	\N	CURSANDO	068e3634-7d87-4449-921a-cfe38b38ac9f	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+644e9623-c9c9-4867-b07e-16ff599220fe	2026-01-01	\N	CURSANDO	b0be8aa4-8401-4ece-8f9c-c9c67b9771b9	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+dff9fe51-dfe1-4b8b-8602-89905b79fd8e	2026-01-01	\N	CURSANDO	440a4071-d1b6-4791-9a26-3ca4af3569e8	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+700be358-4cfe-49c3-8211-766fc4884653	2026-01-01	\N	CURSANDO	e1eeae44-ba04-40c0-8088-abddef78d4ef	7bda7580-c6a1-413f-98c3-1e2aca805239
+78280636-227b-4203-8e45-bd4db5df022c	2026-01-01	\N	CURSANDO	09a8fbb4-28f8-41ea-a10d-a975c35f9b10	60a54341-045c-4111-b081-17c8729b6304
+d2176b26-3624-418c-8ff4-06c8df2956e0	2026-01-01	\N	CURSANDO	bae6ed38-4dd8-4d6b-bccf-d94012ada236	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+c635fd82-c970-4ad9-9826-d496b968072d	2026-01-01	\N	CURSANDO	f7fd17c7-a6aa-418e-bbad-f9700db05df2	7bda7580-c6a1-413f-98c3-1e2aca805239
+cbd64e24-54d4-4377-af34-6646c1bd0bb8	2026-01-01	\N	CURSANDO	0680cf11-a474-4eeb-a3b1-d4a64fe122be	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+3fe0ea7f-3733-43dd-bf32-8549b9a73933	2026-01-01	\N	CURSANDO	1668eb35-8821-405f-b3ab-9a4602f0b793	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+0e350942-4799-40f7-aa2a-04469b2de5b2	2026-01-01	\N	CURSANDO	5cfeb50a-66f8-4046-b7cc-d3b1aafdba81	60a54341-045c-4111-b081-17c8729b6304
+b1014ec6-06cf-4901-bf39-e003876e5ea4	2026-01-01	\N	CURSANDO	def5a9ed-b065-41ad-b285-314dc5e96093	7bda7580-c6a1-413f-98c3-1e2aca805239
+823c26b9-7c81-4669-adde-161c0e6266b8	2026-01-01	\N	CURSANDO	797c4b21-21d9-45f6-a20a-1cc581cf8708	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+4c4664c0-39fa-43a0-9765-650cc9c130b8	2026-01-01	\N	CURSANDO	5a2d834e-76ab-489e-86a9-fc2733916747	60a54341-045c-4111-b081-17c8729b6304
+f8dae2f4-fd62-4150-8363-004ff6f3c43a	2026-01-01	\N	CURSANDO	4d575b52-fe76-4901-a056-2f54e1f09197	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+56593a68-ac83-4711-85b4-202874ce8539	2026-01-01	\N	CURSANDO	0f30d243-2ef3-4afc-8221-c486acc389d0	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+ba86083a-99d0-4283-b85b-570cebdffdbc	2026-01-01	\N	CURSANDO	b0a2728b-d0a1-46df-9f64-1581f6102735	60a54341-045c-4111-b081-17c8729b6304
+71d86af7-52d0-4c0e-a87b-274c70298e86	2026-01-01	\N	CURSANDO	a25f17d7-4c75-496a-9b2d-ef545e035cc6	7bda7580-c6a1-413f-98c3-1e2aca805239
+5519cf8e-a7e4-4ec1-9f68-18346d09b753	2026-01-01	\N	CURSANDO	27e9aee9-b11b-4b0e-b7bb-9fa1b298969d	60a54341-045c-4111-b081-17c8729b6304
+d1008284-fa67-40f7-9e8e-e0f04c229d29	2026-01-01	\N	CURSANDO	6c1d1ba6-f8d3-41f0-b910-6a3af72fb5fe	60a54341-045c-4111-b081-17c8729b6304
+b47737e6-09a7-42c6-a114-db48e94d03e5	2026-01-01	\N	CURSANDO	d1e74898-63a7-480d-b8f6-185963ee9f6f	7bda7580-c6a1-413f-98c3-1e2aca805239
+e614a53c-a51a-46a5-a701-5174c3987ff7	2026-01-01	\N	CURSANDO	27ac07b7-6322-4835-a7a0-5d658f6b6f12	60a54341-045c-4111-b081-17c8729b6304
+74674151-f941-4ded-9776-42aa64719254	2026-01-01	\N	CURSANDO	34efcc7e-476e-49c1-be3e-b1d9fdde1dff	60a54341-045c-4111-b081-17c8729b6304
+8de41834-d59c-4a4f-ac9e-7133625004fe	2026-01-01	\N	CURSANDO	ec45c60b-90d5-4465-be3e-f1524307afd0	7bda7580-c6a1-413f-98c3-1e2aca805239
+c715f3e1-0215-4f5a-aae9-653835bd8b3a	2026-01-01	\N	CURSANDO	158e9af0-f33e-40e7-b60f-918988eb58c6	60a54341-045c-4111-b081-17c8729b6304
+a0ea2e2d-d84b-472c-9436-e7ded682b416	2026-01-01	\N	CURSANDO	e9309989-dbd0-4384-b94c-20d9f03e6d5c	7bda7580-c6a1-413f-98c3-1e2aca805239
+553071d3-f2c8-4ff7-a3d3-a06e09d35200	2026-01-01	\N	CURSANDO	d8330e3d-8ae7-42b7-adbf-c6796b8fd52d	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+31fc2d9e-cc3f-41db-a335-e9581c476305	2026-01-01	\N	CURSANDO	7820f4f2-dfc6-4e46-80d4-79bb97308763	60a54341-045c-4111-b081-17c8729b6304
+1272ab2a-b98e-41ac-a3d8-56e681dfdfa4	2026-01-01	\N	CURSANDO	14c98c92-14bd-4e5e-ba9f-3d36aa6bd9b3	7bda7580-c6a1-413f-98c3-1e2aca805239
+8b5a155a-9050-43da-9e92-81a0b3ae682f	2026-01-01	\N	CURSANDO	d2d95235-d593-471e-bd30-083c67041103	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+9b5f7f3d-ce5b-4d48-ae1b-ca3f54a22cea	2026-01-01	\N	CURSANDO	05ed6cfb-1f81-4ce9-8071-191ad2a303d4	60a54341-045c-4111-b081-17c8729b6304
+a0d3ab8c-3086-4644-9e0f-c12b197cab95	2026-01-01	\N	CURSANDO	776a8151-97d8-4672-a907-ed8231595bb3	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+5fb5b27b-e58b-4716-ba94-7defc361b728	2026-01-01	\N	CURSANDO	991059f2-47fc-455a-b5a7-112daa228dfc	60a54341-045c-4111-b081-17c8729b6304
+796caa94-99d1-4131-843d-e649b8a0a695	2026-01-01	\N	CURSANDO	b5a0a4b0-f408-4ca5-ba7f-27bf2683bd2b	60a54341-045c-4111-b081-17c8729b6304
+ae554869-f4df-4001-bfc3-d486ce64c0d0	2026-01-01	\N	CURSANDO	6843e8cc-d7ed-48b1-a1ff-9b8365b36138	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+e9da4016-18c4-4ce6-a4c3-1bab66aa45c7	2026-01-01	\N	CURSANDO	dd3d9045-eced-492f-823a-e234f1e66f21	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+c9e92085-d5b8-4485-8d21-fa01474330f3	2026-01-01	\N	CURSANDO	6c7da0f0-94b7-47d3-82be-760a2415e30b	9d5e1712-0755-40cf-b0f9-ad9d62465583
+33214fff-f906-43ba-8ed4-d4441e813921	2026-01-01	\N	CURSANDO	be39cacd-4eae-4203-ab71-43007f616a47	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+683f1f8d-561d-4d76-814e-72ebb234e423	2026-01-01	\N	CURSANDO	eff41f30-d9a1-4b4c-8220-4529b7d730a1	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+aa89915c-7d53-4cb0-8532-f6f5eafff5dd	2026-01-01	\N	CURSANDO	38d9858d-927f-4d45-b2b1-ac326970ed4f	9d5e1712-0755-40cf-b0f9-ad9d62465583
+2d210a91-9bab-4a29-8372-7a5b6850487f	2026-01-01	\N	CURSANDO	e3f977f5-094a-4c8e-b528-548199c83962	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+a0fe8afb-feaa-47b3-8b04-f4706f5700d3	2026-01-01	\N	CURSANDO	17b2bb85-41c8-4144-9e7f-e8e01fb43a20	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+7aa2ff44-3796-4852-9529-9c893a83e4c3	2026-01-01	\N	CURSANDO	904e9ee6-ba06-4845-8685-02ef575e63ce	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+7d49ee53-74b2-4141-8f4d-258d49659673	2026-01-01	\N	CURSANDO	960d63fe-a6c6-4c78-b924-3d78b223ee3c	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+17fd5fd7-7b58-45be-97c4-47fe802f721c	2026-01-01	\N	CURSANDO	a0b3e0dc-1c6d-41ea-9818-0fa6ba9f2cde	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+e4086904-8dfc-4273-a16a-62e34d1b2050	2026-01-01	\N	CURSANDO	6ec39cf8-0b2f-47a1-869c-4879bf956ab7	9d5e1712-0755-40cf-b0f9-ad9d62465583
+aec40f29-025e-4994-b99a-00cecc69d29e	2026-01-01	\N	CURSANDO	2a10b618-beb2-4ca9-85d2-aa46eed9c047	9d5e1712-0755-40cf-b0f9-ad9d62465583
+47095742-6d75-4001-9133-6c9c8bb9be7f	2026-01-01	\N	CURSANDO	341777cf-0729-4ece-bc0c-cf21ad138f3e	9d5e1712-0755-40cf-b0f9-ad9d62465583
+309a97d2-ac00-405a-aa18-41b6c16d3386	2026-01-01	\N	CURSANDO	750039e2-3a54-44ca-aa08-c98d409337f4	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+b1535bb9-21d1-49eb-afbd-fc6d04ab3652	2026-01-01	\N	CURSANDO	fb03cf2f-7682-450e-b3d3-3d7d58b9f576	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+8744378a-4c33-4b2a-b5eb-9bffb83927d3	2026-01-01	\N	CURSANDO	e30b41e4-a2ef-4dd8-a188-442aff7793d6	9d5e1712-0755-40cf-b0f9-ad9d62465583
+e442e25e-1250-49b2-a930-2e6c95914200	2026-01-01	\N	CURSANDO	cbf429d1-fdac-46d9-a4d5-5fd827dbc963	9d5e1712-0755-40cf-b0f9-ad9d62465583
+e10a29be-8eed-4d71-825a-b255a4f1b129	2026-01-01	\N	CURSANDO	e571b0a3-e072-4618-9cbe-161d902123f8	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+ae039481-e642-4d72-b159-f6b87556aebb	2026-01-01	\N	CURSANDO	4edc8540-30cd-40af-9acf-c6a7b1901ee1	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+536ca563-0bd7-4213-9f4c-1946248cf3ea	2026-01-01	\N	CURSANDO	25ae0b53-ddf8-4bc2-bef5-72d40c302787	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+3ca97c9f-8f2b-4246-bed4-194eed3f4e2d	2026-01-01	\N	CURSANDO	606db5e1-aa00-43ef-96df-ea88eedfd56e	9d5e1712-0755-40cf-b0f9-ad9d62465583
+9cd59b23-0c89-4a38-9c97-dab1da1b8acd	2026-01-01	\N	CURSANDO	14d20d84-922b-4576-a5c6-e956fe952292	9d5e1712-0755-40cf-b0f9-ad9d62465583
+7633c6b8-3976-4d64-a347-63ef242ebf72	2026-01-01	\N	CURSANDO	edb1fbcf-3c49-49fc-93d3-8f0faebcd5d8	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+8d710ee3-8004-4f7b-b2ef-2e0c09537f5b	2026-01-01	\N	CURSANDO	a5de02be-13e7-479b-b072-08a02129574d	9d5e1712-0755-40cf-b0f9-ad9d62465583
+e820e605-6d38-4001-b6f6-5450047302cc	2026-01-01	\N	CURSANDO	ce8e6319-4058-42b2-8dca-7a9aea66357b	9d5e1712-0755-40cf-b0f9-ad9d62465583
+b194f1a3-daa1-4eb5-89aa-9e96e9fb70bf	2026-01-01	\N	CURSANDO	a9131103-222d-4acf-95dd-8f4cb983e4ac	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+2dd1d270-68db-48b5-8cd7-1759c98f7eb9	2026-01-01	\N	CURSANDO	7a697088-ff81-4dec-ba27-f65dce23a9e7	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+f122b890-1666-4338-8b1e-ffd2d7ff78e3	2026-01-01	\N	CURSANDO	21acc748-f589-4eb4-a42b-e04cefb26474	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+6ee98d43-33a5-4260-ab5c-f605d0377259	2026-01-01	\N	CURSANDO	d4bac841-6b0f-4ab1-81a4-05b341007467	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+497685ca-f6c5-437c-86b8-04501d9e9f25	2026-01-01	\N	CURSANDO	ab3493dc-9498-48ab-898c-3b783af96a6b	9d5e1712-0755-40cf-b0f9-ad9d62465583
+f8beb88e-95a0-4013-92ee-9a9f49bbe690	2026-01-01	\N	CURSANDO	91d5f6d5-6c25-4728-8d2e-93ee84b5c606	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+fca250ab-4999-424e-8d6e-e55155203f07	2026-01-01	\N	CURSANDO	7bdab49e-079c-4ac0-8884-43e48cbed679	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+5c9082dd-bbf7-4b15-9ee3-a25649d2482a	2026-01-01	\N	CURSANDO	9232b1ec-2685-4ab3-be83-4fd7d3373d69	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+b297dbcd-bb91-4d5d-b0a0-fe4a75d78ef4	2026-01-01	\N	CURSANDO	6e9f67d7-93aa-40dc-b55e-97b406d0823d	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+6a1c7a88-5a3d-4d5d-b41b-e026191e5585	2026-01-01	\N	CURSANDO	b287a456-521f-4b24-a0f5-8b5d0df8b53c	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+071516ab-b554-49c2-884d-ecef6d7eef15	2026-01-01	\N	CURSANDO	ff21877c-1152-442f-b9e9-fc2a2975afdc	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+2f8e6419-08aa-4c79-8851-f3ded77f2710	2026-01-01	\N	CURSANDO	6963347b-62f3-4b36-bda5-f32e4708d700	9d5e1712-0755-40cf-b0f9-ad9d62465583
+7a0dcadd-3012-464e-b9a1-f4821c393f50	2026-01-01	\N	CURSANDO	7194beca-9c17-4852-a8bf-6cb48c41f40a	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+08fdb59d-cbda-488b-98af-162e855e8f9a	2026-01-01	\N	CURSANDO	fa222530-e104-4d45-8468-c09e56e9a3e0	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+ffcf12b1-4dee-4149-905c-8772065bcc3c	2026-01-01	\N	CURSANDO	2ef38c02-e050-4a59-a38d-a57984f0d12b	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+e886ad36-7975-47e2-a339-76e6733a40b5	2026-01-01	\N	CURSANDO	7f568178-b06e-4423-ace0-517259aa8d9a	9d5e1712-0755-40cf-b0f9-ad9d62465583
+652d63b5-9896-4e69-85d9-7575c01c0d5f	2026-01-01	\N	CURSANDO	3d7f1b0e-7426-47f2-a4c5-0dd447edf282	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+467d54f6-4743-4ba6-9e65-4acdaa268194	2026-01-01	\N	CURSANDO	d81d70e5-f783-4c2a-9231-e429cc51696f	9d5e1712-0755-40cf-b0f9-ad9d62465583
+89bcb4ee-ba78-4e95-98d9-a6ac087bf12d	2026-01-01	\N	CURSANDO	595d62f0-9da1-4fa1-b423-dbf3d06e93b8	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+6bf726d0-3d16-455e-93c5-80231df7ef4e	2026-01-01	\N	CURSANDO	a83ca994-6479-4b2e-9afd-9aa06d666222	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+5464b120-a149-46d0-9eb6-610c3f12f531	2026-01-01	\N	CURSANDO	415b00af-6f72-4188-9617-fe15bd19aaa6	9d5e1712-0755-40cf-b0f9-ad9d62465583
+a425b355-f113-4de6-a37d-a4e98255007a	2026-01-01	\N	CURSANDO	32457f17-111c-4e67-9e52-10952ba8426f	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+54a9745e-20c0-4c3b-99dd-ca9a81593561	2026-01-01	\N	CURSANDO	f08991eb-ae66-4f9a-a712-38009f326259	9d5e1712-0755-40cf-b0f9-ad9d62465583
+02f2d948-4898-4ed0-948f-d40d334ed315	2026-01-01	\N	CURSANDO	1291dead-084c-41b2-bdcc-6637a018c2cb	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+994c0419-790e-4659-8f4e-c4ae3079c545	2026-01-01	\N	CURSANDO	0095752b-1005-490b-8255-496a9493b851	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+e232c88c-e86e-4c48-a681-ae2713ec04d4	2026-01-01	\N	CURSANDO	be6a94da-9293-43cc-b59c-08b09dd6a981	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+c0771699-dcf4-42fb-85ba-39420ea48eea	2026-01-01	\N	CURSANDO	cba5327d-16c5-43dc-9299-1d110f5f1b81	9d5e1712-0755-40cf-b0f9-ad9d62465583
+8a387a20-7531-4eb5-890b-9178c7716312	2026-01-01	\N	CURSANDO	13ac6715-9dcf-4cb3-bedf-1d37b9f4c784	9d5e1712-0755-40cf-b0f9-ad9d62465583
+12e13f96-5408-418c-b502-2fe59c650879	2026-01-01	\N	CURSANDO	ad18dc8b-5b80-4a2f-9218-dd5694626274	9d5e1712-0755-40cf-b0f9-ad9d62465583
+3c727003-de03-4cae-bff0-9c77349946e3	2026-01-01	\N	CURSANDO	0769c788-21c1-4c0c-9ece-a865e11be920	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+e4cfe7df-a417-46a4-8a89-8e0b3f452379	2026-01-01	\N	CURSANDO	6647f149-04e1-4ea7-b9af-1ebe82475ae0	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+c8918397-ed62-46ee-bbe2-58ede91fae46	2026-01-01	\N	CURSANDO	3f9118d9-1bc3-4f97-a200-d8825d7c0e4d	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+3076c6de-ca41-42b7-bfd2-a34a42b99d0d	2026-01-01	\N	CURSANDO	ad29dcc7-7acf-44bb-9183-c9b31ea04a37	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+e73e2cce-9bbc-4a11-ab67-18b16ae80642	2026-01-01	\N	CURSANDO	81af0e1e-34d7-484c-9c38-c9082f8534e4	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+481ba840-b7ee-4c88-961c-12d74cceff69	2026-01-01	\N	CURSANDO	097426d7-51b0-495a-b717-8e16061e47a7	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+2dcf153a-3ce3-4a30-a043-83e4d93d14db	2026-01-01	\N	CURSANDO	64cbd3f7-22a0-4259-8947-15e541bf873f	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+595f58a2-6abe-4d87-85fc-d24d3b8aad9c	2026-01-01	\N	CURSANDO	998a6f4b-4486-4070-a9cb-0b994182491f	9d5e1712-0755-40cf-b0f9-ad9d62465583
+e736616c-2374-42f3-ae63-f727a0643cfb	2026-01-01	\N	CURSANDO	ac089f04-b9b5-4268-8004-4de7e2db7d6e	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+645f2bd6-b1b3-46cc-9f33-6dc8b91e67fe	2026-01-01	\N	CURSANDO	60dcdcc1-b154-4075-a725-cc1800d78315	9d5e1712-0755-40cf-b0f9-ad9d62465583
+3da15092-9a3b-426b-ad9f-ec2177c9ad3d	2026-01-01	\N	CURSANDO	ae798004-f2ee-4c64-8e54-120e9d1fccba	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+60d23415-1e78-46a9-83e7-29e0e9115165	2026-01-01	\N	CURSANDO	4842d054-b14d-472f-b1f6-c4bb4e8302dc	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+4eb7298e-7a8f-4f3c-a993-73e3f17895cf	2026-01-01	\N	CURSANDO	c884ee01-396a-4832-b3c4-da47c7485a72	9d5e1712-0755-40cf-b0f9-ad9d62465583
+fd2c5301-6f1f-4caa-8b6c-567a752c698b	2026-01-01	\N	CURSANDO	3566f38e-50cf-4f61-b58c-1597120dfdd2	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+f25adacf-420f-4dce-8201-aba735e49af5	2026-01-01	\N	CURSANDO	ef99db42-0105-46f1-b3d6-98ec2ad43c07	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+7c0dbc54-2687-48ac-9038-495899124505	2026-01-01	\N	CURSANDO	1962f6cb-4f50-4ac4-add5-5c85a3ec71ce	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+1198e4cd-4412-454f-946d-00e971a7f902	2026-01-01	\N	CURSANDO	9375c8d3-a7c9-4ce1-8177-e9766349a495	9d5e1712-0755-40cf-b0f9-ad9d62465583
+c776fbf3-7393-4427-bc14-736dda8961c4	2026-01-01	\N	CURSANDO	9ceb08bb-fcfd-4b05-9c9d-00cab32f71cf	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+1b6b0464-9fc9-4f33-8bfa-d32c9f543ab1	2026-01-01	\N	CURSANDO	255abd29-c0bc-41f5-99be-155d1453a907	9d5e1712-0755-40cf-b0f9-ad9d62465583
+7b4285b8-dcee-462b-9d08-ce00ba0d336c	2026-01-01	\N	CURSANDO	35c4771d-04a8-4531-be01-ce574da71461	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+b9c5f23d-d927-4b7d-921f-8f52fe07bf76	2026-01-01	\N	CURSANDO	15cadd21-094f-44e2-81c7-5c9007ed8572	9d5e1712-0755-40cf-b0f9-ad9d62465583
+6e0e9296-bcdf-47ac-9f40-aeefc63190f3	2026-01-02	\N	CURSANDO	e22af666-e92d-410d-a1d0-c17c8e6061bf	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+cb8c84e2-6556-4a81-94b5-d5e59ce81019	2026-01-02	\N	CURSANDO	48862a37-585d-41f1-922f-e15d5d6c77dd	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+\.
+
+
+--
+-- Data for Name: academic_responsavel; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.academic_responsavel (id, cpf, telefone, usuario_id) FROM stdin;
+35e6936c-cb94-4647-9f67-a9ae18c7dad4	21849793840		c47af5ef-2116-42e3-aae1-160d02074af0
+\.
+
+
+--
+-- Data for Name: academic_responsavelestudante; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.academic_responsavelestudante (id, parentesco, telefone, estudante_id, responsavel_id) FROM stdin;
+07589d0c-7a3a-4367-a5f4-8bcbb579ddd4	PAI		6cc39486-d11b-4210-bbf1-3a5128e6ab8c	35e6936c-cb94-4647-9f67-a9ae18c7dad4
+\.
+
+
+--
+-- Data for Name: auth_group; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.auth_group (id, name) FROM stdin;
+\.
+
+
+--
+-- Data for Name: auth_group_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.auth_group_permissions (id, group_id, permission_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: auth_permission; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
+1	Can add log entry	1	add_logentry
+2	Can change log entry	1	change_logentry
+3	Can delete log entry	1	delete_logentry
+4	Can view log entry	1	view_logentry
+5	Can add permission	3	add_permission
+6	Can change permission	3	change_permission
+7	Can delete permission	3	delete_permission
+8	Can view permission	3	view_permission
+9	Can add group	2	add_group
+10	Can change group	2	change_group
+11	Can delete group	2	delete_group
+12	Can view group	2	view_group
+13	Can add content type	4	add_contenttype
+14	Can change content type	4	change_contenttype
+15	Can delete content type	4	delete_contenttype
+16	Can view content type	4	view_contenttype
+17	Can add session	5	add_session
+18	Can change session	5	change_session
+19	Can delete session	5	delete_session
+20	Can view session	5	view_session
+21	Can add Usuário	6	add_user
+22	Can change Usuário	6	change_user
+23	Can delete Usuário	6	delete_user
+24	Can view Usuário	6	view_user
+25	Can add Curso	8	add_curso
+26	Can change Curso	8	change_curso
+27	Can delete Curso	8	delete_curso
+28	Can view Curso	8	view_curso
+29	Can add Dia Letivo Extra	9	add_dialetivoextra
+30	Can change Dia Letivo Extra	9	change_dialetivoextra
+31	Can delete Dia Letivo Extra	9	delete_dialetivoextra
+32	Can view Dia Letivo Extra	9	view_dialetivoextra
+33	Can add Dia Não Letivo	10	add_dianaoletivo
+34	Can change Dia Não Letivo	10	change_dianaoletivo
+35	Can delete Dia Não Letivo	10	delete_dianaoletivo
+36	Can view Dia Não Letivo	10	view_dianaoletivo
+37	Can add Funcionário	13	add_funcionario
+38	Can change Funcionário	13	change_funcionario
+39	Can delete Funcionário	13	delete_funcionario
+40	Can view Funcionário	13	view_funcionario
+41	Can add Grade Horária	14	add_gradehoraria
+42	Can change Grade Horária	14	change_gradehoraria
+43	Can delete Grade Horária	14	delete_gradehoraria
+44	Can view Grade Horária	14	view_gradehoraria
+45	Can add Habilidade	15	add_habilidade
+46	Can change Habilidade	15	change_habilidade
+47	Can delete Habilidade	15	delete_habilidade
+48	Can view Habilidade	15	view_habilidade
+49	Can add Horário de Aula	16	add_horarioaula
+50	Can change Horário de Aula	16	change_horarioaula
+51	Can delete Horário de Aula	16	delete_horarioaula
+52	Can view Horário de Aula	16	view_horarioaula
+53	Can add Período de Trabalho	17	add_periodotrabalho
+54	Can change Período de Trabalho	17	change_periodotrabalho
+55	Can delete Período de Trabalho	17	delete_periodotrabalho
+56	Can view Período de Trabalho	17	view_periodotrabalho
+57	Can add Atribuição de Professor	18	add_professordisciplinaturma
+58	Can change Atribuição de Professor	18	change_professordisciplinaturma
+59	Can delete Atribuição de Professor	18	delete_professordisciplinaturma
+60	Can view Atribuição de Professor	18	view_professordisciplinaturma
+61	Can add Turma	19	add_turma
+62	Can change Turma	19	change_turma
+63	Can delete Turma	19	delete_turma
+64	Can view Turma	19	view_turma
+65	Can add Ano Letivo	7	add_anoletivo
+66	Can change Ano Letivo	7	change_anoletivo
+67	Can delete Ano Letivo	7	delete_anoletivo
+68	Can view Ano Letivo	7	view_anoletivo
+69	Can add Disciplina	11	add_disciplina
+70	Can change Disciplina	11	change_disciplina
+71	Can delete Disciplina	11	delete_disciplina
+72	Can view Disciplina	11	view_disciplina
+73	Can add Disciplina da Turma	12	add_disciplinaturma
+74	Can change Disciplina da Turma	12	change_disciplinaturma
+75	Can delete Disciplina da Turma	12	delete_disciplinaturma
+76	Can view Disciplina da Turma	12	view_disciplinaturma
+77	Can add Atestado	20	add_atestado
+78	Can change Atestado	20	change_atestado
+79	Can delete Atestado	20	delete_atestado
+80	Can view Atestado	20	view_atestado
+81	Can add Estudante	21	add_estudante
+82	Can change Estudante	21	change_estudante
+83	Can delete Estudante	21	delete_estudante
+84	Can view Estudante	21	view_estudante
+85	Can add Matrícula CEMEP	22	add_matriculacemep
+86	Can change Matrícula CEMEP	22	change_matriculacemep
+87	Can delete Matrícula CEMEP	22	delete_matriculacemep
+88	Can view Matrícula CEMEP	22	view_matriculacemep
+89	Can add Matrícula na Turma	23	add_matriculaturma
+90	Can change Matrícula na Turma	23	change_matriculaturma
+91	Can delete Matrícula na Turma	23	delete_matriculaturma
+92	Can view Matrícula na Turma	23	view_matriculaturma
+93	Can add Responsável	24	add_responsavel
+94	Can change Responsável	24	change_responsavel
+95	Can delete Responsável	24	delete_responsavel
+96	Can view Responsável	24	view_responsavel
+97	Can add Vínculo Responsável-Estudante	25	add_responsavelestudante
+98	Can change Vínculo Responsável-Estudante	25	change_responsavelestudante
+99	Can delete Vínculo Responsável-Estudante	25	delete_responsavelestudante
+100	Can view Vínculo Responsável-Estudante	25	view_responsavelestudante
+101	Can add Aula	26	add_aula
+102	Can change Aula	26	change_aula
+103	Can delete Aula	26	delete_aula
+104	Can view Aula	26	view_aula
+105	Can add Avaliação	27	add_avaliacao
+106	Can change Avaliação	27	change_avaliacao
+107	Can delete Avaliação	27	delete_avaliacao
+108	Can view Avaliação	27	view_avaliacao
+109	Can add Tipo de Ocorrência	29	add_descritorocorrenciapedagogica
+110	Can change Tipo de Ocorrência	29	change_descritorocorrenciapedagogica
+111	Can delete Tipo de Ocorrência	29	delete_descritorocorrenciapedagogica
+112	Can view Tipo de Ocorrência	29	view_descritorocorrenciapedagogica
+113	Can add Instrumento Avaliativo	31	add_instrumentoavaliativo
+114	Can change Instrumento Avaliativo	31	change_instrumentoavaliativo
+115	Can delete Instrumento Avaliativo	31	delete_instrumentoavaliativo
+116	Can view Instrumento Avaliativo	31	view_instrumentoavaliativo
+117	Can add Notificação de Recuperação	35	add_notificacaorecuperacao
+118	Can change Notificação de Recuperação	35	change_notificacaorecuperacao
+119	Can delete Notificação de Recuperação	35	delete_notificacaorecuperacao
+120	Can view Notificação de Recuperação	35	view_notificacaorecuperacao
+121	Can add Ocorrência Pedagógica	36	add_ocorrenciapedagogica
+122	Can change Ocorrência Pedagógica	36	change_ocorrenciapedagogica
+123	Can delete Ocorrência Pedagógica	36	delete_ocorrenciapedagogica
+124	Can view Ocorrência Pedagógica	36	view_ocorrenciapedagogica
+125	Can add Plano de Aula	38	add_planoaula
+126	Can change Plano de Aula	38	change_planoaula
+127	Can delete Plano de Aula	38	delete_planoaula
+128	Can view Plano de Aula	38	view_planoaula
+129	Can add Falta	30	add_faltas
+130	Can change Falta	30	change_faltas
+131	Can delete Falta	30	delete_faltas
+132	Can view Falta	30	view_faltas
+133	Can add Visto	28	add_controlevisto
+134	Can change Visto	28	change_controlevisto
+135	Can delete Visto	28	delete_controlevisto
+136	Can view Visto	28	view_controlevisto
+137	Can add Nota de Avaliação	32	add_notaavaliacao
+138	Can change Nota de Avaliação	32	change_notaavaliacao
+139	Can delete Nota de Avaliação	32	delete_notaavaliacao
+140	Can view Nota de Avaliação	32	view_notaavaliacao
+141	Can add Nota Bimestral	33	add_notabimestral
+142	Can change Nota Bimestral	33	change_notabimestral
+143	Can delete Nota Bimestral	33	delete_notabimestral
+144	Can view Nota Bimestral	33	view_notabimestral
+145	Can add Nota de Instrumento Avaliativo	34	add_notainstrumentoavaliativo
+146	Can change Nota de Instrumento Avaliativo	34	change_notainstrumentoavaliativo
+147	Can delete Nota de Instrumento Avaliativo	34	delete_notainstrumentoavaliativo
+148	Can view Nota de Instrumento Avaliativo	34	view_notainstrumentoavaliativo
+149	Can add Ciência de Ocorrência	37	add_ocorrenciaresponsavelciente
+150	Can change Ciência de Ocorrência	37	change_ocorrenciaresponsavelciente
+151	Can delete Ciência de Ocorrência	37	delete_ocorrenciaresponsavelciente
+152	Can view Ciência de Ocorrência	37	view_ocorrenciaresponsavelciente
+153	Can add Anexo do Aviso	40	add_avisoanexo
+154	Can change Anexo do Aviso	40	change_avisoanexo
+155	Can delete Anexo do Aviso	40	delete_avisoanexo
+156	Can view Anexo do Aviso	40	view_avisoanexo
+157	Can add Visualização de Aviso	41	add_avisovisualizacao
+158	Can change Visualização de Aviso	41	change_avisovisualizacao
+159	Can delete Visualização de Aviso	41	delete_avisovisualizacao
+160	Can view Visualização de Aviso	41	view_avisovisualizacao
+161	Can add Notificação de HTPC	42	add_notificacaohtpc
+162	Can change Notificação de HTPC	42	change_notificacaohtpc
+163	Can delete Notificação de HTPC	42	delete_notificacaohtpc
+164	Can view Notificação de HTPC	42	view_notificacaohtpc
+165	Can add Notificação de Tarefa	43	add_notificacaotarefa
+166	Can change Notificação de Tarefa	43	change_notificacaotarefa
+167	Can delete Notificação de Tarefa	43	delete_notificacaotarefa
+168	Can view Notificação de Tarefa	43	view_notificacaotarefa
+169	Can add Reunião HTPC	44	add_reuniaohtpc
+170	Can change Reunião HTPC	44	change_reuniaohtpc
+171	Can delete Reunião HTPC	44	delete_reuniaohtpc
+172	Can view Reunião HTPC	44	view_reuniaohtpc
+173	Can add Anexo de HTPC	45	add_reuniaohtpcanexo
+174	Can change Anexo de HTPC	45	change_reuniaohtpcanexo
+175	Can delete Anexo de HTPC	45	delete_reuniaohtpcanexo
+176	Can view Anexo de HTPC	45	view_reuniaohtpcanexo
+177	Can add Tarefa	46	add_tarefa
+178	Can change Tarefa	46	change_tarefa
+179	Can delete Tarefa	46	delete_tarefa
+180	Can view Tarefa	46	view_tarefa
+181	Can add Anexo da Tarefa	47	add_tarefaanexo
+182	Can change Anexo da Tarefa	47	change_tarefaanexo
+183	Can delete Anexo da Tarefa	47	delete_tarefaanexo
+184	Can view Anexo da Tarefa	47	view_tarefaanexo
+185	Can add Resposta da Tarefa	48	add_tarefaresposta
+186	Can change Resposta da Tarefa	48	change_tarefaresposta
+187	Can delete Resposta da Tarefa	48	delete_tarefaresposta
+188	Can view Resposta da Tarefa	48	view_tarefaresposta
+189	Can add Anexo da Resposta	49	add_tarefarespostaanexo
+190	Can change Anexo da Resposta	49	change_tarefarespostaanexo
+191	Can delete Anexo da Resposta	49	delete_tarefarespostaanexo
+192	Can view Anexo da Resposta	49	view_tarefarespostaanexo
+193	Can add Aviso	39	add_aviso
+194	Can change Aviso	39	change_aviso
+195	Can delete Aviso	39	delete_aviso
+196	Can view Aviso	39	view_aviso
+197	Can add Dados Permanentes do Estudante	50	add_dadospermanenteestudante
+198	Can change Dados Permanentes do Estudante	50	change_dadospermanenteestudante
+199	Can delete Dados Permanentes do Estudante	50	delete_dadospermanenteestudante
+200	Can view Dados Permanentes do Estudante	50	view_dadospermanenteestudante
+201	Can add Dados Permanentes do Responsável	51	add_dadospermanenteresponsavel
+202	Can change Dados Permanentes do Responsável	51	change_dadospermanenteresponsavel
+203	Can delete Dados Permanentes do Responsável	51	delete_dadospermanenteresponsavel
+204	Can view Dados Permanentes do Responsável	51	view_dadospermanenteresponsavel
+205	Can add Histórico Escolar	52	add_historicoescolar
+206	Can change Histórico Escolar	52	change_historicoescolar
+207	Can delete Histórico Escolar	52	delete_historicoescolar
+208	Can view Histórico Escolar	52	view_historicoescolar
+209	Can add Histórico por Ano Letivo	53	add_historicoescolaranoletivo
+210	Can change Histórico por Ano Letivo	53	change_historicoescolaranoletivo
+211	Can delete Histórico por Ano Letivo	53	delete_historicoescolaranoletivo
+212	Can view Histórico por Ano Letivo	53	view_historicoescolaranoletivo
+213	Can add Nota Final do Histórico	54	add_historicoescolarnotas
+214	Can change Nota Final do Histórico	54	change_historicoescolarnotas
+215	Can delete Nota Final do Histórico	54	delete_historicoescolarnotas
+216	Can view Nota Final do Histórico	54	view_historicoescolarnotas
+217	Can add Registro de Prontuário	55	add_registroprontuario
+218	Can change Registro de Prontuário	55	change_registroprontuario
+219	Can delete Registro de Prontuário	55	delete_registroprontuario
+220	Can view Registro de Prontuário	55	view_registroprontuario
+221	Can add Anexo de Registro Prontuário	56	add_registroprontuarioanexo
+222	Can change Anexo de Registro Prontuário	56	change_registroprontuarioanexo
+223	Can delete Anexo de Registro Prontuário	56	delete_registroprontuarioanexo
+224	Can view Anexo de Registro Prontuário	56	view_registroprontuarioanexo
+225	Can add Ano Letivo Selecionado	57	add_anoletivoselecionado
+226	Can change Ano Letivo Selecionado	57	change_anoletivoselecionado
+227	Can delete Ano Letivo Selecionado	57	delete_anoletivoselecionado
+228	Can view Ano Letivo Selecionado	57	view_anoletivoselecionado
+229	Can add Vigência de Grade Horária	58	add_gradehorariavalidade
+230	Can change Vigência de Grade Horária	58	change_gradehorariavalidade
+231	Can delete Vigência de Grade Horária	58	delete_gradehorariavalidade
+232	Can view Vigência de Grade Horária	58	view_gradehorariavalidade
+\.
+
+
+--
+-- Data for Name: core_anoletivo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_anoletivo (id, ano, is_active, data_inicio_1bim, data_fim_1bim, data_inicio_2bim, data_fim_2bim, data_inicio_3bim, data_fim_3bim, data_inicio_4bim, data_fim_4bim) FROM stdin;
+a5f8c071-db65-430a-ae38-ed4eb0b9f301	2026	t	2026-01-26	2026-04-11	2026-04-13	2026-06-20	2026-07-20	2026-09-26	2026-10-05	2026-12-16
+\.
+
+
+--
+-- Data for Name: core_anoletivo_dias_letivos_extras; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_anoletivo_dias_letivos_extras (id, anoletivo_id, dialetivoextra_id) FROM stdin;
+3	a5f8c071-db65-430a-ae38-ed4eb0b9f301	5477616e-9037-426e-b462-ef3072eb54c9
+4	a5f8c071-db65-430a-ae38-ed4eb0b9f301	d35e8f1b-29c3-44c4-a19d-1fbf320f3c4e
+\.
+
+
+--
+-- Data for Name: core_anoletivo_dias_nao_letivos; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_anoletivo_dias_nao_letivos (id, anoletivo_id, dianaoletivo_id) FROM stdin;
+2	a5f8c071-db65-430a-ae38-ed4eb0b9f301	2f4bc39c-1996-4b84-99bd-cfd69afdd3c0
+3	a5f8c071-db65-430a-ae38-ed4eb0b9f301	16bd58af-40ce-43ae-ac52-42d127f5c512
+4	a5f8c071-db65-430a-ae38-ed4eb0b9f301	54f35191-9bf8-4aa4-abd7-210b61a9b965
+5	a5f8c071-db65-430a-ae38-ed4eb0b9f301	76474a0e-0b09-46b7-b526-7e10b63bd232
+6	a5f8c071-db65-430a-ae38-ed4eb0b9f301	4934b6c2-21a4-4cc7-8c19-a8361cb86e71
+7	a5f8c071-db65-430a-ae38-ed4eb0b9f301	3247d65d-9241-4283-aa9c-864b20ec5a19
+8	a5f8c071-db65-430a-ae38-ed4eb0b9f301	a18872c0-9dc4-4415-8dc4-4edf317a4193
+9	a5f8c071-db65-430a-ae38-ed4eb0b9f301	c25bb7c2-1cf4-4e9b-9045-2a6c75a96a99
+10	a5f8c071-db65-430a-ae38-ed4eb0b9f301	5399506d-8f67-4238-b101-315aac0df00b
+11	a5f8c071-db65-430a-ae38-ed4eb0b9f301	d0f7ec7c-fe77-4cf6-9fc6-9003d7c6c396
+\.
+
+
+--
+-- Data for Name: core_anoletivoselecionado; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_anoletivoselecionado (id, ano_letivo_id, usuario_id) FROM stdin;
+2c862d94-d206-4903-a6c1-d2eecd27cb49	a5f8c071-db65-430a-ae38-ed4eb0b9f301	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+a6435c7f-adc8-4c6b-b590-aefb3ed56463	a5f8c071-db65-430a-ae38-ed4eb0b9f301	f601ece2-8f7d-4550-aca8-d0069f139745
+\.
+
+
+--
+-- Data for Name: core_curso; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_curso (id, nome, sigla, is_active) FROM stdin;
+e985987a-7310-4bf8-95d3-faebda1bdf3f	Técnico em Informática	TI	t
+3523065c-f944-4ec5-aa45-2d7dae99c6a6	Ensino Médio	EM	t
+1c58d18c-00c3-49c9-8db5-54b5031c0f4b	Ensino Médio Integrado com Técnico em Informática	EMTI	t
+\.
+
+
+--
+-- Data for Name: core_dialetivoextra; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_dialetivoextra (id, data, descricao) FROM stdin;
+5477616e-9037-426e-b462-ef3072eb54c9	2026-03-22	
+d35e8f1b-29c3-44c4-a19d-1fbf320f3c4e	2026-09-13	
+\.
+
+
+--
+-- Data for Name: core_dianaoletivo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_dianaoletivo (id, data, tipo, descricao) FROM stdin;
+2f4bc39c-1996-4b84-99bd-cfd69afdd3c0	2026-01-01	FERIADO	
+16bd58af-40ce-43ae-ac52-42d127f5c512	2026-02-16	FERIADO	
+54f35191-9bf8-4aa4-abd7-210b61a9b965	2026-02-17	FERIADO	
+76474a0e-0b09-46b7-b526-7e10b63bd232	2026-04-03	FERIADO	
+4934b6c2-21a4-4cc7-8c19-a8361cb86e71	2026-04-21	FERIADO	
+3247d65d-9241-4283-aa9c-864b20ec5a19	2026-05-01	FERIADO	
+a18872c0-9dc4-4415-8dc4-4edf317a4193	2026-06-19	FERIADO	
+c25bb7c2-1cf4-4e9b-9045-2a6c75a96a99	2026-09-07	FERIADO	
+5399506d-8f67-4238-b101-315aac0df00b	2026-10-12	FERIADO	
+d0f7ec7c-fe77-4cf6-9fc6-9003d7c6c396	2026-11-02	FERIADO	
+\.
+
+
+--
+-- Data for Name: core_disciplina; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_disciplina (id, nome, sigla, area_conhecimento, is_active) FROM stdin;
+dca2520f-14a6-4c1a-ad1f-4120c9e2057e	Português	PORT	LINGUAGENS	t
+f2676f6a-fe41-4a6a-99d2-db43e44c2b4a	Matemática	MAT	MATEMATICA	t
+1fc96e19-28f8-4dc4-8be9-2a1c09776ad7	Arte	ART	LINGUAGENS	t
+54c97510-be84-42da-ae41-26d8a9df9a6f	Inglês	ING	LINGUAGENS	t
+10bed171-f7e4-46c1-b9db-6038be9176aa	Educação Física	EF	LINGUAGENS	t
+1a478ff8-19dc-4ed4-a420-b2d0660f0ad9	Biologia	BIO	CIENCIAS_NATUREZA	t
+11f02794-e4f8-4533-872b-1c9dedf758dd	Física	FIS	CIENCIAS_NATUREZA	t
+ab322357-760c-4cb3-9b50-022ce4676849	Química	QUI	CIENCIAS_NATUREZA	t
+31f2c528-c570-491f-bc72-d272b861f9e2	História	HIST	CIENCIAS_HUMANAS	t
+96d41460-ca48-4559-af11-8a90a19303fb	Geografia	GEO	CIENCIAS_HUMANAS	t
+31690f56-afd4-40a2-ba74-190bdb753977	Filosofia	FILO	CIENCIAS_HUMANAS	t
+26b91afa-ee36-4fd2-aa7b-6f1d2b19e933	Sociologia	SOC	CIENCIAS_HUMANAS	t
+ed389637-a56c-4cbe-b0e8-cd5a1f9bed6d	Normatização e Padronização	NP	TEC_INFORMATICA	t
+01f676be-243a-4d2f-9e6c-b7736f998049	Tecnologia da Informação e Comunicação	TIC	TEC_INFORMATICA	t
+fc81de61-265c-4997-a8bb-cb78cc3ff178	Linguagem de Programação I	LP_I	TEC_INFORMATICA	t
+fbeac0df-a111-42f0-8513-a9861018d701	Laboratório de Lógica Aplicada I	LLA_I	TEC_INFORMATICA	t
+95446570-a83f-4495-b131-3db4dce2aa78	Lógica de Programação	LOG	TEC_INFORMATICA	t
+d49f69ca-7bb0-47e4-a0ab-ae874c706953	Banco de Dados I	BD_I	TEC_INFORMATICA	t
+da880160-3b6d-42ff-8bc2-5c446fb45a7d	Desenvolvimento de Sites I	DS_I	TEC_INFORMATICA	t
+5df70516-4be8-439d-a4d4-a7e3927c7b76	Linguagem de Programação Comercial I	LPC_I	TEC_INFORMATICA	t
+3ef9d6c7-bb0d-4357-858a-aa62c60cb5cd	Técnicas de Programação Visual I	TPV_I	TEC_INFORMATICA	t
+99400900-91bc-41c6-9a5e-a238d3028501	Linguagem de Programação II	LP_II	TEC_INFORMATICA	t
+f263bc20-6fc7-41f3-b2dc-5d3e0b04e994	Laboratório de Lógica Aplicada II	LLA_II	TEC_INFORMATICA	t
+eff8cf60-aaf2-47c6-8b80-6694e27e8d17	Engenharia de Sistemas de Informação	ESI	TEC_INFORMATICA	t
+ce2039a1-2b8d-4ec5-871e-47a3009d7b51	Banco de Dados II	BD_II	TEC_INFORMATICA	t
+82dfb83e-05ce-4749-b20c-b655de7a6e36	Desenvolvimento de Sites II	DS_II	TEC_INFORMATICA	t
+d9001747-9003-4920-8157-9f92c6a09507	Linguagem de Programação Comercial II	LPC_II	TEC_INFORMATICA	t
+cb71a3a5-1d9a-4e68-ad1b-3120bb77be16	Técnicas de Programação Visual II	TPV_II	TEC_INFORMATICA	t
+8ea55bd2-dcd8-4667-ba73-fa0e68263d1f	Linguagem de Programação III	LP_III	TEC_INFORMATICA	t
+a41c5efe-b490-422a-ae10-bc1c520cd8c0	Banco de Dados III	BD_III	TEC_INFORMATICA	t
+f8b398a8-094b-49da-8b62-3b9d83a8cb10	Orientação Profissional em TIC	OP	TEC_INFORMATICA	t
+9d608f00-7aeb-4b80-8800-d830766ed878	Trabalho de Conclusão de Curso	TCC	TEC_INFORMATICA	t
+\.
+
+
+--
+-- Data for Name: core_disciplinaturma; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_disciplinaturma (id, aulas_semanais, disciplina_id, turma_id) FROM stdin;
+90a068e3-78ed-4619-94d7-5c830f2f30ac	2	d49f69ca-7bb0-47e4-a0ab-ae874c706953	ae3b13bc-e075-423c-a90f-39dbf165cef1
+8cbf4b7f-415e-49e5-bf35-68ba82f54e42	3	da880160-3b6d-42ff-8bc2-5c446fb45a7d	ae3b13bc-e075-423c-a90f-39dbf165cef1
+a1885ef9-4036-4d71-8913-9bcd7fd083b8	3	fbeac0df-a111-42f0-8513-a9861018d701	ae3b13bc-e075-423c-a90f-39dbf165cef1
+fd907bbf-7da1-4f90-af25-dcc9fe21df30	3	fc81de61-265c-4997-a8bb-cb78cc3ff178	ae3b13bc-e075-423c-a90f-39dbf165cef1
+5cfc6621-3945-4dda-97ea-548bf85db77f	3	95446570-a83f-4495-b131-3db4dce2aa78	ae3b13bc-e075-423c-a90f-39dbf165cef1
+f009b229-487a-42da-9eae-2b3a2c4d6ef9	2	ed389637-a56c-4cbe-b0e8-cd5a1f9bed6d	ae3b13bc-e075-423c-a90f-39dbf165cef1
+39b7af89-3a03-495b-b857-d44d33033460	4	01f676be-243a-4d2f-9e6c-b7736f998049	ae3b13bc-e075-423c-a90f-39dbf165cef1
+fc3058ef-9928-4356-a4f3-a6b0afc39a20	2	d49f69ca-7bb0-47e4-a0ab-ae874c706953	3ef22e1d-0d6b-498e-932d-59135a490561
+bf5a9670-8951-4b63-a270-9b44a9a7c64c	3	da880160-3b6d-42ff-8bc2-5c446fb45a7d	3ef22e1d-0d6b-498e-932d-59135a490561
+6ff014c3-076e-4883-b0ad-deb326330059	3	fbeac0df-a111-42f0-8513-a9861018d701	3ef22e1d-0d6b-498e-932d-59135a490561
+00cc9be2-dbb5-4b49-b734-44b192051a88	3	fc81de61-265c-4997-a8bb-cb78cc3ff178	3ef22e1d-0d6b-498e-932d-59135a490561
+e9e59b3d-ad7d-41f1-a2f0-be5ae612a506	3	95446570-a83f-4495-b131-3db4dce2aa78	3ef22e1d-0d6b-498e-932d-59135a490561
+d9b415dc-27f9-4763-87a1-8d140f72df38	2	ed389637-a56c-4cbe-b0e8-cd5a1f9bed6d	3ef22e1d-0d6b-498e-932d-59135a490561
+2e2bf936-7e88-4802-a0b0-7fbf095dfa41	4	01f676be-243a-4d2f-9e6c-b7736f998049	3ef22e1d-0d6b-498e-932d-59135a490561
+6cc56317-4780-4ed7-859a-b3633e557c30	2	d49f69ca-7bb0-47e4-a0ab-ae874c706953	6c40cc17-bf7b-4990-9737-2081da826233
+51ac8b76-326f-41ee-a427-cc5970ffad5d	3	da880160-3b6d-42ff-8bc2-5c446fb45a7d	6c40cc17-bf7b-4990-9737-2081da826233
+bcb3a01d-e00f-474e-a0e2-a73a98d3740c	3	fbeac0df-a111-42f0-8513-a9861018d701	6c40cc17-bf7b-4990-9737-2081da826233
+fb7f3397-9457-4bfa-afce-226b5a4934c2	3	fc81de61-265c-4997-a8bb-cb78cc3ff178	6c40cc17-bf7b-4990-9737-2081da826233
+8724996c-7649-48d0-aaa2-28381865da63	3	95446570-a83f-4495-b131-3db4dce2aa78	6c40cc17-bf7b-4990-9737-2081da826233
+70c66063-f440-40fe-a44f-e9cbc8a0cb52	2	ed389637-a56c-4cbe-b0e8-cd5a1f9bed6d	6c40cc17-bf7b-4990-9737-2081da826233
+de73f1c0-3e7e-4bf2-9942-59064f935daa	4	01f676be-243a-4d2f-9e6c-b7736f998049	6c40cc17-bf7b-4990-9737-2081da826233
+6d0a18f0-c24a-4e9d-bde7-a5f3f1d5cc81	2	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+65a6ec64-a7c8-488f-9d49-32a185fb72b5	2	10bed171-f7e4-46c1-b9db-6038be9176aa	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+b782c6ea-94f5-43bc-82a6-c0eb36ffa99a	2	31690f56-afd4-40a2-ba74-190bdb753977	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+9d2dab81-c167-4efa-9785-6a65d33246ac	3	11f02794-e4f8-4533-872b-1c9dedf758dd	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+4e5ed8f6-8616-4e87-ab64-7ff9c0bfa082	3	96d41460-ca48-4559-af11-8a90a19303fb	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+2cd4aeb5-4f05-4117-90ba-41c2593c3926	3	31f2c528-c570-491f-bc72-d272b861f9e2	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+2c5830d3-1a85-421b-8cb5-bccd00fe6069	2	54c97510-be84-42da-ae41-26d8a9df9a6f	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+a0e5c25a-27b7-46c5-ac7c-c80d5065321f	4	dca2520f-14a6-4c1a-ad1f-4120c9e2057e	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+552b4c65-7d1f-4acc-aaf9-c48d2718f963	3	ab322357-760c-4cb3-9b50-022ce4676849	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+2fa5e13c-c4f2-4464-8001-74112ce7de02	1	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+96e76ba5-bd12-45ef-998c-8d24f22266b4	5	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a	10fa0e47-c9cb-4b33-8a48-74927b44fa35
+d6ddd267-e364-4bd5-b117-81a6d04fb85c	2	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9	7bda7580-c6a1-413f-98c3-1e2aca805239
+5228f5ea-952c-4cea-a1d4-2b919cbbbce7	2	10bed171-f7e4-46c1-b9db-6038be9176aa	7bda7580-c6a1-413f-98c3-1e2aca805239
+ca7455fb-9548-44da-bea3-2193ada8cda4	2	31690f56-afd4-40a2-ba74-190bdb753977	7bda7580-c6a1-413f-98c3-1e2aca805239
+30f750ee-9b02-4314-8927-1148576e616d	3	11f02794-e4f8-4533-872b-1c9dedf758dd	7bda7580-c6a1-413f-98c3-1e2aca805239
+1ad51a74-3809-43e2-ab80-b72ffc91db92	3	96d41460-ca48-4559-af11-8a90a19303fb	7bda7580-c6a1-413f-98c3-1e2aca805239
+eb9738b7-b3a7-4bd3-8017-def22510be0d	3	31f2c528-c570-491f-bc72-d272b861f9e2	7bda7580-c6a1-413f-98c3-1e2aca805239
+04952e13-b9a4-49ce-b138-f63e8d407b9d	2	54c97510-be84-42da-ae41-26d8a9df9a6f	7bda7580-c6a1-413f-98c3-1e2aca805239
+af14692b-1710-402e-82a0-175dcfacf29e	4	dca2520f-14a6-4c1a-ad1f-4120c9e2057e	7bda7580-c6a1-413f-98c3-1e2aca805239
+61b4e95a-c7c6-48f0-a4d0-4177ca6e5f03	3	ab322357-760c-4cb3-9b50-022ce4676849	7bda7580-c6a1-413f-98c3-1e2aca805239
+35a37423-9cfa-476b-9f57-b41420e54649	1	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933	7bda7580-c6a1-413f-98c3-1e2aca805239
+1f7fd332-2fa7-4786-a5c0-6ad8e9b8686a	5	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a	7bda7580-c6a1-413f-98c3-1e2aca805239
+1a5de4c9-b676-4674-b843-dd75f3f1a615	2	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9	60a54341-045c-4111-b081-17c8729b6304
+5525329d-2f0e-44f3-9d09-72188b4e8762	2	10bed171-f7e4-46c1-b9db-6038be9176aa	60a54341-045c-4111-b081-17c8729b6304
+c34e7eaf-832c-4301-b157-970fa6c584c5	2	31690f56-afd4-40a2-ba74-190bdb753977	60a54341-045c-4111-b081-17c8729b6304
+b67fa3ee-8845-44bc-897f-67a5c3976475	3	11f02794-e4f8-4533-872b-1c9dedf758dd	60a54341-045c-4111-b081-17c8729b6304
+b899a4a5-e2ff-4520-98a3-9ede133a0600	3	96d41460-ca48-4559-af11-8a90a19303fb	60a54341-045c-4111-b081-17c8729b6304
+6ebd3afa-16d1-42af-8113-eb2346a9b191	2	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+0f8cf1d8-c7ed-42a2-882d-e3de906d445b	3	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+e97a8efa-1f0c-4e09-b27b-f361e0ba4400	2	10bed171-f7e4-46c1-b9db-6038be9176aa	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+d8e62cd6-68fa-4c0e-b7d8-e744a6a9d9f7	1	31690f56-afd4-40a2-ba74-190bdb753977	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+bcd41a6d-42cb-466c-95e7-eaee012e3e87	3	11f02794-e4f8-4533-872b-1c9dedf758dd	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+dd29ba41-6ecb-4bfa-9dc2-d606a7e23ba9	3	96d41460-ca48-4559-af11-8a90a19303fb	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+57838b76-59c0-411d-a8da-854324995725	3	31f2c528-c570-491f-bc72-d272b861f9e2	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+f0bbf15d-0571-4cab-a517-c0839198f47d	2	54c97510-be84-42da-ae41-26d8a9df9a6f	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+26c7164b-d2ec-48a5-b2bb-37a0bd4b1b3f	4	dca2520f-14a6-4c1a-ad1f-4120c9e2057e	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+34ca61bc-573f-468d-b479-cde6b4d7036a	2	ab322357-760c-4cb3-9b50-022ce4676849	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+015837aa-a233-4f84-8dd0-10ec2e9030c3	1	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+8b0dee40-ebc3-49c3-bc9c-959051124e91	4	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+bd39f8f3-2029-4722-9db8-8d9bf6561f07	2	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7	5921603f-a060-44ac-863b-bb82b65d9d34
+664a0781-073a-4755-aa5f-698bdc1dcf8e	3	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9	5921603f-a060-44ac-863b-bb82b65d9d34
+a625b009-e279-4562-9002-45d6be3a0ffc	2	10bed171-f7e4-46c1-b9db-6038be9176aa	5921603f-a060-44ac-863b-bb82b65d9d34
+3f292a5e-44fc-44eb-b9de-029181d26831	1	31690f56-afd4-40a2-ba74-190bdb753977	5921603f-a060-44ac-863b-bb82b65d9d34
+0d2612d7-c7c0-4ccf-aa41-e0c68fdf321c	3	11f02794-e4f8-4533-872b-1c9dedf758dd	5921603f-a060-44ac-863b-bb82b65d9d34
+d5af0dba-5b5c-4f7e-a167-145f533c4375	3	96d41460-ca48-4559-af11-8a90a19303fb	5921603f-a060-44ac-863b-bb82b65d9d34
+a63fb916-8de1-4dd3-913f-4fbb059ee7aa	3	31f2c528-c570-491f-bc72-d272b861f9e2	5921603f-a060-44ac-863b-bb82b65d9d34
+a377ab77-ffdd-4188-8381-c6aee195623a	2	54c97510-be84-42da-ae41-26d8a9df9a6f	5921603f-a060-44ac-863b-bb82b65d9d34
+f955fc5d-bb4e-47d4-9237-f0c396365a0a	4	dca2520f-14a6-4c1a-ad1f-4120c9e2057e	5921603f-a060-44ac-863b-bb82b65d9d34
+5ee97f2b-f4bf-459c-a958-6eb10eee1021	2	ab322357-760c-4cb3-9b50-022ce4676849	5921603f-a060-44ac-863b-bb82b65d9d34
+e30b9af1-4b7a-48cf-8c8d-00b243f611b0	1	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933	5921603f-a060-44ac-863b-bb82b65d9d34
+e1576ecb-f336-4e8e-9391-31d7460ce6d3	4	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a	5921603f-a060-44ac-863b-bb82b65d9d34
+9f9b5853-1819-4b47-a0f6-11c168d53a00	2	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7	7f1be428-4464-452c-8030-7173abcf2bb0
+03743da5-ad4b-45be-af2d-d4a9131a29bb	3	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9	7f1be428-4464-452c-8030-7173abcf2bb0
+b60b8c0b-4488-428a-97be-25eacb4e37eb	2	10bed171-f7e4-46c1-b9db-6038be9176aa	7f1be428-4464-452c-8030-7173abcf2bb0
+349a74cf-22d5-4197-a0f9-c8f71db9d5dd	1	31690f56-afd4-40a2-ba74-190bdb753977	7f1be428-4464-452c-8030-7173abcf2bb0
+e0866548-875c-42cd-8d37-25b3782a0aff	3	11f02794-e4f8-4533-872b-1c9dedf758dd	7f1be428-4464-452c-8030-7173abcf2bb0
+636ec1c4-654c-44d7-b393-021c756b1e36	3	96d41460-ca48-4559-af11-8a90a19303fb	7f1be428-4464-452c-8030-7173abcf2bb0
+571ef43e-4abf-4f41-8249-f1a72f094ac2	3	31f2c528-c570-491f-bc72-d272b861f9e2	7f1be428-4464-452c-8030-7173abcf2bb0
+ddd0fd09-1211-4701-89a3-d11f93ecf317	2	54c97510-be84-42da-ae41-26d8a9df9a6f	7f1be428-4464-452c-8030-7173abcf2bb0
+70500d3b-53c9-48e6-91b5-81617c9e3b45	4	dca2520f-14a6-4c1a-ad1f-4120c9e2057e	7f1be428-4464-452c-8030-7173abcf2bb0
+f41dfd3a-bb77-4182-9a6f-dd909fd6adef	2	ab322357-760c-4cb3-9b50-022ce4676849	7f1be428-4464-452c-8030-7173abcf2bb0
+80744589-0353-4c62-be4c-bec21cc2f156	1	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933	7f1be428-4464-452c-8030-7173abcf2bb0
+2fc718e0-2d15-4fd3-871b-4a4c7e977af5	4	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a	7f1be428-4464-452c-8030-7173abcf2bb0
+d7e9cc92-faea-4e2d-87cf-40070b40d804	3	31f2c528-c570-491f-bc72-d272b861f9e2	60a54341-045c-4111-b081-17c8729b6304
+1fa1a2c8-15d7-4cc8-9466-490b6b0434bd	2	54c97510-be84-42da-ae41-26d8a9df9a6f	60a54341-045c-4111-b081-17c8729b6304
+0701c511-e061-4a3c-a10c-9db2dd34bd8a	4	dca2520f-14a6-4c1a-ad1f-4120c9e2057e	60a54341-045c-4111-b081-17c8729b6304
+2d41a847-8f3b-4631-ad5e-ed9ea5682d8a	3	ab322357-760c-4cb3-9b50-022ce4676849	60a54341-045c-4111-b081-17c8729b6304
+a78a715a-c08b-4c40-8249-c527edf4e3d4	1	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933	60a54341-045c-4111-b081-17c8729b6304
+3510042b-be7f-449b-b39e-e8a2add804b6	5	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a	60a54341-045c-4111-b081-17c8729b6304
+571ea570-427d-406a-82c7-8c3948db8be2	3	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+6c340c89-acd6-4892-bf75-480d30db57b3	2	10bed171-f7e4-46c1-b9db-6038be9176aa	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+b97032b6-34c1-49c2-9466-5b898b2d6dfd	2	31690f56-afd4-40a2-ba74-190bdb753977	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+a4002df2-d553-4466-a82b-f34ed1549792	2	11f02794-e4f8-4533-872b-1c9dedf758dd	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+ec4a78f2-013e-4285-b69c-3da401ba8ef9	3	96d41460-ca48-4559-af11-8a90a19303fb	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+2f2c4cd7-d57d-493e-9ebf-01b730af0d9a	3	31f2c528-c570-491f-bc72-d272b861f9e2	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+f7b4e890-adc8-4090-90c5-c20be490cf8a	2	54c97510-be84-42da-ae41-26d8a9df9a6f	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+8d99c406-1841-487d-8525-0e9cbace4c02	5	dca2520f-14a6-4c1a-ad1f-4120c9e2057e	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+61f9dea2-74f5-4a98-906a-b44320ed7e29	3	ab322357-760c-4cb3-9b50-022ce4676849	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+d6b1b2cd-f7dd-4e25-a6d6-94da41fecdb9	1	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+bb0f3897-5aa7-4f78-83a5-29bc06650f4e	4	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+73e9c0d5-b77c-4bc2-9839-4888cbd3d743	3	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+629c5e35-0b3e-4057-b56a-df71454f1bbd	2	10bed171-f7e4-46c1-b9db-6038be9176aa	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+a2a7a912-e907-4a5c-8c6f-94b74a49c818	2	31690f56-afd4-40a2-ba74-190bdb753977	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+0f0abd9d-3d9a-41a4-875b-392ac8749274	2	11f02794-e4f8-4533-872b-1c9dedf758dd	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+61bea260-54ed-450e-a67d-1f5e5cddbe0b	3	96d41460-ca48-4559-af11-8a90a19303fb	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+dfa37685-c865-4841-95ff-0a7f1c0f2b9b	3	31f2c528-c570-491f-bc72-d272b861f9e2	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+11734d72-f9f4-457c-9735-6b3aac6c1080	2	54c97510-be84-42da-ae41-26d8a9df9a6f	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+1c3e7e28-1797-4de3-88e0-c75e726cd940	5	dca2520f-14a6-4c1a-ad1f-4120c9e2057e	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+d53da59e-d0f0-45e6-8b49-2b823fb1fa2e	3	ab322357-760c-4cb3-9b50-022ce4676849	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+0252d4b9-51c0-44d7-982a-0c51a8738b8d	1	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+e6cc8330-ee32-4951-b644-07436525bdc6	4	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a	31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8
+5301dd14-3f44-4493-9390-52b4a295aca7	3	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9	9d5e1712-0755-40cf-b0f9-ad9d62465583
+6cfe73c7-232e-467b-9b59-5ce875d86013	2	10bed171-f7e4-46c1-b9db-6038be9176aa	9d5e1712-0755-40cf-b0f9-ad9d62465583
+a66852bf-d467-4709-b7c5-544ccf88115b	2	31690f56-afd4-40a2-ba74-190bdb753977	9d5e1712-0755-40cf-b0f9-ad9d62465583
+665910b2-5ae1-494f-9975-283d50baca9a	2	11f02794-e4f8-4533-872b-1c9dedf758dd	9d5e1712-0755-40cf-b0f9-ad9d62465583
+6bc90373-0a3a-4d5f-8f77-56424f56b942	3	96d41460-ca48-4559-af11-8a90a19303fb	9d5e1712-0755-40cf-b0f9-ad9d62465583
+f33f6c05-a700-45de-ad48-083b7cf1fdd8	3	31f2c528-c570-491f-bc72-d272b861f9e2	9d5e1712-0755-40cf-b0f9-ad9d62465583
+c7748df3-3d50-4c66-ab4d-bc6513b43387	2	54c97510-be84-42da-ae41-26d8a9df9a6f	9d5e1712-0755-40cf-b0f9-ad9d62465583
+577ba968-7f41-4f76-9c57-ca13f866d5cb	5	dca2520f-14a6-4c1a-ad1f-4120c9e2057e	9d5e1712-0755-40cf-b0f9-ad9d62465583
+cd30ff6f-07f9-4c7c-9513-6bdbd50499ee	3	ab322357-760c-4cb3-9b50-022ce4676849	9d5e1712-0755-40cf-b0f9-ad9d62465583
+915e80ae-11e1-497a-b43c-6439a789db84	1	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933	9d5e1712-0755-40cf-b0f9-ad9d62465583
+d16b8386-bf6d-47d3-8d12-828a02db63be	4	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a	9d5e1712-0755-40cf-b0f9-ad9d62465583
+e97162d1-94ca-4607-9263-a3a4bed8ea0a	3	5df70516-4be8-439d-a4d4-a7e3927c7b76	3a770636-48dc-460b-9573-01b88d9524b7
+c0fe8b15-3255-4fd3-8427-320fa34b5660	3	3ef9d6c7-bb0d-4357-858a-aa62c60cb5cd	3a770636-48dc-460b-9573-01b88d9524b7
+d5c7370f-7470-4309-9e56-91f4faae5147	3	99400900-91bc-41c6-9a5e-a238d3028501	3a770636-48dc-460b-9573-01b88d9524b7
+8acdd243-cee4-4ffc-b3e7-51a9fd964b6b	3	f263bc20-6fc7-41f3-b2dc-5d3e0b04e994	3a770636-48dc-460b-9573-01b88d9524b7
+30372029-f06e-4b8a-8260-c20313e1608c	2	eff8cf60-aaf2-47c6-8b80-6694e27e8d17	3a770636-48dc-460b-9573-01b88d9524b7
+c1936825-9249-4ca1-85d2-46fab37e7789	2	ce2039a1-2b8d-4ec5-871e-47a3009d7b51	3a770636-48dc-460b-9573-01b88d9524b7
+f902ba70-fc90-45c6-8e05-58cc2c597653	4	82dfb83e-05ce-4749-b20c-b655de7a6e36	3a770636-48dc-460b-9573-01b88d9524b7
+c4d60063-76a1-4c25-808a-d2eecbc44877	3	5df70516-4be8-439d-a4d4-a7e3927c7b76	f585dbdf-32a2-432c-a78e-497a7e77cf96
+2f354275-ac04-45dd-9912-60c449e311f3	3	3ef9d6c7-bb0d-4357-858a-aa62c60cb5cd	f585dbdf-32a2-432c-a78e-497a7e77cf96
+8944f836-5793-491d-9290-502ac15560a4	3	99400900-91bc-41c6-9a5e-a238d3028501	f585dbdf-32a2-432c-a78e-497a7e77cf96
+5e1ac63f-520b-4732-ac91-bc7726610ef4	3	f263bc20-6fc7-41f3-b2dc-5d3e0b04e994	f585dbdf-32a2-432c-a78e-497a7e77cf96
+9bed8cd6-c9d5-4853-9dea-35ecf4015509	2	eff8cf60-aaf2-47c6-8b80-6694e27e8d17	f585dbdf-32a2-432c-a78e-497a7e77cf96
+dfc132b7-a6bc-48a7-92cd-6adb7468d843	2	ce2039a1-2b8d-4ec5-871e-47a3009d7b51	f585dbdf-32a2-432c-a78e-497a7e77cf96
+97c3ee4f-1029-4200-8856-9be7e1f320cd	4	82dfb83e-05ce-4749-b20c-b655de7a6e36	f585dbdf-32a2-432c-a78e-497a7e77cf96
+9f073f66-b0f3-4e2f-b329-8aad66e5b746	3	5df70516-4be8-439d-a4d4-a7e3927c7b76	7bde20a6-d740-4cd0-84e1-35443f62d8d0
+e01ca3d1-4d3a-4590-bfce-d650b605f170	3	3ef9d6c7-bb0d-4357-858a-aa62c60cb5cd	7bde20a6-d740-4cd0-84e1-35443f62d8d0
+69783093-657a-4016-9b1b-39792278dba9	3	99400900-91bc-41c6-9a5e-a238d3028501	7bde20a6-d740-4cd0-84e1-35443f62d8d0
+676b7e0f-bb32-4698-9586-650ff9e66d46	3	f263bc20-6fc7-41f3-b2dc-5d3e0b04e994	7bde20a6-d740-4cd0-84e1-35443f62d8d0
+c07c2921-5a56-47ca-9e24-4aeeb111d14f	2	eff8cf60-aaf2-47c6-8b80-6694e27e8d17	7bde20a6-d740-4cd0-84e1-35443f62d8d0
+5128afc4-6e40-43c7-b463-3b03a5975d32	2	ce2039a1-2b8d-4ec5-871e-47a3009d7b51	7bde20a6-d740-4cd0-84e1-35443f62d8d0
+a67e6b18-7bde-4c3e-b0a8-49ffcde508b1	4	82dfb83e-05ce-4749-b20c-b655de7a6e36	7bde20a6-d740-4cd0-84e1-35443f62d8d0
+26ce5e0e-ba00-42cc-ba82-68f0a8fad920	3	d9001747-9003-4920-8157-9f92c6a09507	fea72190-df66-4d30-8f1f-21264b3f44c9
+0c6b236f-2a92-4f6d-9d9d-aee1dc4b3996	2	cb71a3a5-1d9a-4e68-ad1b-3120bb77be16	fea72190-df66-4d30-8f1f-21264b3f44c9
+57aee59e-a975-420f-a485-004ee289986e	3	8ea55bd2-dcd8-4667-ba73-fa0e68263d1f	fea72190-df66-4d30-8f1f-21264b3f44c9
+9e31e1f3-4b9b-452a-aa60-4cee694a9752	2	a41c5efe-b490-422a-ae10-bc1c520cd8c0	fea72190-df66-4d30-8f1f-21264b3f44c9
+072042be-aa0d-4e68-b50d-50b4f068d080	2	f8b398a8-094b-49da-8b62-3b9d83a8cb10	fea72190-df66-4d30-8f1f-21264b3f44c9
+9de772f5-ed7f-4003-a3c4-56732f145253	3	9d608f00-7aeb-4b80-8800-d830766ed878	fea72190-df66-4d30-8f1f-21264b3f44c9
+65647090-dc92-4114-9d9e-7fb5183f11a0	3	d9001747-9003-4920-8157-9f92c6a09507	e72afc8e-6662-4ab3-b435-725940e42a03
+d555c884-1929-4fda-b670-cbcdc1ff6553	2	cb71a3a5-1d9a-4e68-ad1b-3120bb77be16	e72afc8e-6662-4ab3-b435-725940e42a03
+c6794ca2-e284-4c2f-9f73-96522a7702b9	3	8ea55bd2-dcd8-4667-ba73-fa0e68263d1f	e72afc8e-6662-4ab3-b435-725940e42a03
+1495b96c-60b0-48ed-9a4e-26bbab2e0b30	2	a41c5efe-b490-422a-ae10-bc1c520cd8c0	e72afc8e-6662-4ab3-b435-725940e42a03
+62469fa3-9526-4e76-b215-55a3afd43d5d	2	f8b398a8-094b-49da-8b62-3b9d83a8cb10	e72afc8e-6662-4ab3-b435-725940e42a03
+ca297e39-a53d-4f9f-ac3f-58678af46bcb	3	9d608f00-7aeb-4b80-8800-d830766ed878	e72afc8e-6662-4ab3-b435-725940e42a03
+6db78c85-806c-4b41-b241-7600f78c85b0	3	d9001747-9003-4920-8157-9f92c6a09507	1b60c731-2d08-4943-a421-61779fe817ad
+83aa996a-b162-45cb-b224-57b5254f6129	2	cb71a3a5-1d9a-4e68-ad1b-3120bb77be16	1b60c731-2d08-4943-a421-61779fe817ad
+b5327a84-d6a3-4489-bd67-ee4b41ae3064	3	8ea55bd2-dcd8-4667-ba73-fa0e68263d1f	1b60c731-2d08-4943-a421-61779fe817ad
+001cd899-5045-49c1-91ec-15087542316c	2	a41c5efe-b490-422a-ae10-bc1c520cd8c0	1b60c731-2d08-4943-a421-61779fe817ad
+fcbf9b99-09cf-4dc6-8db7-e35404b8ec3c	2	f8b398a8-094b-49da-8b62-3b9d83a8cb10	1b60c731-2d08-4943-a421-61779fe817ad
+5b9924d6-8233-4198-8c5f-6ca990741b26	3	9d608f00-7aeb-4b80-8800-d830766ed878	1b60c731-2d08-4943-a421-61779fe817ad
+\.
+
+
+--
+-- Data for Name: core_funcionario; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_funcionario (id, matricula, area_atuacao, apelido, cpf, cin, nome_social, data_nascimento, logradouro, numero, bairro, cidade, estado, cep, complemento, telefone, data_admissao, usuario_id) FROM stdin;
+b9d1b765-a079-4692-8a9a-bd785a98a546	82759	Arte	Cissa	\N			\N				Paulínia	SP				\N	4fae9619-a546-448f-8a68-c6f7eac9252e
+f3272fd5-0f8d-4104-9e7d-3acd0f0e359b	89567	Física	Bonato	\N			\N				Paulínia	SP				\N	5b2a912a-00cb-4385-bfb8-b70dc502ac3c
+18c109de-eded-4530-b63d-c897ad46acfa	89257	Língua Portuguesa	Carmem	\N			\N				Paulínia	SP				\N	ea41830b-ef51-41fe-9ab8-3d1e5d7d6ca4
+5b4d1db1-ca77-4a46-9063-4b03e4e8f3cd	116270	História	André	\N			\N				Paulínia	SP				\N	29728c02-b192-4dbe-b458-eca5b4bc121f
+e97d7a43-bc20-41b2-8a98-9a335910743f	73920	Informática	Cesar	\N			\N				Paulínia	SP				\N	2d6d3569-95c2-41bf-bc9a-133c9866d045
+fa55b85f-4795-44f1-9f7a-fcdec902f852	141488	Filosofia	Lafaiete	\N			\N				Paulínia	SP				\N	95cd5055-275c-4796-afcb-e50b3323caa3
+78c0ffcd-8feb-4863-83f5-c47bb30ac82a	89044	Geografia	Daniel	\N			\N				Paulínia	SP				\N	da971c2f-284c-428e-b119-f291a0a222ea
+d7049abd-b474-49d8-865c-74b9040412b7	141161	Sociologia	Sara	\N			\N				Paulínia	SP				\N	3d649e46-bb42-47d3-a8bb-dbe0e41e52f3
+9b0e07bc-e790-4f08-9bf2-c80b1079abf8	157775	Informática	Paulo	\N			\N				Paulínia	SP				\N	5151115a-a83a-4642-815e-6bc1632f9f6b
+7fef738e-e9b9-4719-9044-bccfba9436c9	135577	Educação Especial	Juliana	\N			\N				Paulínia	SP				\N	4ef8f829-082c-459a-8390-67482e3d52fa
+597120aa-31c7-40f6-8b46-c2e2be4abfcf	71081	Informática	Raquel	\N			\N				Paulínia	SP				\N	c1cc4602-83b8-4d3f-b78b-660370278070
+ee751a6e-59bf-4e72-b1cf-0aa8ec28fd30	52469	Química	Ana	\N			\N				Paulínia	SP				\N	672de93a-4007-4248-9f40-36a46e005db7
+29c1725f-f1f5-4639-9d7a-852cdbc6fd28	130176	Educação Física	Amanda	\N			\N				Paulínia	SP				\N	1a5b9361-7e9b-4f16-83c5-782c4011b528
+39451cf7-87d1-4e06-9a2d-31702ea144ce	52582	Informática	Fabiana	\N			\N				Paulínia	SP				\N	5ea39008-309d-42d0-8ec5-8c7ac432c21e
+72f48ec9-73c5-42b3-9cf0-9c4904b2eefb	95109	Língua Portuguesa	Cilene	\N			\N				Paulínia	SP				\N	8f64b77f-e569-4777-b619-46f1431c1d69
+7508ea4b-0369-42fe-9e3b-8dd2eb1b159f	71064	Informática	Mirella	\N			\N				Paulínia	SP				\N	6a7810cf-2fe8-41fa-ac1b-3ed81c2eeb4c
+01ab844d-6881-4313-8d12-d2045927dab5	1000	Psicologia	Marister	\N			\N				Paulínia	SP				\N	482d6328-c93a-499f-9314-e774815c5339
+72abb76c-92b9-430c-b2b6-837695cb0e84	70980	Língua Inglesa	Luciane	\N			\N				Paulínia	SP				\N	e533a8dc-b681-44e2-9002-a6096365cece
+a85bbb21-3e26-4049-9eca-bf01b790454c	123242	Matemática	Diogo	30546244807			\N				Paulínia	SP				\N	f601ece2-8f7d-4550-aca8-d0069f139745
+\.
+
+
+--
+-- Data for Name: core_gradehoraria; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_gradehoraria (id, disciplina_id, horario_aula_id, validade_id) FROM stdin;
+b8941e73-1a70-4e08-a410-c18df2771235	dca2520f-14a6-4c1a-ad1f-4120c9e2057e	47c8bd59-1fa7-4a68-80ac-00576f6c8f7f	20b66a6d-6c04-48da-9ce1-05f47c23c1d7
+9bd8740c-d6ea-465a-b5eb-9a2aaef3555b	d9001747-9003-4920-8157-9f92c6a09507	be3a3d66-4fef-48af-835c-fa73c168d013	ac91606a-dfe2-41d2-a8f7-2393df0bcb8f
+\.
+
+
+--
+-- Data for Name: core_gradehorariavalidade; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_gradehorariavalidade (id, data_inicio, data_fim, turma_id) FROM stdin;
+80030517-bb2b-4683-8a84-5d9bf685e10a	2026-01-01	2026-05-16	5921603f-a060-44ac-863b-bb82b65d9d34
+904fb5ae-657d-435b-babf-97300bd8ed1c	2026-01-01	2026-05-16	3ef22e1d-0d6b-498e-932d-59135a490561
+c1031a45-3b8d-4286-9550-4a0cccae64b8	2026-01-01	2026-01-30	c733bc69-af5a-48ae-a5c3-2f353fb5e7b4
+4053b0fd-72ae-4826-92d2-5b42a00e197e	2026-01-01	2026-01-30	ae3b13bc-e075-423c-a90f-39dbf165cef1
+20b66a6d-6c04-48da-9ce1-05f47c23c1d7	2026-01-01	2026-01-16	5fa20c75-e9e0-4b27-8f63-79461fd4d13b
+ac91606a-dfe2-41d2-a8f7-2393df0bcb8f	2026-01-01	2026-01-16	fea72190-df66-4d30-8f1f-21264b3f44c9
+\.
+
+
+--
+-- Data for Name: core_habilidade; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_habilidade (id, codigo, descricao, is_active, disciplina_id) FROM stdin;
+18b8b3c1-4230-4a31-bbd0-b3d175f38406	EM13LP05	Analisar, em textos argumentativos, os posicionamentos assumidos, os movimentos argumentativos e os argumentos utilizados para sustentá-los, para avaliar sua força e eficácia, e posicionar-se diante da questão discutida e/ou dos argumentos utilizados, recorrendo aos mecanismos linguísticos necessários.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+ee9d5d26-14d9-4c45-9d08-486ee23b9bb7	EM13LP06	Analisar efeitos de sentido decorrentes de usos expressivos da linguagem, da escolha de determinadas palavras ou expressões e da ordenação, combinação e contraposição de palavras, dentre outros, para ampliar as possibilidades de construção de sentidos e de uso crítico da língua.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+ea01fbd2-1e53-4952-9497-a0a965a6a2b7	EM13LP07	Analisar, em textos de diferentes gêneros, marcas que expressam a posição do enunciador frente àquilo que é dito: uso de diferentes modalidades (epistêmica, deôntica e apreciativa) e de diferentes recursos gramaticais que operam como modalizadores (verbos modais, tempos e modos verbais, expressões modais, adjetivos, locuções ou orações adjetivas, advérbios, locuções ou orações adverbiais, entonação etc.), uso de estratégias de impessoalização (uso de terceira pessoa e de voz passiva etc.), com vistas ao incremento da compreensão e da criticidade e ao manejo adequado desses elementos nos textos produzidos, considerando os contextos de produção.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+f7ab4d1b-86f8-4b56-983c-021c121d4e48	EM13LP08	Analisar elementos e aspectos da sintaxe do Português, como a ordem dos constituintes da sentença (e os efeito que causam sua inversão), a estrutura dos sintagmas, as categorias sintáticas, os processos de coordenação e subordinação (e os efeitos de seus usos) e a sintaxe de concordância e de regência, de modo a potencializar os processos de compreensão e produção de textos e a possibilitar escolhas adequadas à situação comunicativa.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+298af6b2-67ce-440b-bdd8-a86ace6fe7c1	EM13LP10	Selecionar informações, dados e argumentos em fontes confiáveis, impressas e digitais, e utilizá-los de forma referenciada, para que o texto a ser produzido tenha um nível de aprofundamento adequado (para além do senso comum) e contemple a sustentação das posições defendidas.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+17a9cbd9-9ad9-4bba-b12f-23dec041907b	EM13LP11	Analisar efeitos de sentido decorrentes de escolhas de elementos sonoros (volume, timbre, intensidade, pausas, ritmo, efeitos sonoros, sincronização etc.) e de suas relações com o verbal, levando em conta esses efeitos na produção de áudios, para ampliar as possibilidades de construção de sentidos e de apreciação.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+4a94209a-2b1a-4619-94eb-1847498ac4e3	EM13LP12	Analisar efeitos de sentido decorrentes de escolhas e formatação das imagens (enquadramento, ângulo/vetor, cor, brilho, contraste) e de sua sequenciação (disposição e transição, movimentos de câmera, remix), das performances (movimentos do corpo, gestos, ocupação do espaço cênico), dos elementos sonoros (entonação, trilha sonora, sampleamento etc.) e das relações desses elementos com o verbal, levando em conta esses efeitos nas produções de imagens e vídeos, para ampliar as possibilidades de construção de sentidos e de apreciação.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+27dc227e-87d0-4042-9bfd-881624ef7107	EM13LP13	Planejar, produzir, revisar, editar, reescrever e avaliar textos escritos e multissemióticos, considerando sua adequação às condições de produção do texto, no que diz respeito ao lugar social a ser assumido e à imagem que se pretende passar a respeito de si mesmo, ao leitor pretendido, ao veículo e mídia em que o texto ou produção cultural vai circular, ao contexto imediato e sócio-histórico mais geral, ao gênero textual em questão e suas regularidades, à variedade linguística apropriada a esse contexto e ao uso do conhecimento dos aspectos notacionais (ortografia padrão, pontuação adequada, mecanismos de concordância nominal e verbal, regência verbal etc.), sempre que o contexto o exigir.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+21c827e5-1b93-49fb-aa61-03b5ae4c4505	EM13LP14	Produzir e analisar textos orais, considerando sua adequação aos contextos de produção, à forma composicional e ao estilo do gênero em questão, à clareza, à progressão temática e à variedade linguística empregada, como também aos elementos relacionados à fala (modulação de voz, entonação, ritmo, altura e intensidade, respiração etc.) e à cinestesia (postura corporal, movimentos e gestualidade significativa, expressão facial, contato de olho com plateia etc.).	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+e934eb27-7518-4ef5-9d13-a71f76a63ae6	EM13LP15	Elaborar roteiros para a produção de vídeos variados (vlog, videoclipe, videominuto, documentário etc.), apresentações teatrais, narrativas multimídia e transmídia, podcasts, playlists comentadas etc., para ampliar as possibilidades de produção de sentidos e engajar-se de forma reflexiva em práticas autorais e coletivas.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+6aec54b6-bec4-448c-8d48-aa8e48c18af2	EM13LP16	Utilizar softwares de edição de textos, fotos, vídeos e áudio, além de ferramentas e ambientes colaborativos para criar textos e produções multissemióticas com finalidades diversas, explorando os recursos e efeitos disponíveis e apropriando-se de práticas colaborativas de escrita, de construção coletiva do conhecimento e de desenvolvimento de projetos.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+3d74f710-37b2-451e-9349-dcb617343d6d	EM13LP17	Analisar o fenômeno da variação linguística, em seus diferentes níveis (variação fonético-fonológica, lexical, sintática, semântica e estilístico-pragmática) e em suas diferentes dimensões (regional, histórica, social, situacional, ocupacional, etária etc.), de forma a ampliar a compreensão sobre a natureza viva e dinâmica da língua e sobre o fenômeno da constituição de variedades linguísticas de prestígio e estigmatizadas, e a fundamentar o respeito às variedades linguísticas e o combate a preconceitos linguísticos.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+e169a3ff-9103-4f9b-92a8-8915b10846b8	EM13LP18	Apresentar-se por meio de textos multimodais diversos (perfis variados, gifs biográficos, biodata, currículo web, videocurrículo etc.) e de ferramentas digitais (ferramenta de gif, wiki, site etc.), para falar de si de formas variadas, considerando diferentes situações e objetivos.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+65173d49-0bcb-4ca0-ac99-7620a6282dd4	EM13LP19	Compartilhar gostos, interesses, práticas culturais, temas/problemas/questões que despertam maior interesse ou preocupação, respeitando e valorizando diferenças, como forma de identificar afinidades e interesses comuns, como também de organizar e/ou participar de grupos, clubes, oficinas e afins.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+97da0148-0ee9-4866-8760-3d97adce0579	EM13LP20	Produzir, de forma colaborativa, e socializar playlists comentadas de preferências culturais e de entretenimento, revistas culturais, fanzines, e-zines ou publicações afins que divulguem, comentem e avaliem músicas, games, séries, filmes, quadrinhos, livros, peças, exposições, espetáculos de dança etc., de forma a compartilhar gostos, identificar afinidades, fomentar comunidades etc.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+6c8a8556-f666-461e-9bd3-37c0ea003609	EM13LP21	Construir e/ou atualizar, de forma colaborativa, registros dinâmicos (mapas, wiki etc.) de profissões e ocupações de seu interesse (áreas de atuação, dados sobre formação, fazeres, produções, depoimentos de profissionais etc.) que possibilitem vislumbrar trajetórias pessoais e profissionais.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+25a30ad7-710b-45d3-bd6c-12c858ff3143	EM13LP22	Analisar o histórico e o discurso político de candidatos e de partidos, como também propagandas políticas e programas e propostas de governo, de forma a participar do debate político e tomar decisões fundamentadas.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+2151a9ab-1b0e-441c-a1bf-1f903e57d0c2	EM13LP23	Analisar formas não institucionalizadas de participação social, sobretudo as vinculadas a manifestações artísticas, produções culturais, intervenções urbanas e formas de expressão típica das culturas juvenis que pretendam expor uma problemática ou promover uma reflexão/ação, posicionando-se em relação a essas produções e manifestações.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+5d88eda2-199c-4c86-9b5f-2cd0d12c0d9b	EM13LP24	Participar de reuniões na escola (conselho de escola e de classe, grêmio livre etc.), agremiações, coletivos ou movimentos, entre outros, em debates, assembleias, fóruns de discussão etc., exercitando a escuta atenta, respeitando seu turno e tempo de fala, posicionando-se de forma fundamentada, respeitosa e ética diante da apresentação de propostas e defesas de opiniões, usando estratégias linguísticas típicas de negociação e de apoio e/ou de consideração do discurso do outro (como solicitar esclarecimento, detalhamento, fazer referência direta ou retomar a fala do outro, parafraseando-a para endossá-la, enfatizá-la, complementá-la ou enfraquecê-la), considerando propostas alternativas e reformulando seu posicionamento, quando for caso, com vistas ao entendimento e ao bem comum.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+bf8983bd-3883-45c4-8392-b056af063b5e	EM13LP25	Relacionar textos e documentos legais e normativos de âmbito universal, nacional, local ou escolar que envolvam a definição de direitos e deveres – em especial, os voltados a adolescentes e jovens – aos seus contextos de produção, identificando ou inferindo possíveis motivações e finalidades, como forma de ampliar a compreensão desses direitos e deveres.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+7e656e09-ebb8-47cb-be20-39f61f9f41ba	EM13LP26	Engajar-se na busca de solução de problemas que envolvam a coletividade, denunciando o desrespeito a direitos, organizando e/ou participando de discussões, campanhas e debates, produzindo textos reivindicatórios, normativos, dentre outras possibilidades, como forma de fomentar os princípios democráticos e uma atuação pautada pela ética da responsabilidade.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+a7075a65-78b2-4fa3-a333-affc80734184	EM13LP27	Organizar situações de estudo e utilizar procedimentos e estratégias de leitura adequados aos objetivos e à natureza do conhecimento em questão.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+f9a2dcce-24cd-4946-9140-e08d49bf6fe7	EM13LP28	Resumir e resenhar textos, com o manejo adequado das vozes envolvidas (do autor da obra e do resenhador), por meio do uso de paráfrases, marcas do discurso reportado e citações, para uso em textos de divulgação de estudos e pesquisas.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+01c94f24-8428-427d-aa5b-95ee6c31d071	EM13LP29	Realizar pesquisas de diferentes tipos (bibliográfica, de campo, experimento científico, levantamento de dados etc.), usando fontes abertas e confiáveis, registrando o processo e comunicando os resultados, tendo em vista os objetivos colocados e demais elementos do contexto de produção, como forma de compreender como o conhecimento científico é produzido e apropriar-se dos procedimentos e dos gêneros textuais envolvidos na realização de pesquisas.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+eaa69ee7-73ae-4b42-9230-a51ed7f48452	EM13LP30	Compreender criticamente textos de divulgação científica orais, escritos e multissemióticos de diferentes áreas do conhecimento, identificando sua organização tópica e a hierarquização das informações, questionando fontes não confiáveis e problematizando enfoques tendenciosos ou superficiais.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+85a53871-8113-4b4f-8def-bd1408b55201	EM13LP31	Selecionar informações e dados necessários para uma dada pesquisa (sem excedê-los) em diferentes fontes (orais, impressas, digitais etc.) e comparar autonomamente esses conteúdos, levando em conta seus contextos de produção, referências e índices de confiabilidade, e percebendo coincidências, complementaridades, contradições, erros ou imprecisões conceituais e de dados, de forma a compreender e posicionar-se criticamente sobre esses conteúdos e estabelecer recortes precisos.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+33d25b9f-0c76-4dee-9337-f570a86deddb	EM13LP32	Selecionar, elaborar e utilizar instrumentos simples de coleta de dados e informações (questionários, enquetes, mapeamentos, opinários) e de tratamento e análise dos conteúdos obtidos, que atendam adequadamente a diferentes objetivos de pesquisa.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+64fd9a97-87ad-47ce-9ee9-050c0072e350	EM13LP33	Produzir textos para a divulgação do conhecimento e de resultados de levantamentos e pesquisas – texto monográfico, ensaio, artigo de divulgação científica, verbete de enciclopédia (colaborativa ou não), infográfico (estático ou animado), relato de experimento, relatório, relatório multimidiático de campo, reportagem científica, podcast ou vlog científico, apresentações orais, seminários, comunicações em mesas redondas, mapas dinâmicos etc. –, considerando o contexto de produção e utilizando os conhecimentos sobre os gêneros de divulgação científica, de forma a engajar-se em processos significativos de socialização e divulgação do conhecimento.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+18f470d9-c22f-4478-bc6e-726ffc3bdb5e	EM13LP34	Utilizar adequadamente ferramentas de apoio a apresentações orais, escolhendo e usando tipos e tamanhos de fontes que permitam boa visualização, topicalizando e/ou organizando o conteúdo em itens, inserindo de forma adequada imagens, gráficos, tabelas, formas e elementos gráficos, dimensionando a quantidade de texto e imagem por slide e usando, de forma harmônica, recursos (efeitos de transição, slides mestres, layouts personalizados, gravação de áudios em slides etc.).	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+9f1574d8-7064-4afa-ae9e-6e10c4923bfd	EM13LP35	Analisar os interesses que movem o campo jornalístico, os impactos das novas tecnologias no campo e as condições que fazem da informação uma mercadoria e da checagem de informação uma prática (e um serviço) essencial, adotando atitude analítica e crítica diante dos textos jornalísticos.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+565d375b-c64f-4975-91be-09fed43a8ab2	EM13LP36	Conhecer e analisar diferentes projetos editorias – institucionais, privados, públicos, financiados, independentes etc. –, de forma a ampliar o repertório de escolhas possíveis de fontes de informação e opinião, reconhecendo o papel da mídia plural para a consolidação da democracia.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+ffa6c5fb-3e71-49f4-994d-65be47c6b9dd	EM13LP37	Analisar os diferentes graus de parcialidade/imparcialidade (no limite, a não neutralidade) em textos noticiosos, comparando relatos de diferentes fontes e analisando o recorte feito de fatos/dados e os efeitos de sentido provocados pelas escolhas realizadas pelo autor do texto, de forma a manter uma atitude crítica diante dos textos jornalísticos e tornar-se consciente das escolhas feitas como produtor.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+d0ee739d-6cc1-44fc-8851-7a928a6fe131	EM13LP38	Usar procedimentos de checagem de fatos noticiados e fotos publicadas (verificar/avaliar veículo, fonte, data e local da publicação, autoria, URL, formatação; comparar diferentes fontes; consultar ferramentas e sites checadores etc.), de forma a combater a proliferação de notícias falsas (fake news).	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+b1fca111-f97c-4baa-82f3-80731e89a7c8	EM13LP39	Analisar o fenômeno da pós-verdade – discutindo as condições e os mecanismos de disseminação de fake news e também exemplos, causas e consequências desse fenômeno e da prevalência de crenças e opiniões sobre fatos –, de forma a adotar atitude crítica em relação ao fenômeno e desenvolver uma postura flexível que permita rever crenças e opiniões quando fatos apurados as contradisserem.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+059f1011-5774-42f0-be29-e7e66a0651e8	EM13LP40	Analisar os processos humanos e automáticos de curadoria que operam nas redes sociais e outros domínios da internet, comparando os feeds de diferentes páginas de redes sociais e discutindo os efeitos desses modelos de curadoria, de forma a ampliar as possibilidades de trato com o diferente e minimizar o efeito bolha e a manipulação de terceiros.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+5e5476ee-f9cd-4723-9e5d-02a2b2308290	EM13LP41	Acompanhar, analisar e discutir a cobertura da mídia diante de acontecimentos e questões de relevância social, local e global, comparando diferentes enfoques e perspectivas, por meio do uso de ferramentas de curadoria de informação (como agregadores de conteúdo) e da consulta a serviços e fontes de checagem e curadoria de informação, de forma a aprofundar o entendimento sobre um determinado fato ou questão, identificar o enfoque preponderante da mídia e manter-se implicado, de forma crítica, com os fatos e as questões que afetam a coletividade.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+3da17419-b1eb-4d69-9b83-2f8c4e21c2ee	EM13LP42	Atuar de forma fundamentada, ética e crítica na produção e no compartilhamento de comentários, textos noticiosos e de opinião, memes, gifs, remixes variados etc. em redes sociais ou outros ambientes digitais.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+e20f1072-4e51-465e-89c2-51be81e26d24	EM13LP43	Analisar formas contemporâneas de publicidade em contexto digital e peças de campanhas publicitárias e políticas (cartazes, folhetos, anúncios, propagandas em diferentes mídias, spots, jingles etc.), explicando os mecanismos de persuasão utilizados e os efeitos de sentido provocados pelas escolhas feitas em termos de elementos e recursos linguístico-discursivos, imagéticos, sonoros, gestuais e espaciais, entre outros, e destacando valores e representações de situações, grupos e configurações sociais veiculadas, a fim de desconstruir eventuais estereótipos e proceder a uma avaliação crítica da publicidade e das práticas de consumo.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+854fcfba-36ee-40e6-8d53-67eba466988f	EM13LP44	Analisar, discutir, produzir e socializar, tendo em vista temas e acontecimentos de interesse local ou global, notícias, fotodenúncias, fotorreportagens, reportagens multimidiáticas, documentários, infográficos, podcasts noticiosos, artigos de opinião, críticas da mídia, vlogs de opinião, textos de apresentação e apreciação de produções culturais (resenhas, ensaios etc.) e outros gêneros próprios das formas de expressão das culturas juvenis (vlogs e podcasts culturais, gameplay etc.), em várias mídias, vivenciando de forma significativa o papel de repórter, analista, crítico, editorialista ou articulista, leitor, vlogueiro e booktuber, entre outros.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+167b715d-6a70-4051-9755-9ff742e09639	EM13LP45	Compartilhar sentidos construídos na leitura/escuta de textos literários, percebendo diferenças e eventuais tensões entre as formas pessoais e as coletivas de apreensão desses textos, para exercitar o diálogo cultural e aguçar a perspectiva crítica.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+a0dcea2d-148f-43c0-ad34-7320ae016349	EM13LP46	Participar de eventos (saraus, competições orais, audições, mostras, festivais, feiras culturais e literárias, rodas e clubes de leitura, cooperativas culturais, jograis, repentes, slams etc.), inclusive para socializar obras da própria autoria (poemas, contos e suas variedades, roteiros e microrroteiros, videominutos, playlists comentadas de música etc.) e/ou interpretar obras de outros, inserindo-se nas diferentes práticas culturais de seu tempo.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+d78adc47-6333-4f55-a351-111373f9cafd	EM13LP47	Analisar assimilações e rupturas no processo de constituição da literatura brasileira e ao longo de sua trajetória, por meio da leitura e análise de obras fundamentais do cânone ocidental, em especial da literatura portuguesa, para perceber a historicidade de matrizes e procedimentos estéticos.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+b850fad1-5bda-4e41-9289-ce1008857baf	EM13LP48	Perceber as peculiaridades estruturais e estilísticas de diferentes gêneros literários (a apreensão pessoal do cotidiano nas crônicas, a manifestação livre e subjetiva do eu lírico diante do mundo nos poemas, a múltipla perspectiva da vida humana e social dos romances, a dimensão política e social de textos da literatura marginal e da periferia etc.) para experimentar os diferentes ângulos de apreensão do indivíduo e do mundo pela literatura.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+22505a86-58fb-4fd6-8157-217f7e792021	EM13LP49	Analisar relações intertextuais e interdiscursivas entre obras de diferentes autores e gêneros literários de um mesmo momento histórico e de momentos históricos diversos, explorando os modos como a literatura e as artes em geral se constituem, dialogam e se retroalimentam.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+199bb3ae-773b-4f57-9323-eeb4fb9cc31e	EM13LP50	Selecionar obras do repertório artístico-literário contemporâneo à disposição segundo suas predileções, de modo a constituir um acervo pessoal e dele se apropriar para se inserir e intervir com autonomia e criticidade no meio cultural.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+25d27717-9de5-4c9c-b8ee-0fdc41601743	EM13LP51	Analisar obras significativas da literatura brasileira e da literatura de outros países e povos, em especial a portuguesa, a indígena, a africana e a latino-americana, com base em ferramentas da crítica literária (estrutura da composição, estilo, aspectos discursivos), considerando o contexto de produção (visões de mundo, diálogos com outros textos, inserções em movimentos estéticos e culturais etc.) e o modo como elas dialogam com o presente.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+74414adc-0dc1-405c-be1e-86201053631a	EM13LP52	Produzir apresentações e comentários apreciativos e críticos sobre livros, filmes, discos, canções, espetáculos de teatro e dança, exposições etc. (resenhas, vlogs e podcasts literários e artísticos, playlists comentadas, fanzines, e-zines etc.).	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+df105cb7-aad0-4b9a-8f2b-fae4bab4e698	EM13LP53	Criar obras autorais, em diferentes gêneros e mídias – mediante seleção e apropriação de recursos textuais e expressivos do repertório artístico –, e/ou produções derivadas (paródias, estilizações, fanfics, fanclipes etc.), como forma de dialogar crítica e/ou subjetivamente com o texto literário.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+c006aa54-0a13-485a-a15b-4675f56a9416	EM13MAT101	Interpretar situações econômicas, sociais e das Ciências da Natureza que envolvem a variação de duas grandezas, pela análise dos gráficos das funções representadas e das taxas de variação com ou sem apoio de tecnologias digitais.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+6e0f9ba6-27d4-4869-acc4-4ecf6f652c7e	EM13MAT102	Analisar gráficos e métodos de amostragem de pesquisas estatísticas apresentadas em relatórios divulgados por diferentes meios de comunicação, identificando, quando for o caso, inadequações que possam induzir a erros de interpretação, como escalas e amostras não apropriadas.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+ca6a9bee-eb1f-4324-8b62-a52377b1433f	EM13MAT103	Interpretar e compreender o emprego de unidades de medida de diferentes grandezas, inclusive de novas unidades, como as de armazenamento de dados e de distâncias astronômicas e microscópicas, ligadas aos avanços tecnológicos, amplamente divulgadas na sociedade.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+c6bba18f-4cfa-4ff8-99ca-dc5e06ab07a8	EM13MAT104	Interpretar taxas e índices de natureza socioeconômica, tais como índice de desenvolvimento humano, taxas de inflação, entre outros, investigando os processos de cálculo desses números.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+4a4ccb7c-f3c3-4dd1-80f1-b9803d8531c2	EM13MAT105	Utilizar as noções de transformações isométricas (translação, reflexão, rotação e composições destas) e transformações homotéticas para analisar diferentes produções humanas como construções civis, obras de arte, entre outras.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+86596095-7931-447b-849c-122b020fcc35	EM13MAT201	Propor ações comunitárias, como as voltadas aos locais de moradia dos estudantes dentre outras, envolvendo cálculos das medidas de área, de volume, de capacidade ou de massa, adequados às demandas da região.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+06ddf05d-bf3a-4d2d-b81f-a59302db0f4b	EM13MAT202	Planejar e executar pesquisa amostral usando dados coletados ou de diferentes fontes sobre questões relevantes atuais, incluindo ou não, apoio de recursos tecnológicos, e comunicar os resultados por meio de relatório contendo gráficos e interpretação das medidas de tendência central e das de dispersão.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+74a1562c-a560-468c-a917-4f725bb4a6a9	EM13MAT203	Planejar e executar ações envolvendo a criação e a utilização de aplicativos, jogos (digitais ou não), planilhas para o controle de orçamento familiar, simuladores de cálculos de juros compostos, dentre outros, para aplicar conceitos matemáticos e tomar decisões.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+fcbb9a8a-81a3-4809-b43e-37320652801e	EM13MAT301	Resolver e elaborar problemas do cotidiano, da Matemática e de outras áreas do conhecimento, que envolvem equações lineares simultâneas, usando técnicas algébricas e gráficas, incluindo ou não tecnologias digitais.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+45caff15-b212-4667-b68c-1eb6cacccf01	EM13MAT302	Resolver e elaborar problemas cujos modelos são as funções polinomiais de 1º e 2º graus, em contextos diversos, incluindo ou não tecnologias digitais.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+79b41ab6-8219-4d76-a72a-91158f28fb2e	EM13MAT303	Resolver e elaborar problemas envolvendo porcentagens em diversos contextos e sobre juros compostos, destacando o crescimento exponencial.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+077538b6-9d16-4c78-af82-25fb8b47b25d	EM13MAT304	Resolver e elaborar problemas com funções exponenciais nos quais é necessário compreender e interpretar a variação das grandezas envolvidas, em contextos como o da Matemática Financeira e o do crescimento de seres vivos microscópicos, entre outros.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+558aca91-49e6-4671-8f44-7154c32a843d	EM13MAT305	Resolver e elaborar problemas com funções logarítmicas nos quais é necessário compreender e interpretar a variação das grandezas envolvidas, em contextos como os de abalos sísmicos, pH, radioatividade, Matemática Financeira, entre outros.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+07cd8e51-5192-464a-a951-65c806d6603b	EM13MAT306	Resolver e elaborar problemas em contextos que envolvem fenômenos periódicos reais, como ondas sonoras, ciclos menstruais, movimentos cíclicos, entre outros, e comparar suas representações com as funções seno e cosseno, no plano cartesiano, com ou sem apoio de aplicativos de álgebra e geometria.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+71fcb84e-27b4-45c0-8943-588239ef913a	EM13MAT307	Empregar diferentes métodos para a obtenção da medida da área de uma superfície (reconfigurações, aproximação por cortes etc.) e deduzir expressões de cálculo para aplicá-las em situações reais, como o remanejamento e a distribuição de plantações, com ou sem apoio de tecnologias digitais.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+7b313d4b-ce3e-4a84-ab4f-fc41c48308f3	EM13MAT308	Resolver e elaborar problemas em variados contextos, envolvendo triângulos nos quais se aplicam as relações métricas ou as noções de congruência e semelhança.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+f04caab3-cfa4-4d23-92bd-ac503d59ab93	EM13MAT309	Resolver e elaborar problemas que envolvem o cálculo de áreas totais e de volumes de prismas, pirâmides e corpos redondos (cilindro e cone) em situações reais, como o cálculo do gasto de material para forrações ou pinturas de objetos cujos formatos sejam composições dos sólidos estudados.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+3819357b-780e-45f8-9d16-a8d35a2e3752	EM13MAT311	Resolver e elaborar problemas que envolvem o cálculo da probabilidade de eventos aleatórios, identificando e descrevendo o espaço amostral e realizando contagem das possibilidades.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+5100d03a-9c1a-4b22-a9cf-8e6274d590a6	EM13MAT313	Resolver e elaborar problemas que envolvem medições em que se discuta o emprego de algarismos significativos e algarismos duvidosos, utilizando, quando necessário, a notação científica.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+435ca6bd-1271-420e-8c27-cfa03d742e7e	EM13MAT314	Resolver e elaborar problemas que envolvem grandezas compostas, determinadas pela razão ou pelo produto de duas outras, como velocidade, densidade demográfica, energia elétrica etc.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+d7ceb80a-6619-475f-bdd0-4acd64d8a2d3	EM13MAT315	Reconhecer um problema algorítmico, enunciá-lo, procurar uma solução e expressá-la por meio de um algoritmo, com o respectivo fluxograma.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+300aca0a-1ef7-44e3-9a0c-43a4e8544683	EM13MAT316	Resolver e elaborar problemas, em diferentes contextos, que envolvem cálculo e interpretação das medidas de tendência central (média, moda, mediana) e das de dispersão (amplitude, variância e desvio padrão).	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+b8f9866e-d2fb-4f0d-a861-59a4245201c5	EM13MAT402	Converter representações algébricas de funções polinomiais de 2º grau para representações geométricas no plano cartesiano, distinguindo os casos nos quais uma variável for diretamente proporcional ao quadrado da outra, recorrendo ou não a softwares ou aplicativos de álgebra e geometria dinâmica.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+c70339cf-f917-4b15-a08a-dab6f9e7d0c8	EM13MAT403	Comparar e analisar as representações, em plano cartesiano, das funções exponencial e logarítmica para identificar as características fundamentais (domínio, imagem, crescimento) de cada uma, com ou sem apoio de tecnologias digitais, estabelecendo relações entre elas.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+ac7c0114-6cdd-4219-9a8f-996e3330bc74	EM13MAT404	Identificar as características fundamentais das funções seno e cosseno (periodicidade, domínio, imagem), por meio da comparação das representações em ciclos trigonométricos e em planos cartesianos, com ou sem apoio de tecnologias digitais.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+7d19bcf5-1b95-49e0-824d-d3b8486a7659	EM13MAT405	Reconhecer funções definidas por uma ou mais sentenças (como a tabela do Imposto de Renda, contas de luz, água, gás etc.), em suas representações algébrica e gráfica, convertendo essas representações de uma para outra e identificando domínios de validade, imagem, crescimento e decrescimento.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+ad0c48b8-b872-45fa-aae2-253395a13e6c	EM13MAT406	Utilizar os conceitos básicos de uma linguagem de programação na implementação de algoritmos escritos em linguagem corrente e/ou matemática.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+38801fec-2fea-46a5-be82-22f5c62e550c	EM13MAT407	Interpretar e construir vistas ortogonais de uma figura espacial para representar formas tridimensionais por meio de figuras planas.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+c89ff5c4-7039-49a3-9443-f2cb0d15f2df	EM13MAT408	Construir e interpretar tabelas e gráficos de frequências, com base em dados obtidos em pesquisas por amostras estatísticas, incluindo ou não o uso de softwares que inter-relacionem estatística, geometria e álgebra.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+6711940f-048f-4b9c-acd0-c084bfc50c23	EM13MAT401	Converter representações algébricas de funções polinomiais de 1º grau para representações geométricas no plano cartesiano, distinguindo os casos nos quais o comportamento é proporcional, recorrendo ou não a softwares ou aplicativos de álgebra e geometria dinâmica.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+f876153e-d673-4650-b5bd-8734f7f248b8	EM13MAT409	Interpretar e comparar conjuntos de dados estatísticos por meio de diferentes diagramas e gráficos, como o histograma, o de caixa (box-plot), o de ramos e folhas, reconhecendo os mais eficientes para sua análise.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+782b7a54-b493-4649-83cc-7d16e298ba41	EM13MAT501	Investigar relações entre números expressos em tabelas para representá-los no plano cartesiano, identificando padrões e criando conjecturas para generalizar e expressar algebricamente essa generalização, reconhecendo quando essa representação é de função polinomial de 1º grau.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+624c2a25-764e-4fba-b489-fecca3799341	EM13MAT502	Investigar relações entre números expressos em tabelas para representá-los no plano cartesiano, identificando padrões e criando conjecturas para generalizar e expressar algebricamente essa generalização, reconhecendo quando essa representação é de função polinomial de 2º grau do tipo y = ax².	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+177f246b-6544-4af5-8af2-cc4f9488a634	EM13MAT503	Investigar pontos de máximo ou de mínimo de funções quadráticas em contextos da Matemática Financeira ou da Cinemática, entre outros.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+533bc247-86eb-4059-80d0-295e6a45bbd5	EM13MAT504	Investigar processos de obtenção da medida do volume de prismas, pirâmides, cilindros e cones, incluindo o princípio de Cavalieri, para a obtenção das fórmulas de cálculo da medida do volume dessas figuras.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+04cda027-4670-4cfc-831d-41f692d39fdb	EM13MAT505	Resolver problemas sobre ladrilhamentos do plano, com ou sem apoio de aplicativos de geometria dinâmica, para conjecturar a respeito dos tipos ou composição de polígonos que podem ser utilizados, generalizando padrões observados.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+5088ebad-af8e-4008-9fff-2e87d301a3f2	EM13MAT506	Representar graficamente a variação da área e do perímetro de um polígono regular quando os comprimentos de seus lados variam, analisando e classificando as funções envolvidas.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+1e62fd1d-d20c-4c41-a8d5-068f1c11a02b	EM13MAT507	Identificar e associar sequências numéricas (PA) a funções afins de domínios discretos para análise de propriedades, incluindo dedução de algumas fórmulas e resolução de problemas.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+a50fda7d-371f-4360-bd72-3705f2951936	EM13MAT508	Identificar e associar sequências numéricas (PG) a funções exponenciais de domínios discretos para análise de propriedades, incluindo dedução de algumas fórmulas e resolução de problemas.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+bed28950-b98f-42be-afea-ca2167a3484e	EM13MAT509	Investigar a deformação de ângulos e áreas provocada pelas diferentes projeções usadas em cartografia, como a cilíndrica e a cônica.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+8fa26643-f20c-4593-9feb-be3fe84e4696	EM13MAT510	Investigar conjuntos de dados relativos ao comportamento de duas variáveis numéricas, usando tecnologias da informação, e, se apropriado, levar em conta a variação e utilizar uma reta para descrever a relação observada.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+81760413-efc9-435e-ab5e-05fc12f0d7f1	EM13MAT511	Reconhecer a existência de diferentes tipos de espaços amostrais, discretos ou não, de eventos equiprováveis ou não, e investigar as implicações no cálculo de probabilidades.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+695e2fed-fa4b-45d4-a86a-7425085462a6	EM13MAT512	Investigar propriedades de figuras geométricas, questionando suas conjecturas por meio da busca de contraexemplos, para refutá-las ou reconhecer a necessidade de sua demonstração para validação, como os teoremas relativos aos quadriláteros e triângulos.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+f8d7adfc-d356-4bb8-8094-7706f10066bd	EM13LGG101	Compreender e analisar processos de produção e circulação de discursos, nas diferentes linguagens, para fazer escolhas fundamentadas em função de interesses pessoais e coletivos.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+d1f8ae76-75f5-4cff-a01d-81e3e406cda2	EM13LGG102	Analisar visões de mundo, conflitos de interesse, preconceitos e ideologias presentes nos discursos veiculados nas diferentes mídias como forma de ampliar suas as possibilidades de explicação e interpretação crítica da realidade.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+a4895adf-3c5c-4284-895f-49f96c3df102	EM13LGG103	Analisar, de maneira cada vez mais aprofundada, o funcionamento das linguagens, para interpretar e produzir criticamente discursos em textos de diversas semioses.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+12030efd-52ce-495f-ad85-f82ebd5fc077	EM13LGG104	Utilizar as diferentes linguagens, levando em conta seus funcionamentos, para a compreensão e produção de textos e discursos em diversos campos de atuação social.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+110e31a2-27aa-4cca-9d3a-2af209b794ba	EM13LGG201	Utilizar adequadamente as diversas linguagens (artísticas, corporais e verbais) em diferentes contextos, valorizando-as como fenômeno social, cultural, histórico, variável, heterogêneo e sensível aos contextos de uso.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+c76dd81a-0812-4a53-b173-91f578556057	EM13LGG202	Analisar interesses, relações de poder e perspectivas de mundo nos discursos das diversas práticas de linguagem (artísticas, corporais e verbais), para compreender o modo como circulam, constituem-se e (re)produzem significação e ideologias.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+4429cb16-d6b2-45a4-9c6e-657058b04cc8	EM13LGG203	Analisar os diálogos e conflitos entre diversidades e os processos de disputa por legitimidade nas práticas de linguagem e suas produções (artísticas, corporais e verbais), presentes na cultura local e em outras culturas.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+0660a3c8-2b51-483c-8b41-bccdf4c7d712	EM13LGG204	Negociar sentidos e produzir entendimento mútuo, nas diversas linguagens (artísticas, corporais e verbais), com vistas ao interesse comum pautado em princípios e valores de equidade assentados na democracia e nos Direitos Humanos.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+09e830c6-10bf-47dd-b7bd-62ffbc59ff54	EM13LGG301	Participar de processos de produção individual e colaborativa em diferentes linguagens (artísticas, corporais e verbais), levando em conta seus funcionamentos, para produzir sentidos em diferentes contextos.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+47259b08-d87d-4d4e-a747-14461f84d800	EM13LGG303	Debater questões polêmicas de relevância social, analisando diferentes argumentos e opiniões manifestados, para negociar e sustentar posições, formular propostas, e intervir e tomar decisões democraticamente sustentadas, que levem em conta o bem comum e os Direitos Humanos, a consciência socioambiental e o consumo responsável em âmbito local, regional e global.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+ecfe44b9-eb95-45e5-bdb7-5ccb46850072	EM13LGG304	Mapear e criar, por meio de práticas de linguagem, possibilidades de atuação social, política, artística e cultural para enfrentar desafios contemporâneos, discutindo seus princípios e objetivos de maneira crítica, criativa, solidária e ética.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+d26d220f-d5ca-463a-8a3b-6ca442a6aeb1	EM13LGG401	Analisar textos de modo a caracterizar as línguas como fenômeno (geo)político, histórico, social, variável, heterogêneo e sensível aos contextos de uso.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+7e043416-9b21-46fe-916e-b235946f7d76	EM13MAT312	Resolver e elaborar problemas que envolvem o cálculo de probabilidade de eventos em experimentos aleatórios sucessivos.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+42e0266d-b4c3-4b72-9d73-802cc0625fd4	EM13LGG402	Empregar, nas interações sociais, a variedade e o estilo de língua adequados à situação comunicativa, ao(s) interlocutor(es) e ao gênero do discurso, respeitando os usos das línguas por esse(s) interlocutor(es) e combatendo situações de preconceito linguístico.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+b7730ec0-c10a-45ab-9dfb-ebfa83ed9208	EM13LGG403	Fazer uso do inglês como língua do mundo global, levando em conta a multiplicidade e variedade de usos, usuários e funções dessa língua no mundo contemporâneo.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+4ed6810a-0f2f-457c-b2f9-c8b97e0f99fe	EM13LGG501	Selecionar e utilizar movimentos corporais de forma consciente e intencional para interagir socialmente em práticas da cultura corporal, de modo a estabelecer relações construtivas, éticas e de respeito às diferenças.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+a39dc7e0-4b7f-43fc-bd31-12d22c6b847d	EM13LGG502	Analisar criticamente preconceitos, estereótipos e relações de poder subjacentes às práticas e discursos verbais e imagéticos na apreciação e produção das práticas da cultura corporal de movimento.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+ffb37c03-09ce-4eb2-b12f-e87c8a49c67f	EM13LGG503	Praticar, significar e valorizar a cultura corporal de movimento como forma de autoconhecimento, autocuidado e construção de laços sociais em seus projetos de vida.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+c641f76f-40f7-4890-9d9e-a013ad563d78	EM13LGG601	Apropriar-se do patrimônio artístico e da cultura corporal de movimento de diferentes tempos e lugares, compreendendo a sua diversidade, bem como os processos de disputa por legitimidade.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+a070929f-2bed-41cf-a2c9-5d626c272299	EM13LGG602	Fruir e apreciar esteticamente diversas manifestações artísticas e culturais, das locais às mundiais, assim como delas participar, de modo a aguçar continuamente a sensibilidade, a imaginação e a criatividade.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+7192693d-cf71-4738-aa17-2e229cfc417c	EM13LGG603	Expressar-se e atuar em processos criativos que integrem diferentes linguagens artísticas e referências estéticas e culturais, recorrendo a conhecimentos de naturezas diversas (artísticos, históricos, sociais e políticos) e experiências individuais e coletivas.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+3d608cb3-f72d-4ac3-a133-5c659eff4a4a	EM13LGG604	Relacionar as práticas artísticas e da cultura corporal do movimento às diferentes dimensões da vida social, cultural, política, histórica e econômica.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+716e15e2-3ca7-42ea-88f8-a5ddfaee64b0	EM13LGG701	Explorar tecnologias digitais da informação e comunicação (TDIC), compreendendo seus princípios e funcionalidades, e mobilizá-las de modo ético, responsável e adequado a práticas de linguagem em diferentes contextos.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+6a497952-8853-4929-8ba4-e007aee5af01	EM13LGG702	Avaliar o impacto das tecnologias digitais da informação e comunicação (TDIC) na formação do sujeito e em suas práticas sociais, para fazer uso crítico dessa mídia em práticas de seleção, compreensão e produção de discursos em ambiente digital.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+c1adb5d3-4ac9-4e3e-989d-e3bfe2f5f54c	EM13LGG703	Utilizar diferentes linguagens, mídias e ferramentas digitais em processos de produção coletiva, colaborativa e projetos autorais em ambientes digitais.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+40b75a58-b18e-4298-9dfa-3a21988bdec1	EM13LGG704	Apropriar-se criticamente de processos de pesquisa e busca de informação, por meio de ferramentas e dos novos formatos de produção e distribuição do conhecimento na cultura de rede.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+213f7dc1-48ce-46fc-b5bd-ec0ca5ce3ce8	EM13LGG101	Compreender e analisar processos de produção e circulação de discursos, nas diferentes linguagens, para fazer escolhas fundamentadas em função de interesses pessoais e coletivos.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+39d20b61-8112-4658-9c04-d35dce1f21a7	EM13LGG102	Analisar visões de mundo, conflitos de interesse, preconceitos e ideologias presentes nos discursos veiculados nas diferentes mídias como forma de ampliar suas as possibilidades de explicação e interpretação crítica da realidade.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+ff1ca001-da9f-4659-b75b-7dccac8c765a	EM13LGG103	Analisar, de maneira cada vez mais aprofundada, o funcionamento das linguagens, para interpretar e produzir criticamente discursos em textos de diversas semioses.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+88ed8916-abe6-4604-8f1f-1f1a3e200a34	EM13LGG104	Utilizar as diferentes linguagens, levando em conta seus funcionamentos, para a compreensão e produção de textos e discursos em diversos campos de atuação social.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+d9df3ca2-1ea4-4bd5-a0ea-f3434032c5e0	EM13LGG105	Analisar e experimentar diversos processos de remidiação de produções multissemióticas, multimídia e transmídia, como forma de fomentar diferentes modos de participação e intervenção social.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+ef8f2747-e0ab-404d-9ded-82b760526dcb	EM13LGG201	Utilizar adequadamente as diversas linguagens (artísticas, corporais e verbais) em diferentes contextos, valorizando-as como fenômeno social, cultural, histórico, variável, heterogêneo e sensível aos contextos de uso.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+e7c64536-e14f-4a86-acac-a67379a2cf09	EM13LGG202	Analisar interesses, relações de poder e perspectivas de mundo nos discursos das diversas práticas de linguagem (artísticas, corporais e verbais), para compreender o modo como circulam, constituem-se e (re)produzem significação e ideologias.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+85376407-37c3-4652-9e30-76bcc5fa139a	EM13LGG203	Analisar os diálogos e conflitos entre diversidades e os processos de disputa por legitimidade nas práticas de linguagem e suas produções (artísticas, corporais e verbais), presentes na cultura local e em outras culturas.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+5253113b-4c31-4099-8de5-2502cdb6aff6	EM13LGG204	Negociar sentidos e produzir entendimento mútuo, nas diversas linguagens (artísticas, corporais e verbais), com vistas ao interesse comum pautado em princípios e valores de equidade assentados na democracia e nos Direitos Humanos.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+7ded3418-b11c-4309-a5e7-2d57fc72b643	EM13LGG301	Participar de processos de produção individual e colaborativa em diferentes linguagens (artísticas, corporais e verbais), levando em conta seus funcionamentos, para produzir sentidos em diferentes contextos.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+bbae8a88-70b9-4027-8b81-0eaa692adf04	EM13LGG302	Compreender e posicionar-se criticamente diante de diversas visões de mundo presentes nos discursos em diferentes linguagens, levando em conta seus contextos de produção e de circulação.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+3e94cf75-19b0-4c27-bd14-2417c2ee0f19	EM13LGG303	Debater questões polêmicas de relevância social, analisando diferentes argumentos e opiniões manifestados, para negociar e sustentar posições, formular propostas, e intervir e tomar decisões democraticamente sustentadas, que levem em conta o bem comum e os Direitos Humanos, a consciência socioambiental e o consumo responsável em âmbito local, regional e global.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+c13a4b01-d827-4959-9466-2e778e49ed6f	EM13LGG304	Mapear e criar, por meio de práticas de linguagem, possibilidades de atuação social, política, artística e cultural para enfrentar desafios contemporâneos, discutindo seus princípios e objetivos de maneira crítica, criativa, solidária e ética.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+db0e0348-5cd8-4a32-9145-a1fde4169d69	EM13LGG401	Analisar textos de modo a caracterizar as línguas como fenômeno (geo)político, histórico, social, variável, heterogêneo e sensível aos contextos de uso.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+8352d93d-3502-42b3-96b5-b8c7ec04d8cd	EM13LGG402	Empregar, nas interações sociais, a variedade e o estilo de língua adequados à situação comunicativa, ao(s) interlocutor(es) e ao gênero do discurso, respeitando os usos das línguas por esse(s) interlocutor(es) e combatendo situações de preconceito linguístico.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+53a49cdc-31b3-49df-bf8d-9c75a46c0b7b	EM13LGG403	Fazer uso do inglês como língua do mundo global, levando em conta a multiplicidade e variedade de usos, usuários e funções dessa língua no mundo contemporâneo.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+4a4fdd90-04a5-4ddb-bc5d-89abd6331eeb	EM13LGG501	Selecionar e utilizar movimentos corporais de forma consciente e intencional para interagir socialmente em práticas da cultura corporal, de modo a estabelecer relações construtivas, éticas e de respeito às diferenças.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+d5a2c9df-821b-4d50-ba03-781dcb6b7a87	EM13LGG502	Analisar criticamente preconceitos, estereótipos e relações de poder subjacentes às práticas e discursos verbais e imagéticos na apreciação e produção das práticas da cultura corporal de movimento.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+c604c25a-7b03-4867-9fa9-ab499605be29	EM13LGG503	Praticar, significar e valorizar a cultura corporal de movimento como forma de autoconhecimento, autocuidado e construção de laços sociais em seus projetos de vida.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+49aea096-5c02-429c-934c-6e6d517176d6	EM13LGG601	Apropriar-se do patrimônio artístico e da cultura corporal de movimento de diferentes tempos e lugares, compreendendo a sua diversidade, bem como os processos de disputa por legitimidade.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+573a31ea-88c4-4c93-bbf9-e6b24d7cf9a8	EM13LGG602	Fruir e apreciar esteticamente diversas manifestações artísticas e culturais, das locais às mundiais, assim como delas participar, de modo a aguçar continuamente a sensibilidade, a imaginação e a criatividade.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+8483476c-35e7-456d-bba1-b16b56715837	EM13LGG603	Expressar-se e atuar em processos criativos que integrem diferentes linguagens artísticas e referências estéticas e culturais, recorrendo a conhecimentos de naturezas diversas (artísticos, históricos, sociais e políticos) e experiências individuais e coletivas.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+821ba26c-51a6-463b-9db9-f3ad1416b9df	EM13LGG604	Relacionar as práticas artísticas e da cultura corporal do movimento às diferentes dimensões da vida social, cultural, política, histórica e econômica.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+2b2b44be-482c-4744-852a-7509f00077ef	EM13LGG701	Explorar tecnologias digitais da informação e comunicação (TDIC), compreendendo seus princípios e funcionalidades, e mobilizá-las de modo ético, responsável e adequado a práticas de linguagem em diferentes contextos.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+d638333c-8ddd-4727-8f28-8b8fe7876732	EM13LGG702	Avaliar o impacto das tecnologias digitais da informação e comunicação (TDIC) na formação do sujeito e em suas práticas sociais, para fazer uso crítico dessa mídia em práticas de seleção, compreensão e produção de discursos em ambiente digital.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+1143fcce-4376-496d-9d78-6f994727ea80	EM13LGG703	Utilizar diferentes linguagens, mídias e ferramentas digitais em processos de produção coletiva, colaborativa e projetos autorais em ambientes digitais.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+f4d5bb83-27b4-41eb-97b8-c78d855c286c	EM13LGG704	Apropriar-se criticamente de processos de pesquisa e busca de informação, por meio de ferramentas e dos novos formatos de produção e distribuição do conhecimento na cultura de rede.	t	54c97510-be84-42da-ae41-26d8a9df9a6f
+cf3a9d8f-d101-4781-89a4-24e075a8c214	EM13LGG101	Compreender e analisar processos de produção e circulação de discursos, nas diferentes linguagens, para fazer escolhas fundamentadas em função de interesses pessoais e coletivos.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+b134073a-cac7-482e-a372-2b2af4455ce2	EM13LGG102	Analisar visões de mundo, conflitos de interesse, preconceitos e ideologias presentes nos discursos veiculados nas diferentes mídias como forma de ampliar suas as possibilidades de explicação e interpretação crítica da realidade.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+0ada964e-c5f6-4cf4-aad9-d372935625e7	EM13LGG103	Analisar, de maneira cada vez mais aprofundada, o funcionamento das linguagens, para interpretar e produzir criticamente discursos em textos de diversas semioses.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+78e8ecb0-4406-4390-9483-5d5cb73614f8	EM13LGG104	Utilizar as diferentes linguagens, levando em conta seus funcionamentos, para a compreensão e produção de textos e discursos em diversos campos de atuação social.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+e3557202-4344-42ce-8c8b-456e0ef47df6	EM13LGG105	Analisar e experimentar diversos processos de remidiação de produções multissemióticas, multimídia e transmídia, como forma de fomentar diferentes modos de participação e intervenção social.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+caa6b0dc-1eb2-4d47-9e65-4bb4360a64fe	EM13LGG201	Utilizar adequadamente as diversas linguagens (artísticas, corporais e verbais) em diferentes contextos, valorizando-as como fenômeno social, cultural, histórico, variável, heterogêneo e sensível aos contextos de uso.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+88c42e4c-610c-43a0-a40b-a79d74d9fa87	EM13LGG202	Analisar interesses, relações de poder e perspectivas de mundo nos discursos das diversas práticas de linguagem (artísticas, corporais e verbais), para compreender o modo como circulam, constituem-se e (re)produzem significação e ideologias.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+ed2b027f-445a-40cb-b3c0-9673f318f1c9	EM13LGG203	Analisar os diálogos e conflitos entre diversidades e os processos de disputa por legitimidade nas práticas de linguagem e suas produções (artísticas, corporais e verbais), presentes na cultura local e em outras culturas.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+d19220fd-9429-490e-a240-b011d43aba8d	EM13LGG204	Negociar sentidos e produzir entendimento mútuo, nas diversas linguagens (artísticas, corporais e verbais), com vistas ao interesse comum pautado em princípios e valores de equidade assentados na democracia e nos Direitos Humanos.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+c93ded9e-51ba-4303-9da8-75ef985879bf	EM13LGG301	Participar de processos de produção individual e colaborativa em diferentes linguagens (artísticas, corporais e verbais), levando em conta seus funcionamentos, para produzir sentidos em diferentes contextos.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+1b7adb97-3c1e-49ea-99bf-e2e07546a081	EM13LGG302	Compreender e posicionar-se criticamente diante de diversas visões de mundo presentes nos discursos em diferentes linguagens, levando em conta seus contextos de produção e de circulação.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+94342a4f-d981-455c-af95-50805570054d	EM13LGG303	Debater questões polêmicas de relevância social, analisando diferentes argumentos e opiniões manifestados, para negociar e sustentar posições, formular propostas, e intervir e tomar decisões democraticamente sustentadas, que levem em conta o bem comum e os Direitos Humanos, a consciência socioambiental e o consumo responsável em âmbito local, regional e global.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+bb69b637-7ca0-47d1-9704-95649e196469	EM13LGG304	Mapear e criar, por meio de práticas de linguagem, possibilidades de atuação social, política, artística e cultural para enfrentar desafios contemporâneos, discutindo seus princípios e objetivos de maneira crítica, criativa, solidária e ética.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+3137ce10-5a1d-4778-83c0-4108c4fbc5cf	EM13LGG402	Empregar, nas interações sociais, a variedade e o estilo de língua adequados à situação comunicativa, ao(s) interlocutor(es) e ao gênero do discurso, respeitando os usos das línguas por esse(s) interlocutor(es) e combatendo situações de preconceito linguístico.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+5ea39a65-d058-4a61-a29c-80341f323c3a	EM13LGG403	Fazer uso do inglês como língua do mundo global, levando em conta a multiplicidade e variedade de usos, usuários e funções dessa língua no mundo contemporâneo.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+033b3e6c-f98c-4b29-91b5-299d17a8786d	EM13LGG501	Selecionar e utilizar movimentos corporais de forma consciente e intencional para interagir socialmente em práticas da cultura corporal, de modo a estabelecer relações construtivas, éticas e de respeito às diferenças.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+7973c39b-8c21-440b-8fd5-a6e0e0701785	EM13LGG502	Analisar criticamente preconceitos, estereótipos e relações de poder subjacentes às práticas e discursos verbais e imagéticos na apreciação e produção das práticas da cultura corporal de movimento.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+c5c02cc6-5276-4297-8462-76b146a83a4b	EM13LGG503	Praticar, significar e valorizar a cultura corporal de movimento como forma de autoconhecimento, autocuidado e construção de laços sociais em seus projetos de vida.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+07c01920-72d7-4dc1-bb49-d92bbaf0b9ce	EM13LGG601	Apropriar-se do patrimônio artístico e da cultura corporal de movimento de diferentes tempos e lugares, compreendendo a sua diversidade, bem como os processos de disputa por legitimidade.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+8cbe7878-5146-40d6-832b-a9024ad20b7c	EM13LGG602	Fruir e apreciar esteticamente diversas manifestações artísticas e culturais, das locais às mundiais, assim como delas participar, de modo a aguçar continuamente a sensibilidade, a imaginação e a criatividade.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+1fc4d183-1b82-4f52-b4f2-a8bc38d5064e	EM13LGG603	Expressar-se e atuar em processos criativos que integrem diferentes linguagens artísticas e referências estéticas e culturais, recorrendo a conhecimentos de naturezas diversas (artísticos, históricos, sociais e políticos) e experiências individuais e coletivas.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+e03d5fdd-0b9b-4907-929c-51b87294c7b8	EM13LGG604	Relacionar as práticas artísticas e da cultura corporal do movimento às diferentes dimensões da vida social, cultural, política, histórica e econômica.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+79871544-907d-468e-865f-7709577b333b	EM13LGG701	Explorar tecnologias digitais da informação e comunicação (TDIC), compreendendo seus princípios e funcionalidades, e mobilizá-las de modo ético, responsável e adequado a práticas de linguagem em diferentes contextos.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+6052bd1b-e5a8-480f-bc11-86528d52268f	EM13LGG702	Avaliar o impacto das tecnologias digitais da informação e comunicação (TDIC) na formação do sujeito e em suas práticas sociais, para fazer uso crítico dessa mídia em práticas de seleção, compreensão e produção de discursos em ambiente digital.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+43d608c9-4311-4094-b794-85b0410012bd	EM13LGG703	Utilizar diferentes linguagens, mídias e ferramentas digitais em processos de produção coletiva, colaborativa e projetos autorais em ambientes digitais.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+5c49d3d3-73a9-4a39-b174-49d7fe8dd91f	EM13LGG704	Apropriar-se criticamente de processos de pesquisa e busca de informação, por meio de ferramentas e dos novos formatos de produção e distribuição do conhecimento na cultura de rede.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+4bf9d6f4-6fd4-48bb-9c67-882adbd68a29	EM13CNT101	Analisar e representar as transformações e conservações em sistemas que envolvam quantidade de matéria, de energia e de movimento para realizar previsões em situações cotidianas e processos produtivos que priorizem o uso racional dos recursos naturais.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+9483b374-090e-4501-b4a1-995dfca2bd21	EM13CNT102	Realizar previsões, avaliar intervenções e/ou construir protótipos de sistemas térmicos que visem à sustentabilidade, com base na análise dos efeitos das variáveis termodinâmicas e da composição dos sistemas naturais e tecnológicos.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+9b50cd27-dac7-47a0-840d-5b5c4508675c	EM13CNT103	Utilizar o conhecimento sobre as radiações e suas origens para avaliar as potencialidades e os riscos de sua aplicação em equipamentos de uso cotidiano, na saúde, na indústria e na geração de energia elétrica.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+146a1a23-6aaf-4f97-8d7a-c7d197c4e95f	EM13CNT104	Avaliar potenciais prejuízos de diferentes materiais e produtos à saúde e ao ambiente, considerando sua composição, toxicidade e reatividade, como também o nível de exposição a eles, posicionando-se criticamente e propondo soluções individuais e/ou coletivas para o uso adequado desses materiais e produtos.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+62fa9e7a-21fc-475d-a695-37cd1917f380	EM13CNT105	Analisar a ciclagem de elementos químicos no solo, na água, na atmosfera e nos seres vivos e interpretar os efeitos de fenômenos naturais e da interferência humana sobre esses ciclos, para promover ações individuais e/ou coletivas que minimizem consequências nocivas à vida.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+f4517a61-b9bc-49b9-9f4d-260c80fbe4e0	EM13CNT106	Avaliar tecnologias e possíveis soluções para as demandas que envolvem a geração, o transporte, a distribuição e o consumo de energia elétrica, considerando a disponibilidade de recursos, a eficiência energética, a relação custo/benefício, as características geográficas e ambientais, a produção de resíduos e os impactos socioambientais.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+a99ad164-7b39-424d-954d-9cb2879d4e77	EM13CNT201	Analisar e utilizar modelos científicos, propostos em diferentes épocas e culturas para avaliar distintas explicações sobre o surgimento e a evolução da Vida, da Terra e do Universo.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+f63c404f-f424-4316-b6ae-8d427ff123c5	EM13CNT202	Interpretar formas de manifestação da vida, considerando seus diferentes níveis de organização (da composição molecular à biosfera), bem como as condições ambientais favoráveis e os fatores limitantes a elas, tanto na Terra quanto em outros planetas.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+29789f43-ab6d-4dbb-972e-ebe3731df90e	EM13CNT203	Avaliar e prever efeitos de intervenções nos ecossistemas, nos seres vivos e no corpo humano, interpretando os mecanismos de manutenção da vida com base nos ciclos da matéria e nas transformações e transferências de energia.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+e1a4e878-0b4a-4604-8c5d-f6a306a25fea	EM13CNT204	Elaborar explicações e previsões a respeito dos movimentos de objetos na Terra, no Sistema Solar e no Universo com base na análise das interações gravitacionais.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+7a1376a1-9fa6-484b-a8b8-3ea0febd4292	EM13CNT205	Utilizar noções de probabilidade e incerteza para interpretar previsões sobre atividades experimentais, fenômenos naturais e processos tecnológicos, reconhecendo os limites explicativos das ciências.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+fd3e406d-c97e-40b0-be3e-31726af19fcd	EM13CNT206	Justificar a importância da preservação e conservação da biodiversidade, considerando parâmetros qualitativos e quantitativos, e avaliar os efeitos da ação humana e das políticas ambientais para a garantia da sustentabilidade do planeta.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+1c6f7e02-eb0e-4758-b0e5-c61a75a62f99	EM13CNT207	Identificar e analisar vulnerabilidades vinculadas aos desafios contemporâneos aos quais as juventudes estão expostas, considerando as dimensões física, psicoemocional e social, a fim de desenvolver e divulgar ações de prevenção e de promoção da saúde e do bem-estar.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+828abda9-134b-4c24-a525-92011106f404	EM13CNT301	Construir questões, elaborar hipóteses, previsões e estimativas, empregar instrumentos de medição e representar e interpretar modelos explicativos, dados e/ou resultados experimentais para construir, avaliar e justificar conclusões no enfrentamento de situações-problema sob uma perspectiva científica.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+f9b65185-08a5-4993-be0a-3c7820f1184b	EM13CNT302	Comunicar, para públicos variados, em diversos contextos, resultados de análises, pesquisas e/ou experimentos – interpretando gráficos, tabelas, símbolos, códigos, sistemas de classificação e equações, elaborando textos e utilizando diferentes mídias e tecnologias digitais de informação e comunicação (TDIC) –, de modo a promover debates em torno de temas científicos e/ou tecnológicos de relevância sociocultural.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+05005c27-c72e-49d4-a21a-3ef79ae41827	EM13CNT303	Interpretar textos de divulgação científica que tratem de temáticas das Ciências da Natureza, disponíveis em diferentes mídias, considerando a apresentação dos dados, a consistência dos argumentos e a coerência das conclusões, visando construir estratégias de seleção de fontes confiáveis de informações.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+86631f41-1d10-4f69-b4e2-2c9f9da8e19a	EM13CNT304	Analisar e debater situações controversas sobre a aplicação de conhecimentos da área de Ciências da Natureza (tais como tecnologias do DNA, tratamentos com células-tronco, produção de armamentos, formas de controle de pragas, entre outros), com base em argumentos consistentes, éticos e responsáveis, distinguindo diferentes pontos de vista.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+06a322f4-66cc-4955-831d-a8ce04654d90	EM13CNT305	Investigar e discutir o uso indevido de conhecimentos das Ciências da Natureza na justificativa de processos de discriminação, segregação e privação de direitos individuais e coletivos para promover a equidade e o respeito à diversidade.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+837f58f2-a171-4bfc-bb14-0d2b8e5aba6b	EM13CNT306	Avaliar os riscos envolvidos em atividades cotidianas, aplicando conhecimentos das Ciências da Natureza, para justificar o uso de equipamentos e comportamentos de segurança, visando à integridade física, individual e coletiva, e socioambiental.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+ad2fb51c-dcc3-47fb-901b-0ec708944edd	EM13CNT307	Analisar as propriedades específicas dos materiais para avaliar a adequação de seu uso em diferentes aplicações (industriais, cotidianas, arquitetônicas ou tecnológicas) e/ou propor soluções seguras e sustentáveis.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+ca058237-97c9-4965-aa0d-b97420c87ad6	EM13CNT308	Analisar o funcionamento de equipamentos elétricos e/ou eletrônicos, redes de informática e sistemas de automação para compreender as tecnologias contemporâneas e avaliar seus impactos.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+040e40d8-17f3-4396-a18f-e439e320abc6	EM13CNT309	Analisar questões socioambientais, políticas e econômicas relativas à dependência do mundo atual com relação aos recursos fósseis e discutir a necessidade de introdução de alternativas e novas tecnologias energéticas e de materiais, comparando diferentes tipos de motores e processos de produção de novos materiais.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+bafb610f-0ea5-49a3-a7af-8b43a9a35f0c	EM13CNT310	Investigar e analisar os efeitos de programas de infraestrutura e demais serviços básicos (saneamento, energia elétrica, transporte, telecomunicações, cobertura vacinal, atendimento primário à saúde e produção de alimentos, entre outros) e identificar necessidades locais e/ou regionais em relação a esses serviços, a fim de promover ações que contribuam para a melhoria na qualidade de vida e nas condições de saúde da população.	t	1a478ff8-19dc-4ed4-a420-b2d0660f0ad9
+ab70405b-c27a-407b-a2ee-a07823f8bc74	EM13CNT101	Analisar e representar as transformações e conservações em sistemas que envolvam quantidade de matéria, de energia e de movimento para realizar previsões em situações cotidianas e processos produtivos que priorizem o uso racional dos recursos naturais.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+c5c05971-9cc2-4685-bc78-a4facbfe0c81	EM13CNT102	Realizar previsões, avaliar intervenções e/ou construir protótipos de sistemas térmicos que visem à sustentabilidade, com base na análise dos efeitos das variáveis termodinâmicas e da composição dos sistemas naturais e tecnológicos.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+15acf15c-ee15-4d7f-9a08-2a1b24df9baf	EM13CNT103	Utilizar o conhecimento sobre as radiações e suas origens para avaliar as potencialidades e os riscos de sua aplicação em equipamentos de uso cotidiano, na saúde, na indústria e na geração de energia elétrica.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+3df6fdfc-098b-46a5-86d2-1a7ba0856879	EM13CNT104	Avaliar potenciais prejuízos de diferentes materiais e produtos à saúde e ao ambiente, considerando sua composição, toxicidade e reatividade, como também o nível de exposição a eles, posicionando-se criticamente e propondo soluções individuais e/ou coletivas para o uso adequado desses materiais e produtos.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+0db121fb-f619-4726-a3a8-339696b95402	EM13CNT105	Analisar a ciclagem de elementos químicos no solo, na água, na atmosfera e nos seres vivos e interpretar os efeitos de fenômenos naturais e da interferência humana sobre esses ciclos, para promover ações individuais e/ou coletivas que minimizem consequências nocivas à vida.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+0476ecc0-4e2e-4947-b15c-a7470fdb3d52	EM13CNT106	Avaliar tecnologias e possíveis soluções para as demandas que envolvem a geração, o transporte, a distribuição e o consumo de energia elétrica, considerando a disponibilidade de recursos, a eficiência energética, a relação custo/benefício, as características geográficas e ambientais, a produção de resíduos e os impactos socioambientais.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+8f141549-787e-4ec3-afa8-d261382a624d	EM13CNT201	Analisar e utilizar modelos científicos, propostos em diferentes épocas e culturas para avaliar distintas explicações sobre o surgimento e a evolução da Vida, da Terra e do Universo.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+3842e41f-e739-4667-a56d-f3b448c62e29	EM13CNT202	Interpretar formas de manifestação da vida, considerando seus diferentes níveis de organização (da composição molecular à biosfera), bem como as condições ambientais favoráveis e os fatores limitantes a elas, tanto na Terra quanto em outros planetas.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+b53bc44f-d48f-4331-a601-25bea98491a8	EM13CNT203	Avaliar e prever efeitos de intervenções nos ecossistemas, nos seres vivos e no corpo humano, interpretando os mecanismos de manutenção da vida com base nos ciclos da matéria e nas transformações e transferências de energia.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+08473822-f243-46b1-afff-b6251dc7d7e7	EM13CNT205	Utilizar noções de probabilidade e incerteza para interpretar previsões sobre atividades experimentais, fenômenos naturais e processos tecnológicos, reconhecendo os limites explicativos das ciências.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+277d5d1d-7067-4509-9d31-d616dd1c6e63	EM13CNT206	Justificar a importância da preservação e conservação da biodiversidade, considerando parâmetros qualitativos e quantitativos, e avaliar os efeitos da ação humana e das políticas ambientais para a garantia da sustentabilidade do planeta.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+7f425470-33b3-4693-a832-a5c5f385dbb6	EM13CNT207	Identificar e analisar vulnerabilidades vinculadas aos desafios contemporâneos aos quais as juventudes estão expostas, considerando as dimensões física, psicoemocional e social, a fim de desenvolver e divulgar ações de prevenção e de promoção da saúde e do bem-estar.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+cd9451ab-eb5a-4730-bb3e-5b2c010c98e1	EM13MAT310	Resolver e elaborar problemas de contagem envolvendo diferentes tipos de agrupamento de elementos, por meio dos princípios multiplicativo e aditivo, recorrendo a estratégias diversas como o diagrama de árvore.	t	f2676f6a-fe41-4a6a-99d2-db43e44c2b4a
+4e25c7aa-9864-4020-aeaf-da2c40e93345	EM13CNT301	Construir questões, elaborar hipóteses, previsões e estimativas, empregar instrumentos de medição e representar e interpretar modelos explicativos, dados e/ou resultados experimentais para construir, avaliar e justificar conclusões no enfrentamento de situações-problema sob uma perspectiva científica.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+ad7eb081-8a8c-4d6d-affb-fe8564138a5b	EM13CNT302	Comunicar, para públicos variados, em diversos contextos, resultados de análises, pesquisas e/ou experimentos – interpretando gráficos, tabelas, símbolos, códigos, sistemas de classificação e equações, elaborando textos e utilizando diferentes mídias e tecnologias digitais de informação e comunicação (TDIC) –, de modo a promover debates em torno de temas científicos e/ou tecnológicos de relevância sociocultural.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+c3194f66-9ad5-48a0-ade3-85831b096b73	EM13CNT303	Interpretar textos de divulgação científica que tratem de temáticas das Ciências da Natureza, disponíveis em diferentes mídias, considerando a apresentação dos dados, a consistência dos argumentos e a coerência das conclusões, visando construir estratégias de seleção de fontes confiáveis de informações.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+40e87044-7722-46b9-9370-e1261c4fcb38	EM13CNT304	Analisar e debater situações controversas sobre a aplicação de conhecimentos da área de Ciências da Natureza (tais como tecnologias do DNA, tratamentos com células-tronco, produção de armamentos, formas de controle de pragas, entre outros), com base em argumentos consistentes, éticos e responsáveis, distinguindo diferentes pontos de vista.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+e0cd3e56-89ee-4c25-a2ea-ed863dda9266	EM13CNT305	Investigar e discutir o uso indevido de conhecimentos das Ciências da Natureza na justificativa de processos de discriminação, segregação e privação de direitos individuais e coletivos para promover a equidade e o respeito à diversidade.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+633f516c-957b-4188-9e70-b44d0ad62b9f	EM13CNT306	Avaliar os riscos envolvidos em atividades cotidianas, aplicando conhecimentos das Ciências da Natureza, para justificar o uso de equipamentos e comportamentos de segurança, visando à integridade física, individual e coletiva, e socioambiental.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+69053f8e-6198-49cb-bf92-0b5cec84d650	EM13CNT307	Analisar as propriedades específicas dos materiais para avaliar a adequação de seu uso em diferentes aplicações (industriais, cotidianas, arquitetônicas ou tecnológicas) e/ou propor soluções seguras e sustentáveis.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+0eea5d0e-0ebc-4f36-9ece-674fc1af68e3	EM13CNT308	Analisar o funcionamento de equipamentos elétricos e/ou eletrônicos, redes de informática e sistemas de automação para compreender as tecnologias contemporâneas e avaliar seus impactos.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+53e38793-81af-434a-bbbf-0e9f38b8ad58	EM13CNT309	Analisar questões socioambientais, políticas e econômicas relativas à dependência do mundo atual com relação aos recursos fósseis e discutir a necessidade de introdução de alternativas e novas tecnologias energéticas e de materiais, comparando diferentes tipos de motores e processos de produção de novos materiais.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+2411eb53-5743-47ba-8042-3cc58bb66aac	EM13CNT310	Investigar e analisar os efeitos de programas de infraestrutura e demais serviços básicos (saneamento, energia elétrica, transporte, telecomunicações, cobertura vacinal, atendimento primário à saúde e produção de alimentos, entre outros) e identificar necessidades locais e/ou regionais em relação a esses serviços, a fim de promover ações que contribuam para a melhoria na qualidade de vida e nas condições de saúde da população.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+32416c33-a91d-4f06-b142-96ecf95a066e	EM13CNT101	Analisar e representar as transformações e conservações em sistemas que envolvam quantidade de matéria, de energia e de movimento para realizar previsões em situações cotidianas e processos produtivos que priorizem o uso racional dos recursos naturais.	t	ab322357-760c-4cb3-9b50-022ce4676849
+22b4ea1c-45c1-4ac8-9508-e57a4d9b4e1a	EM13CNT102	Realizar previsões, avaliar intervenções e/ou construir protótipos de sistemas térmicos que visem à sustentabilidade, com base na análise dos efeitos das variáveis termodinâmicas e da composição dos sistemas naturais e tecnológicos.	t	ab322357-760c-4cb3-9b50-022ce4676849
+284c86cc-4bec-40bd-a21a-ade667568550	EM13CNT103	Utilizar o conhecimento sobre as radiações e suas origens para avaliar as potencialidades e os riscos de sua aplicação em equipamentos de uso cotidiano, na saúde, na indústria e na geração de energia elétrica.	t	ab322357-760c-4cb3-9b50-022ce4676849
+1139d08f-255b-4722-b7b2-95e9da11fdcb	EM13CNT104	Avaliar potenciais prejuízos de diferentes materiais e produtos à saúde e ao ambiente, considerando sua composição, toxicidade e reatividade, como também o nível de exposição a eles, posicionando-se criticamente e propondo soluções individuais e/ou coletivas para o uso adequado desses materiais e produtos.	t	ab322357-760c-4cb3-9b50-022ce4676849
+f746ac6e-42ae-42dd-80d6-d2a40128ee33	EM13CNT105	Analisar a ciclagem de elementos químicos no solo, na água, na atmosfera e nos seres vivos e interpretar os efeitos de fenômenos naturais e da interferência humana sobre esses ciclos, para promover ações individuais e/ou coletivas que minimizem consequências nocivas à vida.	t	ab322357-760c-4cb3-9b50-022ce4676849
+b40f2c59-1482-4552-b993-da7cc8f19090	EM13CNT106	Avaliar tecnologias e possíveis soluções para as demandas que envolvem a geração, o transporte, a distribuição e o consumo de energia elétrica, considerando a disponibilidade de recursos, a eficiência energética, a relação custo/benefício, as características geográficas e ambientais, a produção de resíduos e os impactos socioambientais.	t	ab322357-760c-4cb3-9b50-022ce4676849
+c4ec0aa0-cfc2-4f5b-88eb-75e1073676c6	EM13CNT201	Analisar e utilizar modelos científicos, propostos em diferentes épocas e culturas para avaliar distintas explicações sobre o surgimento e a evolução da Vida, da Terra e do Universo.	t	ab322357-760c-4cb3-9b50-022ce4676849
+762772cb-9360-447d-8fad-c36ccb8355e5	EM13CNT202	Interpretar formas de manifestação da vida, considerando seus diferentes níveis de organização (da composição molecular à biosfera), bem como as condições ambientais favoráveis e os fatores limitantes a elas, tanto na Terra quanto em outros planetas.	t	ab322357-760c-4cb3-9b50-022ce4676849
+183802e2-91a7-44c0-a0f0-e78b1f6d7f32	EM13CNT203	Avaliar e prever efeitos de intervenções nos ecossistemas, nos seres vivos e no corpo humano, interpretando os mecanismos de manutenção da vida com base nos ciclos da matéria e nas transformações e transferências de energia.	t	ab322357-760c-4cb3-9b50-022ce4676849
+c0177d8d-91aa-4525-a180-3639a8623660	EM13CNT205	Utilizar noções de probabilidade e incerteza para interpretar previsões sobre atividades experimentais, fenômenos naturais e processos tecnológicos, reconhecendo os limites explicativos das ciências.	t	ab322357-760c-4cb3-9b50-022ce4676849
+c4f1b7b4-5050-4e77-827e-6a62f9e89f1d	EM13CNT204	Elaborar explicações e previsões a respeito dos movimentos de objetos na Terra, no Sistema Solar e no Universo com base na análise das interações gravitacionais.	t	ab322357-760c-4cb3-9b50-022ce4676849
+b9436d2e-ead2-49aa-a131-efd29193048a	EM13CNT206	Justificar a importância da preservação e conservação da biodiversidade, considerando parâmetros qualitativos e quantitativos, e avaliar os efeitos da ação humana e das políticas ambientais para a garantia da sustentabilidade do planeta.	t	ab322357-760c-4cb3-9b50-022ce4676849
+f5cca4a2-b029-469a-aea8-64e55f0fa469	EM13CNT207	Identificar e analisar vulnerabilidades vinculadas aos desafios contemporâneos aos quais as juventudes estão expostas, considerando as dimensões física, psicoemocional e social, a fim de desenvolver e divulgar ações de prevenção e de promoção da saúde e do bem-estar.	t	ab322357-760c-4cb3-9b50-022ce4676849
+28d113d3-6c80-43e1-aea6-6ac0203fd7cb	EM13CNT301	Construir questões, elaborar hipóteses, previsões e estimativas, empregar instrumentos de medição e representar e interpretar modelos explicativos, dados e/ou resultados experimentais para construir, avaliar e justificar conclusões no enfrentamento de situações-problema sob uma perspectiva científica.	t	ab322357-760c-4cb3-9b50-022ce4676849
+91443308-400e-4c55-b5bf-9289549a4982	EM13CNT302	Comunicar, para públicos variados, em diversos contextos, resultados de análises, pesquisas e/ou experimentos – interpretando gráficos, tabelas, símbolos, códigos, sistemas de classificação e equações, elaborando textos e utilizando diferentes mídias e tecnologias digitais de informação e comunicação (TDIC) –, de modo a promover debates em torno de temas científicos e/ou tecnológicos de relevância sociocultural.	t	ab322357-760c-4cb3-9b50-022ce4676849
+75ba1e45-67da-4e0d-99bd-9bd33120ce8a	EM13CNT303	Interpretar textos de divulgação científica que tratem de temáticas das Ciências da Natureza, disponíveis em diferentes mídias, considerando a apresentação dos dados, a consistência dos argumentos e a coerência das conclusões, visando construir estratégias de seleção de fontes confiáveis de informações.	t	ab322357-760c-4cb3-9b50-022ce4676849
+e516a368-ce13-438d-8aff-743ff3d910a1	EM13CNT304	Analisar e debater situações controversas sobre a aplicação de conhecimentos da área de Ciências da Natureza (tais como tecnologias do DNA, tratamentos com células-tronco, produção de armamentos, formas de controle de pragas, entre outros), com base em argumentos consistentes, éticos e responsáveis, distinguindo diferentes pontos de vista.	t	ab322357-760c-4cb3-9b50-022ce4676849
+44e37d8b-1da0-4cfb-8dff-d57104f79512	EM13CNT305	Investigar e discutir o uso indevido de conhecimentos das Ciências da Natureza na justificativa de processos de discriminação, segregação e privação de direitos individuais e coletivos para promover a equidade e o respeito à diversidade.	t	ab322357-760c-4cb3-9b50-022ce4676849
+ef49aa85-8acb-4b38-bde5-de50ba748f37	EM13CNT306	Avaliar os riscos envolvidos em atividades cotidianas, aplicando conhecimentos das Ciências da Natureza, para justificar o uso de equipamentos e comportamentos de segurança, visando à integridade física, individual e coletiva, e socioambiental.	t	ab322357-760c-4cb3-9b50-022ce4676849
+f4ed4972-f52b-47d0-ac3f-fea49176689a	EM13CNT307	Analisar as propriedades específicas dos materiais para avaliar a adequação de seu uso em diferentes aplicações (industriais, cotidianas, arquitetônicas ou tecnológicas) e/ou propor soluções seguras e sustentáveis.	t	ab322357-760c-4cb3-9b50-022ce4676849
+35753c13-7b6f-443b-a10f-a079168da836	EM13CNT308	Analisar o funcionamento de equipamentos elétricos e/ou eletrônicos, redes de informática e sistemas de automação para compreender as tecnologias contemporâneas e avaliar seus impactos.	t	ab322357-760c-4cb3-9b50-022ce4676849
+39ae94bd-b53d-4bfc-8c63-f2e6dbff98ae	EM13CNT309	Analisar questões socioambientais, políticas e econômicas relativas à dependência do mundo atual com relação aos recursos fósseis e discutir a necessidade de introdução de alternativas e novas tecnologias energéticas e de materiais, comparando diferentes tipos de motores e processos de produção de novos materiais.	t	ab322357-760c-4cb3-9b50-022ce4676849
+af603daa-6d93-4fa3-a76a-20eecfd1639b	EM13CNT310	Investigar e analisar os efeitos de programas de infraestrutura e demais serviços básicos (saneamento, energia elétrica, transporte, telecomunicações, cobertura vacinal, atendimento primário à saúde e produção de alimentos, entre outros) e identificar necessidades locais e/ou regionais em relação a esses serviços, a fim de promover ações que contribuam para a melhoria na qualidade de vida e nas condições de saúde da população.	t	ab322357-760c-4cb3-9b50-022ce4676849
+d8e804ed-d6ee-4b57-a067-ba9f7239de37	EM13CHS101	Analisar e comparar diferentes fontes e narrativas expressas em diversas linguagens, com vistas à compreensão e à crítica de ideias filosóficas e processos e eventos históricos, geográficos, políticos, econômicos, sociais, ambientais e culturais.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+74b2b079-9303-4a72-bb69-ed199a600536	EM13CHS102	Identificar, analisar e discutir as circunstâncias históricas, geográficas, políticas, econômicas, sociais, ambientais e culturais da emergência de matrizes conceituais hegemônicas (etnocentrismo, evolução, modernidade etc.), comparando-as a narrativas que contemplem outros agentes e discursos.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+61b920bb-d152-420f-9a4f-b59506a2dd84	EM13CHS103	Elaborar hipóteses, selecionar evidências e compor argumentos relativos a processos políticos, econômicos, sociais, ambientais, culturais e epistemológicos, com base na sistematização de dados e informações de natureza qualitativa e quantitativa (expressões artísticas, textos filosóficos e sociológicos, documentos históricos, gráficos, mapas, tabelas etc.).	t	31f2c528-c570-491f-bc72-d272b861f9e2
+7b302ab1-9b37-4382-aee4-26e3410c9e8c	EM13CHS104	Analisar objetos da cultura material e imaterial como suporte de conhecimentos, valores, crenças e práticas que singularizam diferentes sociedades inseridas no tempo e no espaço.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+40e84725-ee8d-4543-a8ff-f5ca18d8b907	EM13CHS105	Identificar, contextualizar e criticar as tipologias evolutivas (como populações nômades e sedentárias, entre outras) e as oposições dicotômicas (cidade/campo, cultura/natureza, civilizados/bárbaros, razão/sensibilidade, material/virtual etc.), explicitando as ambiguidades e a complexidade dos conceitos e dos sujeitos envolvidos em diferentes circunstâncias e processos.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+82ef3085-73a0-44fd-aca4-e986e2afac89	EM13CHS106	Utilizar as linguagens cartográfica, gráfica e iconográfica e de diferentes gêneros textuais e as tecnologias digitais de informação e comunicação de forma crítica, significativa, reflexiva e ética nas diversas práticas sociais (incluindo as escolares) para se comunicar, acessar e disseminar informações, produzir conhecimentos, resolver problemas e exercer protagonismo e autoria na vida pessoal e coletiva.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+642b52cd-9418-42fa-b23c-a45e63cfe611	EM13CHS201	Analisar e caracterizar as dinâmicas das populações, das mercadorias e do capital nos diversos continentes, com destaque para a mobilidade e a fixação de pessoas, grupos humanos e povos, em função de eventos naturais, políticos, econômicos, sociais e culturais.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+e70540c3-51f4-484b-959f-874484f5d01d	EM13CHS202	Analisar e avaliar os impactos das tecnologias na estruturação e nas dinâmicas das sociedades contemporâneas (fluxos populacionais, financeiros, de mercadorias, de informações, de valores éticos e culturais etc.), bem como suas interferências nas decisões políticas, sociais, ambientais, econômicas e culturais.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+14ae9645-5b76-4f7d-b6c2-604a78f64839	EM13CHS203	Contrapor os diversos significados de território, fronteiras e vazio (espacial, temporal e cultural) em diferentes sociedades, contextualizando e relativizando visões dualistas como civilização/barbárie, nomadismo/sedentarismo e cidade/campo, entre outras.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+c05295a4-9277-4f20-8fc9-2f6d8bff17d7	EM13CHS204	Comparar e avaliar os processos de ocupação do espaço e a formação de territórios, territorialidades e fronteiras, identificando o papel de diferentes agentes (como grupos sociais e culturais, impérios, Estados Nacionais e organismos internacionais) e considerando os conflitos populacionais (internos e externos), a diversidade étnico-cultural e as características socioeconômicas, políticas e tecnológicas.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+a36b7d55-147f-4c09-af0e-464379da1a24	EM13CHS205	Analisar a produção de diferentes territorialidades em suas dimensões culturais, econômicas, ambientais, políticas e sociais, no Brasil e no mundo contemporâneo, com destaque para as culturas juvenis.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+12dea305-4c80-4b2b-a4bc-b87d0810a995	EM13CHS206	Compreender e aplicar os princípios de localização, distribuição, ordem, extensão, conexão, entre outros, relacionados com o raciocínio geográfico, na análise da ocupação humana e da produção do espaço em diferentes tempos.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+3aab566b-0af7-45f0-b511-9c187e8c90ae	EM13CHS301	Problematizar hábitos e práticas individuais e coletivos de produção e descarte (reuso e reciclagem) de resíduos na contemporaneidade e elaborar e/ou selecionar propostas de ação que promovam a sustentabilidade socioambiental e o consumo responsável.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+8c623161-60f5-4d94-ba26-896a861f9184	EM13CHS302	Analisar e avaliar os impactos econômicos e socioambientais de cadeias produtivas ligadas à exploração de recursos naturais e às atividades agropecuárias em diferentes ambientes e escalas de análise, considerando o modo de vida das populações locais e o compromisso com a sustentabilidade.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+b23a6db9-a565-4a44-9862-d606ec611560	EM13CHS303	Debater e avaliar o papel da indústria cultural e das culturas de massa no estímulo ao consumismo, seus impactos econômicos e socioambientais, com vistas a uma percepção crítica das necessidades criadas pelo consumo.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+60cd0601-37c4-4fba-9188-aedabf432c2a	EM13CHS304	Analisar os impactos socioambientais decorrentes de práticas de instituições governamentais, de empresas e de indivíduos, discutindo as origens dessas práticas, e selecionar aquelas que respeitem e promovam a consciência e a ética socioambiental e o consumo responsável.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+b991b7b1-896b-4af4-a7ad-dbfd70b30cca	EM13CHS305	Analisar e discutir o papel dos organismos nacionais de regulação, controle e fiscalização ambiental e dos acordos internacionais para a promoção e a garantia de práticas ambientais sustentáveis.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+ee398229-6edc-4359-b4e4-501403b9f6e1	EM13CHS306	Contextualizar, comparar e avaliar os impactos de diferentes modelos econômicos no uso dos recursos naturais e na promoção da sustentabilidade econômica e socioambiental do planeta.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+b5d07e0f-508b-4f80-bd29-65d42aa93ebf	EM13CHS401	Identificar e analisar as relações entre sujeitos, grupos e classes sociais diante das transformações técnicas, tecnológicas e informacionais e das novas formas de trabalho ao longo do tempo, em diferentes espaços e contextos.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+ea653f45-7883-48aa-8b53-ddc201786313	EM13CHS402	Analisar e comparar indicadores de emprego, trabalho e renda em diferentes espaços, escalas e tempos, associando-os a processos de estratificação e desigualdade socioeconômica.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+e37b6a25-4ca5-4d95-a6dc-588546682afe	EM13CHS403	Caracterizar e analisar processos próprios da contemporaneidade, com ênfase nas transformações tecnológicas e das relações sociais e de trabalho, para propor ações que visem à superação de situações de opressão e violação dos Direitos Humanos.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+b44b76d1-331a-4e5c-8821-6034f2061bac	EM13CHS404	Identificar e discutir os múltiplos aspectos do trabalho em diferentes circunstâncias e contextos históricos e/ou geográficos e seus efeitos sobre as gerações, em especial, os jovens e as gerações futuras, levando em consideração, na atualidade, as transformações técnicas, tecnológicas e informacionais.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+802eb959-7824-4594-94a1-52e2751f4264	EM13CHS501	Compreender e analisar os fundamentos da ética em diferentes culturas, identificando processos que contribuem para a formação de sujeitos éticos que valorizem a liberdade, a autonomia e o poder de decisão (vontade).	t	31f2c528-c570-491f-bc72-d272b861f9e2
+bade3f8f-2aab-4ed2-a83c-6c56fe3957d9	EM13CHS502	Analisar situações da vida cotidiana (estilos de vida, valores, condutas etc.), desnaturalizando e problematizando formas de desigualdade e preconceito, e propor ações que promovam os Direitos Humanos, a solidariedade e o respeito às diferenças e às escolhas individuais.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+e6527720-9db9-4726-89d9-70d4a3bf3331	EM13CHS503	Identificar diversas formas de violência (física, simbólica, psicológica etc.), suas causas, significados e usos políticos, sociais e culturais, avaliando e propondo mecanismos para combatê-las, com base em argumentos éticos.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+9ca037cc-2117-4337-9a6c-83d289db6b6c	EM13CHS504	Analisar e avaliar os impasses ético-políticos decorrentes das transformações científicas e tecnológicas no mundo contemporâneo e seus desdobramentos nas atitudes e nos valores de indivíduos, grupos sociais, sociedades e culturas.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+ee8beab2-1d25-4854-8209-615ceedbf00f	EM13CHS601	Relacionar as demandas políticas, sociais e culturais de indígenas e afrodescendentes no Brasil contemporâneo aos processos históricos das Américas e ao contexto de exclusão e inclusão precária desses grupos na ordem social e econômica atual.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+85117d2e-4229-4941-a38b-9c8c4f0cb92e	EM13CHS602	Identificar, caracterizar e relacionar a presença do paternalismo, do autoritarismo e do populismo na política, na sociedade e nas culturas brasileira e latino-americana, em períodos ditatoriais e democráticos, com as formas de organização e de articulação das sociedades em defesa da autonomia, da liberdade, do diálogo e da promoção da cidadania.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+044a6aa6-dbf3-4a0f-a44e-90207ba27097	EM13CHS603	Compreender e aplicar conceitos políticos básicos (Estado, poder, formas, sistemas e regimes de governo, soberania etc.) na análise da formação de diferentes países, povos e nações e de suas experiências políticas.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+59fae7b4-3058-4a8e-aab7-d7514663cce6	EM13CHS604	Conhecer e discutir o papel dos organismos internacionais no contexto mundial, com vistas à elaboração de uma visão crítica sobre seus limites e suas formas de atuação.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+8193cb08-b6da-4614-b9e6-d3534cc4fcd5	EM13CHS605	Analisar os princípios da declaração dos Direitos Humanos, recorrendo às noções de justiça, igualdade e fraternidade, para fundamentar a crítica à desigualdade entre indivíduos, grupos e sociedades e propor ações concretas diante da desigualdade e das violações desses direitos em diferentes espaços de vivência dos jovens.	t	31f2c528-c570-491f-bc72-d272b861f9e2
+7c623347-7f6d-4b48-a5bb-ab98123c1683	EM13CHS101	Analisar e comparar diferentes fontes e narrativas expressas em diversas linguagens, com vistas à compreensão e à crítica de ideias filosóficas e processos e eventos históricos, geográficos, políticos, econômicos, sociais, ambientais e culturais.	t	96d41460-ca48-4559-af11-8a90a19303fb
+37442f4f-2399-4c58-aa18-40603a7f2bdb	EM13CHS102	Identificar, analisar e discutir as circunstâncias históricas, geográficas, políticas, econômicas, sociais, ambientais e culturais da emergência de matrizes conceituais hegemônicas (etnocentrismo, evolução, modernidade etc.), comparando-as a narrativas que contemplem outros agentes e discursos.	t	96d41460-ca48-4559-af11-8a90a19303fb
+a4e249a5-25f6-4a50-b960-64bce4b4f44c	EM13CHS103	Elaborar hipóteses, selecionar evidências e compor argumentos relativos a processos políticos, econômicos, sociais, ambientais, culturais e epistemológicos, com base na sistematização de dados e informações de natureza qualitativa e quantitativa (expressões artísticas, textos filosóficos e sociológicos, documentos históricos, gráficos, mapas, tabelas etc.).	t	96d41460-ca48-4559-af11-8a90a19303fb
+7d76c0dd-d87a-46ed-b9f7-b3cc4440c92e	EM13CHS104	Analisar objetos da cultura material e imaterial como suporte de conhecimentos, valores, crenças e práticas que singularizam diferentes sociedades inseridas no tempo e no espaço.	t	96d41460-ca48-4559-af11-8a90a19303fb
+2a628bc5-f03e-4d0e-b073-d83fd1d46433	EM13CHS105	Identificar, contextualizar e criticar as tipologias evolutivas (como populações nômades e sedentárias, entre outras) e as oposições dicotômicas (cidade/campo, cultura/natureza, civilizados/bárbaros, razão/sensibilidade, material/virtual etc.), explicitando as ambiguidades e a complexidade dos conceitos e dos sujeitos envolvidos em diferentes circunstâncias e processos.	t	96d41460-ca48-4559-af11-8a90a19303fb
+8bf41f99-87b4-49aa-8d8c-a7759613f8b4	EM13CHS106	Utilizar as linguagens cartográfica, gráfica e iconográfica e de diferentes gêneros textuais e as tecnologias digitais de informação e comunicação de forma crítica, significativa, reflexiva e ética nas diversas práticas sociais (incluindo as escolares) para se comunicar, acessar e disseminar informações, produzir conhecimentos, resolver problemas e exercer protagonismo e autoria na vida pessoal e coletiva.	t	96d41460-ca48-4559-af11-8a90a19303fb
+9b18f867-d9b4-4ee4-a4c6-abcdca02ed12	EM13CHS201	Analisar e caracterizar as dinâmicas das populações, das mercadorias e do capital nos diversos continentes, com destaque para a mobilidade e a fixação de pessoas, grupos humanos e povos, em função de eventos naturais, políticos, econômicos, sociais e culturais.	t	96d41460-ca48-4559-af11-8a90a19303fb
+00a73634-6f1b-4f6b-a297-2dbcd0dd697e	EM13CHS202	Analisar e avaliar os impactos das tecnologias na estruturação e nas dinâmicas das sociedades contemporâneas (fluxos populacionais, financeiros, de mercadorias, de informações, de valores éticos e culturais etc.), bem como suas interferências nas decisões políticas, sociais, ambientais, econômicas e culturais.	t	96d41460-ca48-4559-af11-8a90a19303fb
+9a0a72e3-f297-438f-ad36-408c8c0a4db6	EM13CHS203	Contrapor os diversos significados de território, fronteiras e vazio (espacial, temporal e cultural) em diferentes sociedades, contextualizando e relativizando visões dualistas como civilização/barbárie, nomadismo/sedentarismo e cidade/campo, entre outras.	t	96d41460-ca48-4559-af11-8a90a19303fb
+36cb2f14-b063-4ff9-b8ff-de6332d24aa7	EM13CHS204	Comparar e avaliar os processos de ocupação do espaço e a formação de territórios, territorialidades e fronteiras, identificando o papel de diferentes agentes (como grupos sociais e culturais, impérios, Estados Nacionais e organismos internacionais) e considerando os conflitos populacionais (internos e externos), a diversidade étnico-cultural e as características socioeconômicas, políticas e tecnológicas.	t	96d41460-ca48-4559-af11-8a90a19303fb
+4903d013-611b-42a7-8e6e-3b9e063166a3	EM13CHS205	Analisar a produção de diferentes territorialidades em suas dimensões culturais, econômicas, ambientais, políticas e sociais, no Brasil e no mundo contemporâneo, com destaque para as culturas juvenis.	t	96d41460-ca48-4559-af11-8a90a19303fb
+3568ae38-472b-4518-b11b-b3ece559690f	EM13CHS206	Compreender e aplicar os princípios de localização, distribuição, ordem, extensão, conexão, entre outros, relacionados com o raciocínio geográfico, na análise da ocupação humana e da produção do espaço em diferentes tempos.	t	96d41460-ca48-4559-af11-8a90a19303fb
+c1b30286-808d-4a1b-ba16-8b56e2321051	EM13CHS301	Problematizar hábitos e práticas individuais e coletivos de produção e descarte (reuso e reciclagem) de resíduos na contemporaneidade e elaborar e/ou selecionar propostas de ação que promovam a sustentabilidade socioambiental e o consumo responsável.	t	96d41460-ca48-4559-af11-8a90a19303fb
+062ce9e9-f2a9-4023-890a-7cabc1674af5	EM13CHS302	Analisar e avaliar os impactos econômicos e socioambientais de cadeias produtivas ligadas à exploração de recursos naturais e às atividades agropecuárias em diferentes ambientes e escalas de análise, considerando o modo de vida das populações locais e o compromisso com a sustentabilidade.	t	96d41460-ca48-4559-af11-8a90a19303fb
+2bcdc3a0-c8da-42bc-84bd-b704ad81d37e	EM13CHS303	Debater e avaliar o papel da indústria cultural e das culturas de massa no estímulo ao consumismo, seus impactos econômicos e socioambientais, com vistas a uma percepção crítica das necessidades criadas pelo consumo.	t	96d41460-ca48-4559-af11-8a90a19303fb
+73b93399-b572-438e-aece-5f862bbc70b8	EM13CHS304	Analisar os impactos socioambientais decorrentes de práticas de instituições governamentais, de empresas e de indivíduos, discutindo as origens dessas práticas, e selecionar aquelas que respeitem e promovam a consciência e a ética socioambiental e o consumo responsável.	t	96d41460-ca48-4559-af11-8a90a19303fb
+3d863dd6-af83-4dec-839a-b44d674882c0	EM13CHS305	Analisar e discutir o papel dos organismos nacionais de regulação, controle e fiscalização ambiental e dos acordos internacionais para a promoção e a garantia de práticas ambientais sustentáveis.	t	96d41460-ca48-4559-af11-8a90a19303fb
+dd3f9082-b56b-4661-9689-914a53e6ba93	EM13CHS306	Contextualizar, comparar e avaliar os impactos de diferentes modelos econômicos no uso dos recursos naturais e na promoção da sustentabilidade econômica e socioambiental do planeta.	t	96d41460-ca48-4559-af11-8a90a19303fb
+d60fa021-e26f-4a4b-9958-82f435b7a083	EM13CHS401	Identificar e analisar as relações entre sujeitos, grupos e classes sociais diante das transformações técnicas, tecnológicas e informacionais e das novas formas de trabalho ao longo do tempo, em diferentes espaços e contextos.	t	96d41460-ca48-4559-af11-8a90a19303fb
+f19641a1-73dd-4871-978b-7f412006d1f2	EM13CHS402	Analisar e comparar indicadores de emprego, trabalho e renda em diferentes espaços, escalas e tempos, associando-os a processos de estratificação e desigualdade socioeconômica.	t	96d41460-ca48-4559-af11-8a90a19303fb
+51c30a88-9b16-48e8-9fce-84bb4b02c928	EM13CHS403	Caracterizar e analisar processos próprios da contemporaneidade, com ênfase nas transformações tecnológicas e das relações sociais e de trabalho, para propor ações que visem à superação de situações de opressão e violação dos Direitos Humanos.	t	96d41460-ca48-4559-af11-8a90a19303fb
+41f6ac06-599b-4f7a-a0df-7862e8b040a0	EM13CHS404	Identificar e discutir os múltiplos aspectos do trabalho em diferentes circunstâncias e contextos históricos e/ou geográficos e seus efeitos sobre as gerações, em especial, os jovens e as gerações futuras, levando em consideração, na atualidade, as transformações técnicas, tecnológicas e informacionais.	t	96d41460-ca48-4559-af11-8a90a19303fb
+3b3647e3-9e30-48f2-8e6a-fdc57ea02e89	EM13CHS501	Compreender e analisar os fundamentos da ética em diferentes culturas, identificando processos que contribuem para a formação de sujeitos éticos que valorizem a liberdade, a autonomia e o poder de decisão (vontade).	t	96d41460-ca48-4559-af11-8a90a19303fb
+9dbbfac5-7b86-4d09-8c19-638f7f5d8eea	EM13CHS502	Analisar situações da vida cotidiana (estilos de vida, valores, condutas etc.), desnaturalizando e problematizando formas de desigualdade e preconceito, e propor ações que promovam os Direitos Humanos, a solidariedade e o respeito às diferenças e às escolhas individuais.	t	96d41460-ca48-4559-af11-8a90a19303fb
+6d0adbbd-1062-4f0c-8cd8-6a07edc245ba	EM13CHS503	Identificar diversas formas de violência (física, simbólica, psicológica etc.), suas causas, significados e usos políticos, sociais e culturais, avaliando e propondo mecanismos para combatê-las, com base em argumentos éticos.	t	96d41460-ca48-4559-af11-8a90a19303fb
+683b778b-421d-4c5e-9397-1b5011fca789	EM13CHS504	Analisar e avaliar os impasses ético-políticos decorrentes das transformações científicas e tecnológicas no mundo contemporâneo e seus desdobramentos nas atitudes e nos valores de indivíduos, grupos sociais, sociedades e culturas.	t	96d41460-ca48-4559-af11-8a90a19303fb
+4e3d0786-0e08-4db7-8fdf-91ed03ac5ea6	EM13CHS601	Relacionar as demandas políticas, sociais e culturais de indígenas e afrodescendentes no Brasil contemporâneo aos processos históricos das Américas e ao contexto de exclusão e inclusão precária desses grupos na ordem social e econômica atual.	t	96d41460-ca48-4559-af11-8a90a19303fb
+51e2108b-38d6-467b-bdf6-9df2bbfcbeb4	EM13CHS602	Identificar, caracterizar e relacionar a presença do paternalismo, do autoritarismo e do populismo na política, na sociedade e nas culturas brasileira e latino-americana, em períodos ditatoriais e democráticos, com as formas de organização e de articulação das sociedades em defesa da autonomia, da liberdade, do diálogo e da promoção da cidadania.	t	96d41460-ca48-4559-af11-8a90a19303fb
+af64a868-9aa6-434d-8a13-57e7b88038de	EM13CHS603	Compreender e aplicar conceitos políticos básicos (Estado, poder, formas, sistemas e regimes de governo, soberania etc.) na análise da formação de diferentes países, povos e nações e de suas experiências políticas.	t	96d41460-ca48-4559-af11-8a90a19303fb
+dc25e52f-5d06-4529-9633-3c157e2315b6	EM13CHS604	Conhecer e discutir o papel dos organismos internacionais no contexto mundial, com vistas à elaboração de uma visão crítica sobre seus limites e suas formas de atuação.	t	96d41460-ca48-4559-af11-8a90a19303fb
+8309441e-6511-4dd6-92f3-ca629b055648	EM13CHS605	Analisar os princípios da declaração dos Direitos Humanos, recorrendo às noções de justiça, igualdade e fraternidade, para fundamentar a crítica à desigualdade entre indivíduos, grupos e sociedades e propor ações concretas diante da desigualdade e das violações desses direitos em diferentes espaços de vivência dos jovens.	t	96d41460-ca48-4559-af11-8a90a19303fb
+800ba647-a46d-425b-bdd5-78bbec2ad950	EM13CHS101	Analisar e comparar diferentes fontes e narrativas expressas em diversas linguagens, com vistas à compreensão e à crítica de ideias filosóficas e processos e eventos históricos, geográficos, políticos, econômicos, sociais, ambientais e culturais.	t	31690f56-afd4-40a2-ba74-190bdb753977
+856bb1e0-42d6-454a-be47-6da37bdf56dd	EM13CHS102	Identificar, analisar e discutir as circunstâncias históricas, geográficas, políticas, econômicas, sociais, ambientais e culturais da emergência de matrizes conceituais hegemônicas (etnocentrismo, evolução, modernidade etc.), comparando-as a narrativas que contemplem outros agentes e discursos.	t	31690f56-afd4-40a2-ba74-190bdb753977
+4bbb4b11-c81d-4168-a37c-544368929258	EM13CHS103	Elaborar hipóteses, selecionar evidências e compor argumentos relativos a processos políticos, econômicos, sociais, ambientais, culturais e epistemológicos, com base na sistematização de dados e informações de natureza qualitativa e quantitativa (expressões artísticas, textos filosóficos e sociológicos, documentos históricos, gráficos, mapas, tabelas etc.).	t	31690f56-afd4-40a2-ba74-190bdb753977
+a07644e7-e93f-485b-9f01-79b8c4821ebd	EM13CHS104	Analisar objetos da cultura material e imaterial como suporte de conhecimentos, valores, crenças e práticas que singularizam diferentes sociedades inseridas no tempo e no espaço.	t	31690f56-afd4-40a2-ba74-190bdb753977
+ac679fb6-6cc9-4945-be2b-a219e3eb48b3	EM13CHS105	Identificar, contextualizar e criticar as tipologias evolutivas (como populações nômades e sedentárias, entre outras) e as oposições dicotômicas (cidade/campo, cultura/natureza, civilizados/bárbaros, razão/sensibilidade, material/virtual etc.), explicitando as ambiguidades e a complexidade dos conceitos e dos sujeitos envolvidos em diferentes circunstâncias e processos.	t	31690f56-afd4-40a2-ba74-190bdb753977
+60d1787f-df77-4249-bc80-e93bf7d15b73	EM13CHS106	Utilizar as linguagens cartográfica, gráfica e iconográfica e de diferentes gêneros textuais e as tecnologias digitais de informação e comunicação de forma crítica, significativa, reflexiva e ética nas diversas práticas sociais (incluindo as escolares) para se comunicar, acessar e disseminar informações, produzir conhecimentos, resolver problemas e exercer protagonismo e autoria na vida pessoal e coletiva.	t	31690f56-afd4-40a2-ba74-190bdb753977
+f22652a7-c9b8-4d46-8177-59e946ac333a	EM13CHS201	Analisar e caracterizar as dinâmicas das populações, das mercadorias e do capital nos diversos continentes, com destaque para a mobilidade e a fixação de pessoas, grupos humanos e povos, em função de eventos naturais, políticos, econômicos, sociais e culturais.	t	31690f56-afd4-40a2-ba74-190bdb753977
+dc05017c-92c8-47eb-84c8-47d2bf7fb4ef	EM13CHS202	Analisar e avaliar os impactos das tecnologias na estruturação e nas dinâmicas das sociedades contemporâneas (fluxos populacionais, financeiros, de mercadorias, de informações, de valores éticos e culturais etc.), bem como suas interferências nas decisões políticas, sociais, ambientais, econômicas e culturais.	t	31690f56-afd4-40a2-ba74-190bdb753977
+4c7456a7-6947-4554-829c-8cccd60daa49	EM13CHS203	Contrapor os diversos significados de território, fronteiras e vazio (espacial, temporal e cultural) em diferentes sociedades, contextualizando e relativizando visões dualistas como civilização/barbárie, nomadismo/sedentarismo e cidade/campo, entre outras.	t	31690f56-afd4-40a2-ba74-190bdb753977
+7c8f8605-6b45-49c2-b686-bf65e73d5e53	EM13CHS204	Comparar e avaliar os processos de ocupação do espaço e a formação de territórios, territorialidades e fronteiras, identificando o papel de diferentes agentes (como grupos sociais e culturais, impérios, Estados Nacionais e organismos internacionais) e considerando os conflitos populacionais (internos e externos), a diversidade étnico-cultural e as características socioeconômicas, políticas e tecnológicas.	t	31690f56-afd4-40a2-ba74-190bdb753977
+fa2c281e-297d-4b7a-8ee3-e5b5de7df033	EM13CHS205	Analisar a produção de diferentes territorialidades em suas dimensões culturais, econômicas, ambientais, políticas e sociais, no Brasil e no mundo contemporâneo, com destaque para as culturas juvenis.	t	31690f56-afd4-40a2-ba74-190bdb753977
+d5bed74f-2c28-40a5-b913-dd3aca59f7d4	EM13CHS206	Compreender e aplicar os princípios de localização, distribuição, ordem, extensão, conexão, entre outros, relacionados com o raciocínio geográfico, na análise da ocupação humana e da produção do espaço em diferentes tempos.	t	31690f56-afd4-40a2-ba74-190bdb753977
+264baf1c-5be0-415d-8b7c-4eb812b72bd2	EM13CHS301	Problematizar hábitos e práticas individuais e coletivos de produção e descarte (reuso e reciclagem) de resíduos na contemporaneidade e elaborar e/ou selecionar propostas de ação que promovam a sustentabilidade socioambiental e o consumo responsável.	t	31690f56-afd4-40a2-ba74-190bdb753977
+75011bc9-4611-4924-a8ce-aeae4441f8a9	EM13CHS302	Analisar e avaliar os impactos econômicos e socioambientais de cadeias produtivas ligadas à exploração de recursos naturais e às atividades agropecuárias em diferentes ambientes e escalas de análise, considerando o modo de vida das populações locais e o compromisso com a sustentabilidade.	t	31690f56-afd4-40a2-ba74-190bdb753977
+781caa64-0fcc-4c87-96f3-edfeff454940	EM13CHS303	Debater e avaliar o papel da indústria cultural e das culturas de massa no estímulo ao consumismo, seus impactos econômicos e socioambientais, com vistas a uma percepção crítica das necessidades criadas pelo consumo.	t	31690f56-afd4-40a2-ba74-190bdb753977
+ab01810f-91f1-4e3b-8120-d579efe48599	EM13CHS304	Analisar os impactos socioambientais decorrentes de práticas de instituições governamentais, de empresas e de indivíduos, discutindo as origens dessas práticas, e selecionar aquelas que respeitem e promovam a consciência e a ética socioambiental e o consumo responsável.	t	31690f56-afd4-40a2-ba74-190bdb753977
+a6d984cf-6bfc-47d3-86d5-f00ca0e6d5ac	EM13CHS305	Analisar e discutir o papel dos organismos nacionais de regulação, controle e fiscalização ambiental e dos acordos internacionais para a promoção e a garantia de práticas ambientais sustentáveis.	t	31690f56-afd4-40a2-ba74-190bdb753977
+0cdc6a5c-f597-47b9-b0b5-734961c2f19f	EM13CHS306	Contextualizar, comparar e avaliar os impactos de diferentes modelos econômicos no uso dos recursos naturais e na promoção da sustentabilidade econômica e socioambiental do planeta.	t	31690f56-afd4-40a2-ba74-190bdb753977
+2b62e8ab-94b0-4114-9f64-73b6b3129e74	EM13CHS401	Identificar e analisar as relações entre sujeitos, grupos e classes sociais diante das transformações técnicas, tecnológicas e informacionais e das novas formas de trabalho ao longo do tempo, em diferentes espaços e contextos.	t	31690f56-afd4-40a2-ba74-190bdb753977
+1b84d552-e8d9-486c-80e7-83d275170b3f	EM13CHS402	Analisar e comparar indicadores de emprego, trabalho e renda em diferentes espaços, escalas e tempos, associando-os a processos de estratificação e desigualdade socioeconômica.	t	31690f56-afd4-40a2-ba74-190bdb753977
+ec391028-921f-48b8-bda0-a9b2cd4b25b5	EM13CHS403	Caracterizar e analisar processos próprios da contemporaneidade, com ênfase nas transformações tecnológicas e das relações sociais e de trabalho, para propor ações que visem à superação de situações de opressão e violação dos Direitos Humanos.	t	31690f56-afd4-40a2-ba74-190bdb753977
+8a728abc-d9ba-41c8-968e-b4d04cda06b1	EM13CHS404	Identificar e discutir os múltiplos aspectos do trabalho em diferentes circunstâncias e contextos históricos e/ou geográficos e seus efeitos sobre as gerações, em especial, os jovens e as gerações futuras, levando em consideração, na atualidade, as transformações técnicas, tecnológicas e informacionais.	t	31690f56-afd4-40a2-ba74-190bdb753977
+3ba10b2b-9d49-4663-8b74-d4eb3da1b8e8	EM13CHS501	Compreender e analisar os fundamentos da ética em diferentes culturas, identificando processos que contribuem para a formação de sujeitos éticos que valorizem a liberdade, a autonomia e o poder de decisão (vontade).	t	31690f56-afd4-40a2-ba74-190bdb753977
+a68f3769-852b-4a6c-b8f8-0b6eb1ba96c8	EM13CHS502	Analisar situações da vida cotidiana (estilos de vida, valores, condutas etc.), desnaturalizando e problematizando formas de desigualdade e preconceito, e propor ações que promovam os Direitos Humanos, a solidariedade e o respeito às diferenças e às escolhas individuais.	t	31690f56-afd4-40a2-ba74-190bdb753977
+83abc2b0-d02c-4c54-8571-11d43307b88f	EM13CHS503	Identificar diversas formas de violência (física, simbólica, psicológica etc.), suas causas, significados e usos políticos, sociais e culturais, avaliando e propondo mecanismos para combatê-las, com base em argumentos éticos.	t	31690f56-afd4-40a2-ba74-190bdb753977
+ae3287e6-a4b6-4421-984d-089b9215672f	EM13CHS504	Analisar e avaliar os impasses ético-políticos decorrentes das transformações científicas e tecnológicas no mundo contemporâneo e seus desdobramentos nas atitudes e nos valores de indivíduos, grupos sociais, sociedades e culturas.	t	31690f56-afd4-40a2-ba74-190bdb753977
+9920ab19-ea0c-46fe-8d0c-defab12f8d68	EM13CHS601	Relacionar as demandas políticas, sociais e culturais de indígenas e afrodescendentes no Brasil contemporâneo aos processos históricos das Américas e ao contexto de exclusão e inclusão precária desses grupos na ordem social e econômica atual.	t	31690f56-afd4-40a2-ba74-190bdb753977
+121edbe3-bf2b-4476-bce3-3744cb36e5b8	EM13CHS602	Identificar, caracterizar e relacionar a presença do paternalismo, do autoritarismo e do populismo na política, na sociedade e nas culturas brasileira e latino-americana, em períodos ditatoriais e democráticos, com as formas de organização e de articulação das sociedades em defesa da autonomia, da liberdade, do diálogo e da promoção da cidadania.	t	31690f56-afd4-40a2-ba74-190bdb753977
+4c25646e-4ec2-4673-b86b-acd5e044df50	EM13CHS603	Compreender e aplicar conceitos políticos básicos (Estado, poder, formas, sistemas e regimes de governo, soberania etc.) na análise da formação de diferentes países, povos e nações e de suas experiências políticas.	t	31690f56-afd4-40a2-ba74-190bdb753977
+c7351b98-06e8-47da-bc55-7165ebc52a23	EM13CHS604	Conhecer e discutir o papel dos organismos internacionais no contexto mundial, com vistas à elaboração de uma visão crítica sobre seus limites e suas formas de atuação.	t	31690f56-afd4-40a2-ba74-190bdb753977
+80bf3054-791d-4565-ab10-0704114fbc7b	EM13CHS605	Analisar os princípios da declaração dos Direitos Humanos, recorrendo às noções de justiça, igualdade e fraternidade, para fundamentar a crítica à desigualdade entre indivíduos, grupos e sociedades e propor ações concretas diante da desigualdade e das violações desses direitos em diferentes espaços de vivência dos jovens.	t	31690f56-afd4-40a2-ba74-190bdb753977
+4223b305-817a-4958-a459-979ea8c2e2a5	EM13CHS101	Analisar e comparar diferentes fontes e narrativas expressas em diversas linguagens, com vistas à compreensão e à crítica de ideias filosóficas e processos e eventos históricos, geográficos, políticos, econômicos, sociais, ambientais e culturais.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+fb23c62c-d6ab-4627-9e7c-a1353cbbeb1f	EM13CHS102	Identificar, analisar e discutir as circunstâncias históricas, geográficas, políticas, econômicas, sociais, ambientais e culturais da emergência de matrizes conceituais hegemônicas (etnocentrismo, evolução, modernidade etc.), comparando-as a narrativas que contemplem outros agentes e discursos.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+54a86292-27ec-4aa3-b139-07849abed947	EM13CHS103	Elaborar hipóteses, selecionar evidências e compor argumentos relativos a processos políticos, econômicos, sociais, ambientais, culturais e epistemológicos, com base na sistematização de dados e informações de natureza qualitativa e quantitativa (expressões artísticas, textos filosóficos e sociológicos, documentos históricos, gráficos, mapas, tabelas etc.).	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+e6c2adaf-b926-40fe-848e-17d6e28fac50	EM13CHS104	Analisar objetos da cultura material e imaterial como suporte de conhecimentos, valores, crenças e práticas que singularizam diferentes sociedades inseridas no tempo e no espaço.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+7e80b9e1-6aa5-45b7-9a90-b091b1784cdf	EM13CHS105	Identificar, contextualizar e criticar as tipologias evolutivas (como populações nômades e sedentárias, entre outras) e as oposições dicotômicas (cidade/campo, cultura/natureza, civilizados/bárbaros, razão/sensibilidade, material/virtual etc.), explicitando as ambiguidades e a complexidade dos conceitos e dos sujeitos envolvidos em diferentes circunstâncias e processos.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+d0e57817-d363-4d31-be05-b6823841232d	EM13CHS106	Utilizar as linguagens cartográfica, gráfica e iconográfica e de diferentes gêneros textuais e as tecnologias digitais de informação e comunicação de forma crítica, significativa, reflexiva e ética nas diversas práticas sociais (incluindo as escolares) para se comunicar, acessar e disseminar informações, produzir conhecimentos, resolver problemas e exercer protagonismo e autoria na vida pessoal e coletiva.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+11dc8de3-31a0-4b70-96da-f1c95d0b17c3	EM13CHS201	Analisar e caracterizar as dinâmicas das populações, das mercadorias e do capital nos diversos continentes, com destaque para a mobilidade e a fixação de pessoas, grupos humanos e povos, em função de eventos naturais, políticos, econômicos, sociais e culturais.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+a7d97d9d-f4b6-4c3b-9598-f2090b5c903e	EM13CHS202	Analisar e avaliar os impactos das tecnologias na estruturação e nas dinâmicas das sociedades contemporâneas (fluxos populacionais, financeiros, de mercadorias, de informações, de valores éticos e culturais etc.), bem como suas interferências nas decisões políticas, sociais, ambientais, econômicas e culturais.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+8cba0386-0920-44da-b822-a2299cde8285	EM13CHS203	Contrapor os diversos significados de território, fronteiras e vazio (espacial, temporal e cultural) em diferentes sociedades, contextualizando e relativizando visões dualistas como civilização/barbárie, nomadismo/sedentarismo e cidade/campo, entre outras.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+1e4140cf-28cc-4a96-96d8-ef2e2a884f95	EM13CHS204	Comparar e avaliar os processos de ocupação do espaço e a formação de territórios, territorialidades e fronteiras, identificando o papel de diferentes agentes (como grupos sociais e culturais, impérios, Estados Nacionais e organismos internacionais) e considerando os conflitos populacionais (internos e externos), a diversidade étnico-cultural e as características socioeconômicas, políticas e tecnológicas.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+6048e814-15fe-4ea0-b2a9-b10576e21086	EM13CHS205	Analisar a produção de diferentes territorialidades em suas dimensões culturais, econômicas, ambientais, políticas e sociais, no Brasil e no mundo contemporâneo, com destaque para as culturas juvenis.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+41dced7a-2229-47f9-9df9-171174eb2c19	EM13CHS206	Compreender e aplicar os princípios de localização, distribuição, ordem, extensão, conexão, entre outros, relacionados com o raciocínio geográfico, na análise da ocupação humana e da produção do espaço em diferentes tempos.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+68fdacc0-7701-4ba1-ae63-fcf09ef90148	EM13CHS301	Problematizar hábitos e práticas individuais e coletivos de produção e descarte (reuso e reciclagem) de resíduos na contemporaneidade e elaborar e/ou selecionar propostas de ação que promovam a sustentabilidade socioambiental e o consumo responsável.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+baef4c77-8ce8-4040-8b07-eecd0b10b02a	EM13CHS302	Analisar e avaliar os impactos econômicos e socioambientais de cadeias produtivas ligadas à exploração de recursos naturais e às atividades agropecuárias em diferentes ambientes e escalas de análise, considerando o modo de vida das populações locais e o compromisso com a sustentabilidade.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+e079a72e-cf12-4cc0-b46f-35046fb4698e	EM13CHS303	Debater e avaliar o papel da indústria cultural e das culturas de massa no estímulo ao consumismo, seus impactos econômicos e socioambientais, com vistas a uma percepção crítica das necessidades criadas pelo consumo.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+51471cac-8845-4a9c-a348-62525f91a926	EM13CHS304	Analisar os impactos socioambientais decorrentes de práticas de instituições governamentais, de empresas e de indivíduos, discutindo as origens dessas práticas, e selecionar aquelas que respeitem e promovam a consciência e a ética socioambiental e o consumo responsável.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+f9054299-7c29-4518-9042-6266ea055abd	EM13CHS305	Analisar e discutir o papel dos organismos nacionais de regulação, controle e fiscalização ambiental e dos acordos internacionais para a promoção e a garantia de práticas ambientais sustentáveis.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+5dd9643f-50a6-4154-a4f0-cba64aa480e0	EM13CHS306	Contextualizar, comparar e avaliar os impactos de diferentes modelos econômicos no uso dos recursos naturais e na promoção da sustentabilidade econômica e socioambiental do planeta.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+2d5724c8-0882-4f83-a6d3-45dfed8fa91e	EM13CHS401	Identificar e analisar as relações entre sujeitos, grupos e classes sociais diante das transformações técnicas, tecnológicas e informacionais e das novas formas de trabalho ao longo do tempo, em diferentes espaços e contextos.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+4b650c23-4532-4462-a354-e64165d4484f	EM13CHS402	Analisar e comparar indicadores de emprego, trabalho e renda em diferentes espaços, escalas e tempos, associando-os a processos de estratificação e desigualdade socioeconômica.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+0229745c-8ad1-4852-a74b-e7f9cc4a4df1	EM13CHS403	Caracterizar e analisar processos próprios da contemporaneidade, com ênfase nas transformações tecnológicas e das relações sociais e de trabalho, para propor ações que visem à superação de situações de opressão e violação dos Direitos Humanos.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+280852cf-4616-428c-b1e2-b372e9bcdef9	EM13CHS404	Identificar e discutir os múltiplos aspectos do trabalho em diferentes circunstâncias e contextos históricos e/ou geográficos e seus efeitos sobre as gerações, em especial, os jovens e as gerações futuras, levando em consideração, na atualidade, as transformações técnicas, tecnológicas e informacionais.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+bde83eac-4149-4c86-9de1-a0f1f2e81d6c	EM13CHS501	Compreender e analisar os fundamentos da ética em diferentes culturas, identificando processos que contribuem para a formação de sujeitos éticos que valorizem a liberdade, a autonomia e o poder de decisão (vontade).	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+902024b6-936d-4ae4-b54a-d0e934da68c6	EM13CHS502	Analisar situações da vida cotidiana (estilos de vida, valores, condutas etc.), desnaturalizando e problematizando formas de desigualdade e preconceito, e propor ações que promovam os Direitos Humanos, a solidariedade e o respeito às diferenças e às escolhas individuais.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+7864ce85-e97d-40fc-8ea5-895d94379346	EM13CHS503	Identificar diversas formas de violência (física, simbólica, psicológica etc.), suas causas, significados e usos políticos, sociais e culturais, avaliando e propondo mecanismos para combatê-las, com base em argumentos éticos.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+7f39550a-a3cf-438c-8d3a-c9d6417f4b8e	EM13LP01	Relacionar o texto, tanto na produção como na recepção, com suas condições de produção e seu contexto sócio-histórico de circulação (leitor previsto, objetivos, pontos de vista e perspectivas, papel social do autor, época, gênero do discurso etc.).	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+deb5d76f-2bb9-44a7-bc62-9e851e1e1b36	EM13LP02	Estabelecer relações entre as partes do texto, tanto na produção como na recepção, considerando a construção composicional e o estilo do gênero, usando/reconhecendo adequadamente elementos e recursos coesivos diversos que contribuam para a coerência, a continuidade do texto e sua progressão temática, e organizando informações, tendo em vista as condições de produção e as relações lógico-discursivas envolvidas (causa/efeito ou consequência; tese/argumentos; problema/solução; definição/exemplos etc.).	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+e38aa29a-97e2-487e-91af-6d90c673ae91	EM13LP03	Analisar relações de intertextualidade e interdiscursividade que permitam a explicitação de relações dialógicas, a identificação de posicionamentos ou de perspectivas, a compreensão de paródias e estilizações, entre outras possibilidades.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+188da2c2-a484-4b5f-a050-51dfa8de379a	EM13LP04	Estabelecer relações de interdiscursividade e intertextualidade para explicitar, sustentar e qualificar posicionamentos e para construir e referendar explicações e relatos, fazendo uso de citações e paráfrases devidamente marcadas.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+0285f1cc-4d20-4499-a1b5-45f07ea6a38d	EM13LP09	Fazer curadoria de informações, tendo em vista diferentes propósitos e projetos discursivos.	t	dca2520f-14a6-4c1a-ad1f-4120c9e2057e
+1e3e559c-ddd9-40ec-a546-60d2a0e6b041	EM13LGG105	Analisar e experimentar diversos processos de remidiação de produções multissemióticas, multimídia e transmídia, como forma de fomentar diferentes modos de participação e intervenção social.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+7ffac38b-0255-48cf-91bf-b4d436bffbfd	EM13LGG302	Compreender e posicionar-se criticamente diante de diversas visões de mundo presentes nos discursos em diferentes linguagens, levando em conta seus contextos de produção e de circulação.	t	1fc96e19-28f8-4dc4-8be9-2a1c09776ad7
+03ce43b2-f74b-43f1-a20b-6f45ec40268b	EM13LGG401	Analisar textos de modo a caracterizar as línguas como fenômeno (geo)político, histórico, social, variável, heterogêneo e sensível aos contextos de uso.	t	10bed171-f7e4-46c1-b9db-6038be9176aa
+e805927c-f9bd-49c5-aaa2-159cb503b551	EM13CNT204	Elaborar explicações e previsões a respeito dos movimentos de objetos na Terra, no Sistema Solar e no Universo com base na análise das interações gravitacionais.	t	11f02794-e4f8-4533-872b-1c9dedf758dd
+7f3eb005-1be9-42eb-93a3-e7bc137e8a74	EM13CHS504	Analisar e avaliar os impasses ético-políticos decorrentes das transformações científicas e tecnológicas no mundo contemporâneo e seus desdobramentos nas atitudes e nos valores de indivíduos, grupos sociais, sociedades e culturas.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+9a6e6391-6c1c-4342-996f-c00b6fbd9e16	EM13CHS601	Relacionar as demandas políticas, sociais e culturais de indígenas e afrodescendentes no Brasil contemporâneo aos processos históricos das Américas e ao contexto de exclusão e inclusão precária desses grupos na ordem social e econômica atual.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+de548ac5-ff5b-4c50-9f4c-adb799bfe1f3	EM13CHS602	Identificar, caracterizar e relacionar a presença do paternalismo, do autoritarismo e do populismo na política, na sociedade e nas culturas brasileira e latino-americana, em períodos ditatoriais e democráticos, com as formas de organização e de articulação das sociedades em defesa da autonomia, da liberdade, do diálogo e da promoção da cidadania.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+7305d9d9-0001-4b75-bc8b-f8d3c9182f49	EM13CHS603	Compreender e aplicar conceitos políticos básicos (Estado, poder, formas, sistemas e regimes de governo, soberania etc.) na análise da formação de diferentes países, povos e nações e de suas experiências políticas.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+b97cfa8a-be2a-464f-b5f4-8bb22a9ddadc	EM13CHS604	Conhecer e discutir o papel dos organismos internacionais no contexto mundial, com vistas à elaboração de uma visão crítica sobre seus limites e suas formas de atuação.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+07293c9e-c2d6-401e-82a6-b0735c4d4e52	EM13CHS605	Analisar os princípios da declaração dos Direitos Humanos, recorrendo às noções de justiça, igualdade e fraternidade, para fundamentar a crítica à desigualdade entre indivíduos, grupos e sociedades e propor ações concretas diante da desigualdade e das violações desses direitos em diferentes espaços de vivência dos jovens.	t	26b91afa-ee36-4fd2-aa7b-6f1d2b19e933
+\.
+
+
+--
+-- Data for Name: core_horarioaula; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_horarioaula (id, numero, dia_semana, hora_inicio, hora_fim, ano_letivo_id) FROM stdin;
+d13e5ba0-2602-4be2-8150-1182c4961d60	1	0	07:00:00	07:50:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+47c8bd59-1fa7-4a68-80ac-00576f6c8f7f	2	0	07:50:00	08:40:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+f17a342c-40f8-4d02-aa4d-9c553423f1f1	3	0	08:40:00	09:30:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+3c0ec6e1-3956-45fd-af67-8465aba9e9d1	4	0	09:45:00	10:35:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+58398f45-9eb3-4a59-b2e2-d42bdfdb1c37	5	0	10:35:00	11:25:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+00e0569a-b5df-4935-8032-b9a2f5c1ab15	6	0	11:25:00	12:15:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+ac5677fc-9b1a-46d7-92cb-438904c73262	7	0	13:15:00	14:05:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+c693dc0c-d507-407e-9725-f8b6edcf0cfa	8	0	14:05:00	14:55:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+8067d845-a8b8-4d54-ad06-2ef937855d63	9	0	14:55:00	15:45:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+deb30019-f604-40d4-9601-c506953c38b4	10	0	16:00:00	16:50:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+8b36b3e2-4418-4877-a8ea-571a7ebc84ee	11	0	16:50:00	17:40:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+d6332d54-76e9-447b-bb96-f70772a7a4f0	1	1	07:00:00	07:50:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+88dfcf77-8e37-434a-a41c-e6947e698037	2	1	07:50:00	08:40:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+5aaf617d-3b05-4c59-8f3f-7293488ee61d	3	1	08:40:00	09:30:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+c3f616e8-d0a1-47fa-974d-5a2ec06f8ba3	4	1	09:45:00	10:35:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+ef07d326-6314-4fbb-bd3d-4b4784008b20	5	1	10:35:00	11:25:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+d6f0f1a6-686c-4b62-a207-1469c3614786	6	1	11:25:00	12:15:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+5e783aad-0ea4-4bab-85ca-70b70f152c6e	7	1	13:15:00	14:05:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+3d79c611-3f4a-4161-b26a-5b5032d366bb	8	1	14:05:00	14:55:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+4c533118-b15f-4c72-b82d-1027e05eed7b	9	1	14:55:00	15:45:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+8e29dba5-6978-47a7-b747-5386cfed8461	10	1	16:00:00	16:50:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+bee618b5-0443-4f4e-a777-72bf54cbee91	11	1	16:50:00	17:40:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+4c1d9155-7a36-4653-a152-701f59cca849	1	2	07:00:00	07:50:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+d55f997b-6abd-458e-8521-cf4868c18f5c	2	2	07:50:00	08:40:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+e1d72dd2-3751-4cb4-bf44-73a88f7f7b3b	3	2	08:40:00	09:30:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+873b1c95-e9f8-4d42-b1ee-2b1e15297528	4	2	09:45:00	10:35:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+c22da9ac-1497-43fc-90bb-ee49d94b5ae3	5	2	10:35:00	11:25:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+f1934dc9-e335-4fed-a0bb-3028a0d58998	6	2	11:25:00	12:15:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+d42122a1-10c6-4429-bef8-d61751f397bb	7	2	13:15:00	14:05:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+daa4d4a8-9145-4c9b-9c8f-df4ab2ad1bfc	8	2	14:05:00	14:55:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+2ee4cc18-4e87-4c43-86be-3e45c8cd3ed9	9	2	14:55:00	15:45:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+0094dbe7-5697-499c-808f-27c11586de3e	10	2	16:00:00	16:50:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+7f99c6d2-c4b5-48c2-83a0-a56c6b733877	11	2	16:50:00	17:40:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+6d8a709e-50bc-4d43-a312-68c92bc3690e	1	3	07:00:00	07:50:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+3c2d4ff9-863b-4655-8b98-387b718dad97	2	3	07:50:00	08:40:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+88678931-d235-45e9-9849-f309a100febf	3	3	08:40:00	09:30:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+f83dc8df-d5a4-4460-8ef2-989230105449	4	3	09:45:00	10:35:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+5945b7a2-0ded-4d41-be37-b72851eb15ef	5	3	10:35:00	11:25:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+724519b9-f11d-4302-b450-d7929a4f6b22	6	3	11:25:00	12:15:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+7248a7aa-828e-4609-a179-02673ce6cebf	7	3	13:15:00	14:05:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+d6e41834-34d4-46a3-aa9f-fec1280272bc	8	3	14:05:00	14:55:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+d4d7c083-0fca-4c74-a8ad-da66d225c6b1	9	3	14:55:00	15:45:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+e18c166c-6d0c-4c73-911f-38b1f292e21c	10	3	16:00:00	16:50:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+2df0b925-6251-40d2-8512-8ad0aed2ee80	11	3	16:50:00	17:40:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+be3a3d66-4fef-48af-835c-fa73c168d013	1	4	07:00:00	07:50:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+9cfcdcdf-f6d4-4f01-9e16-efdcda4e4b63	2	4	07:50:00	08:40:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+cd53c75a-60cf-4dcc-a9cc-83dd7c75e0e4	3	4	08:40:00	09:30:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+ff4a1e28-e9b3-4c00-b311-1c482475db30	4	4	09:45:00	10:35:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+45f07bf3-f0e0-4874-9d94-1723edbd1feb	5	4	10:35:00	11:25:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+390cff55-d9e0-4dda-9ea1-faf890380d6f	6	4	11:25:00	12:15:00	a5f8c071-db65-430a-ae38-ed4eb0b9f301
+\.
+
+
+--
+-- Data for Name: core_periodotrabalho; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_periodotrabalho (id, data_entrada, data_saida, funcionario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: core_professordisciplinaturma; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_professordisciplinaturma (id, tipo, data_inicio, data_fim, disciplina_turma_id, professor_id) FROM stdin;
+466762ba-c73b-4b61-ad45-36e900f07b58	TITULAR	\N	\N	6ebd3afa-16d1-42af-8113-eb2346a9b191	b9d1b765-a079-4692-8a9a-bd785a98a546
+ae646d5e-188d-4156-904b-cfabaadc4666	TITULAR	\N	\N	e97a8efa-1f0c-4e09-b27b-f361e0ba4400	29c1725f-f1f5-4639-9d7a-852cdbc6fd28
+4a700acf-a341-4bc7-a199-f87d5b8a2854	TITULAR	\N	\N	f0bbf15d-0571-4cab-a517-c0839198f47d	72abb76c-92b9-430c-b2b6-837695cb0e84
+e81d71c3-5cc8-4766-8712-b5469ff31ee4	TITULAR	\N	\N	8b0dee40-ebc3-49c3-bc9c-959051124e91	a85bbb21-3e26-4049-9eca-bf01b790454c
+\.
+
+
+--
+-- Data for Name: core_turma; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_turma (id, numero, letra, ano_letivo, nomenclatura, is_active, curso_id) FROM stdin;
+c733bc69-af5a-48ae-a5c3-2f353fb5e7b4	1	W	2026	SERIE	t	3523065c-f944-4ec5-aa45-2d7dae99c6a6
+5921603f-a060-44ac-863b-bb82b65d9d34	1	X	2026	SERIE	t	3523065c-f944-4ec5-aa45-2d7dae99c6a6
+7f1be428-4464-452c-8030-7173abcf2bb0	1	Y	2026	SERIE	t	3523065c-f944-4ec5-aa45-2d7dae99c6a6
+10fa0e47-c9cb-4b33-8a48-74927b44fa35	2	W	2026	SERIE	t	3523065c-f944-4ec5-aa45-2d7dae99c6a6
+7bda7580-c6a1-413f-98c3-1e2aca805239	2	X	2026	SERIE	t	3523065c-f944-4ec5-aa45-2d7dae99c6a6
+60a54341-045c-4111-b081-17c8729b6304	2	Y	2026	SERIE	t	3523065c-f944-4ec5-aa45-2d7dae99c6a6
+5fa20c75-e9e0-4b27-8f63-79461fd4d13b	3	W	2026	SERIE	t	3523065c-f944-4ec5-aa45-2d7dae99c6a6
+31a4eacb-a7b4-49d5-b5e6-1c31bf11baa8	3	X	2026	SERIE	t	3523065c-f944-4ec5-aa45-2d7dae99c6a6
+9d5e1712-0755-40cf-b0f9-ad9d62465583	3	Y	2026	SERIE	t	3523065c-f944-4ec5-aa45-2d7dae99c6a6
+ae3b13bc-e075-423c-a90f-39dbf165cef1	1	W	2026	SERIE	t	e985987a-7310-4bf8-95d3-faebda1bdf3f
+3ef22e1d-0d6b-498e-932d-59135a490561	1	X	2026	SERIE	t	e985987a-7310-4bf8-95d3-faebda1bdf3f
+6c40cc17-bf7b-4990-9737-2081da826233	1	Y	2026	SERIE	t	e985987a-7310-4bf8-95d3-faebda1bdf3f
+3a770636-48dc-460b-9573-01b88d9524b7	2	W	2026	SERIE	t	e985987a-7310-4bf8-95d3-faebda1bdf3f
+f585dbdf-32a2-432c-a78e-497a7e77cf96	2	X	2026	SERIE	t	e985987a-7310-4bf8-95d3-faebda1bdf3f
+7bde20a6-d740-4cd0-84e1-35443f62d8d0	2	Y	2026	SERIE	t	e985987a-7310-4bf8-95d3-faebda1bdf3f
+fea72190-df66-4d30-8f1f-21264b3f44c9	3	W	2026	SERIE	t	e985987a-7310-4bf8-95d3-faebda1bdf3f
+e72afc8e-6662-4ab3-b435-725940e42a03	3	X	2026	SERIE	t	e985987a-7310-4bf8-95d3-faebda1bdf3f
+1b60c731-2d08-4943-a421-61779fe817ad	3	Y	2026	SERIE	t	e985987a-7310-4bf8-95d3-faebda1bdf3f
+\.
+
+
+--
+-- Data for Name: core_turma_professores_representantes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.core_turma_professores_representantes (id, turma_id, funcionario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
+149	2026-01-01 17:35:33.784063-03	0cd41288-3d87-40ba-86e6-bd7735b623e9	Maria da silva	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+150	2026-01-01 17:39:56.98456-03	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff	Diogo	2	[{"changed": {"fields": ["First name", "Tipo de Usu\\u00e1rio"]}}]	6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+151	2026-01-01 17:41:32.61224-03	c31fb33a-1ac6-453b-b05a-0d5fc5ff4795	Aldry Lubarino Lopes	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+152	2026-01-01 17:41:32.612271-03	53b5d467-d2dc-4d37-a6d5-83996c44f045	Ana Beatriz Ferrreira Do Vale	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+153	2026-01-01 17:41:32.612284-03	69691beb-d194-41a7-bc9f-c362a7a35e4a	Ana Clara Amaral De Oliveira	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+154	2026-01-01 17:41:32.612296-03	eaeac3ce-d909-4fa3-b35a-5b2e4ad1408c	Ana Julia Zanardi	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+155	2026-01-01 17:41:32.612307-03	dce40c71-ae35-4aca-a2c7-ded143fcfe0c	Ana Luiza Cortello Dos Santos	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+156	2026-01-01 17:41:32.612317-03	ac291cdd-6637-4041-b7aa-cc0beb0fbf5b	Ana Maria Padilha Carneiro	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+157	2026-01-01 17:41:32.612327-03	12f03176-953a-4554-b9bb-304a86fe4d16	Apolo Almeida Fernades Nogueira	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+158	2026-01-01 17:41:32.612338-03	98c66016-3f81-4369-95d3-8d731658ce70	Arthur Oliveira Leal	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+159	2026-01-01 17:41:32.612348-03	dc04c779-7014-4a6b-84b3-57f40d191456	Brenda Tayna Moreira	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+160	2026-01-01 17:41:32.612359-03	feef418a-2565-4c0f-9ac0-be3422d5609e	Bruno José De Brito	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+161	2026-01-01 17:41:32.612369-03	d8b57f56-b3a9-41e0-8e58-38da59df20bd	Caio Henrique Malavasi	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+162	2026-01-01 17:41:32.612378-03	97013a72-3e85-4c05-8c97-09f7107cbb9c	Claudio Camilo Rodrigues Moura	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+163	2026-01-01 17:41:32.612387-03	f4044efb-7521-4cb0-9b0d-823668e594ba	Daniel Barbosa De Paula	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+164	2026-01-01 17:41:32.612397-03	5a7b3b22-23f2-47df-bd45-ea197d1154f1	Danilo Correia Surian	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+165	2026-01-01 17:41:32.612406-03	094de978-3ebb-44a7-8577-0a92f88341a1	Davi Barbosa Maciel	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+166	2026-01-01 17:41:32.612415-03	28a48811-e24e-410c-b418-e0386fa16d28	Eduarda Castanho Da Silva	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+167	2026-01-01 17:41:32.612424-03	9c5e4879-f3d8-427d-bc1e-0c986c7c0bfc	Enzo Gabiatti Lins	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+168	2026-01-01 17:41:32.612433-03	2944df86-200d-4d64-af88-aa848c3da847	Enzo Seiichi Yamakawa	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+169	2026-01-01 17:41:32.612441-03	d67bea84-0727-4718-8e08-2d71d5a6ebc9	Erick Fulgencio De Oliveira	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+170	2026-01-01 17:41:32.612449-03	5616fc20-e10f-46e4-8f42-9fa839853723	Felipe Gusmão Andrade	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+171	2026-01-01 17:41:32.612457-03	f2341b4e-5022-45cc-9ee0-8441181534bb	Felipe Teodoro	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+172	2026-01-01 17:41:32.612465-03	9486c336-a494-47af-a15a-9c0660f1380f	Gabriel Nascimento De Oliveira	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+173	2026-01-01 17:41:32.612474-03	aa2e4a5f-053d-41c7-8539-ab8660617d56	Gabriela Correia Cunha Rodrigues	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+174	2026-01-01 17:41:32.612482-03	4242fa74-723f-4b63-b28a-119bf2c63f8e	Giovana Cristina Ferreira	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+175	2026-01-01 17:41:32.612491-03	1d127800-7e41-4c90-83e4-3c85c7c29975	Giovanne Santos Martins	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+176	2026-01-01 17:41:32.612503-03	a0f680ac-7b76-4954-85bb-539793d9c6bf	Girlany Karine Barros Da Silva	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+177	2026-01-01 17:41:32.612512-03	ae535ca9-a872-40fa-9151-b83fd0dcba51	Heloísa Maria Carvalho	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+178	2026-01-01 17:41:32.612521-03	cadf512a-5a78-4f42-b6f8-86d1056b1cd0	Henry Kaito Yamanaka Nakasone	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+179	2026-01-01 17:41:32.612532-03	9c45987a-d366-4044-ab77-4ee0917b751c	Joanna Francisca Silva Brito	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+180	2026-01-01 17:41:32.612541-03	8e4feb34-49d7-4bcf-a686-b7a8ace68cb4	João Gabriel De Oliveira M. Da Silva	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+181	2026-01-01 17:41:32.61255-03	f3350962-5f64-445c-88b1-a3dd4628e2a0	João Victor Da Silva Charme	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+182	2026-01-01 17:41:32.612559-03	fce64eb1-bcd1-4dab-9d06-fd8314bed4bb	Jucielly Aparecida Nepununcena De Lima	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+183	2026-01-01 17:41:32.612567-03	a24b6d35-9fe9-4a8c-8d4e-094ecd0f0993	Julia Cosmo Morais Ferreira	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+184	2026-01-01 17:41:32.612576-03	8b504b2e-037f-427b-a095-498fbb742294	Júlia Domingues Araujo	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+185	2026-01-01 17:41:32.612585-03	510c6a1f-5753-488c-bf23-a7f5fb91efcd	Kauan Lopes Da Silva	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+186	2026-01-01 17:41:32.612594-03	76260148-72f6-43be-8dfb-f8f6f24ed436	Kemilly Manueli Torres Da Silva	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+187	2026-01-01 17:41:32.612602-03	879b3b4a-580b-45db-b341-fc32e24d60c6	Leticia Jangue Gadioli	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+188	2026-01-01 17:41:32.612611-03	6fc51f20-4730-4a6c-ba67-a124d2cc1626	Leticia Oksanicz Mano Bianco	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+189	2026-01-01 17:41:32.61262-03	e4ef43a6-01f1-4545-929e-c28a3c86b70b	Lívia Ferreira Barbosa	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+190	2026-01-01 17:41:32.612629-03	ec7bf8db-aaf2-4cb3-b337-42eb72e65407	Lorena Helmeister Furlan	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+191	2026-01-01 17:41:32.612637-03	14eaf99c-1a89-4058-af6c-6ee930a1765a	Luan Dias Marinho	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+192	2026-01-01 17:41:32.612645-03	78a0423b-15e6-4b95-b840-c61fdebf272c	Lucas Batista Caldeira	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+193	2026-01-01 17:41:32.612653-03	1cb8f789-7b3a-46fe-833a-559444e2d23b	Marcos Oliveira Batista	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+194	2026-01-01 17:41:32.612661-03	1c8737ae-d4a9-4899-af67-3c8ad67b11ef	Maria Clara De Camargo Calcagno	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+195	2026-01-01 17:41:32.61267-03	122cbae1-0cce-4ec8-a345-097f9ad0ccf2	Maria Gabriela Fontes Cardoso	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+196	2026-01-01 17:41:32.612678-03	3a03e52e-787a-463b-a5f3-ace3bb63eb19	Matheus Passos Miranda	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+197	2026-01-01 17:41:32.612686-03	dea4a0ee-72ab-433d-98bc-0446ce2317c9	Max Pierre Da Silva Rodrigues	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+198	2026-01-01 17:41:32.612695-03	2cb7b2f2-b3d6-4548-9146-16f504c7c2eb	Miguel Luis Borçato	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+199	2026-01-01 17:41:32.612703-03	ff144b54-bd7c-49e0-93c3-2bc7562a5e89	Miguel Raboni Cordeiro	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+200	2026-01-01 17:41:32.612711-03	f3fd3dfb-d4db-494c-bd6c-6fee73f16a11	Mirella Maria Rosa	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+201	2026-01-01 17:41:32.612719-03	d7efeb02-7dbd-417b-af9b-9edbbe488599	Murilo Di Blasio Souza	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+202	2026-01-01 17:41:32.612727-03	53a87e37-6c31-48a0-b256-73f23b75f82e	Nina Chaves Vicente	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+203	2026-01-01 17:41:32.612736-03	35e58b53-b958-43dc-8791-0d948d90132e	Pedro Henrique Teixeira Bauman	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+204	2026-01-01 17:41:32.612745-03	f4e7a9dc-ab4c-4094-a6c1-4fd553d2a196	Rafael Souza Castilho	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+205	2026-01-01 17:41:32.612754-03	df3866f4-ae18-4728-9923-15e0176b88d6	Rayssa Gabrielle Macedo Rodrigues	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+206	2026-01-01 17:41:32.612763-03	4bb4a8cf-c261-4815-8296-fd86eb8091ad	Ryan Dias Muniz	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+207	2026-01-01 17:41:32.612771-03	029d9ba7-d68f-49df-88fc-9632d50e56fb	Sara Dos Santos Silva	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+208	2026-01-01 17:41:32.612779-03	c83288b1-98a7-4776-8139-250b849a01ce	Sarah Rebeca Farias Sousa	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+209	2026-01-01 17:41:32.612787-03	77cec2dc-8ce4-4206-8a8f-af39143cfd1a	Thiago Levi De Souza Oliveira	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+210	2026-01-01 17:41:32.612794-03	e9a88278-6c33-40a2-b712-08901d324aee	Thiago Moda Da Silva	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+211	2026-01-01 17:41:32.612802-03	708b4073-f8fd-438d-8744-a92b734bfc97	Victor Hugo De Freitas Padovini	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+212	2026-01-01 17:41:32.61281-03	a5d39177-793e-4671-a25e-c965895887bf	Victor Hugo Thomaz	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+213	2026-01-01 17:41:32.612817-03	979e9120-5247-4ce3-9463-7e29107a07ba	Victor Yuuki Nakamura	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+214	2026-01-01 17:41:32.612826-03	52d3aece-81f7-4f73-b52a-8ebf515e8527	Vinícios Dos Santos Martins	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+215	2026-01-01 17:41:32.612834-03	366d0104-294f-487a-96a9-ae2e7cc7beef	Vinicius Fernandes Gatti	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+216	2026-01-01 17:41:32.612843-03	9ba37a23-96de-4a97-babc-aba345b65e23	Vinícius Gouvêa Farias	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+217	2026-01-01 17:41:32.612851-03	35f4e3e8-e421-48a4-b34b-790cf6f71bd4	Vinicius Souza Marinho	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+218	2026-01-01 17:41:32.612858-03	a85515ce-58ee-4cde-ad0b-75318de9bc59	Vitor Pontes Breda	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+219	2026-01-01 17:41:32.612866-03	ec298c34-9a0f-4f71-8351-bcc068a595fe	Vitória De Almeida Carvalho Correa	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+220	2026-01-01 17:41:32.612874-03	4937f578-b74d-4a7f-afbc-747a4d816f40	Willian Leme Alves	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+221	2026-01-01 17:41:32.612882-03	c52de5e4-1fa7-4e64-836f-b90b0d07c534	Yasmin Kaori Massuda	3		6	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+222	2026-01-01 17:53:04.674855-03	d063be41-fe1a-42f3-961c-07c51b7ab2f6	Alexandre Servolo Mateus (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+223	2026-01-01 17:53:04.674903-03	8d998870-f391-4a0d-8101-a9d5e5c037f0	Amanda Marin Rodrigues (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+224	2026-01-01 17:53:04.674933-03	e1cc7bca-d929-4871-afa3-1c7398f57f4f	Ana Beatriz Padilha Fontoura (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+225	2026-01-01 17:53:04.674957-03	c351a570-7381-4c60-a31e-25ebbf07cac9	Ana Clara De Brito (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+226	2026-01-01 17:53:04.67498-03	f033a589-9146-41cc-af48-b9bc3084bcd5	Ana Julia Carvalho Rodrigues (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+227	2026-01-01 17:53:04.675002-03	c8f74398-ea90-41ed-b8b8-497cfb8a52de	Ana Leticia Franciosi Dos Santos (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+228	2026-01-01 17:53:04.675023-03	74410d43-12df-4385-b1cc-55df7ca48ac6	Ananda Gabrielly França Dos Santos (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+229	2026-01-01 17:53:04.675044-03	753e3a25-0216-4330-98ad-60a4befd8e1d	Arthur Alexandrino Fabri (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+230	2026-01-01 17:53:04.675065-03	a0ca9781-7b3a-467a-99f4-f6f02d5ff89a	Arthur Eduardo Rosario Pereira (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+231	2026-01-01 17:53:04.675085-03	b8d42ea3-4823-4a2a-bd4f-6d23b45e31eb	Beatriz Marques De Lima (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+232	2026-01-01 17:53:04.675105-03	c13143a8-17c8-45d9-92f6-22cec7ddb22c	Beatriz Terto Soares (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+233	2026-01-01 17:53:04.675126-03	a0594166-a789-4fbd-905e-19b5332864fe	Bianca Yasmim Ribeiro E Silva (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+234	2026-01-01 17:53:04.675145-03	617e326e-eb09-4be4-acb8-1c3e73c5767c	Bruno Brayn Vedovello (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+235	2026-01-01 17:53:04.675166-03	6c367fa7-9c5f-4f7b-901a-7a69b5ace532	Cauã Logato Marmirolli (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+236	2026-01-01 17:53:04.675186-03	0fd9d76b-f332-4428-90c0-0b02a1be3560	Daízi Cuchi Vilela (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+237	2026-01-01 17:53:04.675205-03	90d5a190-4f9c-4c69-a3cd-4d553d1fd6eb	Daniel Moreira Da Silva (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+238	2026-01-01 17:53:04.675224-03	3af14693-2664-433d-8317-e2e95b7d165a	Davi André Dias Da Silva (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+239	2026-01-01 17:53:04.675243-03	735d3d45-b5e4-4f39-a6d2-3b9bb7028487	Davi De Miranda Motta (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+240	2026-01-01 17:53:04.675265-03	119a5c6e-ae0e-4248-8952-daeea21f23f0	Davi De Souza Bragança (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+241	2026-01-01 17:53:04.675288-03	eb583f81-5ace-4f59-919d-deca7ac20f4a	Davi Oliveira Poletto (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+242	2026-01-01 17:53:04.675307-03	feb4ed9a-e35f-478b-97e3-3e2cad5eb2ec	Edgar Bicalho Da Rocha (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+243	2026-01-01 17:53:04.675327-03	aa4052ac-9bad-4254-bc2c-1dffcb9b4d7b	Emanuel De Almeida Gadioli (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+244	2026-01-01 17:53:04.675346-03	8a6b08f8-5df8-43fa-8e0b-335d31e68e77	Emmanuel Vinicius Valdívia Martinez (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+245	2026-01-01 17:53:04.675365-03	7bf8ca32-f294-467d-89b3-01d41ebed46d	Enzo Enrico De Freitas Luchetti M. Godinho (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+246	2026-01-01 17:53:04.675383-03	189912d4-9161-4ce1-9767-67e7a5b5ea38	Enzo Gabiatti Lins (46847544805) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+247	2026-01-01 17:53:04.675403-03	ef4cd7f4-1af3-4191-87b3-25b129839d83	Enzo Hisashi Yamamoto Cabral (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+248	2026-01-01 17:53:04.675422-03	66e59fea-ddf5-4ac2-9bc8-d68a53be74a7	Fernanda Gabriely Tavares Toledo (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+249	2026-01-01 17:53:04.675441-03	76c738bc-4135-4adf-9178-1b62c73efa4f	Fernanda Montrezol Dos Santos (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+250	2026-01-01 17:53:04.675459-03	67f5b2f7-77bc-4952-b999-4d4cfbf28c40	Gabriel Alan Cunha Silva (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+251	2026-01-01 17:53:04.675478-03	83d423e0-0e6b-4e7f-9de6-b250d410a186	Gabriel Carlos Da Silva (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+252	2026-01-01 17:53:04.675496-03	8d0bc08a-e6d7-4634-9736-8a0fa6427492	Gabriel Isaac Silva Coelho (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+253	2026-01-01 17:53:04.675514-03	cd1e1218-b083-4ac4-9ad6-15658b1fd0f1	Giovanny De Araujo Campos (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+254	2026-01-01 17:53:04.675532-03	b9517f73-77b0-464e-adaa-316250b0ebfc	Grasiely Amaro De Carvalho (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+255	2026-01-01 17:53:04.67555-03	b87c658a-8a87-41b2-907d-223eba1b3979	Guilherme Adan Machado (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+256	2026-01-01 17:53:04.675567-03	d0544adc-bb7c-48b3-8f7e-313928680031	Igor Portal Alves (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+257	2026-01-01 17:53:04.675586-03	c7660bb9-101e-4b16-8689-624d16c07090	João Vitor Do Nascimento Nakano (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+258	2026-01-01 17:53:04.675604-03	71799d68-fbf4-4cde-ade7-906e483975d3	João Vitor Silva De Souza (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+259	2026-01-01 17:53:04.675621-03	2bffd8c0-4346-4003-a846-3a83e476d845	José Eduardo Leite Da Silva (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+260	2026-01-01 17:53:04.675639-03	54f8218b-dd4e-4d39-8932-e9d583d8b956	José Francisco Ledesma (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+261	2026-01-01 17:53:04.675657-03	2a43556e-6578-49ee-8725-d1e91b8c05f5	Julia Negri De Oliveira (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+262	2026-01-01 17:53:04.675675-03	ac6a61b1-bddb-469d-820b-e0694b504fa0	Kaike Rafael Santos De Almeida (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+263	2026-01-01 17:53:04.675693-03	5fc9af0b-5cdf-4231-a9e3-9b51b06a691b	Lavínia Lahr Alvarenga (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+264	2026-01-01 17:53:04.675711-03	965a28dd-6030-465d-97e0-71a632180684	Leonardo Araújo De Oliveira (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+265	2026-01-01 17:53:04.675729-03	21af4ee3-d8d2-4c60-8ed0-88e1f905293c	Letícia Assis Camillo (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+266	2026-01-01 17:53:04.675747-03	7ab1b378-5f05-4504-8bcf-7510ff739b2b	Letícia De Paula Vedovello (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+267	2026-01-01 17:53:04.675765-03	5818cee6-374e-4f7f-9ffb-d09e55d9ab6d	Lucas Gabriel De Almeida (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+268	2026-01-01 17:53:04.675783-03	91ad21ea-14b5-4111-9b9a-37ce13521852	Luigi Michilin Ribeiro Da Silva (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+269	2026-01-01 17:53:04.675801-03	87f7f9f5-cf7e-42f3-acf4-b8add815823d	Luiza Conde Alexandre Rocha (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+270	2026-01-01 17:53:04.675819-03	2630dcbb-c93a-4dd9-be29-b9c1ec34caa0	Marconi Feliciano Gomes Neto (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+271	2026-01-01 17:53:04.675838-03	9131a689-31d4-4e08-a88c-714baa915f3f	Maria Eduarda Soriano (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+272	2026-01-01 17:53:04.675857-03	c67f9163-55e2-42f5-a66f-1357f26940e9	Mariana Ap. Dos Santos Silva (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+273	2026-01-01 17:53:04.675876-03	ad306a13-0895-4148-a413-47cf7d641038	Mariana D'Elia Vinhal De Pádua (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+274	2026-01-01 17:53:04.675894-03	c6d4dc6c-d056-4604-b5eb-065e019a33d0	Mateus Iório Chaim (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+275	2026-01-01 17:53:04.675913-03	38022f2f-c4ab-418b-8f90-6637ee61b642	Matheus Lanza De Queiroz (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+276	2026-01-01 17:53:04.675931-03	ae6ba2c5-1ebc-4fa2-bb06-ff1c39190d1f	Melissa Eloise Silva De Souza (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+277	2026-01-01 17:53:04.675949-03	22792036-a4e2-4ddf-835d-389ccb02e6d5	Milena Von Zuben Bueno De Castro (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+278	2026-01-01 17:53:04.675967-03	3944e1cb-dfbd-41cd-9f06-97769158037f	Mirela Harumi Kimura De Souza (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+279	2026-01-01 17:53:04.675986-03	d4e2c1e5-9666-4927-ab74-82317efeb044	Pedro Henrique Pires Fernandes (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+280	2026-01-01 17:53:04.676004-03	d3ab8a9c-cb1b-41a1-be9b-5a4b47c24d12	Rafaela Bacan Dos Anjos (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+281	2026-01-01 17:53:04.676021-03	92398cce-88c6-4dc3-b313-b171217e3a50	Rafaela Oliveira Munsignatti (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+282	2026-01-01 17:53:04.676039-03	750b8876-f3cd-4724-a4ec-8a4c6a7c4231	Raul Barrella Sotero (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+283	2026-01-01 17:53:04.676057-03	45d8e999-eecd-4396-ba5d-c95bc7911a13	Renan Dos Santos Ribeiro (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+284	2026-01-01 17:53:04.676075-03	1197e09e-6832-49f3-9353-576128e3510b	Ryan Guilherme Jacundina (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+285	2026-01-01 17:53:04.676093-03	ea6570d5-dcbb-4d13-b760-b48f8e7ea854	Sarah Thaynara Gomes Subtil (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+286	2026-01-01 17:53:04.67611-03	13f90482-bdf0-44e2-ab25-b787c8063920	Sophia Novais Moraes (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+287	2026-01-01 17:53:04.676128-03	cf4fe01a-0acb-4c5b-b8bf-c0c5cf28c88b	Thiago Moreira Moretti (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+288	2026-01-01 17:53:04.676146-03	bc34fba8-c9e4-4573-b860-aab0c483da81	Valentina Gonçalves Mascarenhas (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+289	2026-01-01 17:53:04.676164-03	2b7a767c-59ba-4c25-943e-f324ccbadd67	Victor Hugo Pinheiro Gonçalves (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+290	2026-01-01 17:53:04.676182-03	7c01d399-40a5-4272-a47b-2918b8dc2efe	Vinicius Fernandes Gatti (50269580875) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+291	2026-01-01 17:53:04.6762-03	52855d1f-bbd9-4056-84f8-9c6d9e590493	Vinícius Martins De Camargo (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+292	2026-01-01 17:53:04.676218-03	ba91b221-5147-449f-a102-d63b5221cd9f	Yago Fellipe Dos Santos Borges (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+293	2026-01-01 17:53:04.676236-03	5139f336-1dad-4d9b-a392-e75159158bd5	Yuri Coêlho Purcino (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+294	2026-01-01 17:53:04.676254-03	03a09972-3e16-4516-8776-694cc1e03654	Zakeu Goveia De Sousa (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+295	2026-01-01 17:58:31.234116-03	57597115-5c03-414c-a350-dc729924cb0b	Alexandre Servolo Mateus (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+296	2026-01-01 17:58:31.234191-03	d6be9827-2847-4bfe-b926-d442782e7502	Amanda Marin Rodrigues (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+297	2026-01-01 17:58:31.234247-03	10352519-12b2-418f-b157-ed782bd4b20e	Ana Beatriz Padilha Fontoura (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+298	2026-01-01 17:58:31.234306-03	3f9d57c3-96e0-4ba4-a957-790e54ee34b9	Ana Clara De Brito (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+299	2026-01-01 17:58:31.234365-03	3c66302a-e618-49ce-9896-2f976be9e898	Ana Julia Carvalho Rodrigues (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+300	2026-01-01 17:58:31.234414-03	43c1d9f1-dff2-40ca-a5a6-731ecc774ddc	Ana Leticia Franciosi Dos Santos (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+301	2026-01-01 17:58:31.234464-03	3017baf5-c4ca-4e3b-9319-d91cdc9aa586	Ananda Gabrielly França Dos Santos (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+302	2026-01-01 17:58:31.234494-03	43350e8b-8296-47d2-8720-9dce355c37c9	Arthur Alexandrino Fabri (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+303	2026-01-01 17:58:31.234519-03	a743d1d9-43ab-4bcb-a1c3-741a85982e6c	Arthur Eduardo Rosario Pereira (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+304	2026-01-01 17:58:31.234542-03	5c5799a5-1f3e-4362-b6bb-dcc7b3532ac5	Beatriz Marques De Lima (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+305	2026-01-01 17:58:31.234566-03	2e4a524b-bdba-4bbc-88b4-832e9f92bcd3	Beatriz Terto Soares (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+306	2026-01-01 17:58:31.2346-03	499952db-73be-47d0-8ef1-68326a2ee800	Bianca Yasmim Ribeiro E Silva (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+307	2026-01-01 17:58:31.234627-03	9197a6f7-f46f-4181-b0d5-d6c4edc18fd7	Bruno Brayn Vedovello (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+308	2026-01-01 17:58:31.234652-03	da64ce38-d031-46ba-ae2b-3fc3cf1a158d	Cauã Logato Marmirolli (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+309	2026-01-01 17:58:31.234674-03	a06fc746-a573-48ca-8a21-1916fe7db58a	Daízi Cuchi Vilela (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+310	2026-01-01 17:58:31.234702-03	ed95dfe5-e7a9-494e-a5c9-1e2d726add79	Daniel Moreira Da Silva (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+311	2026-01-01 17:58:31.234743-03	4d4e2f0b-5500-4289-8e39-c582024044e3	Davi André Dias Da Silva (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+312	2026-01-01 17:58:31.234787-03	aeaab3c3-4edf-46e4-883c-e111350dc2ff	Davi De Miranda Motta (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+313	2026-01-01 17:58:31.234834-03	d428ade7-db19-4065-926a-0daf54d31050	Davi De Souza Bragança (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+314	2026-01-01 17:58:31.234874-03	f16f1469-a8d6-4e65-868f-ab6330842af1	Davi Oliveira Poletto (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+315	2026-01-01 17:58:31.23492-03	d311b0f0-bce8-4250-9be9-baf202eb3dcb	Edgar Bicalho Da Rocha (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+316	2026-01-01 17:58:31.234959-03	7206d98e-d07e-4c23-8b99-988f48953553	Emanuel De Almeida Gadioli (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+317	2026-01-01 17:58:31.234995-03	36d4dcfb-725f-4dbd-a5a1-0e167349da7c	Emmanuel Vinicius Valdívia Martinez (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+318	2026-01-01 17:58:31.235031-03	ff56d079-a211-4c8d-b3ce-0456d0c93a5c	Enzo Enrico De Freitas Luchetti M. Godinho (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+319	2026-01-01 17:58:31.23507-03	22594bfa-6e89-4720-84fa-bc4c71b79d63	Enzo Gabiatti Lins (46847544805) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+320	2026-01-01 17:58:31.235114-03	18fae4bb-05de-4c13-b889-424b533de9b1	Enzo Hisashi Yamamoto Cabral (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+321	2026-01-01 17:58:31.235156-03	af243a35-d77b-4190-a1c8-8b9d9774c5bf	Fernanda Gabriely Tavares Toledo (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+322	2026-01-01 17:58:31.235199-03	89bf8a44-2487-40fe-8560-8ea3461b1dc4	Fernanda Montrezol Dos Santos (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+323	2026-01-01 17:58:31.235239-03	f971022d-e930-49ea-8363-4667d9f1c80a	Gabriel Alan Cunha Silva (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+324	2026-01-01 17:58:31.235276-03	9844d032-a471-43e7-8c03-c1b5859b6448	Gabriel Carlos Da Silva (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+325	2026-01-01 17:58:31.235316-03	7b0114e7-ccb5-4990-a573-52207f0aebe6	Gabriel Isaac Silva Coelho (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+326	2026-01-01 17:58:31.235357-03	b0f5278b-46a5-4836-b029-6dadb97d2f7a	Giovanny De Araujo Campos (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+327	2026-01-01 17:58:31.235396-03	844bfade-708f-4b8f-97f8-3993fb0ed5b3	Grasiely Amaro De Carvalho (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+328	2026-01-01 17:58:31.235435-03	1d9c0034-c79e-401e-8cc8-5b60d27ce2fd	Guilherme Adan Machado (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+329	2026-01-01 17:58:31.235475-03	8b962b64-4fcf-4b87-a578-e93a4f80dcf1	Igor Portal Alves (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+330	2026-01-01 17:58:31.235516-03	f04d3765-ead4-4473-a254-02cdd95e7cca	João Vitor Do Nascimento Nakano (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+331	2026-01-01 17:58:31.235555-03	576e4fa6-991e-48b6-aa69-7ec81bab5f42	João Vitor Silva De Souza (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+332	2026-01-01 17:58:31.235595-03	4ee208c6-6ec2-4e27-821a-5bc1db5222b3	José Eduardo Leite Da Silva (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+333	2026-01-01 17:58:31.235633-03	edb5d7d3-ae9b-4803-8623-79689b2ee647	José Francisco Ledesma (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+334	2026-01-01 17:58:31.235668-03	0e6d5dff-19be-40c7-abc1-bf3689e1262b	Julia Negri De Oliveira (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+335	2026-01-01 17:58:31.2357-03	fe6599ca-3dc7-4baf-b5db-24c47ec96941	Kaike Rafael Santos De Almeida (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+336	2026-01-01 17:58:31.235733-03	54dac2ec-9d6f-4eb0-bdfe-497ed1e68bbe	Lavínia Lahr Alvarenga (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+337	2026-01-01 17:58:31.235765-03	72fdcd70-baeb-415b-8939-e7af450fc0a8	Leonardo Araújo De Oliveira (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+338	2026-01-01 17:58:31.235801-03	1c80ff20-3627-434c-853a-1d30c296dd04	Letícia Assis Camillo (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+339	2026-01-01 17:58:31.235838-03	12868289-ca52-4ac8-b228-a9bd646f0f18	Letícia De Paula Vedovello (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+340	2026-01-01 17:58:31.235874-03	4585561b-8bb4-474b-af48-69168444251d	Lucas Gabriel De Almeida (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+341	2026-01-01 17:58:31.235911-03	14680154-7449-4777-9fad-d73c84fb15cb	Luigi Michilin Ribeiro Da Silva (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+342	2026-01-01 17:58:31.23595-03	32741d45-aeae-4800-a638-6fa00dfc57e1	Luiza Conde Alexandre Rocha (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+343	2026-01-01 17:58:31.235986-03	c66cd2f3-6ceb-4a09-8c69-e80844c4acfa	Marconi Feliciano Gomes Neto (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+344	2026-01-01 17:58:31.236021-03	b2502b3b-498c-4a7c-8f69-627ee2250267	Maria Eduarda Soriano (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+345	2026-01-01 17:58:31.236058-03	56a07919-3b52-412c-9fe5-60ff74eb0f27	Mariana Ap. Dos Santos Silva (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+346	2026-01-01 17:58:31.236096-03	6bd3450e-5d07-4bf5-833e-d206ac1f3348	Mariana D'Elia Vinhal De Pádua (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+347	2026-01-01 17:58:31.236133-03	78b484a0-140a-45b6-9881-89e31702b685	Mateus Iório Chaim (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+348	2026-01-01 17:58:31.236168-03	223ba94e-019f-4b19-ade0-474b6095ad6a	Matheus Lanza De Queiroz (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+349	2026-01-01 17:58:31.236203-03	70bb2fa9-720e-4925-a0f5-17638fadf0c8	Melissa Eloise Silva De Souza (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+350	2026-01-01 17:58:31.236236-03	473a777d-66d7-463d-a370-b43f13922d92	Milena Von Zuben Bueno De Castro (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+351	2026-01-01 17:58:31.23627-03	025444e9-09f5-4c66-8833-b76f28995e73	Mirela Harumi Kimura De Souza (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+352	2026-01-01 17:58:31.236304-03	13f43175-f24c-4ddc-8230-4e17428b8182	Pedro Henrique Pires Fernandes (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+353	2026-01-01 17:58:31.236339-03	6f4d5860-8e1c-4899-9885-243fd24e3233	Rafaela Bacan Dos Anjos (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+354	2026-01-01 17:58:31.236373-03	c28bc6c5-2fd2-4d2d-88ff-7857c630e000	Rafaela Oliveira Munsignatti (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+355	2026-01-01 17:58:31.236406-03	13c50d52-1165-4a14-8d3b-d175f90b095e	Raul Barrella Sotero (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+356	2026-01-01 17:58:31.23644-03	ed965768-c4b5-4d97-a9ee-89eabf4e1596	Renan Dos Santos Ribeiro (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+357	2026-01-01 17:58:31.236489-03	c43a8d63-f09f-47c7-8037-f73c1745583e	Ryan Guilherme Jacundina (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+358	2026-01-01 17:58:31.236527-03	d09b888b-e11f-407a-a9e0-890f903739a2	Sarah Thaynara Gomes Subtil (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+359	2026-01-01 17:58:31.236561-03	995451ef-6e05-4ce7-b3b6-d5b8f2de2b1f	Sophia Novais Moraes (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+360	2026-01-01 17:58:31.236596-03	980a4bff-14af-458e-9d86-d11e47ec4db2	Thiago Moreira Moretti (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+361	2026-01-01 17:58:31.23663-03	eb1cf039-01ba-4bd1-afdc-329acf4d8be2	Valentina Gonçalves Mascarenhas (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+362	2026-01-01 17:58:31.236664-03	e62eb65b-52dc-4e06-912f-91163412bd11	Victor Hugo Pinheiro Gonçalves (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+363	2026-01-01 17:58:31.236699-03	57d7181d-b130-4cc3-8adb-059de0b3efaf	Vinicius Fernandes Gatti (50269580875) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+364	2026-01-01 17:58:31.236739-03	dc29de89-98a8-4752-8526-32ae12301c38	Vinícius Martins De Camargo (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+365	2026-01-01 17:58:31.236776-03	04526dd3-889f-4947-ae78-90b71aee5fe1	Yago Fellipe Dos Santos Borges (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+366	2026-01-01 17:58:31.236812-03	cb061b3f-b273-4dcf-bb8c-830e54f64a30	Yuri Coêlho Purcino (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+367	2026-01-01 17:58:31.236847-03	d9d4f009-d9e0-46e4-8283-b0393187ef01	Zakeu Goveia De Sousa (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+368	2026-01-01 18:00:44.346664-03	037f581d-ad5c-4779-8cfb-a15ee2af07df	Alexandre Servolo Mateus (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+369	2026-01-01 18:00:44.346713-03	6195325d-7500-4767-bd27-e72a49139a47	Amanda Marin Rodrigues (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+370	2026-01-01 18:00:44.346742-03	19755bd7-009b-4032-a63a-9778b7a37dce	Ana Beatriz Padilha Fontoura (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+371	2026-01-01 18:00:44.346767-03	300d21ac-2549-4937-aa1d-84cfaf47920e	Ana Clara De Brito (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+372	2026-01-01 18:00:44.346789-03	1107f978-7db0-40eb-a8f2-e82843d3d3e6	Ana Julia Carvalho Rodrigues (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+373	2026-01-01 18:00:44.346811-03	a41cc4cb-5302-4f8f-9480-cd9f4856091c	Ana Leticia Franciosi Dos Santos (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+374	2026-01-01 18:00:44.346833-03	8c8ae063-0e4c-451d-b392-f276d8eccc5a	Ananda Gabrielly França Dos Santos (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+375	2026-01-01 18:00:44.346855-03	8be8f6ea-0d1e-435d-9606-893638cf27b2	Arthur Alexandrino Fabri (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+376	2026-01-01 18:00:44.346875-03	3300eccf-bb1f-40cb-b467-d13f53cc1cc3	Arthur Eduardo Rosario Pereira (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+377	2026-01-01 18:00:44.346895-03	613467b9-bb4a-4ff4-a271-5a09cd3af332	Beatriz Marques De Lima (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+378	2026-01-01 18:00:44.346916-03	9bf9e232-9cbc-4646-816e-2cab30c6df32	Beatriz Terto Soares (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+379	2026-01-01 18:00:44.346936-03	9c0beb48-e1fe-45e3-a1b8-8590c4a799d0	Bianca Yasmim Ribeiro E Silva (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+380	2026-01-01 18:00:44.346956-03	6d2f6ec1-52d1-4921-814f-7dc4da7195a6	Bruno Brayn Vedovello (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+381	2026-01-01 18:00:44.346977-03	46eec756-6b29-496e-a84c-c2bd838131eb	Cauã Logato Marmirolli (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+382	2026-01-01 18:00:44.346998-03	ba8db563-8335-4cea-a4a6-7bbc474f08ce	Daízi Cuchi Vilela (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+383	2026-01-01 18:00:44.347018-03	5f77cc51-fb74-4231-9357-0c77e9d20fc8	Daniel Moreira Da Silva (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+384	2026-01-01 18:00:44.347037-03	225f13eb-5406-45c3-aa92-29fcbebefb40	Davi André Dias Da Silva (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+385	2026-01-01 18:00:44.347056-03	960afde2-a6c8-4b49-8653-2be7ad61e8d5	Davi De Miranda Motta (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+386	2026-01-01 18:00:44.347075-03	56aaf64f-17b2-41b8-ad20-6f09c2188a68	Davi De Souza Bragança (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+387	2026-01-01 18:00:44.347095-03	4c6772ff-a786-4e7b-9e46-27aec63f50ee	Davi Oliveira Poletto (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+388	2026-01-01 18:00:44.347115-03	617cd546-fd58-4406-a193-5529934cea12	Edgar Bicalho Da Rocha (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+389	2026-01-01 18:00:44.347133-03	5aaae15d-8550-4a96-8945-df3debb69009	Emanuel De Almeida Gadioli (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+390	2026-01-01 18:00:44.347152-03	a75fc1e2-99b9-4ab9-8105-df0dcb18a9a6	Emmanuel Vinicius Valdívia Martinez (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+391	2026-01-01 18:00:44.34717-03	49897a78-4065-49cb-9818-c81ae960e18a	Enzo Enrico De Freitas Luchetti M. Godinho (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+392	2026-01-01 18:00:44.347188-03	c41bbbcb-6378-4839-a917-a763da009a49	Enzo Gabiatti Lins (46847544805) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+393	2026-01-01 18:00:44.347211-03	b62c4f41-899d-4bca-901f-86d27414d5f9	Enzo Hisashi Yamamoto Cabral (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+394	2026-01-01 18:00:44.347232-03	222dc58c-c7db-407c-83c1-7ed337c0edea	Fernanda Gabriely Tavares Toledo (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+395	2026-01-01 18:00:44.347251-03	70095501-09a3-4a14-82cd-62aa88c91631	Fernanda Montrezol Dos Santos (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+396	2026-01-01 18:00:44.347269-03	709c08c1-3917-4e8e-bff5-e6427d088c5e	Gabriel Alan Cunha Silva (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+397	2026-01-01 18:00:44.347288-03	7540372f-88ee-49b5-aab4-ef1f1fdab635	Gabriel Carlos Da Silva (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+398	2026-01-01 18:00:44.347308-03	bbd0badb-0a11-4b91-a23d-df2f2bf1edbe	Gabriel Isaac Silva Coelho (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+399	2026-01-01 18:00:44.347327-03	f97f055e-da10-4db5-b376-d9ec869a97b8	Giovanny De Araujo Campos (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+400	2026-01-01 18:00:44.347345-03	5242bb09-c097-47b6-b645-ea31301f4eed	Grasiely Amaro De Carvalho (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+401	2026-01-01 18:00:44.347369-03	ccf829dd-9f6f-45a0-8e78-9d6e44dd0863	Guilherme Adan Machado (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+402	2026-01-01 18:00:44.347389-03	08c81528-fdc1-4bbd-b3e1-c31db14a8dc4	Igor Portal Alves (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+403	2026-01-01 18:00:44.347407-03	cd8852de-b80a-4b6d-8923-c1c1eadbc499	João Vitor Do Nascimento Nakano (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+404	2026-01-01 18:00:44.347423-03	c7ff990f-01a8-4d19-926b-802669125086	João Vitor Silva De Souza (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+405	2026-01-01 18:00:44.347439-03	6d1b9ce7-fe6f-4258-bdef-a865bde6448e	José Eduardo Leite Da Silva (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+406	2026-01-01 18:00:44.347454-03	2fa3594e-51d8-4b09-90e3-2f8ff7779ffb	José Francisco Ledesma (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+407	2026-01-01 18:00:44.347469-03	4f2d8b62-cd4a-447e-b224-00771da1ab5f	Julia Negri De Oliveira (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+408	2026-01-01 18:00:44.347484-03	a325ad1f-edc8-427a-adb7-9da5262a2b51	Kaike Rafael Santos De Almeida (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+409	2026-01-01 18:00:44.347499-03	47ce68b3-1bbc-40ec-9516-ae0c0a3c6eca	Lavínia Lahr Alvarenga (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+410	2026-01-01 18:00:44.347515-03	ae5e73aa-f570-42d0-9bbd-c7f17b73cc74	Leonardo Araújo De Oliveira (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+411	2026-01-01 18:00:44.347529-03	7d0fcea2-8301-4d1d-a03d-ddb9d021faa0	Letícia Assis Camillo (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+412	2026-01-01 18:00:44.347544-03	2239895c-4134-476e-8821-9fd09274c008	Letícia De Paula Vedovello (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+413	2026-01-01 18:00:44.347577-03	f55b48f8-9de2-4a79-91aa-4ed97f466b2e	Lucas Gabriel De Almeida (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+414	2026-01-01 18:00:44.347602-03	f73bf8d9-5aad-4f8a-b1d4-7cb7cba1c38b	Luigi Michilin Ribeiro Da Silva (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+415	2026-01-01 18:00:44.347619-03	dec9c353-c384-4152-a296-c7d85368589b	Luiza Conde Alexandre Rocha (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+416	2026-01-01 18:00:44.347634-03	3d0d931e-d2e1-4ff8-b35c-6070bf68a547	Marconi Feliciano Gomes Neto (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+417	2026-01-01 18:00:44.347649-03	8e4c9570-835b-4c12-b6e2-f6f2dccbe72b	Maria Eduarda Soriano (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+418	2026-01-01 18:00:44.347664-03	4e6d773c-279d-4cd7-9032-7d7cf78e1886	Mariana Ap. Dos Santos Silva (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+419	2026-01-01 18:00:44.34768-03	1ad30fbe-3525-4aa6-a310-bcb629d6e4b9	Mariana D'Elia Vinhal De Pádua (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+420	2026-01-01 18:00:44.347695-03	7a1f81c1-89d3-40da-a27f-ab44704e252f	Mateus Iório Chaim (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+421	2026-01-01 18:00:44.34771-03	b6bc54f5-8a9c-4343-9e1a-f85729f3134e	Matheus Lanza De Queiroz (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+422	2026-01-01 18:00:44.347727-03	cedd9083-48bd-479c-adb0-f79613c2259e	Melissa Eloise Silva De Souza (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+423	2026-01-01 18:00:44.347743-03	346559df-25d1-4ff8-b568-6969e8db4bef	Milena Von Zuben Bueno De Castro (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+424	2026-01-01 18:00:44.347758-03	8216b874-9cb6-4c55-86c1-b149a2e94941	Mirela Harumi Kimura De Souza (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+425	2026-01-01 18:00:44.347773-03	8c03f98b-ab63-4cdd-ba35-db0fcf3d908c	Pedro Henrique Pires Fernandes (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+426	2026-01-01 18:00:44.347788-03	53a87482-6633-4651-b71b-276d4b67de11	Rafaela Bacan Dos Anjos (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+427	2026-01-01 18:00:44.347803-03	20a2878f-fd59-4bb6-9342-6a36195f695f	Rafaela Oliveira Munsignatti (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+428	2026-01-01 18:00:44.347932-03	84bcedc8-3b47-4db2-bb13-eac930ded0db	Raul Barrella Sotero (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+429	2026-01-01 18:00:44.34795-03	b044ddf2-01e4-4ebf-8ca3-54e31420bf61	Renan Dos Santos Ribeiro (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+430	2026-01-01 18:00:44.347965-03	148b9901-8378-4762-8f3b-50f671908906	Ryan Guilherme Jacundina (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+431	2026-01-01 18:00:44.34798-03	3ddbb028-29d2-4f99-80ab-1234941b9172	Sarah Thaynara Gomes Subtil (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+432	2026-01-01 18:00:44.347995-03	de1ba60d-6242-4c27-a0f8-d432309ece30	Sophia Novais Moraes (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+433	2026-01-01 18:00:44.348011-03	adc6f192-2b45-4909-b8cb-b08208cfe91d	Thiago Moreira Moretti (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+434	2026-01-01 18:00:44.348026-03	9fbf2500-d0d4-413c-8c56-28513fb02e11	Valentina Gonçalves Mascarenhas (None) - 2ª Série X - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+435	2026-01-01 18:00:44.348041-03	8acae31e-011b-4ea6-9b92-c37f0a37960c	Victor Hugo Pinheiro Gonçalves (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+436	2026-01-01 18:00:44.348055-03	08a75dcc-ccd3-4c2b-b7c2-4d7b05ed266b	Vinicius Fernandes Gatti (50269580875) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+437	2026-01-01 18:00:44.348071-03	45be5728-fe86-433e-9a6b-128a7ce466a1	Vinícius Martins De Camargo (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+438	2026-01-01 18:00:44.348088-03	74bdf64a-4037-47e6-80a8-34e815e456b1	Yago Fellipe Dos Santos Borges (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+439	2026-01-01 18:00:44.348104-03	fc37f21a-d281-428f-acb2-1d93afd24e2c	Yuri Coêlho Purcino (None) - 2ª Série Y - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+440	2026-01-01 18:00:44.348119-03	a35fbdf9-a1c5-44f3-9f46-f97ab28a424d	Zakeu Goveia De Sousa (None) - 2ª Série W - EM - 2026	3		23	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+441	2026-01-02 16:38:23.615605-03	e4658f5e-94ce-4206-a3ef-687f757e5f2c	1ª Série W - TI - 2026 - Segunda-feira - 4ª Aula (09:45 - 10:35) - TIC	3		14	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+442	2026-01-02 16:38:23.615656-03	f27a2776-a677-41e2-adcf-c40d12eb1a94	1ª Série W - EM - 2026 - Terça-feira - 5ª Aula (10:35 - 11:25) - MAT	3		14	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff
+\.
+
+
+--
+-- Data for Name: django_content_type; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_content_type (id, app_label, model) FROM stdin;
+1	admin	logentry
+2	auth	group
+3	auth	permission
+4	contenttypes	contenttype
+5	sessions	session
+6	users	user
+7	core	anoletivo
+8	core	curso
+9	core	dialetivoextra
+10	core	dianaoletivo
+11	core	disciplina
+12	core	disciplinaturma
+13	core	funcionario
+14	core	gradehoraria
+15	core	habilidade
+16	core	horarioaula
+17	core	periodotrabalho
+18	core	professordisciplinaturma
+19	core	turma
+20	academic	atestado
+21	academic	estudante
+22	academic	matriculacemep
+23	academic	matriculaturma
+24	academic	responsavel
+25	academic	responsavelestudante
+26	pedagogical	aula
+27	pedagogical	avaliacao
+28	pedagogical	controlevisto
+29	pedagogical	descritorocorrenciapedagogica
+30	pedagogical	faltas
+31	pedagogical	instrumentoavaliativo
+32	pedagogical	notaavaliacao
+33	pedagogical	notabimestral
+34	pedagogical	notainstrumentoavaliativo
+35	pedagogical	notificacaorecuperacao
+36	pedagogical	ocorrenciapedagogica
+37	pedagogical	ocorrenciaresponsavelciente
+38	pedagogical	planoaula
+39	management	aviso
+40	management	avisoanexo
+41	management	avisovisualizacao
+42	management	notificacaohtpc
+43	management	notificacaotarefa
+44	management	reuniaohtpc
+45	management	reuniaohtpcanexo
+46	management	tarefa
+47	management	tarefaanexo
+48	management	tarefaresposta
+49	management	tarefarespostaanexo
+50	permanent	dadospermanenteestudante
+51	permanent	dadospermanenteresponsavel
+52	permanent	historicoescolar
+53	permanent	historicoescolaranoletivo
+54	permanent	historicoescolarnotas
+55	permanent	registroprontuario
+56	permanent	registroprontuarioanexo
+57	core	anoletivoselecionado
+58	core	gradehorariavalidade
+\.
+
+
+--
+-- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_migrations (id, app, name, applied) FROM stdin;
+1	contenttypes	0001_initial	2025-12-31 09:57:09.885534-03
+2	contenttypes	0002_remove_content_type_name	2025-12-31 09:57:09.89805-03
+3	auth	0001_initial	2025-12-31 09:57:09.946335-03
+4	auth	0002_alter_permission_name_max_length	2025-12-31 09:57:09.952522-03
+5	auth	0003_alter_user_email_max_length	2025-12-31 09:57:09.95658-03
+6	auth	0004_alter_user_username_opts	2025-12-31 09:57:09.962606-03
+7	auth	0005_alter_user_last_login_null	2025-12-31 09:57:09.96862-03
+8	auth	0006_require_contenttypes_0002	2025-12-31 09:57:09.970833-03
+9	auth	0007_alter_validators_add_error_messages	2025-12-31 09:57:09.975328-03
+10	auth	0008_alter_user_username_max_length	2025-12-31 09:57:09.980851-03
+11	auth	0009_alter_user_last_name_max_length	2025-12-31 09:57:09.986431-03
+12	auth	0010_alter_group_name_max_length	2025-12-31 09:57:10.007464-03
+13	auth	0011_update_proxy_permissions	2025-12-31 09:57:10.014926-03
+14	auth	0012_alter_user_first_name_max_length	2025-12-31 09:57:10.021598-03
+15	users	0001_initial	2025-12-31 09:57:10.068968-03
+16	core	0001_initial	2025-12-31 09:57:10.168457-03
+17	academic	0001_initial	2025-12-31 09:57:10.201177-03
+18	academic	0002_initial	2025-12-31 09:57:10.327351-03
+19	admin	0001_initial	2025-12-31 09:57:10.350075-03
+20	admin	0002_logentry_remove_auto_add	2025-12-31 09:57:10.358873-03
+21	admin	0003_logentry_add_action_flag_choices	2025-12-31 09:57:10.368937-03
+22	core	0002_initial	2025-12-31 09:57:10.588358-03
+23	management	0001_initial	2025-12-31 09:57:10.657307-03
+24	management	0002_initial	2025-12-31 09:57:11.178587-03
+25	pedagogical	0001_initial	2025-12-31 09:57:11.756977-03
+26	permanent	0001_initial	2025-12-31 09:57:11.85113-03
+27	sessions	0001_initial	2025-12-31 09:57:11.862974-03
+28	academic	0003_alter_estudante_cpf	2026-01-01 17:20:54.731923-03
+29	core	0003_anoletivoselecionado	2026-01-02 09:50:33.270179-03
+30	core	0004_alter_gradehoraria_options_gradehorariavalidade_and_more	2026-01-02 17:19:42.145014-03
+31	core	0005_alter_habilidade_codigo	2026-01-03 08:00:53.047727-03
+32	core	0006_alter_habilidade_unique_together	2026-01-03 08:01:52.559642-03
+\.
+
+
+--
+-- Data for Name: django_session; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
+lki8s0cpp6rr0wvjl4lejpl5r3xjiuso	.eJxVjDsOwjAMQO-SmUaOnU_TkZ0zVE7i0AJqpX4mxN1RpQ4wv89b9bxvQ7-vsvRjUZ3KWLGIaRsW4xqbAjScfG3QuVSJxUCt6vKbJc5PmY62PHi6zzrP07aMSR-KPumqb3OR1_V0_wYDr4PqVIAYTCKbPaSAJrYkxWe0kTA6jOI8QgqVWk8GAEtmKExEjmyJlEV9vimVQGw:1vbPOG:-B_HnfiJoT2eZPiEt7uggRPXp2yVpyBT8tS-zCMwJbs	2026-01-15 17:35:24.317951-03
+\.
+
+
+--
+-- Data for Name: management_aviso; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_aviso (id, titulo, texto, data_aviso, criador_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_aviso_destinatarios; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_aviso_destinatarios (id, aviso_id, user_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_avisoanexo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_avisoanexo (id, arquivo, descricao, aviso_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_avisovisualizacao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_avisovisualizacao (id, visualizado, data_visualizacao, aviso_id, usuario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_notificacaohtpc; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_notificacaohtpc (id, visualizado, data_visualizacao, funcionario_id, reuniao_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_notificacaotarefa; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_notificacaotarefa (id, visualizado, data_visualizacao, funcionario_id, tarefa_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_reuniaohtpc; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_reuniaohtpc (id, data_reuniao, pauta, ata, data_registro, quem_registrou_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_reuniaohtpc_presentes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_reuniaohtpc_presentes (id, reuniaohtpc_id, funcionario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_reuniaohtpcanexo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_reuniaohtpcanexo (id, arquivo, descricao, reuniao_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_tarefa; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_tarefa (id, titulo, descricao, prazo, concluido, data_conclusao, data_cadastro, criador_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_tarefa_funcionarios; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_tarefa_funcionarios (id, tarefa_id, funcionario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_tarefaanexo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_tarefaanexo (id, arquivo, descricao, tarefa_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_tarefaresposta; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_tarefaresposta (id, texto, data_envio, funcionario_id, tarefa_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: management_tarefarespostaanexo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.management_tarefarespostaanexo (id, arquivo, descricao, resposta_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_aula; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_aula (id, data, conteudo, numero_aulas, criado_em, professor_disciplina_turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_avaliacao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_avaliacao (id, valor, tipo, tipo_calculo_instrumentos, professor_disciplina_turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_controlevisto; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_controlevisto (id, titulo, data_visto, visto, matricula_turma_id, professor_disciplina_turma_id, instrumento_avaliativo_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_descritorocorrenciapedagogica; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_descritorocorrenciapedagogica (id, texto, ativo, gestor_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_faltas; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_faltas (id, aula_numero, aula_id, estudante_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_instrumentoavaliativo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_instrumentoavaliativo (id, titulo, data_inicio, data_fim, usa_vistos, peso, valor, avaliacao_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_notaavaliacao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_notaavaliacao (id, valor, avaliacao_id, matricula_turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_notabimestral; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_notabimestral (id, nota, matricula_turma_id, professor_disciplina_turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_notainstrumentoavaliativo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_notainstrumentoavaliativo (id, valor, instrumento_avaliativo_id, matricula_turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_notificacaorecuperacao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_notificacaorecuperacao (id, visualizado, data_visualizacao, estudante_id, professor_disciplina_turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_ocorrenciapedagogica; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_ocorrenciapedagogica (id, data, autor_id, estudante_id, tipo_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_ocorrenciaresponsavelciente; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_ocorrenciaresponsavelciente (id, ciente, data_ciencia, ocorrencia_id, responsavel_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_planoaula; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_planoaula (id, data_inicio, data_fim, conteudo, criado_em, atualizado_em, disciplina_id, professor_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_planoaula_habilidades; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_planoaula_habilidades (id, planoaula_id, habilidade_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pedagogical_planoaula_turmas; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pedagogical_planoaula_turmas (id, planoaula_id, turma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_dadospermanenteestudante; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_dadospermanenteestudante (id, cpf, nome, data_nascimento, telefone, email, endereco_completo, criado_em, atualizado_em) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_dadospermanenteresponsavel; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_dadospermanenteresponsavel (id, cpf, nome, telefone, email, parentesco, estudante_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_historicoescolar; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_historicoescolar (id, numero_matricula, nome_curso, data_entrada_cemep, data_saida_cemep, concluido, observacoes_gerais, estudante_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_historicoescolaranoletivo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_historicoescolaranoletivo (id, ano_letivo, nomenclatura_turma, numero_turma, letra_turma, status_final, descricao_status, observacoes, historico_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_historicoescolarnotas; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_historicoescolarnotas (id, nome_disciplina, aulas_semanais, nota_final, frequencia_total, ano_letivo_ref_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_registroprontuario; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_registroprontuario (id, ocorrencia_disciplinar, cpf, nome_estudante, autor_nome, data_ocorrido, data_registro, descricao, ano_letivo, bimestre, pai_ocorrencia_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permanent_registroprontuarioanexo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.permanent_registroprontuarioanexo (id, arquivo, descricao, criado_em, registro_prontuario_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: users_user; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users_user (password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined, id, tipo_usuario, foto, dark_mode) FROM stdin;
+pbkdf2_sha256$1200000$ThBMExM5QWmQvvQ7fUIk1L$zjo4Sh5QVBwriF+5IJbkdKuQrYFQmvo8r071Nnfke1U=	2026-01-01 17:35:24-03	t	diogo	Diogo		diogopelaes@gmail.com	t	t	2026-01-01 17:35:17-03	c2f2de18-ae15-4b70-ab6f-255bf3ae10ff	GESTAO		f
+pbkdf2_sha256$1200000$Ork7E25VkSv5voAGWDYL1r$lNSrmdBl28gbGC2e/YCxhgpzTS39fexk8FqdFtEDILI=	\N	f	alopes@alu.paulinia.sp.gov.br	Aldry Lubarino Lopes		alopes@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:01.974185-03	b9090881-9239-449e-9036-9f1f426b9921	ESTUDANTE		f
+pbkdf2_sha256$1200000$RW1zOu2SLIMMkabT82Rkbf$yzYr9T2qxla3Cs5Lvi7fzDlNg0POeWxlibPtDFHBxXY=	\N	f	a.servolo@alu.paulinia.sp.gov.br	Alexandre Servolo Mateus		a.servolo@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:02.440324-03	1f9dbfc5-0f9d-4f75-87d6-d998291d6016	ESTUDANTE		f
+pbkdf2_sha256$1200000$DmYw7kbWUbg9NsypwFhEZA$nhzKPoYJU38iqwVKIMLOqw3MqlnzLoAIoj8CFeFETEs=	\N	f	amanda.rodrigues@alu.paulinia.sp.gov.br	Amanda Marin Rodrigues		amanda.rodrigues@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:03.05418-03	a2b00bea-f3df-4b44-8446-e7e3a7451939	ESTUDANTE		f
+pbkdf2_sha256$1200000$zOjvQvRZJmoA55FAPTL8x0$Qh9j9+k4+e40yBPbqUi/tDHsTQ18K4XO+Tu5NfLnPBM=	\N	f	avale@alu.paulinia.sp.gov.br	Ana Beatriz Ferrreira Do Vale		avale@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:03.495559-03	8c5e243b-9cf0-4fa1-9903-046e51180092	ESTUDANTE		f
+pbkdf2_sha256$1200000$yGktTiEU3i7Cv2849i3Iwu$C4ATiehKnKld8yhCi8dJNMyDEHWSKKKmBWTWBTQyrQs=	\N	f	beatriz.fontoura@alu.paulinia.sp.gov.br	Ana Beatriz Padilha Fontoura		beatriz.fontoura@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:03.936001-03	a03cc6c8-0a9a-4b27-9f18-a7b580c241eb	ESTUDANTE		f
+pbkdf2_sha256$1200000$2q05x0UNg4WDQmRQ8COYC1$miyu1DSvbGNNnR4oTfB+uyb8Lse5wn5573/mDk/JRfM=	\N	f	aamaral@alu.paulinia.sp.gov.br	Ana Clara Amaral De Oliveira		aamaral@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:04.379324-03	552d0adb-d2fc-40c1-9124-d5820dcd2d96	ESTUDANTE		f
+pbkdf2_sha256$1200000$0DXXgvNVgogGDOIk6vSlXq$oWjkg/pIi33aNG94F9oDG5JZYItmU4GaCmCkXrV6Q+E=	\N	f	ana.clara.brito@alu.paulinia.sp.gov.br	Ana Clara De Brito		ana.clara.brito@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:04.810434-03	9e4a6c24-e5ca-49cc-9cde-b720ee48e371	ESTUDANTE		f
+pbkdf2_sha256$1200000$35oUTv2eMGxVi6MhKKvpCw$h/oi9/WqA4Bo88KDv66ucqYuA5KDrpRuVhom2LsXfI8=	\N	f	aj.rodrigues@alu.paulinia.sp.gov.br	Ana Julia Carvalho Rodrigues		aj.rodrigues@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:05.30074-03	2853b9d2-5b54-46f3-b632-b3eb28b8ad68	ESTUDANTE		f
+pbkdf2_sha256$1200000$GjvkaUqtodmAnSIGDmNOci$coGHiwbRXKe6lbecpyFSSh+4Z+obcW3wW3RhzowMQ8Y=	\N	f	azanardi@alu.paulinia.sp.gov.br	Ana Julia Zanardi		azanardi@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:05.733166-03	dc486446-afb1-488b-8ba2-e242409257d5	ESTUDANTE		f
+pbkdf2_sha256$1200000$6usD5Qu8M7zwb7hSPIyrvT$zV/eWNX0uMEpilUU+9tIDcuZ232waOONFKn8wDmRsVU=	\N	f	ana.franciosi@alu.paulinia.sp.gov.br	Ana Leticia Franciosi Dos Santos		ana.franciosi@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:06.219287-03	f55ce735-8cdd-4a39-966f-0910e8ae6f71	ESTUDANTE		f
+pbkdf2_sha256$1200000$ZiwAFa9ovWj4g2Kb7GDWVN$XtNnzpHY6iovgIcYs8EwxWNAV2o9MMfPecqoisxZg9M=	\N	f	ana.piva@alu.paulinia.sp.gov.br	Ana Lívia Evaristo Piva		ana.piva@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:06.662341-03	2efe83ed-fcaa-4492-8b8e-1f9893eb9f4e	ESTUDANTE		f
+pbkdf2_sha256$1200000$hZfMZzFVZAwPyHbBNi9Udd$7cFA8GeOEJzDGom873ae65er0ylf0f3V2dIGxjqR0Cc=	\N	f	alsantos@alu.paulinia.sp.gov.br	Ana Luiza Cortello Dos Santos		alsantos@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:07.095848-03	eda369a4-b16c-4d6d-81ca-672a737ae9c6	ESTUDANTE		f
+pbkdf2_sha256$1200000$sx9fXVeSBOL8XmvU6WgbyN$O0RELWw6jjRPg8NWIn39zVRQW3He6khfA4sUIMZe+SM=	\N	f	aleal@alu.paulinia.sp.gov.br	Arthur Oliveira Leal		aleal@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:09.818778-03	4956cfcc-78e0-4bf3-8c98-a4b3b6ba7974	ESTUDANTE		f
+pbkdf2_sha256$1200000$MsNciA9APZlBpZmvoCaW94$wVGCf4BEZNVNnkt0qoFJPguZjaiaxYCFSRo2HmwaV3k=	\N	f	beatriz.marques.lima@alu.paulinia.sp.gov.br	Beatriz Marques De Lima		beatriz.marques.lima@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:10.276106-03	cff27364-d301-4e76-8a42-557540139876	ESTUDANTE		f
+pbkdf2_sha256$1200000$haZwQdRGpfBJLeBm0vSdpD$1MSBvwAu5lbp/IpfqxPBPzhJyqt4ApEp1B8AgXEtfJ8=	\N	f	beatriz.terto@alu.paulinia.sp.gov.br	Beatriz Terto Soares		beatriz.terto@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:10.745455-03	27cf6939-a3d5-465c-a669-172d4565db03	ESTUDANTE		f
+pbkdf2_sha256$1200000$0fcQJcoYKtT6xZlvt7waxY$P0qRB6JOypeZjorxS6sfYmOV5672eyIaV/i9vI265VM=	\N	f	bianca.yasmim@alu.paulinia.sp.gov.br	Bianca Yasmim Ribeiro E Silva		bianca.yasmim@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:11.181581-03	ed4835cb-15ee-4ccd-8658-d3e4d07730ed	ESTUDANTE		f
+pbkdf2_sha256$1200000$e0s7jSXwFdXMQz3ti3Ryjo$f4lKFWynKvRvOUNI3cMqepUW517uD5HOTDKeLFIzPLs=	\N	f	bmoreira@alu.paulinia.sp.gov.br	Brenda Tayna Moreira		bmoreira@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:11.617255-03	0003986b-9bdc-4830-b747-89891d06e1b4	ESTUDANTE		f
+pbkdf2_sha256$1200000$Pd8tpVaPfcUDHe3mgCjvRs$+VcEYhTlSOYfu8ISY0MNJhdNhiqvQzlPbYu+M30AgXk=	\N	f	b.vedovello@alu.paulinia.sp.gov.br	Bruno Brayn Vedovello		b.vedovello@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:12.094237-03	80c41ede-a2c1-4e98-b2f2-92568a96ad3a	ESTUDANTE		f
+pbkdf2_sha256$1200000$ULlCcXQIu6gsObwOfTR6as$8Dh5Eupt9MyODXllXXSjKikNXM1JLzhJp3mtOwm6xsM=	\N	f	bbrito@alu.paulinia.sp.gov.br	Bruno José De Brito		bbrito@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:12.533341-03	cea11fd3-eec2-4b9b-8b24-2351cdbbdce1	ESTUDANTE		f
+pbkdf2_sha256$1200000$lVuIb3Brql7mGliTlvHPh8$ZvQMk15mONzfWuemrDtg6sHpqkVG/AHmKfXIGfUeJHY=	\N	f	cmalavasi@alu.paulinia.sp.gov.br	Caio Henrique Malavasi		cmalavasi@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:13.01496-03	8739faf0-4b49-45f0-8dd3-24f06fa0e489	ESTUDANTE		f
+pbkdf2_sha256$1200000$7U9jT9AfRcmxaMDK6Gi0uC$f3h8estqYK3uUmHjLKoOkXTmp0IqA5D62de145TYQso=	\N	f	caua.marmirolli@alu.paulinia.sp.gov.br	Cauã Logato Marmirolli		caua.marmirolli@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:13.454508-03	a38d1fc7-aab0-4ca8-9808-02ac4fd516b3	ESTUDANTE		f
+pbkdf2_sha256$1200000$Uir6mXtLpFAnbHBnagbbbs$8qGNfSRMDefewu/E114o5btBtgE+7+zlNxPk1JJAgUo=	\N	f	cmoura@alu.paulinia.sp.gov.br	Claudio Camilo Rodrigues Moura		cmoura@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:13.926591-03	42080e3b-df15-424a-9c63-65d95dbabe52	ESTUDANTE		f
+pbkdf2_sha256$1200000$GHctYSZCTQhe5q29qrRbpE$s1vun3VIeU5z2JMDlXwTEOtHDWf6RHIaoPgFxiwIbyY=	\N	f	daizi.vilela@alu.paulinia.sp.gov.br	Daízi Cuchi Vilela		daizi.vilela@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:14.373068-03	e8f24408-adf3-4f7d-ae2f-48ff11945c98	ESTUDANTE		f
+pbkdf2_sha256$1200000$0FklYw5bNz6GzWsVadSeJB$6Gtj7Z9J8YtOIGiqUAQqsVHXZ97nhzGEktUS8PJOvvc=	\N	f	dpaula@alu.paulinia.sp.gov.br	Daniel Barbosa De Paula		dpaula@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:14.804196-03	09577acf-c018-46ba-a83e-69e3574d13a8	ESTUDANTE		f
+pbkdf2_sha256$1200000$wpGpEoDfK3hEimaid00cbw$t/pdPh8UqWkATtJPJteFylKJlJAO5hIkLhqcJRXXH5Q=	\N	f	davi.poletto@alu.paulinia.sp.gov.br	Davi Oliveira Poletto		davi.poletto@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:18.022971-03	55653e8e-66c6-4342-9d9a-626a97acf10c	ESTUDANTE		f
+pbkdf2_sha256$1200000$nOsHVNxIfD7suRdc05kZke$8NySz0q3qeqOf2/Ik5O+ynPzowKVDQ4THf4T8P4U2Cw=	\N	f	edgar.rocha@alu.paulinia.sp.gov.br	Edgar Bicalho Da Rocha		edgar.rocha@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:18.517479-03	5719c423-1c88-426a-b892-098753f10f1c	ESTUDANTE		f
+pbkdf2_sha256$1200000$5mLNPop1Jna7ZfZuwzAMLs$k9D8ymYiwYHZJ65HKNPUKgivnkHCGRPwAdIz+jpnq98=	\N	f	ecsilva@alu.paulinia.sp.gov.br	Eduarda Castanho Da Silva		ecsilva@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:18.953668-03	f131077f-ba9b-4ebc-aee0-f682be59c70e	ESTUDANTE		f
+pbkdf2_sha256$1200000$gPBpv2IYTy6F5ph9ESDIU9$G8+YLMxNCz7hCnz75Bol5uM71CxJrxahvsqMH0ObSkE=	\N	f	e.gadioli@alu.paulinia.sp.gov.br	Emanuel De Almeida Gadioli		e.gadioli@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:19.387771-03	146ee1f1-4710-42f7-a312-d137de9cb0b2	ESTUDANTE		f
+pbkdf2_sha256$1200000$n6WSOUvjxkvyurDom9dNo7$5ygkCqAraL+NLEzXQHBI8WJTk+n6hvzxjhkMiduGF/o=	\N	f	emmanuel.valdivia@alu.paulinia.sp.gov.br	Emmanuel Vinicius Valdívia Martinez		emmanuel.valdivia@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:19.871416-03	8068732b-1241-455e-bef4-3e8006e47adf	ESTUDANTE		f
+pbkdf2_sha256$1200000$nuYMHhhUNdAwsk9pl7HdXj$qeKM45SLnYtvhCCEBAQUr0dEUWIyDVp/deasMpvslDI=	\N	f	enzo.luchetti@alu.paulinia.sp.gov.br	Enzo Enrico De Freitas Luchetti M. Godinho		enzo.luchetti@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:20.305465-03	05501934-1d93-44ce-8a0e-13c0843ce89f	ESTUDANTE		f
+pbkdf2_sha256$1200000$B5eYd2Eweh9VJE44jcsU9K$bbJdXVrNE9d9jCqoARy+wc1QtJvzD9BnMwpQYJ+MtV8=	\N	f	e.lins@alu.paulinia.sp.gov.br	Enzo Gabiatti Lins		e.lins@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:20.787974-03	b2359ff4-8cc5-4485-ae9e-391657a7d11c	ESTUDANTE		f
+pbkdf2_sha256$1200000$HY5tg3YKbtZO9tG7aoO0LO$ecLgp6kadj7q/ci/tm1jScRdA3s7tSiQQCDDEk7qJzo=	\N	f	enzo.cabral@alu.paulinia.sp.gov.br	Enzo Hisashi Yamamoto Cabral		enzo.cabral@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:21.229481-03	4254a5f5-85f3-4439-b8a0-0bc2d48c1ea3	ESTUDANTE		f
+pbkdf2_sha256$1200000$xoDrN1ctiwLBSHkCH2iRo5$JO9TKaoXK5no9QzNMe2K3P7tBMMmXDWADubk2M6VCf4=	\N	f	eyamakawa@alu.paulinia.sp.gov.br	Enzo Seiichi Yamakawa		eyamakawa@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:21.704372-03	6620e3bd-e662-469f-b982-37447c671fac	ESTUDANTE		f
+pbkdf2_sha256$1200000$gmFk4eL6l8ym5HyOQDsVgD$NrE72oqt+Lp6OqW7SCTyHyq6DmTyjEqte3SiZ0F60Uc=	\N	f	efoliveira@alu.paulinia.sp.gov.br	Erick Fulgencio De Oliveira		efoliveira@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:22.323937-03	1a5204e3-a469-4a54-aaa3-0b20200b7bd7	ESTUDANTE		f
+pbkdf2_sha256$1200000$Roz3qmWnUfY8jTwLr1LMQ6$LrQqyxIJLeVsY7+kTYMZpLOaQMn4pEfkcSbnUrMIB7E=	\N	f	estevan.fernandes@alu.paulinia.sp.gov.br	Estevam Godoy Fernandes		estevan.fernandes@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:22.769035-03	13e4b026-1bdc-449f-a9e4-f58415a1248a	ESTUDANTE		f
+pbkdf2_sha256$1200000$oP30vb9QCu10AqdDRP6Qty$A33GGRhTW0TcCv9P0H+ashriBC5vp+MProe85KUGefs=	\N	f	gabriel.i.coelho@alu.paulinia.sp.gov.br	Gabriel Isaac Silva Coelho		gabriel.i.coelho@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:26.496607-03	999333e1-df03-4be3-87f9-de31f64a419d	ESTUDANTE		f
+pbkdf2_sha256$1200000$gCNne4nr8NHgzk9CFmIEvj$eMv6IZ2EkJt/qQslURqm/KXxKQlzs2l7I5+mHczvc7k=	\N	f	goliveira@alu.paulinia.sp.gov.br	Gabriel Nascimento De Oliveira		goliveira@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:26.950542-03	eb5ff42d-704f-40be-969d-7fe8c98ccba6	ESTUDANTE		f
+pbkdf2_sha256$1200000$fGMZ4vyPMPtYe40n3Q5JhK$gKW2F+q0U1UvTwHgFVOVYvmKewkmwJcd7RaKm714Ijo=	\N	f	grodrigues@alu.paulinia.sp.gov.br	Gabriela Correia Cunha Rodrigues		grodrigues@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:27.495137-03	2883c433-19a8-41b9-a9da-55757a4ab217	ESTUDANTE		f
+pbkdf2_sha256$1200000$U6FYS1qE6Ktjtg0vxnvbO9$/QSk+M2fcZHaFH1S3KG3UEG+DB1hwDdPeeXGfWn/jo0=	\N	f	gnascimento@alu.paulinia.sp.gov.br	Gabriela Salgado Nascimento		gnascimento@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:27.926284-03	b452ccd2-3726-4e01-a1b1-91a36e06432b	ESTUDANTE		f
+pbkdf2_sha256$1200000$xdxktU9KUmZXTUQ4mW6zMA$IOH+d5sH87AR7ax1d1eFu/OMjLURaozhsC4G5DZu40o=	\N	f	gferreira@alu.paulinia.sp.gov.br	Giovana Cristina Ferreira		gferreira@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:28.404755-03	97eadef1-f609-4d89-95ba-fcad51579852	ESTUDANTE		f
+pbkdf2_sha256$1200000$BsiyNDj4Jr5QdEMefe5pvB$yICoh0im7/8WjhS4hjtPQ+Kqyuzg8GtiuqDbJq6AT3Q=	\N	f	gmartins@alu.paulinia.sp.gov.br	Giovanne Santos Martins		gmartins@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:28.839187-03	ba7bf953-5fd5-4bbb-b06f-ad71564288a0	ESTUDANTE		f
+pbkdf2_sha256$1200000$kiVjW1eNFBCG4LaJKFBWyq$e3LnxrQA3YUJGFITUaIQympsxbsX1jKuXelbSIZaNOw=	\N	f	giovanny.campos@alu.paulinia.sp.gov.br	Giovanny De Araujo Campos		giovanny.campos@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:29.272052-03	d82eb065-6155-4578-ace1-d9166ff9c19c	ESTUDANTE		f
+pbkdf2_sha256$1200000$0xqJFRSOnwCQG4gfVsML6O$1He/gsV2noQ9x9yRQCdadFMbMfGqsXMa3XORHosIj/k=	\N	f	gkbsilva@alu.paulinia.sp.gov.br	Girlany Karine Barros Da Silva		gkbsilva@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:29.756237-03	9241e414-6130-4564-b373-cbefaeb55787	ESTUDANTE		f
+pbkdf2_sha256$1200000$rcfzVqWFjoFhxE2GzIJcZG$ZFzHpEm+njGY2LEixc+RG0G8u9JwM4lJH10vqX8mqWg=	\N	f	glanducci@alu.paulinia.sp.gov.br	Giulia Forti Landucci		glanducci@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:30.190368-03	d577acaa-ebfb-4058-ac89-7d5a16e209a4	ESTUDANTE		f
+pbkdf2_sha256$1200000$SM42WVX9aNvdpEXYAECcwV$xj25wh6sBP8TO835xU5bi4Thj4swmX+yT02oUb9WjIQ=	\N	f	grasiely.carvalho@alu.paulinia.sp.gov.br	Grasiely Amaro De Carvalho		grasiely.carvalho@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:30.673017-03	683ecf1c-8866-4f82-b373-c8cf5c63891b	ESTUDANTE		f
+pbkdf2_sha256$1200000$rXWY22wwJ9LHsaQhjjo3vz$JtXfVx2aLltMcoRAlEBqMyISZnYCvSBz1bn0hpg20AY=	\N	f	guilherme.machado@alu.paulinia.sp.gov.br	Guilherme Adan Machado		guilherme.machado@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:31.101099-03	17547b0d-81c0-4e60-8123-014e4179361d	ESTUDANTE		f
+pbkdf2_sha256$1200000$XaWYQUzZI1BDIT2O27ZDb9$X3W4Kx0RTs98W1OVLAd6Wf7of1L83XNfLyf50rICEw4=	\N	f	gksilva@alu.paulinia.sp.gov.br	Guilherme Kauê Souza Da Silva		gksilva@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:31.537012-03	726e4c61-34a0-4e5a-bb1c-75aa0d9e1a66	ESTUDANTE		f
+pbkdf2_sha256$1200000$qrsfJ14SDzdxYSFHRe6TW1$7nyajtgSrSbIaoBNkQuKpzaLFKogsnljFGpcD3pgU4k=	\N	f	jgsilva@alu.paulinia.sp.gov.br	João Gabriel De Oliveira M. Da Silva		jgsilva@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:34.698615-03	f3b45134-002e-4064-8a54-6085e43aee59	ESTUDANTE		f
+pbkdf2_sha256$1200000$IQtl52fbR5vMQQBrtYvdaX$cLLzohQ9GsANMLU9QxaglnnXmaW2TIIcJeHBjKDSt9A=	\N	f	jcharme@alu.paulinia.sp.gov.br	João Victor Da Silva Charme		jcharme@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:35.182651-03	e9139433-eb96-4d87-82e8-66da85d6d357	ESTUDANTE		f
+pbkdf2_sha256$1200000$7cXiHV3U8QA2Wa3KXbku49$ezI31/FpHfZy9xEq/G8vHg6ud/SKusPa7DAmRXdkg/I=	\N	f	joao.vitor.nakano@alu.paulinia.sp.gov.br	João Vitor Do Nascimento Nakano		joao.vitor.nakano@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:35.613645-03	091f17b9-eac5-4c74-a679-9f5f2a591121	ESTUDANTE		f
+pbkdf2_sha256$1200000$RePk96vehRmqJXQ4AjCfa8$9Wl8FKX/yai5V6+hQpqMD4Wh9CrLOE/G7PVAUii2NbU=	\N	f	joao.souza@alu.paulinia.sp.gov.br	João Vitor Silva De Souza		joao.souza@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:36.043081-03	b668e296-767b-4a96-914b-303df8558e7d	ESTUDANTE		f
+pbkdf2_sha256$1200000$Mzldd2Lz3r4brTqUqKktS6$kW5S6zMtn2Iox6HInM1Xpcu453kfcourW+H5OBn3V9o=	\N	f	jose.leite@alu.paulinia.sp.gov.br	José Eduardo Leite Da Silva		jose.leite@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:36.522929-03	11c26ec5-0ac7-49b3-ab43-5190fd7a1e9e	ESTUDANTE		f
+pbkdf2_sha256$1200000$rZvkMQ8feBJl4vT2sslrC8$m4qlvDTHKs0iizey5DeTSI2m94v1G+dGyuMh88Ha1v0=	\N	f	jose.ledesma@alu.paulinia.sp.gov.br	José Francisco Ledesma		jose.ledesma@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:36.956556-03	401f4061-2f0e-4dc8-8f07-2e09470a87fa	ESTUDANTE		f
+pbkdf2_sha256$1200000$TlL0rDBoARRkqUJzDpRCKi$LvFwba938X3/IcREPpjrGbdZtI0cCLWO8ilaysJGWDI=	\N	f	jlima@alu.paulinia.sp.gov.br	Jucielly Aparecida Nepununcena De Lima		jlima@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:37.394376-03	abff1d82-44fe-4c4e-ab09-a6932a986732	ESTUDANTE		f
+pbkdf2_sha256$1200000$DV1K7255CvnxBRDAiCQbyC$6r6uQRvAyxiTIKR2UAazCZ35XxFInrCNlMwbtdp9a4I=	\N	f	jferreira@alu.paulinia.sp.gov.br	Julia Cosmo Morais Ferreira		jferreira@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:37.824997-03	69124186-e7d5-4942-8a81-b770441e0088	ESTUDANTE		f
+pbkdf2_sha256$1200000$deU6RZ4UrQtIq9sSOuRXWQ$Sng5ZEl7s1RJEj0UjxqX0qz6ktWoRhZFb6rJsodcMIs=	\N	f	jaraujo@alu.paulinia.sp.gov.br	Júlia Domingues Araujo		jaraujo@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:38.25731-03	ac41471c-f32f-48c2-8187-440e1019048d	ESTUDANTE		f
+pbkdf2_sha256$1200000$MDGcYIz5NqgWHlX3NHoyPi$e3X/8WTgMV64X9wcptnqb71lQmpRMbSjJYdzsFP2Upw=	\N	f	j.negri@alu.paulinia.sp.gov.br	Julia Negri De Oliveira		j.negri@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:38.736408-03	19103dc7-9cd0-499b-8464-2e1d6aa7397e	ESTUDANTE		f
+pbkdf2_sha256$1200000$SZrMUVa3Ca7tS6ZRnAfQOp$NPtyhbjsX2HU3HPDWlGWUkJXKLn+1edpVeNRr9FIYns=	\N	f	kaike.almeida@alu.paulinia.sp.gov.br	Kaike Rafael Santos De Almeida		kaike.almeida@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:39.168667-03	313c0e42-b52a-4ac4-a496-fff0e028999c	ESTUDANTE		f
+pbkdf2_sha256$1200000$DbsT8oGzuNuq62O8aiTH7h$Tt7t8RodAHGHr1UKWSMZx6GdYktQwl2BqmwY07iKwtE=	\N	f	lgadioli@alu.paulinia.sp.gov.br	Leticia Jangue Gadioli		lgadioli@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:42.790737-03	816e58d7-7511-4583-827d-8c42b6df81b1	ESTUDANTE		f
+pbkdf2_sha256$1200000$UXwSSeVqWPyQaH5pmP6V3j$3fQV/K3Sk5d/Xa09e2t8wLDlpUk6Idsohp7BxGNhZ7c=	\N	f	lbianco@alu.paulinia.sp.gov.br	Leticia Oksanicz Mano Bianco		lbianco@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:43.227789-03	3dd6ef1a-5c34-4982-b04d-9aa525b1fe91	ESTUDANTE		f
+pbkdf2_sha256$1200000$kYawWSxZtzTNgVMzkXv4fh$TwjIgg1/Z0iCvuV6Yo5/n2fjqoRlQcRB8DVNhxJ7ans=	\N	f	llima@alu.paulinia.sp.gov.br	Lívia Borges Ferro Lima		llima@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:43.658101-03	ee2d434d-a83a-4db3-a05b-0e4f4629ad6e	ESTUDANTE		f
+pbkdf2_sha256$1200000$VqGY8eJtQLoUPEdIWLFKuG$mgXIuGQMQWurIOWWWg5nT6Ndl+EPPSjkeMcnKQWOJ78=	\N	f	lbarbosa@alu.paulinia.sp.gov.br	Lívia Ferreira Barbosa		lbarbosa@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:44.141066-03	36b3b2db-ce0e-4cfc-8a10-7d7ad7b84ea0	ESTUDANTE		f
+pbkdf2_sha256$1200000$CKCEQqpw5AI92YqSFg40L7$oE2VNE8/ZRH87PbDQQdIYgmLr0g3Qfj39b4TpE5bZC8=	\N	f	lfurlan@alu.paulinia.sp.gov.br	Lorena Helmeister Furlan		lfurlan@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:44.575771-03	a4c67b8e-2ce6-4c40-8fc7-3d788f075d45	ESTUDANTE		f
+pbkdf2_sha256$1200000$bD6bCguQP8fWNTXy6XP7vr$Lw13MMY/hAgQBVOebTunOWGcRpz1QqqDr97E+8JGD4E=	\N	f	lmarinho@alu.paulinia.sp.gov.br	Luan Dias Marinho		lmarinho@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:45.044065-03	114e7455-dba7-4998-8363-d04e798a2680	ESTUDANTE		f
+pbkdf2_sha256$1200000$ndbiYn61JQslTQF0BpyNB8$WI7becdx546xAHccNZKvPri0AcQPuAz2NpMTmvZfYco=	\N	f	lcaldeira@alu.paulinia.sp.gov.br	Lucas Batista Caldeira		lcaldeira@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:45.490709-03	865b8f66-0476-4aef-903f-50c76f4ca684	ESTUDANTE		f
+pbkdf2_sha256$1200000$6DXk0Dbc6kAT8VVufjrUZH$skZAiiEAjjBNGQSJthl36Kim1fNWrVtYg7KXW5Iw8tE=	\N	f	lucas.almeida1@alu.paulinia.sp.gov.br	Lucas Gabriel De Almeida		lucas.almeida1@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:45.921463-03	25a6e71c-89e5-4a35-ac26-7ec79b8e2093	ESTUDANTE		f
+pbkdf2_sha256$1200000$09BeRvRDVp0WJLTpF9LpNC$YT5wh4qEHW88h9dYSFEaejGZZO342KtiBr1gKQruB80=	\N	f	luigi.silva1@alu.paulinia.sp.gov.br	Luigi Michilin Ribeiro Da Silva		luigi.silva1@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:46.405652-03	1e84a77f-58a5-459c-8c45-6c34bddeab46	ESTUDANTE		f
+pbkdf2_sha256$1200000$gs7tInBBpKRr1GqD34UGQW$PL8xX+jVRk56StOsTyXpxwwyTCMU4n5EStdxbnqY68E=	\N	f	luiza.conde@alu.paulinia.sp.gov.br	Luiza Conde Alexandre Rocha		luiza.conde@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:46.835819-03	e6b4b2e8-3861-4677-94a8-926b1ee1661a	ESTUDANTE		f
+pbkdf2_sha256$1200000$Yn9rtOwU8zeVxf4CUUV6YY$MVAsSMDt7baNGEJdQ5uMW9cWXlQqHlerK3Xa9TXFQgQ=	\N	f	marcelo.bodrini@alu.paulinia.sp.gov.br	Marcelo Brugin Bodrini		marcelo.bodrini@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:47.319377-03	58888f00-6a83-4661-b283-032745e1c3e3	ESTUDANTE		f
+pbkdf2_sha256$1200000$JE2Kf16AHMhSua0c85xwp8$3r+2/PGq0pj1d0Zp+7c9EUuAKfniCtaLnw7+X2xL4/M=	\N	f	marconi.neto@alu.paulinia.sp.gov.br	Marconi Feliciano Gomes Neto		marconi.neto@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:47.748558-03	c3450eae-6fa5-4efb-ab2d-d2388e9921be	ESTUDANTE		f
+pbkdf2_sha256$1200000$9KMsL6Uk70OdryV654bOt8$Wgls9Y7dHmfdJzEh8k0LfX6gE0KuYAMR/fuajpN1SR4=	\N	f	mateus.chaim@alu.paulinia.sp.gov.br	Mateus Iório Chaim		mateus.chaim@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:50.950097-03	d528f26a-fc32-48ca-98ba-84aa8ccadc5c	ESTUDANTE		f
+pbkdf2_sha256$1200000$LHKWSFLrH5n7EnMc1kOnbA$S7RdoXuWc8v4jLaTY89kXaPFnP/mH+jQFFEP9FRYA10=	\N	f	matheus.lanza@alu.paulinia.sp.gov.br	Matheus Lanza De Queiroz		matheus.lanza@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:51.396071-03	0dad555e-957e-4b01-a22a-ffdd3f9cef69	ESTUDANTE		f
+pbkdf2_sha256$1200000$KPjg0QGTl6by36oAnc98eu$VMZRKzbBJK9eDGpHEAtM5BxR5On2GQyu6I+muQQkMi0=	\N	f	mmiranda@alu.paulinia.sp.gov.br	Matheus Passos Miranda		mmiranda@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:51.880897-03	1f59849a-838f-4d4b-bfcc-5047f903248f	ESTUDANTE		f
+pbkdf2_sha256$1200000$DE3jklaj92xxypRKUxC1po$TFXcMcAmO2JbcYZtt+xjziLthI/ZTd/RXXYpqtmRHlo=	\N	f	mrodrigues@alu.paulinia.sp.gov.br	Max Pierre Da Silva Rodrigues		mrodrigues@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:52.31472-03	5b7b94af-64b3-4a3a-8aa1-46aba906c68d	ESTUDANTE		f
+pbkdf2_sha256$1200000$bMUBupWy4mjT1cEJe21vtU$8I4862dGxq/aaoQ3gPZIFpNwKw8sTOQ+Xci5vPlreBA=	\N	f	melissa.souza@alu.paulinia.sp.gov.br	Melissa Eloise Silva De Souza		melissa.souza@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:52.744913-03	feef97a6-0ab6-44e4-bd1d-b7e759af0462	ESTUDANTE		f
+pbkdf2_sha256$1200000$Y65J3kl0NSJ79B93B3A5G1$4p7YYtvHsZoHYRMAHTqxpC/TOHtfBxTVPliv5bzW/w8=	\N	f	mborcato@alu.paulinia.sp.gov.br	Miguel Luis Borçato		mborcato@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:53.21474-03	083d59e9-3d64-424e-a504-bc161943d208	ESTUDANTE		f
+pbkdf2_sha256$1200000$MAhvI8Y4AwC0T1WWkGcJ19$WadDXaF5BprruN2kAwo8LxtGy35kI2CF7n8ZDoELR4g=	\N	f	mcordeiro@alu.paulinia.sp.gov.br	Miguel Raboni Cordeiro		mcordeiro@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:53.644074-03	bda9815d-8b90-444b-b333-7344b9568e38	ESTUDANTE		f
+pbkdf2_sha256$1200000$S43KTwEUN8gM5RftlJczeY$GKcoggNi43MM6i7gLohQUCqMfcthWklaH7gibA5usHw=	\N	f	milena.castro@alu.paulinia.sp.gov.br	Milena Von Zuben Bueno De Castro		milena.castro@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:54.105019-03	a41dd7c2-4ac9-4bef-ba4e-4fe2fe77e365	ESTUDANTE		f
+pbkdf2_sha256$1200000$0Tp8U1BK4OhvpsEKmFvVDv$3H2A1HaCWPLgC1NzYFJ0IeHiP8U8i8VOwnGcU9Z9AXw=	\N	f	mirela.kimura@alu.paulinia.sp.gov.br	Mirela Harumi Kimura De Souza		mirela.kimura@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:54.537305-03	1dd63807-db1c-441b-9b42-d15e70c04650	ESTUDANTE		f
+pbkdf2_sha256$1200000$hFATZcVCAAS30Y4P7zhu5X$1lLk5voGnjF/HvIGdEbfHVuIYoA9MVypAo28u1hcJFE=	\N	f	mrosa@alu.paulinia.sp.gov.br	Mirella Maria Rosa		mrosa@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:54.972551-03	3bd9681d-1bd5-481b-8560-3eb54a68308a	ESTUDANTE		f
+pbkdf2_sha256$1200000$xBDRaoFg39pJUMRvLieEOs$69sB052NBJqNlftWlouulzdM+TylOssD6IWxyZKrNLE=	\N	f	mbsouza@alu.paulinia.sp.gov.br	Murilo Di Blasio Souza		mbsouza@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:55.440345-03	8381501a-1f02-497b-bd09-b0e4b63335ba	ESTUDANTE		f
+pbkdf2_sha256$1200000$KhpXGAOTYZdX311LIxuzZf$3pzOjy5Pb/VTmi75JstjVtufQLJ+SarhAMlZbr4DGl0=	\N	f	nmoreira@alu.paulinia.sp.gov.br	Nicole Emanuella Oliveira Moreira		nmoreira@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:55.869576-03	4bb76a5a-70c0-4f91-9724-cf6889ea3877	ESTUDANTE		f
+pbkdf2_sha256$1200000$306HcjslvrlEBnp2VFBpKO$BBJ4Onr2hEdZtNr54t2rS0X9FtvBN0AQFjy63FJvIUk=	\N	f	raul.sotero@alu.paulinia.sp.gov.br	Raul Barrella Sotero		raul.sotero@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:59.041687-03	d9903284-2c9b-4a2e-959b-65c8d4a66adb	ESTUDANTE		f
+pbkdf2_sha256$1200000$zG6qpbcGj5mkyxETcIhroD$uSuQtaKedP6XXH72M3YqknLSvU+W1My9FSDxWJx5ryc=	\N	f	rrodrigues@alu.paulinia.sp.gov.br	Rayssa Gabrielle Macedo Rodrigues		rrodrigues@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:59.497118-03	57b4030d-2ed3-411d-8239-b1d22bc88d2f	ESTUDANTE		f
+pbkdf2_sha256$1200000$ucutGWuZfNSvcRBVYNEBVV$42XFnLN+o4j9iY10VveOk1p9gbB9mbOOU2HruVgMPtg=	\N	f	renan.s.ribeiro@alu.paulinia.sp.gov.br	Renan Dos Santos Ribeiro		renan.s.ribeiro@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:59.930435-03	f65dcaa5-adeb-48ed-b05c-e07ba96024d0	ESTUDANTE		f
+pbkdf2_sha256$1200000$5Hd77e6ssZfCqyzVfDdVJD$udTG+iSFOAfszbG3NksjZ0aXVvoMFdZH02AKc2XvoiE=	\N	f	rchionha@alu.paulinia.sp.gov.br	Rodrigo Braz Chionha		rchionha@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:00.363529-03	5356efbd-2de2-42d4-9d03-34ac4136e76a	ESTUDANTE		f
+pbkdf2_sha256$1200000$6oPFYBTB6dniEfZXgzIusI$wIqVxBlr5dvoEaw08uKxegjD2GS4VpeVdTDFt889GyQ=	\N	f	rmuniz@alu.paulinia.sp.gov.br	Ryan Dias Muniz		rmuniz@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:00.846011-03	6f5aae83-8c86-4d5a-a622-8a4eff71135c	ESTUDANTE		f
+pbkdf2_sha256$1200000$6fA7zjDos8hsEp14O5dfxZ$cd/hJSiz+gpcSIm78Sa+QYGcIg13qO3DGD6MOffKb3w=	\N	f	ryan.jacundina@alu.paulinia.sp.gov.br	Ryan Guilherme Jacundina		ryan.jacundina@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:01.277646-03	bce51e9c-b070-4dbf-bf58-0d28aaaa0f2f	ESTUDANTE		f
+pbkdf2_sha256$1200000$MoUd8pRi1qkqs1r0sAbwVI$TkfozV9esFrjioT3bKfoP4fl2NgPJQhWfpJeKlynRqg=	\N	f	ssilva@alu.paulinia.sp.gov.br	Sara Dos Santos Silva		ssilva@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:01.75925-03	190debb8-2963-4d41-86f1-309206077b7a	ESTUDANTE		f
+pbkdf2_sha256$1200000$rtX9niSb4o0GWAXIcQTUJd$GhTd7sOBHgnTL3AWiwuMBTHlFIFjxHSaqw53DZx+HRM=	\N	f	ssousa@alu.paulinia.sp.gov.br	Sarah Rebeca Farias Sousa		ssousa@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:02.19314-03	ecd1af05-d742-4ba9-bf71-0aa4959ce937	ESTUDANTE		f
+pbkdf2_sha256$1200000$d2Uo2DU5MKAHtIE6JVVFwZ$quqoOLtay7TInUXEWyI2bkYnQ9QZkhn5pP3QyNXvg/g=	\N	f	sarah.gomes@alu.paulinia.sp.gov.br	Sarah Thaynara Gomes Subtil		sarah.gomes@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:02.621784-03	e7fb3543-50f3-4f53-9752-fe057dedf146	ESTUDANTE		f
+pbkdf2_sha256$1200000$G2CTo5N0TU6KzRVFmq5y2W$NmSk+tv0KrjmYZmW24G2ig19XLQxEL3YRizV8VbEVZU=	\N	f	snmoraes@alu.paulinia.sp.gov.br	Sophia Novais Moraes		snmoraes@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:03.105147-03	838044f5-fba2-4c5f-9acb-89e0883148b2	ESTUDANTE		f
+pbkdf2_sha256$1200000$soFY1VUlBhZgAL59wcOgcV$ylVJsaQhAuIAgqJMUhttN2fstf2P90UEzbCarSBBi3Q=	\N	f	toliveira@alu.paulinia.sp.gov.br	Thiago Levi De Souza Oliveira		toliveira@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:03.539802-03	30d4411e-2d6b-4d9b-8b66-4ad96e4feec2	ESTUDANTE		f
+pbkdf2_sha256$1200000$MDbEBgRJ1TdvA66ATMOuWE$ym6oLPHNzeRGtEvSHEJ5bzptA75c00EUGCOYBXqkKAI=	\N	f	tsilva@alu.paulinia.sp.gov.br	Thiago Moda Da Silva		tsilva@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:04.02232-03	8569eb83-d6da-426f-aec5-2ca77df79b19	ESTUDANTE		f
+pbkdf2_sha256$1200000$uxtLR40Kaww6XMAA62y4Cq$7ODdQ4vJ1MHgVBtWJfglXUHqgp+5qG5ZF7dgQVrNano=	\N	f	21849793840	Zé Mané			f	t	2026-01-01 17:48:31.699546-03	c47af5ef-2116-42e3-aae1-160d02074af0	RESPONSAVEL		f
+pbkdf2_sha256$1200000$HEsZQdX5xPz3KTZIidsWFN$h+VJGB8E279FDRVNWWlN072PXKOoZfX9DomW9Lni114=	\N	f	maroa.silva@aluna.com	MAria da silvaa		maroa.silva@aluna.com	f	t	2026-01-01 17:48:26.96165-03	8078bdd3-ba6a-44fa-b66c-cb3e50f4941e	ESTUDANTE	profile_pics/7f0bbe91-5896-4ae6-8743-8295998e09b2.jpg	f
+pbkdf2_sha256$1200000$jrPKsttoKJc6a9XkDfvt4X$x/3LjkjEOnFtDNLIT+FMAOu5swpP98JZYERtMNtDxFg=	\N	f	acarneiro@alu.paulinia.sp.gov.br	Ana Maria Padilha Carneiro		acarneiro@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:07.58206-03	dac0af51-1522-4291-a26b-902fe5e467ac	ESTUDANTE		f
+pbkdf2_sha256$1200000$B0zfISBy7BUrggqXF63Wiu$4D7ONdQHNqjj643iquIbTqP0muSKnzN4Y/SWu/d5LJ4=	\N	f	ananda.santos@alu.paulinia.sp.gov.br	Ananda Gabrielly França Dos Santos		ananda.santos@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:08.019513-03	329c521b-b1e3-40f6-b5d5-34ae5d71d824	ESTUDANTE		f
+pbkdf2_sha256$1200000$R6WlGgVCBD90qrOM5K1mJo$2saAcSJFQLGjdYqzVGxGO1LDRTKxZ7op/lPzU24PeWY=	\N	f	anogueira@alu.paulinia.sp.gov.br	Apolo Almeida Fernades Nogueira		anogueira@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:08.511504-03	b693d0ac-b56e-4abc-bd8e-c6c0d07c8f3a	ESTUDANTE		f
+pbkdf2_sha256$1200000$kYnGTS6yHFkeehsSMHMvv1$p80mRMLOwysaS2Wg5JcSXDr2iYvhWfEGLMGR10saS3Y=	\N	f	arthur.fabri@alu.paulinia.sp.gov.br	Arthur Alexandrino Fabri		arthur.fabri@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:08.942517-03	4dbc4910-b3b2-4002-b481-f4ec47c3de5f	ESTUDANTE		f
+pbkdf2_sha256$1200000$WR7AJmkomN8o7qkVad4TpF$ZhGDuO+AkOZivCbb/AN1FBmA1sk/zE48FBKEHJgsSoI=	\N	f	arthur.rosario@alu.paulinia.sp.gov.br	Arthur Eduardo Rosario Pereira		arthur.rosario@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:09.383951-03	d8d0fe87-29bb-490e-b0bb-e0691dee7287	ESTUDANTE		f
+pbkdf2_sha256$1200000$HMh3aPWVfU70L9ruu5ySvu$1WWdYdADp29kVlust8vEI56fMd+YUzRDKioIW7Cw/Io=	\N	f	daniel.moreira@alu.paulinia.sp.gov.br	Daniel Moreira Da Silva		daniel.moreira@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:15.292961-03	7dba1164-2f11-4bbc-bb14-7d1f936254c8	ESTUDANTE		f
+pbkdf2_sha256$1200000$9BMPXjqboZEwtFrCMnMpTm$T87hRylrLYe5Ye3KNtsxbM28esSv7/sNUboeIYInsYo=	\N	f	dsurian@alu.paulinia.sp.gov.br	Danilo Correia Surian		dsurian@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:15.724262-03	771f1e6a-5a26-46da-9113-eacfcd8e7adc	ESTUDANTE		f
+pbkdf2_sha256$1200000$Q7iC6mMU5vYWG2ceCEKYGt$OmfBCrA7QCgn6dU6WJb/liOm3GJJf2Ps9J7LKZirYG4=	\N	f	davi.dias.silva@alu.paulinia.sp.gov.br	Davi André Dias Da Silva		davi.dias.silva@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:16.208163-03	00e9f13f-421d-4131-901a-3ae951066977	ESTUDANTE		f
+pbkdf2_sha256$1200000$2sOxz2l5oIQY9rz8PGdLFZ$3HeZSGVP1j2dT6NcZaPXY9syWc8Jj161d/UQr//zne4=	\N	f	dmaciel@alu.paulinia.sp.gov.br	Davi Barbosa Maciel		dmaciel@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:16.63848-03	12d24703-a561-4028-abd9-b51c0a348fdc	ESTUDANTE		f
+pbkdf2_sha256$1200000$yBE9NYG6PD2ErJC5c0wF0h$Ft6/rRiIRiMy66sV61b1sZRkRES3vKptGRLpUYh/DWI=	\N	f	davi.motta@alu.paulinia.sp.gov.br	Davi De Miranda Motta		davi.motta@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:17.085698-03	7aca0526-e0b6-4bb2-b471-f91438dfa029	ESTUDANTE		f
+pbkdf2_sha256$1200000$W3812nwaiXZxVmRIfymguQ$dKlgZ//bV8ps0bOFe+aGiCK9vo9ayITccm4J0Ttzcbg=	\N	f	vmartins@alu.paulinia.sp.gov.br	Vinícios Dos Santos Martins		vmartins@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:07.114712-03	efcc4045-f789-43f9-b43d-18c32c8d6521	ESTUDANTE		f
+pbkdf2_sha256$1200000$aNWpfVcJSl1d25KnVw8bIP$r6aS/VAJrJMMEye3MTcO1mGqMABG/avnQiC9UhLvs7A=	\N	f	vgatti@alu.paulinia.sp.gov.br	Vinicius Fernandes Gatti		vgatti@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:07.593084-03	ff7d9f9a-6f64-4d86-b5d8-9d6ca7e5fb8f	ESTUDANTE		f
+pbkdf2_sha256$1200000$WbKzFftVofpyZBb4LvFQtC$Ggl+5+zxqV5yBAIoFl9DXkDPZFWivw2wxb3Zv5E1F48=	\N	f	vfarias@alu.paulinia.sp.gov.br	Vinícius Gouvêa Farias		vfarias@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:08.023442-03	04e9508a-dcce-4304-814e-a866352c6760	ESTUDANTE		f
+pbkdf2_sha256$1200000$Sbl8CPKC1isWZmSTyWGOpL$7jCocH8OUzC0ndIsSrimAgG++uyla43vAKJ6z5Cn2WA=	\N	f	vinicius.m.camargo@alu.paulinia.sp.gov.br	Vinícius Martins De Camargo		vinicius.m.camargo@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:08.511547-03	d70ce22d-cd7c-42eb-9cb6-d18462802a3a	ESTUDANTE		f
+pbkdf2_sha256$1200000$moZGc9JBUFcgwlRidZx73l$CMQzwQIyaM1b41H+Ub4tNtZAWCfyrTjkrFxKn5ZksUg=	\N	f	vmarinho@alu.paulinia.sp.gov.br	Vinicius Souza Marinho		vmarinho@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:08.939753-03	6a38d88c-12a9-4784-b233-d45c90a74a26	ESTUDANTE		f
+pbkdf2_sha256$1200000$7GAiPeBDwJO3VFB81OUf4r$0DVOkJSltZwILc6/TIGqwEvVw1KE3EgiL7gHHvEX4+Q=	\N	f	vbreda@alu.paulinia.sp.gov.br	Vitor Pontes Breda		vbreda@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:09.371755-03	f4b71ef3-235c-49df-ae35-4015a7e418a0	ESTUDANTE		f
+pbkdf2_sha256$1200000$ly6en7q2VfEL0mbFpx7MFS$4LlvFpeVaqQ5vypABPXJrNonMisqOAmYm7IUuavAin0=	\N	f	vcorrea@alu.paulinia.sp.gov.br	Vitória De Almeida Carvalho Correa		vcorrea@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:09.846077-03	0c69f55c-301c-4cce-af4f-2a09508324cb	ESTUDANTE		f
+pbkdf2_sha256$1200000$NQiL26t0DoX9ZAB5AwAbhI$xGovSysG/hzDl+v/fs26nXSV8KWYL2Fadch12wyNdlw=	\N	f	davi.braganca@alu.paulinia.sp.gov.br	Davi De Souza Bragança		davi.braganca@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:17.586719-03	5d44f199-8cf5-4382-a923-98dad416ea32	ESTUDANTE		f
+pbkdf2_sha256$1200000$vVnL2kXd4nwv7kcc9yfLvF$nen07KHAedtrzSHf3pPj5vf9QNTOAej9JJ6W6Fs5tWk=	\N	f	f.pereira@alu.paulinia.sp.gov.br	Felipe De Oliveira Pereira		f.pereira@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:23.300275-03	e1a492b8-a9ab-40b9-8caa-b674bc68c262	ESTUDANTE		f
+pbkdf2_sha256$1200000$hgoEerDBRTQ2VyRlkyMkkK$okfvkrL5hyHjHZbgZ3pB6WxSFlze/eb1yAI2aBfKnmo=	\N	f	fandrade@alu.paulinia.sp.gov.br	Felipe Gusmão Andrade		fandrade@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:23.739004-03	fc46f783-8d0d-421c-8cfc-cbcf7893ecab	ESTUDANTE		f
+pbkdf2_sha256$1200000$bgxIv2rES6x5OinWjbsK47$/i1dneY9GUqTLykVIwQ+HQEGHdetbMRRgU0aydfb/jQ=	\N	f	fteodoro@alu.paulinia.sp.gov.br	Felipe Teodoro		fteodoro@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:24.235564-03	42b6624a-0701-4097-ae6f-8e21a45c3595	ESTUDANTE		f
+pbkdf2_sha256$1200000$qesu56RofgVYwj7Q11uIx2$kbf4iXbZPBL9y/4ahFJJ9RnF1VWHem5shHQsxywtZbY=	\N	f	fernanda.toledo@alu.paulinia.sp.gov.br	Fernanda Gabriely Tavares Toledo		fernanda.toledo@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:24.671316-03	6d7f4c92-e33c-4b5d-aa99-3f8a2439429e	ESTUDANTE		f
+pbkdf2_sha256$1200000$XDSiVTwda5z4NqIghOHsIH$tnBmWY+1ycJfA6BwBd3vrI5iVF3wFAQThQIPi1y7qJE=	\N	f	fernanda.santos@alu.paulinia.sp.gov.br	Fernanda Montrezol Dos Santos		fernanda.santos@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:25.136653-03	c4e411c6-195c-4cc8-88c8-b060c162044a	ESTUDANTE		f
+pbkdf2_sha256$1200000$KuwgT2XLnQpazt9fpn3J77$qnLn8X0mHVvUdDkuFhrFZA01P4mMEPYRStCyXjTlAF8=	\N	f	gabriel.alan@alu.paulinia.sp.gov.br	Gabriel Alan Cunha Silva		gabriel.alan@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:25.577913-03	b3d8a629-387c-4323-81b8-aa9d630371f7	ESTUDANTE		f
+pbkdf2_sha256$1200000$yJRfocXfUWumqTkwPfwEJw$cZ1aQEWWZFfjVbAIvHptF4FIBi7Cyv7SUX6V8VFAFH0=	\N	f	gabriel.carlos@alu.paulinia.sp.gov.br	Gabriel Carlos Da Silva		gabriel.carlos@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:26.011582-03	ff464b8a-22c0-466d-ab78-984f6f248dbe	ESTUDANTE		f
+pbkdf2_sha256$1200000$f1XmuouTJqWssMN8jRUVBe$nlWVf8XdCciSj1HAdSOhyTQJRel+u7L7r+84GETzogc=	\N	f	hcarvalho@alu.paulinia.sp.gov.br	Heloísa Maria Carvalho		hcarvalho@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:32.020162-03	a0d76dcd-c932-47e6-a292-2b8d1d6c25c0	ESTUDANTE		f
+pbkdf2_sha256$1200000$8Endg5V0lahLKmM0P3m4cX$3m/bbCAZcdFYrKOXXqqRvYh/MI1InEfg5k/l9Rqbks4=	\N	f	hnakasone@alu.paulinia.sp.gov.br	Henry Kaito Yamanaka Nakasone		hnakasone@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:32.450862-03	96086df0-8051-4909-b5f3-69c7ab51fed7	ESTUDANTE		f
+pbkdf2_sha256$1200000$kbjvX4qxTnZg4Asbc6OfeR$jQUIJDQnmMiLGYF9lpp/Qhly+DD3T+1/uEnmyViLyS4=	\N	f	igor.alves@alu.paulinia.sp.gov.br	Igor Portal Alves		igor.alves@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:32.932482-03	cb04fb0d-4a0b-4563-a925-47b27bf77407	ESTUDANTE		f
+pbkdf2_sha256$1200000$09oHXA6JWEGEGi5fXW4BJL$Gbrmtjm3G3KJ2xc5a6Klln+0MPAjaEOiZRxlABQmL8Y=	\N	f	isa.santos@alu.paulinia.sp.gov.br	Isabela Lourenço Dos Santos		isa.santos@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:33.36308-03	26e5d500-98ed-4c41-a455-ba45de89bc35	ESTUDANTE		f
+pbkdf2_sha256$1200000$Jlx4pgBTWfSiOWeHdFLANt$wfKl/vjdvUy/Y2CMAlFFelSmCO8b0TyJ8XrvcQ0XsVs=	\N	f	icassiano@alu.paulinia.sp.gov.br	Isadora Nascimento Cassiano		icassiano@alu.paulinia.sp.gov.br	f	t	2026-01-02 08:22:31.665267-03	cbbac458-c9a1-481a-ba01-aefd3d3c2688	ESTUDANTE		f
+pbkdf2_sha256$1200000$J7YEQlKNjpxhGKTkUd7scK$WQ1MaDwNjjAhLcHXOaCk3WTnisNHSWjSWU3UTbp3RSk=	\N	f	jbrito@alu.paulinia.sp.gov.br	Joanna Francisca Silva Brito		jbrito@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:33.794016-03	e73b287f-236f-4c8e-be54-b6efaac3d876	ESTUDANTE		f
+pbkdf2_sha256$1200000$Bj4nRdXzMbxMYdq86ey7G9$Na/1/1Wdk6jbQg6+uLq90m4fmeS6tEV3YW51iemGNW0=	\N	f	jscaramal@alu.paulinia.sp.gov.br	João Gabriel Carvalho Scaramal		jscaramal@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:34.268982-03	07447079-39f2-4398-9150-18718af0423e	ESTUDANTE		f
+pbkdf2_sha256$1200000$vQpejwPQRITPCnzJy7mB6K$nrx//aXXxMNL0zDvV/cOTeoISN82NU+2e+ZNRYGcv6A=	\N	f	ksilva@alu.paulinia.sp.gov.br	Kauan Lopes Da Silva		ksilva@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:39.651257-03	aaa21340-f32d-4062-97b6-c56eac7064f3	ESTUDANTE		f
+pbkdf2_sha256$1200000$QZud7S2XPcncHMn5DBciwJ$LzP4Q2Iz0seKREXkGNtOVuFCVdmx9fDijPNsNNTTyYw=	\N	f	kmsilva@alu.paulinia.sp.gov.br	Kemilly Manueli Torres Da Silva		kmsilva@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:40.080886-03	5974d74a-7591-4fcb-9932-8890c0d12c0c	ESTUDANTE		f
+pbkdf2_sha256$1200000$qOdbx7wscML1pufcawWVWo$Xf73ak0xE7dRGBty80XwH1hhjFZOLTy2gBTHX6X/Yws=	\N	f	kimberly.camara@alu.paulinia.sp.gov.br	Kimberly Lara Rodrigues Camara		kimberly.camara@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:40.513978-03	8b345727-9180-4ca8-ad16-76003f8780a5	ESTUDANTE		f
+pbkdf2_sha256$1200000$ZLHOxazNcu9FWWqNBQ3tID$lV6JnFBpVG1NDr/qVvjgnFAyv5HWsxBa0jYvDpKqiRA=	\N	f	lavinia.alvarenga@alu.paulinia.sp.gov.br	Lavínia Lahr Alvarenga		lavinia.alvarenga@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:40.995995-03	af50bf39-c4ec-4bfb-909f-bab6bee405c2	ESTUDANTE		f
+pbkdf2_sha256$1200000$kfA8WegU83gom7r1VP4XVA$YkJWWK7ifNn0dAY7Rd5crIbWHouzPnnnHQXEdvEMdP4=	\N	f	leonardo.araujo@alu.paulinia.sp.gov.br	Leonardo Araújo De Oliveira		leonardo.araujo@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:41.433319-03	84410c31-9e2f-4a76-a13c-34bdf8eaa5eb	ESTUDANTE		f
+pbkdf2_sha256$1200000$qaG1FSikHAPJnoqFBtqvDf$IIMVwJrxVxBUW7UVBIqDuSE5HdV/owh2ubaYBqsEcu0=	\N	f	leticia.camilo@alu.paulinia.sp.gov.br	Letícia Assis Camillo		leticia.camilo@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:41.915182-03	645b83ba-cffe-43d2-893a-e9a254db7335	ESTUDANTE		f
+pbkdf2_sha256$1200000$WJrrwFxNKub2Wqac3LBwqS$Nm2f8pehQj30mdl8mrd5UAVDzajsNaVdQRxX071eQJc=	\N	f	leticia.vedovello@alu.paulinia.sp.gov.br	Letícia De Paula Vedovello		leticia.vedovello@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:42.34817-03	917b575e-3d7f-4f35-9ddd-5bbd84fb2c7b	ESTUDANTE		f
+pbkdf2_sha256$1200000$cCSztSJvpKpxY8iUAN5ihn$CnS82xGZBT/Th+ciJ8MTcdvO9ziBY9KTqGPB3QPkVkU=	\N	f	mbatista@alu.paulinia.sp.gov.br	Marcos Oliveira Batista		mbatista@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:48.18267-03	77d49c59-3063-4b35-b8b0-19d64e1ae3c5	ESTUDANTE		f
+pbkdf2_sha256$1200000$9dIu2uBqVNrHBBCw26hXGB$yvax6jYg/N6xM/Tb3vrx8UnqqaAJvmlL8ln0S3zujQ4=	\N	f	mcalcagno@alu.paulinia.sp.gov.br	Maria Clara De Camargo Calcagno		mcalcagno@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:48.665196-03	7abd721a-1c13-4fbd-ad86-574c9859e263	ESTUDANTE		f
+pbkdf2_sha256$1200000$jNW66OuZOHEm60elOQrfbO$exwWz74BVfL8r826P6iitan4KZA1MJOTc0HpZRL+TrM=	\N	f	maria.soriano@alu.paulinia.sp.gov.br	Maria Eduarda Soriano		maria.soriano@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:49.094092-03	4d3d1ba1-3700-41f6-baf1-e9e2f34e27f8	ESTUDANTE		f
+pbkdf2_sha256$1200000$U879BZCh4qStBcItY9ooSP$Q3wLV3yS8kMTg/mQw5S1Vo52K+Z3p//+AzfDwgW7s4g=	\N	f	mcardoso@alu.paulinia.sp.gov.br	Maria Gabriela Fontes Cardoso		mcardoso@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:49.580876-03	bd9db399-5953-4863-9e57-a98be6409d41	ESTUDANTE		f
+pbkdf2_sha256$1200000$3O8r8chL7UlKZmKPbaQgW6$0uAUhvZVnH9cRsxnCLMXDIlsNBtxWX9bu91anOBzXAY=	\N	f	mariana.silva1@alu.paulinia.sp.gov.br	Mariana Ap. Dos Santos Silva		mariana.silva1@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:50.011932-03	22f6a4a3-1999-4ac9-b8d4-87a171801224	ESTUDANTE		f
+pbkdf2_sha256$1200000$4AlXHhkIzgAVBdrIonDgLU$nUfHdbSr7vnK8Xc2ypZaT/LMfSURbYswT51X4bA6NFc=	\N	f	mariana.padua@alu.paulinia.sp.gov.br	Mariana D'Elia Vinhal De Pádua		mariana.padua@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:50.444069-03	ceca08a5-ca4e-42d1-a450-440ec3d92ab2	ESTUDANTE		f
+pbkdf2_sha256$1200000$2QouXaiNFTqu79D9pAFNA0$sG9mob+cXsl1VtxT3v8k02vAMFMMZG4vUmi0jenLkcw=	\N	f	nvicente@alu.paulinia.sp.gov.br	Nina Chaves Vicente		nvicente@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:56.352037-03	74b8ea22-2fe1-491e-a8a6-fd7cabb57a1b	ESTUDANTE		f
+pbkdf2_sha256$1200000$N71IQYNCz3aWUm42cdApks$JTBHgJ5F9YS/ilBFdHu0b9tixo9y22sXAxqBbxrvg5E=	\N	f	pedroh.fernandes@alu.paulinia.sp.gov.br	Pedro Henrique Pires Fernandes		pedroh.fernandes@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:56.781166-03	8e7e0561-8fd4-4c3e-9009-33ad1b3c1d6a	ESTUDANTE		f
+pbkdf2_sha256$1200000$T5bIcOhj1XGXOawy7J9zDq$k1+5Dkrhx2OTlHigQ1nuLSqdyid37vkzIMa9aej1wDc=	\N	f	pbauman@alu.paulinia.sp.gov.br	Pedro Henrique Teixeira Bauman		pbauman@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:57.237392-03	5dd12b97-4a30-4489-980e-a825750218cb	ESTUDANTE		f
+pbkdf2_sha256$1200000$JLcEiwftX1irQInVcRGAdv$0565TRf4yc+IGa9Zp/rbb9zxGR80UHsitsJX/PPnFrk=	\N	f	rcastilho@alu.paulinia.sp.gov.br	Rafael Souza Castilho		rcastilho@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:57.695658-03	ec89b232-3727-4e00-9691-66342eb61a83	ESTUDANTE		f
+pbkdf2_sha256$1200000$aOy1xBGZohGxzQB8ioJwnf$mgs4sSuk53NRxysyKGwxMuuQib8I9cqjFzmMTo0703U=	\N	f	rafaella.anjos@alu.paulinia.sp.gov.br	Rafaela Bacan Dos Anjos		rafaella.anjos@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:58.125637-03	56ae2b7f-db75-4a1a-aa01-c3bda9b6d659	ESTUDANTE		f
+pbkdf2_sha256$1200000$KKn3jDxx6AuzYiSNsT9qcc$JgQhmvwne/Pt8gH5i5Ks4cWndUeMisxvuxAtPgEm8UU=	\N	f	rafa.munsignatti@alu.paulinia.sp.gov.br	Rafaela Oliveira Munsignatti		rafa.munsignatti@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:46:58.612192-03	828ea03b-9c89-475d-841a-8584d6f0dad6	ESTUDANTE		f
+pbkdf2_sha256$1200000$qORfmqqdXwUbJDc6tziH0a$zyaXXd5715o+3Sn71cNMMDEvR6I21qcbuD+3t55fDB4=	\N	f	thiago.m.moretti@alu.paulinia.sp.gov.br	Thiago Moreira Moretti		thiago.m.moretti@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:04.455045-03	9bf06e22-57ed-4dcc-9161-8b8d9533c460	ESTUDANTE		f
+pbkdf2_sha256$1200000$9iqX77aomuyNICdvszT45x$5Sd/W8zEn41pUTqM4XQwR8P/o3qe2vhYkuQRKFCTpYg=	\N	f	valentina.mascarenhas@alu.paulinia.sp.gov.br	Valentina Gonçalves Mascarenhas		valentina.mascarenhas@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:04.884641-03	fae96661-c2ea-4f9d-9e31-5b7dedb4ac1a	ESTUDANTE		f
+pbkdf2_sha256$1200000$8nL2NXlfOHddWYr8chU8eq$n1wabm7TqnL9kL6rYpHFrXphX6MfObHjJEXqcJXLZKQ=	\N	f	vpadovini@alu.paulinia.sp.gov.br	Victor Hugo De Freitas Padovini		vpadovini@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:05.326771-03	f1a4a4d1-17f7-4c93-b5d8-ee9c76c0d6b7	ESTUDANTE		f
+pbkdf2_sha256$1200000$0h707Aonp6lcmT8XM9kh8i$cOJXlSnH7qV5ARjlo9Z3BWa8WQXmIzbUloV/PdP9ZpA=	\N	f	vitorhugo.pinheiro@alu.paulinia.sp.gov.br	Victor Hugo Pinheiro Gonçalves		vitorhugo.pinheiro@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:05.757848-03	5a47a696-9dcb-4731-acd5-4cc2f915e0bb	ESTUDANTE		f
+pbkdf2_sha256$1200000$NFSAc4IMTpizqVxv3rGwCN$Dq1R+gflxTuBDiXynRnG7VBHjr1DLqHAmX3ch7Tx+hc=	\N	f	vthomaz@alu.paulinia.sp.gov.br	Victor Hugo Thomaz		vthomaz@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:06.241892-03	b354da12-f4b4-44dd-881b-bc22b1353184	ESTUDANTE		f
+pbkdf2_sha256$1200000$wFO4X0HLDCtW6xO7XBNjuh$vnaQqQ83NMQoPVr5InwCIeuHztH3rB3Qdn6DAYeSEeU=	\N	f	nakamura@alu.paulinia.sp.gov.br	Victor Yuuki Nakamura		nakamura@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:06.685598-03	1f2f0cb4-fcf2-4179-ad55-2b295b40b81d	ESTUDANTE		f
+pbkdf2_sha256$1200000$CiW3VLECwQlwsb2BGN5XX4$b4NKIGXwCfonmw1rQT63aSEVbIdGS5TQvYgl77sSd0E=	\N	f	walves@alu.paulinia.sp.gov.br	Willian Leme Alves		walves@alu.paulinia.sp.gov.br	f	t	2026-01-02 08:22:32.649444-03	026bdd52-aaa3-4cab-857b-0b9f1dc0c601	ESTUDANTE		f
+pbkdf2_sha256$1200000$j8AtPb6Zl00WQ4LaIKvUM8$GYFn/8xXmPx6WraIjghfUa7Etosx11QgmPj+435KO4U=	\N	f	yago.borges@alu.paulinia.sp.gov.br	Yago Fellipe Dos Santos Borges		yago.borges@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:10.312784-03	9f7c2f3b-c9ae-44a4-83c0-3209a18a95cf	ESTUDANTE		f
+pbkdf2_sha256$1200000$QHIKRtLXUpocPY0WRKefbL$6MDalJp18SZTL5dHKGm21YLWV7oD5FcZV5NBZ2aEHlU=	\N	f	ymassuda@alu.paulinia.sp.gov.br	Yasmin Kaori Massuda		ymassuda@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:10.825359-03	05436e9b-2716-41e2-8667-0fba732a8c09	ESTUDANTE		f
+pbkdf2_sha256$1200000$bLuzC0Tijy49ZGHGEa6280$EtvIKFCwgEqxD/erYkd8nurUqAsfxAk+pXWea32dQ/E=	\N	f	yuri.purcino@alu.paulinia.sp.gov.br	Yuri Coêlho Purcino		yuri.purcino@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:11.265807-03	4e7fd19d-6832-45ac-bb2e-190072270e93	ESTUDANTE		f
+pbkdf2_sha256$1200000$Jroj7brn2HwpIaleDn6072$WFFpDw5MPrYkl8PN4+J+fqgwZKGiLj9Dpzr58d14Za4=	\N	f	zakeu.sousa@alu.paulinia.sp.gov.br	Zakeu Goveia De Sousa		zakeu.sousa@alu.paulinia.sp.gov.br	f	t	2026-01-01 17:47:11.755654-03	5308e24c-2ff8-4354-973b-bf93e610eb0e	ESTUDANTE		f
+pbkdf2_sha256$1200000$kqGadAjbkzMVxdm4OWp8m5$IAAG4dAzwqpJZiqrBpMKFpyA9XxeR8qf/bAyzkfy4HA=	\N	f	82759	Alcimar Veiga Lima De Melo		alcimar.melo@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:33.09008-03	4fae9619-a546-448f-8a68-c6f7eac9252e	PROFESSOR		f
+pbkdf2_sha256$1200000$3Kk7n59wVXKUuu25SZubWL$pH3VE/zbepsaoEnhxfYV2uJTYt57G/CiLRN3OATv+nA=	\N	f	89567	Rafael Bonato		rafael.bonato@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:33.532677-03	5b2a912a-00cb-4385-bfb8-b70dc502ac3c	PROFESSOR		f
+pbkdf2_sha256$1200000$AWIalnke9kgllzwo7hGLI1$HdXO7jfiTLBdwMRSsOCoLibB79zXX+i1TSNWdJXrYx4=	\N	f	89257	Carmem Ap Dos Santos Bornancin		carmem.bornancim@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:33.965218-03	ea41830b-ef51-41fe-9ab8-3d1e5d7d6ca4	PROFESSOR		f
+pbkdf2_sha256$1200000$Qa1DVOCkdCyxr2dSn9yU9l$doTQd/nJ3FO3uUEHEzNayufgWqRhdo5zeACNn01wMKc=	\N	f	116270	André Luiz Ricardo Cantalogo		andre.cantalogo@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:34.398592-03	29728c02-b192-4dbe-b458-eca5b4bc121f	PROFESSOR		f
+pbkdf2_sha256$1200000$OaI7bIJUYONN1ycX3H6MKT$SHoH1kgeegsCbnQ8BoJ6pJLyDQq+oblraquyD3N5jMU=	\N	f	73920	Cesar Augusto F Balbino		cesar.fbalbino@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:34.84993-03	2d6d3569-95c2-41bf-bc9a-133c9866d045	PROFESSOR		f
+pbkdf2_sha256$1200000$ExoxCGtl5uBgb5nEediYj2$rut0qpl2sOrlVGTEmmbmHnS70BVKR0Rc+8TezGwqeVA=	\N	f	141488	Wagner Lafaiete De Oliveira Junior		wagner.junior@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:35.329132-03	95cd5055-275c-4796-afcb-e50b3323caa3	PROFESSOR		f
+pbkdf2_sha256$1200000$iXIsqONxdauOtDsP0PHZWq$37SzxQpkiT+b+Yf8C5QjkmllpV1yPl/lTqdTHDTQXvg=	\N	f	89044	Daniel Teixeira Almeida		daniel.almeida@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:35.763971-03	da971c2f-284c-428e-b119-f291a0a222ea	PROFESSOR		f
+pbkdf2_sha256$1200000$NtOBWd4zFotqKZzVX7htMM$nX/mlN8XlT0tIGOuxPVYyzdpEjSMBQVDc9k1I/kbZA0=	\N	f	141161	Sara Badra De Oliveira		sara.oliveira@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:36.249678-03	3d649e46-bb42-47d3-a8bb-dbe0e41e52f3	PROFESSOR		f
+pbkdf2_sha256$1200000$wCX34xVHJ3oZLgKq8opSbl$fPstKAIR5ECGyPrGXbO7E1ElGbS5RPAuW3R5U1h5Vhg=	\N	f	157775	Paulo Barbosa Iamanaka		paulo.iamanaka@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:36.680034-03	5151115a-a83a-4642-815e-6bc1632f9f6b	PROFESSOR		f
+pbkdf2_sha256$1200000$ciOlngoUSSLPJgycrqZHeU$Lw6wA2arV6yM940ic1TarqakyMFFHOqJzzrztdgwvYo=	\N	f	135577	Juliana Cecconelo Ramos		juliana.ramos@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:37.150175-03	4ef8f829-082c-459a-8390-67482e3d52fa	PROFESSOR		f
+pbkdf2_sha256$1200000$EEfuDzfRbvkAPNZt6KRBSe$/N1ZXSUkgf4IQXkNnFi7LlL0Ifd9AUNl5w0rSqv7uS0=	\N	f	71081	Raquel Cristina Bertolini Lot		raquel.lot@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:37.598652-03	c1cc4602-83b8-4d3f-b78b-660370278070	PROFESSOR		f
+pbkdf2_sha256$1200000$AeMdUVgShIii2am68RC3EC$VCFjXBq8hQgOLxC894pg54KCZi0voY7JYxxX6V8lJJw=	\N	f	52469	Ana Lucia D´ Elia Vinhal R De Sousa		ana.vinhal@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:38.02939-03	672de93a-4007-4248-9f40-36a46e005db7	PROFESSOR		f
+pbkdf2_sha256$1200000$7vpuMb2pkQ0h5aRMNkAQKo$kniCbl1yC4juUtYPcyujPL8MjclZz2BLDcy8woT566w=	\N	f	130176	Amanda Christine Da Silva Sponton		amanda.sponton@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:38.510527-03	1a5b9361-7e9b-4f16-83c5-782c4011b528	PROFESSOR		f
+pbkdf2_sha256$1200000$G0ysjm7Xxp1DlCAYSkE3Lx$E8JR107OesgQFVGObHsLYQhk1rnrYc5u4Ly6LWRT+E8=	\N	f	52582	Fabiana Cristine Gonçalves		fabiana.goncalves@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:38.95274-03	5ea39008-309d-42d0-8ec5-8c7ac432c21e	PROFESSOR		f
+pbkdf2_sha256$1200000$Lzjy5QRky8L51tmQ7oRtq6$MGDKT8HHViHpKoObjn3b9Tm8uZGnWtPQJnJ0ZvyFrvI=	\N	f	95109	Cilene Vicente Dos Santos		cilene.santos@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:39.430676-03	8f64b77f-e569-4777-b619-46f1431c1d69	PROFESSOR		f
+pbkdf2_sha256$1200000$7Tes4RA9C1xGoz3FeREuzg$l7ApVkWCpiSQ6mW3Fa45RrsNhGuelKXopOFosz2iT2c=	\N	f	71064	Mirella Christine C C Ganzarolli		mirella.ccganzarolli@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:39.86111-03	6a7810cf-2fe8-41fa-ac1b-3ed81c2eeb4c	PROFESSOR		f
+pbkdf2_sha256$1200000$Qb06U7qv7UMIXd1PEzcYjM$7WKKwtYEw9aNEZ1NJfYz7dbhsfSLXT0Faccny0Pavqw=	\N	f	1000	Marister Aparecida Gomes De Godoi		marister.godoi@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:40.300071-03	482d6328-c93a-499f-9314-e774815c5339	PROFESSOR		f
+pbkdf2_sha256$1200000$Xuf2eUrmSlWSDNqkNnYeDi$6PbhJdEoZEqwwyrdP3CoyJTwIqGk0xy9vHojsvD+VF8=	\N	f	70980	Luciane Tomie N Shimozono		luciane.shimozono@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:40.736379-03	e533a8dc-b681-44e2-9002-a6096365cece	PROFESSOR		f
+pbkdf2_sha256$1200000$9S81WVrxHxPiWYoACsf3Mv$iOGiOV+E0AdlZiMIr0+wUrpi0oUKAmigRxFqILC6ll4=	2026-01-02 09:16:19.546859-03	f	123242	Diogo Pelaes Franco Pereira		diogo.pelaes@prof.paulinia.sp.gov.br	f	t	2026-01-02 08:33:41.16927-03	f601ece2-8f7d-4550-aca8-d0069f139745	PROFESSOR		f
+\.
+
+
+--
+-- Data for Name: users_user_groups; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users_user_groups (id, user_id, group_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: users_user_user_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users_user_user_permissions (id, user_id, permission_id) FROM stdin;
+\.
+
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.auth_group_id_seq', 1, false);
+
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
+
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.auth_permission_id_seq', 232, true);
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.core_anoletivo_dias_letivos_extras_id_seq', 4, true);
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.core_anoletivo_dias_nao_letivos_id_seq', 11, true);
+
+
+--
+-- Name: core_turma_professores_representantes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.core_turma_professores_representantes_id_seq', 1, false);
+
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.django_admin_log_id_seq', 442, true);
+
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.django_content_type_id_seq', 58, true);
+
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 32, true);
+
+
+--
+-- Name: management_aviso_destinatarios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.management_aviso_destinatarios_id_seq', 1, false);
+
+
+--
+-- Name: management_reuniaohtpc_presentes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.management_reuniaohtpc_presentes_id_seq', 1, false);
+
+
+--
+-- Name: management_tarefa_funcionarios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.management_tarefa_funcionarios_id_seq', 1, false);
+
+
+--
+-- Name: pedagogical_planoaula_habilidades_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pedagogical_planoaula_habilidades_id_seq', 1, false);
+
+
+--
+-- Name: pedagogical_planoaula_turmas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pedagogical_planoaula_turmas_id_seq', 1, false);
+
+
+--
+-- Name: permanent_registroprontuarioanexo_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.permanent_registroprontuarioanexo_id_seq', 1, false);
+
+
+--
+-- Name: users_user_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_user_groups_id_seq', 1, false);
+
+
+--
+-- Name: users_user_user_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_user_user_permissions_id_seq', 1, false);
+
+
+--
+-- Name: academic_atestado academic_atestado_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_atestado
+    ADD CONSTRAINT academic_atestado_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: academic_estudante academic_estudante_cpf_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_estudante
+    ADD CONSTRAINT academic_estudante_cpf_key UNIQUE (cpf);
+
+
+--
+-- Name: academic_estudante academic_estudante_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_estudante
+    ADD CONSTRAINT academic_estudante_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: academic_estudante academic_estudante_usuario_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_estudante
+    ADD CONSTRAINT academic_estudante_usuario_id_key UNIQUE (usuario_id);
+
+
+--
+-- Name: academic_matriculacemep academic_matriculacemep_estudante_id_curso_id_e693898d_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculacemep
+    ADD CONSTRAINT academic_matriculacemep_estudante_id_curso_id_e693898d_uniq UNIQUE (estudante_id, curso_id);
+
+
+--
+-- Name: academic_matriculacemep academic_matriculacemep_numero_matricula_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculacemep
+    ADD CONSTRAINT academic_matriculacemep_numero_matricula_key UNIQUE (numero_matricula);
+
+
+--
+-- Name: academic_matriculacemep academic_matriculacemep_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculacemep
+    ADD CONSTRAINT academic_matriculacemep_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: academic_matriculaturma academic_matriculaturma_matricula_cemep_id_turma_0c8af67a_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculaturma
+    ADD CONSTRAINT academic_matriculaturma_matricula_cemep_id_turma_0c8af67a_uniq UNIQUE (matricula_cemep_id, turma_id);
+
+
+--
+-- Name: academic_matriculaturma academic_matriculaturma_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculaturma
+    ADD CONSTRAINT academic_matriculaturma_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: academic_responsavel academic_responsavel_cpf_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavel
+    ADD CONSTRAINT academic_responsavel_cpf_key UNIQUE (cpf);
+
+
+--
+-- Name: academic_responsavel academic_responsavel_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavel
+    ADD CONSTRAINT academic_responsavel_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: academic_responsavel academic_responsavel_usuario_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavel
+    ADD CONSTRAINT academic_responsavel_usuario_id_key UNIQUE (usuario_id);
+
+
+--
+-- Name: academic_responsavelestudante academic_responsavelestu_responsavel_id_estudante_c0b18ca7_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavelestudante
+    ADD CONSTRAINT academic_responsavelestu_responsavel_id_estudante_c0b18ca7_uniq UNIQUE (responsavel_id, estudante_id);
+
+
+--
+-- Name: academic_responsavelestudante academic_responsavelestudante_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavelestudante
+    ADD CONSTRAINT academic_responsavelestudante_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_group auth_group_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group
+    ADD CONSTRAINT auth_group_name_key UNIQUE (name);
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_permission_id_0cd325b0_uniq UNIQUE (group_id, permission_id);
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_group auth_group_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group
+    ADD CONSTRAINT auth_group_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_permission auth_permission_content_type_id_codename_01ab375a_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_content_type_id_codename_01ab375a_uniq UNIQUE (content_type_id, codename);
+
+
+--
+-- Name: auth_permission auth_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_anoletivo core_anoletivo_ano_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo
+    ADD CONSTRAINT core_anoletivo_ano_key UNIQUE (ano);
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras core_anoletivo_dias_leti_anoletivo_id_dialetivoex_9720edaa_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_letivos_extras
+    ADD CONSTRAINT core_anoletivo_dias_leti_anoletivo_id_dialetivoex_9720edaa_uniq UNIQUE (anoletivo_id, dialetivoextra_id);
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras core_anoletivo_dias_letivos_extras_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_letivos_extras
+    ADD CONSTRAINT core_anoletivo_dias_letivos_extras_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos core_anoletivo_dias_nao__anoletivo_id_dianaoletiv_1c4d1942_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_nao_letivos
+    ADD CONSTRAINT core_anoletivo_dias_nao__anoletivo_id_dianaoletiv_1c4d1942_uniq UNIQUE (anoletivo_id, dianaoletivo_id);
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos core_anoletivo_dias_nao_letivos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_nao_letivos
+    ADD CONSTRAINT core_anoletivo_dias_nao_letivos_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_anoletivo core_anoletivo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo
+    ADD CONSTRAINT core_anoletivo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_anoletivoselecionado core_anoletivoselecionado_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivoselecionado
+    ADD CONSTRAINT core_anoletivoselecionado_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_anoletivoselecionado core_anoletivoselecionado_usuario_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivoselecionado
+    ADD CONSTRAINT core_anoletivoselecionado_usuario_id_key UNIQUE (usuario_id);
+
+
+--
+-- Name: core_curso core_curso_nome_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_curso
+    ADD CONSTRAINT core_curso_nome_key UNIQUE (nome);
+
+
+--
+-- Name: core_curso core_curso_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_curso
+    ADD CONSTRAINT core_curso_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_curso core_curso_sigla_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_curso
+    ADD CONSTRAINT core_curso_sigla_key UNIQUE (sigla);
+
+
+--
+-- Name: core_dialetivoextra core_dialetivoextra_data_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_dialetivoextra
+    ADD CONSTRAINT core_dialetivoextra_data_key UNIQUE (data);
+
+
+--
+-- Name: core_dialetivoextra core_dialetivoextra_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_dialetivoextra
+    ADD CONSTRAINT core_dialetivoextra_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_dianaoletivo core_dianaoletivo_data_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_dianaoletivo
+    ADD CONSTRAINT core_dianaoletivo_data_key UNIQUE (data);
+
+
+--
+-- Name: core_dianaoletivo core_dianaoletivo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_dianaoletivo
+    ADD CONSTRAINT core_dianaoletivo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_disciplina core_disciplina_nome_sigla_cfba4fd5_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_disciplina
+    ADD CONSTRAINT core_disciplina_nome_sigla_cfba4fd5_uniq UNIQUE (nome, sigla);
+
+
+--
+-- Name: core_disciplina core_disciplina_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_disciplina
+    ADD CONSTRAINT core_disciplina_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_disciplinaturma core_disciplinaturma_disciplina_id_turma_id_81fe966e_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_disciplinaturma
+    ADD CONSTRAINT core_disciplinaturma_disciplina_id_turma_id_81fe966e_uniq UNIQUE (disciplina_id, turma_id);
+
+
+--
+-- Name: core_disciplinaturma core_disciplinaturma_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_disciplinaturma
+    ADD CONSTRAINT core_disciplinaturma_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_funcionario core_funcionario_cpf_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_funcionario
+    ADD CONSTRAINT core_funcionario_cpf_key UNIQUE (cpf);
+
+
+--
+-- Name: core_funcionario core_funcionario_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_funcionario
+    ADD CONSTRAINT core_funcionario_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_funcionario core_funcionario_usuario_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_funcionario
+    ADD CONSTRAINT core_funcionario_usuario_id_key UNIQUE (usuario_id);
+
+
+--
+-- Name: core_funcionario core_funcionario_usuario_id_matricula_cfb6ab95_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_funcionario
+    ADD CONSTRAINT core_funcionario_usuario_id_matricula_cfb6ab95_uniq UNIQUE (usuario_id, matricula);
+
+
+--
+-- Name: core_gradehoraria core_gradehoraria_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_gradehoraria
+    ADD CONSTRAINT core_gradehoraria_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_gradehoraria core_gradehoraria_validade_id_horario_aula_id_2f338eb7_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_gradehoraria
+    ADD CONSTRAINT core_gradehoraria_validade_id_horario_aula_id_2f338eb7_uniq UNIQUE (validade_id, horario_aula_id);
+
+
+--
+-- Name: core_gradehorariavalidade core_gradehorariavalidade_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_gradehorariavalidade
+    ADD CONSTRAINT core_gradehorariavalidade_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_habilidade core_habilidade_codigo_disciplina_id_6b845f09_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_habilidade
+    ADD CONSTRAINT core_habilidade_codigo_disciplina_id_6b845f09_uniq UNIQUE (codigo, disciplina_id);
+
+
+--
+-- Name: core_habilidade core_habilidade_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_habilidade
+    ADD CONSTRAINT core_habilidade_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_horarioaula core_horarioaula_ano_letivo_id_dia_semana_a1a489e0_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_horarioaula
+    ADD CONSTRAINT core_horarioaula_ano_letivo_id_dia_semana_a1a489e0_uniq UNIQUE (ano_letivo_id, dia_semana, hora_inicio);
+
+
+--
+-- Name: core_horarioaula core_horarioaula_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_horarioaula
+    ADD CONSTRAINT core_horarioaula_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_periodotrabalho core_periodotrabalho_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_periodotrabalho
+    ADD CONSTRAINT core_periodotrabalho_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_professordisciplinaturma core_professordisciplinaturma_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_professordisciplinaturma
+    ADD CONSTRAINT core_professordisciplinaturma_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_turma core_turma_numero_letra_ano_letivo_curso_id_5eb491fa_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma
+    ADD CONSTRAINT core_turma_numero_letra_ano_letivo_curso_id_5eb491fa_uniq UNIQUE (numero, letra, ano_letivo, curso_id);
+
+
+--
+-- Name: core_turma core_turma_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma
+    ADD CONSTRAINT core_turma_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: core_turma_professores_representantes core_turma_professores_r_turma_id_funcionario_id_de1cccc2_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma_professores_representantes
+    ADD CONSTRAINT core_turma_professores_r_turma_id_funcionario_id_de1cccc2_uniq UNIQUE (turma_id, funcionario_id);
+
+
+--
+-- Name: core_turma_professores_representantes core_turma_professores_representantes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma_professores_representantes
+    ADD CONSTRAINT core_turma_professores_representantes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_content_type django_content_type_app_label_model_76bd3d3b_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_content_type
+    ADD CONSTRAINT django_content_type_app_label_model_76bd3d3b_uniq UNIQUE (app_label, model);
+
+
+--
+-- Name: django_content_type django_content_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_content_type
+    ADD CONSTRAINT django_content_type_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_migrations
+    ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_session django_session_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_session
+    ADD CONSTRAINT django_session_pkey PRIMARY KEY (session_key);
+
+
+--
+-- Name: management_aviso_destinatarios management_aviso_destinatarios_aviso_id_user_id_96e1b7ac_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_aviso_destinatarios
+    ADD CONSTRAINT management_aviso_destinatarios_aviso_id_user_id_96e1b7ac_uniq UNIQUE (aviso_id, user_id);
+
+
+--
+-- Name: management_aviso_destinatarios management_aviso_destinatarios_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_aviso_destinatarios
+    ADD CONSTRAINT management_aviso_destinatarios_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_aviso management_aviso_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_aviso
+    ADD CONSTRAINT management_aviso_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_avisoanexo management_avisoanexo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_avisoanexo
+    ADD CONSTRAINT management_avisoanexo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_avisovisualizacao management_avisovisualizacao_aviso_id_usuario_id_fa7ea6ab_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_avisovisualizacao
+    ADD CONSTRAINT management_avisovisualizacao_aviso_id_usuario_id_fa7ea6ab_uniq UNIQUE (aviso_id, usuario_id);
+
+
+--
+-- Name: management_avisovisualizacao management_avisovisualizacao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_avisovisualizacao
+    ADD CONSTRAINT management_avisovisualizacao_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_notificacaohtpc management_notificacaoht_reuniao_id_funcionario_i_1d59b0d9_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaohtpc
+    ADD CONSTRAINT management_notificacaoht_reuniao_id_funcionario_i_1d59b0d9_uniq UNIQUE (reuniao_id, funcionario_id);
+
+
+--
+-- Name: management_notificacaohtpc management_notificacaohtpc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaohtpc
+    ADD CONSTRAINT management_notificacaohtpc_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_notificacaotarefa management_notificacaota_tarefa_id_funcionario_id_1ac10f51_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaotarefa
+    ADD CONSTRAINT management_notificacaota_tarefa_id_funcionario_id_1ac10f51_uniq UNIQUE (tarefa_id, funcionario_id);
+
+
+--
+-- Name: management_notificacaotarefa management_notificacaotarefa_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaotarefa
+    ADD CONSTRAINT management_notificacaotarefa_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_reuniaohtpc_presentes management_reuniaohtpc_p_reuniaohtpc_id_funcionar_f649c41d_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpc_presentes
+    ADD CONSTRAINT management_reuniaohtpc_p_reuniaohtpc_id_funcionar_f649c41d_uniq UNIQUE (reuniaohtpc_id, funcionario_id);
+
+
+--
+-- Name: management_reuniaohtpc management_reuniaohtpc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpc
+    ADD CONSTRAINT management_reuniaohtpc_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_reuniaohtpc_presentes management_reuniaohtpc_presentes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpc_presentes
+    ADD CONSTRAINT management_reuniaohtpc_presentes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_reuniaohtpcanexo management_reuniaohtpcanexo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpcanexo
+    ADD CONSTRAINT management_reuniaohtpcanexo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_tarefa_funcionarios management_tarefa_funcio_tarefa_id_funcionario_id_000938f5_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefa_funcionarios
+    ADD CONSTRAINT management_tarefa_funcio_tarefa_id_funcionario_id_000938f5_uniq UNIQUE (tarefa_id, funcionario_id);
+
+
+--
+-- Name: management_tarefa_funcionarios management_tarefa_funcionarios_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefa_funcionarios
+    ADD CONSTRAINT management_tarefa_funcionarios_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_tarefa management_tarefa_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefa
+    ADD CONSTRAINT management_tarefa_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_tarefaanexo management_tarefaanexo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefaanexo
+    ADD CONSTRAINT management_tarefaanexo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_tarefaresposta management_tarefaresposta_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefaresposta
+    ADD CONSTRAINT management_tarefaresposta_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: management_tarefarespostaanexo management_tarefarespostaanexo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefarespostaanexo
+    ADD CONSTRAINT management_tarefarespostaanexo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_aula pedagogical_aula_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_aula
+    ADD CONSTRAINT pedagogical_aula_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_aula pedagogical_aula_professor_disciplina_tur_59f44b30_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_aula
+    ADD CONSTRAINT pedagogical_aula_professor_disciplina_tur_59f44b30_uniq UNIQUE (professor_disciplina_turma_id, data);
+
+
+--
+-- Name: pedagogical_avaliacao pedagogical_avaliacao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_avaliacao
+    ADD CONSTRAINT pedagogical_avaliacao_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_avaliacao pedagogical_avaliacao_professor_disciplina_tur_6e3b4402_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_avaliacao
+    ADD CONSTRAINT pedagogical_avaliacao_professor_disciplina_tur_6e3b4402_uniq UNIQUE (professor_disciplina_turma_id, tipo);
+
+
+--
+-- Name: pedagogical_controlevisto pedagogical_controlevist_matricula_turma_id_profe_f078c861_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_controlevisto
+    ADD CONSTRAINT pedagogical_controlevist_matricula_turma_id_profe_f078c861_uniq UNIQUE (matricula_turma_id, professor_disciplina_turma_id, titulo);
+
+
+--
+-- Name: pedagogical_controlevisto pedagogical_controlevisto_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_controlevisto
+    ADD CONSTRAINT pedagogical_controlevisto_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_descritorocorrenciapedagogica pedagogical_descritorocorrenciapedagogica_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_descritorocorrenciapedagogica
+    ADD CONSTRAINT pedagogical_descritorocorrenciapedagogica_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_faltas pedagogical_faltas_aula_id_estudante_id_aul_f1073a2e_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_faltas
+    ADD CONSTRAINT pedagogical_faltas_aula_id_estudante_id_aul_f1073a2e_uniq UNIQUE (aula_id, estudante_id, aula_numero);
+
+
+--
+-- Name: pedagogical_faltas pedagogical_faltas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_faltas
+    ADD CONSTRAINT pedagogical_faltas_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_instrumentoavaliativo pedagogical_instrumentoavaliativo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_instrumentoavaliativo
+    ADD CONSTRAINT pedagogical_instrumentoavaliativo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_notaavaliacao pedagogical_notaavaliaca_avaliacao_id_matricula_t_855334ed_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notaavaliacao
+    ADD CONSTRAINT pedagogical_notaavaliaca_avaliacao_id_matricula_t_855334ed_uniq UNIQUE (avaliacao_id, matricula_turma_id);
+
+
+--
+-- Name: pedagogical_notaavaliacao pedagogical_notaavaliacao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notaavaliacao
+    ADD CONSTRAINT pedagogical_notaavaliacao_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_notabimestral pedagogical_notabimestra_matricula_turma_id_profe_0b860eb8_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notabimestral
+    ADD CONSTRAINT pedagogical_notabimestra_matricula_turma_id_profe_0b860eb8_uniq UNIQUE (matricula_turma_id, professor_disciplina_turma_id);
+
+
+--
+-- Name: pedagogical_notabimestral pedagogical_notabimestral_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notabimestral
+    ADD CONSTRAINT pedagogical_notabimestral_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_notainstrumentoavaliativo pedagogical_notainstrume_instrumento_avaliativo_i_c0e14627_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notainstrumentoavaliativo
+    ADD CONSTRAINT pedagogical_notainstrume_instrumento_avaliativo_i_c0e14627_uniq UNIQUE (instrumento_avaliativo_id, matricula_turma_id);
+
+
+--
+-- Name: pedagogical_notainstrumentoavaliativo pedagogical_notainstrumentoavaliativo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notainstrumentoavaliativo
+    ADD CONSTRAINT pedagogical_notainstrumentoavaliativo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_notificacaorecuperacao pedagogical_notificacaorecuperacao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notificacaorecuperacao
+    ADD CONSTRAINT pedagogical_notificacaorecuperacao_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica pedagogical_ocorrenciapedagogica_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciapedagogica
+    ADD CONSTRAINT pedagogical_ocorrenciapedagogica_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente pedagogical_ocorrenciare_responsavel_id_ocorrenci_d90b5924_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciaresponsavelciente
+    ADD CONSTRAINT pedagogical_ocorrenciare_responsavel_id_ocorrenci_d90b5924_uniq UNIQUE (responsavel_id, ocorrencia_id);
+
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente pedagogical_ocorrenciaresponsavelciente_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciaresponsavelciente
+    ADD CONSTRAINT pedagogical_ocorrenciaresponsavelciente_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_planoaula_habilidades pedagogical_planoaula_ha_planoaula_id_habilidade__7ba2559c_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_habilidades
+    ADD CONSTRAINT pedagogical_planoaula_ha_planoaula_id_habilidade__7ba2559c_uniq UNIQUE (planoaula_id, habilidade_id);
+
+
+--
+-- Name: pedagogical_planoaula_habilidades pedagogical_planoaula_habilidades_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_habilidades
+    ADD CONSTRAINT pedagogical_planoaula_habilidades_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_planoaula pedagogical_planoaula_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula
+    ADD CONSTRAINT pedagogical_planoaula_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pedagogical_planoaula_turmas pedagogical_planoaula_tu_planoaula_id_turma_id_07abf25a_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_turmas
+    ADD CONSTRAINT pedagogical_planoaula_tu_planoaula_id_turma_id_07abf25a_uniq UNIQUE (planoaula_id, turma_id);
+
+
+--
+-- Name: pedagogical_planoaula_turmas pedagogical_planoaula_turmas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_turmas
+    ADD CONSTRAINT pedagogical_planoaula_turmas_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_dadospermanenteestudante permanent_dadospermanenteestudante_cpf_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_dadospermanenteestudante
+    ADD CONSTRAINT permanent_dadospermanenteestudante_cpf_key UNIQUE (cpf);
+
+
+--
+-- Name: permanent_dadospermanenteestudante permanent_dadospermanenteestudante_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_dadospermanenteestudante
+    ADD CONSTRAINT permanent_dadospermanenteestudante_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_dadospermanenteresponsavel permanent_dadospermanenteresponsavel_cpf_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_dadospermanenteresponsavel
+    ADD CONSTRAINT permanent_dadospermanenteresponsavel_cpf_key UNIQUE (cpf);
+
+
+--
+-- Name: permanent_dadospermanenteresponsavel permanent_dadospermanenteresponsavel_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_dadospermanenteresponsavel
+    ADD CONSTRAINT permanent_dadospermanenteresponsavel_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_historicoescolaranoletivo permanent_historicoescol_historico_id_ano_letivo_5ba46114_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolaranoletivo
+    ADD CONSTRAINT permanent_historicoescol_historico_id_ano_letivo_5ba46114_uniq UNIQUE (historico_id, ano_letivo);
+
+
+--
+-- Name: permanent_historicoescolar permanent_historicoescolar_estudante_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolar
+    ADD CONSTRAINT permanent_historicoescolar_estudante_id_key UNIQUE (estudante_id);
+
+
+--
+-- Name: permanent_historicoescolar permanent_historicoescolar_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolar
+    ADD CONSTRAINT permanent_historicoescolar_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_historicoescolaranoletivo permanent_historicoescolaranoletivo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolaranoletivo
+    ADD CONSTRAINT permanent_historicoescolaranoletivo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_historicoescolarnotas permanent_historicoescolarnotas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolarnotas
+    ADD CONSTRAINT permanent_historicoescolarnotas_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_registroprontuario permanent_registroprontuario_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_registroprontuario
+    ADD CONSTRAINT permanent_registroprontuario_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: permanent_registroprontuarioanexo permanent_registroprontuarioanexo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_registroprontuarioanexo
+    ADD CONSTRAINT permanent_registroprontuarioanexo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_user_groups users_user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_groups
+    ADD CONSTRAINT users_user_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_user_groups users_user_groups_user_id_group_id_b88eab82_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_groups
+    ADD CONSTRAINT users_user_groups_user_id_group_id_b88eab82_uniq UNIQUE (user_id, group_id);
+
+
+--
+-- Name: users_user users_user_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user
+    ADD CONSTRAINT users_user_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_user_user_permissions users_user_user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_user_permissions
+    ADD CONSTRAINT users_user_user_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_user_user_permissions users_user_user_permissions_user_id_permission_id_43338c45_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_user_permissions
+    ADD CONSTRAINT users_user_user_permissions_user_id_permission_id_43338c45_uniq UNIQUE (user_id, permission_id);
+
+
+--
+-- Name: users_user users_user_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user
+    ADD CONSTRAINT users_user_username_key UNIQUE (username);
+
+
+--
+-- Name: academic_atestado_criado_por_id_1ec83eaa; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_atestado_criado_por_id_1ec83eaa ON public.academic_atestado USING btree (criado_por_id);
+
+
+--
+-- Name: academic_atestado_usuario_alvo_id_e5053ddb; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_atestado_usuario_alvo_id_e5053ddb ON public.academic_atestado USING btree (usuario_alvo_id);
+
+
+--
+-- Name: academic_estudante_cpf_59369532_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_estudante_cpf_59369532_like ON public.academic_estudante USING btree (cpf varchar_pattern_ops);
+
+
+--
+-- Name: academic_matriculacemep_curso_id_1d70f539; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_matriculacemep_curso_id_1d70f539 ON public.academic_matriculacemep USING btree (curso_id);
+
+
+--
+-- Name: academic_matriculacemep_estudante_id_099ea42a; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_matriculacemep_estudante_id_099ea42a ON public.academic_matriculacemep USING btree (estudante_id);
+
+
+--
+-- Name: academic_matriculacemep_numero_matricula_9f241c94_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_matriculacemep_numero_matricula_9f241c94_like ON public.academic_matriculacemep USING btree (numero_matricula varchar_pattern_ops);
+
+
+--
+-- Name: academic_matriculaturma_matricula_cemep_id_e921d770; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_matriculaturma_matricula_cemep_id_e921d770 ON public.academic_matriculaturma USING btree (matricula_cemep_id);
+
+
+--
+-- Name: academic_matriculaturma_turma_id_b8dafc46; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_matriculaturma_turma_id_b8dafc46 ON public.academic_matriculaturma USING btree (turma_id);
+
+
+--
+-- Name: academic_responsavel_cpf_e4018ebe_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_responsavel_cpf_e4018ebe_like ON public.academic_responsavel USING btree (cpf varchar_pattern_ops);
+
+
+--
+-- Name: academic_responsavelestudante_estudante_id_bac00c0e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_responsavelestudante_estudante_id_bac00c0e ON public.academic_responsavelestudante USING btree (estudante_id);
+
+
+--
+-- Name: academic_responsavelestudante_responsavel_id_1b66ff12; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX academic_responsavelestudante_responsavel_id_1b66ff12 ON public.academic_responsavelestudante USING btree (responsavel_id);
+
+
+--
+-- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_group_name_a6ea08ec_like ON public.auth_group USING btree (name varchar_pattern_ops);
+
+
+--
+-- Name: auth_group_permissions_group_id_b120cbf9; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_group_permissions_group_id_b120cbf9 ON public.auth_group_permissions USING btree (group_id);
+
+
+--
+-- Name: auth_group_permissions_permission_id_84c5c92e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_group_permissions_permission_id_84c5c92e ON public.auth_group_permissions USING btree (permission_id);
+
+
+--
+-- Name: auth_permission_content_type_id_2f476e4b; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_permission_content_type_id_2f476e4b ON public.auth_permission USING btree (content_type_id);
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras_anoletivo_id_3ae79300; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_anoletivo_dias_letivos_extras_anoletivo_id_3ae79300 ON public.core_anoletivo_dias_letivos_extras USING btree (anoletivo_id);
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras_dialetivoextra_id_557a1463; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_anoletivo_dias_letivos_extras_dialetivoextra_id_557a1463 ON public.core_anoletivo_dias_letivos_extras USING btree (dialetivoextra_id);
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos_anoletivo_id_a42bc54a; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_anoletivo_dias_nao_letivos_anoletivo_id_a42bc54a ON public.core_anoletivo_dias_nao_letivos USING btree (anoletivo_id);
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos_dianaoletivo_id_d7c593db; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_anoletivo_dias_nao_letivos_dianaoletivo_id_d7c593db ON public.core_anoletivo_dias_nao_letivos USING btree (dianaoletivo_id);
+
+
+--
+-- Name: core_anoletivoselecionado_ano_letivo_id_6fa2ee77; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_anoletivoselecionado_ano_letivo_id_6fa2ee77 ON public.core_anoletivoselecionado USING btree (ano_letivo_id);
+
+
+--
+-- Name: core_curso_nome_994746c5_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_curso_nome_994746c5_like ON public.core_curso USING btree (nome varchar_pattern_ops);
+
+
+--
+-- Name: core_curso_sigla_8dace4b8_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_curso_sigla_8dace4b8_like ON public.core_curso USING btree (sigla varchar_pattern_ops);
+
+
+--
+-- Name: core_disciplinaturma_disciplina_id_e924a909; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_disciplinaturma_disciplina_id_e924a909 ON public.core_disciplinaturma USING btree (disciplina_id);
+
+
+--
+-- Name: core_disciplinaturma_turma_id_ca8b9173; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_disciplinaturma_turma_id_ca8b9173 ON public.core_disciplinaturma USING btree (turma_id);
+
+
+--
+-- Name: core_funcionario_cpf_6876030f_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_funcionario_cpf_6876030f_like ON public.core_funcionario USING btree (cpf varchar_pattern_ops);
+
+
+--
+-- Name: core_gradehoraria_disciplina_id_8f2a8982; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_gradehoraria_disciplina_id_8f2a8982 ON public.core_gradehoraria USING btree (disciplina_id);
+
+
+--
+-- Name: core_gradehoraria_horario_aula_id_fd2ce14b; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_gradehoraria_horario_aula_id_fd2ce14b ON public.core_gradehoraria USING btree (horario_aula_id);
+
+
+--
+-- Name: core_gradehoraria_validade_id_d6e45158; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_gradehoraria_validade_id_d6e45158 ON public.core_gradehoraria USING btree (validade_id);
+
+
+--
+-- Name: core_gradehorariavalidade_turma_id_9e797795; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_gradehorariavalidade_turma_id_9e797795 ON public.core_gradehorariavalidade USING btree (turma_id);
+
+
+--
+-- Name: core_habilidade_disciplina_id_4e464227; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_habilidade_disciplina_id_4e464227 ON public.core_habilidade USING btree (disciplina_id);
+
+
+--
+-- Name: core_horarioaula_ano_letivo_id_f60146b2; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_horarioaula_ano_letivo_id_f60146b2 ON public.core_horarioaula USING btree (ano_letivo_id);
+
+
+--
+-- Name: core_periodotrabalho_funcionario_id_50ce0870; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_periodotrabalho_funcionario_id_50ce0870 ON public.core_periodotrabalho USING btree (funcionario_id);
+
+
+--
+-- Name: core_professordisciplinaturma_disciplina_turma_id_91091248; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_professordisciplinaturma_disciplina_turma_id_91091248 ON public.core_professordisciplinaturma USING btree (disciplina_turma_id);
+
+
+--
+-- Name: core_professordisciplinaturma_professor_id_43b30907; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_professordisciplinaturma_professor_id_43b30907 ON public.core_professordisciplinaturma USING btree (professor_id);
+
+
+--
+-- Name: core_turma_curso_id_3be244ac; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_turma_curso_id_3be244ac ON public.core_turma USING btree (curso_id);
+
+
+--
+-- Name: core_turma_professores_representantes_funcionario_id_7a07fc74; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_turma_professores_representantes_funcionario_id_7a07fc74 ON public.core_turma_professores_representantes USING btree (funcionario_id);
+
+
+--
+-- Name: core_turma_professores_representantes_turma_id_a50d824e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX core_turma_professores_representantes_turma_id_a50d824e ON public.core_turma_professores_representantes USING btree (turma_id);
+
+
+--
+-- Name: django_admin_log_content_type_id_c4bce8eb; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_admin_log_content_type_id_c4bce8eb ON public.django_admin_log USING btree (content_type_id);
+
+
+--
+-- Name: django_admin_log_user_id_c564eba6; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_admin_log_user_id_c564eba6 ON public.django_admin_log USING btree (user_id);
+
+
+--
+-- Name: django_session_expire_date_a5c62663; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_session_expire_date_a5c62663 ON public.django_session USING btree (expire_date);
+
+
+--
+-- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_session_session_key_c0390e0f_like ON public.django_session USING btree (session_key varchar_pattern_ops);
+
+
+--
+-- Name: management_aviso_criador_id_9a68bd6c; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_aviso_criador_id_9a68bd6c ON public.management_aviso USING btree (criador_id);
+
+
+--
+-- Name: management_aviso_destinatarios_aviso_id_145c8d68; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_aviso_destinatarios_aviso_id_145c8d68 ON public.management_aviso_destinatarios USING btree (aviso_id);
+
+
+--
+-- Name: management_aviso_destinatarios_user_id_c6e7aac2; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_aviso_destinatarios_user_id_c6e7aac2 ON public.management_aviso_destinatarios USING btree (user_id);
+
+
+--
+-- Name: management_avisoanexo_aviso_id_57d552a1; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_avisoanexo_aviso_id_57d552a1 ON public.management_avisoanexo USING btree (aviso_id);
+
+
+--
+-- Name: management_avisovisualizacao_aviso_id_d790d3ff; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_avisovisualizacao_aviso_id_d790d3ff ON public.management_avisovisualizacao USING btree (aviso_id);
+
+
+--
+-- Name: management_avisovisualizacao_usuario_id_a09d066e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_avisovisualizacao_usuario_id_a09d066e ON public.management_avisovisualizacao USING btree (usuario_id);
+
+
+--
+-- Name: management_notificacaohtpc_funcionario_id_c52be426; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_notificacaohtpc_funcionario_id_c52be426 ON public.management_notificacaohtpc USING btree (funcionario_id);
+
+
+--
+-- Name: management_notificacaohtpc_reuniao_id_b17766c2; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_notificacaohtpc_reuniao_id_b17766c2 ON public.management_notificacaohtpc USING btree (reuniao_id);
+
+
+--
+-- Name: management_notificacaotarefa_funcionario_id_2a07f22e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_notificacaotarefa_funcionario_id_2a07f22e ON public.management_notificacaotarefa USING btree (funcionario_id);
+
+
+--
+-- Name: management_notificacaotarefa_tarefa_id_aa1f4780; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_notificacaotarefa_tarefa_id_aa1f4780 ON public.management_notificacaotarefa USING btree (tarefa_id);
+
+
+--
+-- Name: management_reuniaohtpc_presentes_funcionario_id_496fe539; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_reuniaohtpc_presentes_funcionario_id_496fe539 ON public.management_reuniaohtpc_presentes USING btree (funcionario_id);
+
+
+--
+-- Name: management_reuniaohtpc_presentes_reuniaohtpc_id_e5439d2e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_reuniaohtpc_presentes_reuniaohtpc_id_e5439d2e ON public.management_reuniaohtpc_presentes USING btree (reuniaohtpc_id);
+
+
+--
+-- Name: management_reuniaohtpc_quem_registrou_id_621368dc; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_reuniaohtpc_quem_registrou_id_621368dc ON public.management_reuniaohtpc USING btree (quem_registrou_id);
+
+
+--
+-- Name: management_reuniaohtpcanexo_reuniao_id_3a8a9698; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_reuniaohtpcanexo_reuniao_id_3a8a9698 ON public.management_reuniaohtpcanexo USING btree (reuniao_id);
+
+
+--
+-- Name: management_tarefa_criador_id_4901be8f; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefa_criador_id_4901be8f ON public.management_tarefa USING btree (criador_id);
+
+
+--
+-- Name: management_tarefa_funcionarios_funcionario_id_81a43c3c; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefa_funcionarios_funcionario_id_81a43c3c ON public.management_tarefa_funcionarios USING btree (funcionario_id);
+
+
+--
+-- Name: management_tarefa_funcionarios_tarefa_id_1b4fd1c4; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefa_funcionarios_tarefa_id_1b4fd1c4 ON public.management_tarefa_funcionarios USING btree (tarefa_id);
+
+
+--
+-- Name: management_tarefaanexo_tarefa_id_3e316151; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefaanexo_tarefa_id_3e316151 ON public.management_tarefaanexo USING btree (tarefa_id);
+
+
+--
+-- Name: management_tarefaresposta_funcionario_id_14bad833; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefaresposta_funcionario_id_14bad833 ON public.management_tarefaresposta USING btree (funcionario_id);
+
+
+--
+-- Name: management_tarefaresposta_tarefa_id_750b6388; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefaresposta_tarefa_id_750b6388 ON public.management_tarefaresposta USING btree (tarefa_id);
+
+
+--
+-- Name: management_tarefarespostaanexo_resposta_id_c53702e5; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX management_tarefarespostaanexo_resposta_id_c53702e5 ON public.management_tarefarespostaanexo USING btree (resposta_id);
+
+
+--
+-- Name: pedagogical_aula_professor_disciplina_turma_id_45ce1ebb; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_aula_professor_disciplina_turma_id_45ce1ebb ON public.pedagogical_aula USING btree (professor_disciplina_turma_id);
+
+
+--
+-- Name: pedagogical_avaliacao_professor_disciplina_turma_id_d6581024; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_avaliacao_professor_disciplina_turma_id_d6581024 ON public.pedagogical_avaliacao USING btree (professor_disciplina_turma_id);
+
+
+--
+-- Name: pedagogical_controlevisto_instrumento_avaliativo_id_1837df71; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_controlevisto_instrumento_avaliativo_id_1837df71 ON public.pedagogical_controlevisto USING btree (instrumento_avaliativo_id);
+
+
+--
+-- Name: pedagogical_controlevisto_matricula_turma_id_60d3df7b; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_controlevisto_matricula_turma_id_60d3df7b ON public.pedagogical_controlevisto USING btree (matricula_turma_id);
+
+
+--
+-- Name: pedagogical_controlevisto_professor_disciplina_turma_93b5e757; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_controlevisto_professor_disciplina_turma_93b5e757 ON public.pedagogical_controlevisto USING btree (professor_disciplina_turma_id);
+
+
+--
+-- Name: pedagogical_descritorocorrenciapedagogica_gestor_id_7d075a73; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_descritorocorrenciapedagogica_gestor_id_7d075a73 ON public.pedagogical_descritorocorrenciapedagogica USING btree (gestor_id);
+
+
+--
+-- Name: pedagogical_faltas_aula_id_3fc456ba; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_faltas_aula_id_3fc456ba ON public.pedagogical_faltas USING btree (aula_id);
+
+
+--
+-- Name: pedagogical_faltas_estudante_id_cacf9e7c; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_faltas_estudante_id_cacf9e7c ON public.pedagogical_faltas USING btree (estudante_id);
+
+
+--
+-- Name: pedagogical_instrumentoavaliativo_avaliacao_id_f9ee5536; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_instrumentoavaliativo_avaliacao_id_f9ee5536 ON public.pedagogical_instrumentoavaliativo USING btree (avaliacao_id);
+
+
+--
+-- Name: pedagogical_notaavaliacao_avaliacao_id_541388b3; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notaavaliacao_avaliacao_id_541388b3 ON public.pedagogical_notaavaliacao USING btree (avaliacao_id);
+
+
+--
+-- Name: pedagogical_notaavaliacao_matricula_turma_id_3061c106; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notaavaliacao_matricula_turma_id_3061c106 ON public.pedagogical_notaavaliacao USING btree (matricula_turma_id);
+
+
+--
+-- Name: pedagogical_notabimestral_matricula_turma_id_710e9fa7; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notabimestral_matricula_turma_id_710e9fa7 ON public.pedagogical_notabimestral USING btree (matricula_turma_id);
+
+
+--
+-- Name: pedagogical_notabimestral_professor_disciplina_turma_800de48d; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notabimestral_professor_disciplina_turma_800de48d ON public.pedagogical_notabimestral USING btree (professor_disciplina_turma_id);
+
+
+--
+-- Name: pedagogical_notainstrument_instrumento_avaliativo_id_5df6482d; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notainstrument_instrumento_avaliativo_id_5df6482d ON public.pedagogical_notainstrumentoavaliativo USING btree (instrumento_avaliativo_id);
+
+
+--
+-- Name: pedagogical_notainstrument_matricula_turma_id_1aa0de08; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notainstrument_matricula_turma_id_1aa0de08 ON public.pedagogical_notainstrumentoavaliativo USING btree (matricula_turma_id);
+
+
+--
+-- Name: pedagogical_notificacaorec_professor_disciplina_turma_67a2ca65; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notificacaorec_professor_disciplina_turma_67a2ca65 ON public.pedagogical_notificacaorecuperacao USING btree (professor_disciplina_turma_id);
+
+
+--
+-- Name: pedagogical_notificacaorecuperacao_estudante_id_3d9a2b58; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_notificacaorecuperacao_estudante_id_3d9a2b58 ON public.pedagogical_notificacaorecuperacao USING btree (estudante_id);
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica_autor_id_959a9a6f; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_ocorrenciapedagogica_autor_id_959a9a6f ON public.pedagogical_ocorrenciapedagogica USING btree (autor_id);
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica_estudante_id_4c3be7f4; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_ocorrenciapedagogica_estudante_id_4c3be7f4 ON public.pedagogical_ocorrenciapedagogica USING btree (estudante_id);
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica_tipo_id_bf9e428c; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_ocorrenciapedagogica_tipo_id_bf9e428c ON public.pedagogical_ocorrenciapedagogica USING btree (tipo_id);
+
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente_ocorrencia_id_a0779f60; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_ocorrenciaresponsavelciente_ocorrencia_id_a0779f60 ON public.pedagogical_ocorrenciaresponsavelciente USING btree (ocorrencia_id);
+
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente_responsavel_id_eaa3f2d6; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_ocorrenciaresponsavelciente_responsavel_id_eaa3f2d6 ON public.pedagogical_ocorrenciaresponsavelciente USING btree (responsavel_id);
+
+
+--
+-- Name: pedagogical_planoaula_disciplina_id_6203c6ae; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_planoaula_disciplina_id_6203c6ae ON public.pedagogical_planoaula USING btree (disciplina_id);
+
+
+--
+-- Name: pedagogical_planoaula_habilidades_habilidade_id_e78fd94c; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_planoaula_habilidades_habilidade_id_e78fd94c ON public.pedagogical_planoaula_habilidades USING btree (habilidade_id);
+
+
+--
+-- Name: pedagogical_planoaula_habilidades_planoaula_id_87c1d53d; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_planoaula_habilidades_planoaula_id_87c1d53d ON public.pedagogical_planoaula_habilidades USING btree (planoaula_id);
+
+
+--
+-- Name: pedagogical_planoaula_professor_id_81dc1fb6; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_planoaula_professor_id_81dc1fb6 ON public.pedagogical_planoaula USING btree (professor_id);
+
+
+--
+-- Name: pedagogical_planoaula_turmas_planoaula_id_3a17c7da; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_planoaula_turmas_planoaula_id_3a17c7da ON public.pedagogical_planoaula_turmas USING btree (planoaula_id);
+
+
+--
+-- Name: pedagogical_planoaula_turmas_turma_id_baa02398; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pedagogical_planoaula_turmas_turma_id_baa02398 ON public.pedagogical_planoaula_turmas USING btree (turma_id);
+
+
+--
+-- Name: permanent_dadospermanenteestudante_cpf_0448c7fa_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_dadospermanenteestudante_cpf_0448c7fa_like ON public.permanent_dadospermanenteestudante USING btree (cpf varchar_pattern_ops);
+
+
+--
+-- Name: permanent_dadospermanenteresponsavel_cpf_df6ec16d_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_dadospermanenteresponsavel_cpf_df6ec16d_like ON public.permanent_dadospermanenteresponsavel USING btree (cpf varchar_pattern_ops);
+
+
+--
+-- Name: permanent_dadospermanenteresponsavel_estudante_id_6711e4a2; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_dadospermanenteresponsavel_estudante_id_6711e4a2 ON public.permanent_dadospermanenteresponsavel USING btree (estudante_id);
+
+
+--
+-- Name: permanent_historicoescolaranoletivo_historico_id_4e976066; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_historicoescolaranoletivo_historico_id_4e976066 ON public.permanent_historicoescolaranoletivo USING btree (historico_id);
+
+
+--
+-- Name: permanent_historicoescolarnotas_ano_letivo_ref_id_9940c1ac; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_historicoescolarnotas_ano_letivo_ref_id_9940c1ac ON public.permanent_historicoescolarnotas USING btree (ano_letivo_ref_id);
+
+
+--
+-- Name: permanent_registroprontuar_registro_prontuario_id_b6e90955; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_registroprontuar_registro_prontuario_id_b6e90955 ON public.permanent_registroprontuarioanexo USING btree (registro_prontuario_id);
+
+
+--
+-- Name: permanent_registroprontuario_cpf_43d7f443; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_registroprontuario_cpf_43d7f443 ON public.permanent_registroprontuario USING btree (cpf);
+
+
+--
+-- Name: permanent_registroprontuario_cpf_43d7f443_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_registroprontuario_cpf_43d7f443_like ON public.permanent_registroprontuario USING btree (cpf varchar_pattern_ops);
+
+
+--
+-- Name: permanent_registroprontuario_pai_ocorrencia_id_971a9543; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX permanent_registroprontuario_pai_ocorrencia_id_971a9543 ON public.permanent_registroprontuario USING btree (pai_ocorrencia_id);
+
+
+--
+-- Name: users_user_groups_group_id_9afc8d0e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_user_groups_group_id_9afc8d0e ON public.users_user_groups USING btree (group_id);
+
+
+--
+-- Name: users_user_groups_user_id_5f6f5a90; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_user_groups_user_id_5f6f5a90 ON public.users_user_groups USING btree (user_id);
+
+
+--
+-- Name: users_user_user_permissions_permission_id_0b93982e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_user_user_permissions_permission_id_0b93982e ON public.users_user_user_permissions USING btree (permission_id);
+
+
+--
+-- Name: users_user_user_permissions_user_id_20aca447; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_user_user_permissions_user_id_20aca447 ON public.users_user_user_permissions USING btree (user_id);
+
+
+--
+-- Name: users_user_username_06e46fe6_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_user_username_06e46fe6_like ON public.users_user USING btree (username varchar_pattern_ops);
+
+
+--
+-- Name: academic_atestado academic_atestado_criado_por_id_1ec83eaa_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_atestado
+    ADD CONSTRAINT academic_atestado_criado_por_id_1ec83eaa_fk_users_user_id FOREIGN KEY (criado_por_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_atestado academic_atestado_usuario_alvo_id_e5053ddb_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_atestado
+    ADD CONSTRAINT academic_atestado_usuario_alvo_id_e5053ddb_fk_users_user_id FOREIGN KEY (usuario_alvo_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_estudante academic_estudante_usuario_id_fb0d4a0b_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_estudante
+    ADD CONSTRAINT academic_estudante_usuario_id_fb0d4a0b_fk_users_user_id FOREIGN KEY (usuario_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_matriculacemep academic_matriculace_estudante_id_099ea42a_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculacemep
+    ADD CONSTRAINT academic_matriculace_estudante_id_099ea42a_fk_academic_ FOREIGN KEY (estudante_id) REFERENCES public.academic_estudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_matriculacemep academic_matriculacemep_curso_id_1d70f539_fk_core_curso_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculacemep
+    ADD CONSTRAINT academic_matriculacemep_curso_id_1d70f539_fk_core_curso_id FOREIGN KEY (curso_id) REFERENCES public.core_curso(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_matriculaturma academic_matriculatu_matricula_cemep_id_e921d770_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculaturma
+    ADD CONSTRAINT academic_matriculatu_matricula_cemep_id_e921d770_fk_academic_ FOREIGN KEY (matricula_cemep_id) REFERENCES public.academic_matriculacemep(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_matriculaturma academic_matriculaturma_turma_id_b8dafc46_fk_core_turma_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_matriculaturma
+    ADD CONSTRAINT academic_matriculaturma_turma_id_b8dafc46_fk_core_turma_id FOREIGN KEY (turma_id) REFERENCES public.core_turma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_responsavelestudante academic_responsavel_estudante_id_bac00c0e_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavelestudante
+    ADD CONSTRAINT academic_responsavel_estudante_id_bac00c0e_fk_academic_ FOREIGN KEY (estudante_id) REFERENCES public.academic_estudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_responsavelestudante academic_responsavel_responsavel_id_1b66ff12_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavelestudante
+    ADD CONSTRAINT academic_responsavel_responsavel_id_1b66ff12_fk_academic_ FOREIGN KEY (responsavel_id) REFERENCES public.academic_responsavel(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: academic_responsavel academic_responsavel_usuario_id_234fac3d_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.academic_responsavel
+    ADD CONSTRAINT academic_responsavel_usuario_id_234fac3d_fk_users_user_id FOREIGN KEY (usuario_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissio_permission_id_84c5c92e_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_b120cbf9_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_content_type_id_2f476e4b_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras core_anoletivo_dias__anoletivo_id_3ae79300_fk_core_anol; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_letivos_extras
+    ADD CONSTRAINT core_anoletivo_dias__anoletivo_id_3ae79300_fk_core_anol FOREIGN KEY (anoletivo_id) REFERENCES public.core_anoletivo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos core_anoletivo_dias__anoletivo_id_a42bc54a_fk_core_anol; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_nao_letivos
+    ADD CONSTRAINT core_anoletivo_dias__anoletivo_id_a42bc54a_fk_core_anol FOREIGN KEY (anoletivo_id) REFERENCES public.core_anoletivo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_anoletivo_dias_letivos_extras core_anoletivo_dias__dialetivoextra_id_557a1463_fk_core_dial; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_letivos_extras
+    ADD CONSTRAINT core_anoletivo_dias__dialetivoextra_id_557a1463_fk_core_dial FOREIGN KEY (dialetivoextra_id) REFERENCES public.core_dialetivoextra(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_anoletivo_dias_nao_letivos core_anoletivo_dias__dianaoletivo_id_d7c593db_fk_core_dian; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivo_dias_nao_letivos
+    ADD CONSTRAINT core_anoletivo_dias__dianaoletivo_id_d7c593db_fk_core_dian FOREIGN KEY (dianaoletivo_id) REFERENCES public.core_dianaoletivo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_anoletivoselecionado core_anoletivoseleci_ano_letivo_id_6fa2ee77_fk_core_anol; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivoselecionado
+    ADD CONSTRAINT core_anoletivoseleci_ano_letivo_id_6fa2ee77_fk_core_anol FOREIGN KEY (ano_letivo_id) REFERENCES public.core_anoletivo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_anoletivoselecionado core_anoletivoselecionado_usuario_id_d080649b_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_anoletivoselecionado
+    ADD CONSTRAINT core_anoletivoselecionado_usuario_id_d080649b_fk_users_user_id FOREIGN KEY (usuario_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_disciplinaturma core_disciplinaturma_disciplina_id_e924a909_fk_core_disc; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_disciplinaturma
+    ADD CONSTRAINT core_disciplinaturma_disciplina_id_e924a909_fk_core_disc FOREIGN KEY (disciplina_id) REFERENCES public.core_disciplina(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_disciplinaturma core_disciplinaturma_turma_id_ca8b9173_fk_core_turma_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_disciplinaturma
+    ADD CONSTRAINT core_disciplinaturma_turma_id_ca8b9173_fk_core_turma_id FOREIGN KEY (turma_id) REFERENCES public.core_turma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_funcionario core_funcionario_usuario_id_13720693_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_funcionario
+    ADD CONSTRAINT core_funcionario_usuario_id_13720693_fk_users_user_id FOREIGN KEY (usuario_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_gradehoraria core_gradehoraria_disciplina_id_8f2a8982_fk_core_disciplina_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_gradehoraria
+    ADD CONSTRAINT core_gradehoraria_disciplina_id_8f2a8982_fk_core_disciplina_id FOREIGN KEY (disciplina_id) REFERENCES public.core_disciplina(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_gradehoraria core_gradehoraria_horario_aula_id_fd2ce14b_fk_core_hora; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_gradehoraria
+    ADD CONSTRAINT core_gradehoraria_horario_aula_id_fd2ce14b_fk_core_hora FOREIGN KEY (horario_aula_id) REFERENCES public.core_horarioaula(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_gradehoraria core_gradehoraria_validade_id_d6e45158_fk_core_grad; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_gradehoraria
+    ADD CONSTRAINT core_gradehoraria_validade_id_d6e45158_fk_core_grad FOREIGN KEY (validade_id) REFERENCES public.core_gradehorariavalidade(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_gradehorariavalidade core_gradehorariavalidade_turma_id_9e797795_fk_core_turma_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_gradehorariavalidade
+    ADD CONSTRAINT core_gradehorariavalidade_turma_id_9e797795_fk_core_turma_id FOREIGN KEY (turma_id) REFERENCES public.core_turma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_habilidade core_habilidade_disciplina_id_4e464227_fk_core_disciplina_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_habilidade
+    ADD CONSTRAINT core_habilidade_disciplina_id_4e464227_fk_core_disciplina_id FOREIGN KEY (disciplina_id) REFERENCES public.core_disciplina(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_horarioaula core_horarioaula_ano_letivo_id_f60146b2_fk_core_anoletivo_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_horarioaula
+    ADD CONSTRAINT core_horarioaula_ano_letivo_id_f60146b2_fk_core_anoletivo_id FOREIGN KEY (ano_letivo_id) REFERENCES public.core_anoletivo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_periodotrabalho core_periodotrabalho_funcionario_id_50ce0870_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_periodotrabalho
+    ADD CONSTRAINT core_periodotrabalho_funcionario_id_50ce0870_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_professordisciplinaturma core_professordiscip_disciplina_turma_id_91091248_fk_core_disc; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_professordisciplinaturma
+    ADD CONSTRAINT core_professordiscip_disciplina_turma_id_91091248_fk_core_disc FOREIGN KEY (disciplina_turma_id) REFERENCES public.core_disciplinaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_professordisciplinaturma core_professordiscip_professor_id_43b30907_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_professordisciplinaturma
+    ADD CONSTRAINT core_professordiscip_professor_id_43b30907_fk_core_func FOREIGN KEY (professor_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_turma core_turma_curso_id_3be244ac_fk_core_curso_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma
+    ADD CONSTRAINT core_turma_curso_id_3be244ac_fk_core_curso_id FOREIGN KEY (curso_id) REFERENCES public.core_curso(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_turma_professores_representantes core_turma_professor_funcionario_id_7a07fc74_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma_professores_representantes
+    ADD CONSTRAINT core_turma_professor_funcionario_id_7a07fc74_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: core_turma_professores_representantes core_turma_professor_turma_id_a50d824e_fk_core_turm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.core_turma_professores_representantes
+    ADD CONSTRAINT core_turma_professor_turma_id_a50d824e_fk_core_turm FOREIGN KEY (turma_id) REFERENCES public.core_turma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_content_type_id_c4bce8eb_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_users_user_id FOREIGN KEY (user_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_aviso management_aviso_criador_id_9a68bd6c_fk_core_funcionario_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_aviso
+    ADD CONSTRAINT management_aviso_criador_id_9a68bd6c_fk_core_funcionario_id FOREIGN KEY (criador_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_aviso_destinatarios management_aviso_des_aviso_id_145c8d68_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_aviso_destinatarios
+    ADD CONSTRAINT management_aviso_des_aviso_id_145c8d68_fk_managemen FOREIGN KEY (aviso_id) REFERENCES public.management_aviso(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_aviso_destinatarios management_aviso_des_user_id_c6e7aac2_fk_users_use; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_aviso_destinatarios
+    ADD CONSTRAINT management_aviso_des_user_id_c6e7aac2_fk_users_use FOREIGN KEY (user_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_avisoanexo management_avisoanexo_aviso_id_57d552a1_fk_management_aviso_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_avisoanexo
+    ADD CONSTRAINT management_avisoanexo_aviso_id_57d552a1_fk_management_aviso_id FOREIGN KEY (aviso_id) REFERENCES public.management_aviso(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_avisovisualizacao management_avisovisu_aviso_id_d790d3ff_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_avisovisualizacao
+    ADD CONSTRAINT management_avisovisu_aviso_id_d790d3ff_fk_managemen FOREIGN KEY (aviso_id) REFERENCES public.management_aviso(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_avisovisualizacao management_avisovisu_usuario_id_a09d066e_fk_users_use; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_avisovisualizacao
+    ADD CONSTRAINT management_avisovisu_usuario_id_a09d066e_fk_users_use FOREIGN KEY (usuario_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_notificacaotarefa management_notificac_funcionario_id_2a07f22e_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaotarefa
+    ADD CONSTRAINT management_notificac_funcionario_id_2a07f22e_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_notificacaohtpc management_notificac_funcionario_id_c52be426_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaohtpc
+    ADD CONSTRAINT management_notificac_funcionario_id_c52be426_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_notificacaohtpc management_notificac_reuniao_id_b17766c2_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaohtpc
+    ADD CONSTRAINT management_notificac_reuniao_id_b17766c2_fk_managemen FOREIGN KEY (reuniao_id) REFERENCES public.management_reuniaohtpc(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_notificacaotarefa management_notificac_tarefa_id_aa1f4780_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_notificacaotarefa
+    ADD CONSTRAINT management_notificac_tarefa_id_aa1f4780_fk_managemen FOREIGN KEY (tarefa_id) REFERENCES public.management_tarefa(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_reuniaohtpc_presentes management_reuniaoht_funcionario_id_496fe539_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpc_presentes
+    ADD CONSTRAINT management_reuniaoht_funcionario_id_496fe539_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_reuniaohtpc management_reuniaoht_quem_registrou_id_621368dc_fk_users_use; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpc
+    ADD CONSTRAINT management_reuniaoht_quem_registrou_id_621368dc_fk_users_use FOREIGN KEY (quem_registrou_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_reuniaohtpcanexo management_reuniaoht_reuniao_id_3a8a9698_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpcanexo
+    ADD CONSTRAINT management_reuniaoht_reuniao_id_3a8a9698_fk_managemen FOREIGN KEY (reuniao_id) REFERENCES public.management_reuniaohtpc(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_reuniaohtpc_presentes management_reuniaoht_reuniaohtpc_id_e5439d2e_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_reuniaohtpc_presentes
+    ADD CONSTRAINT management_reuniaoht_reuniaohtpc_id_e5439d2e_fk_managemen FOREIGN KEY (reuniaohtpc_id) REFERENCES public.management_reuniaohtpc(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefa management_tarefa_criador_id_4901be8f_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefa
+    ADD CONSTRAINT management_tarefa_criador_id_4901be8f_fk_users_user_id FOREIGN KEY (criador_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefa_funcionarios management_tarefa_fu_funcionario_id_81a43c3c_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefa_funcionarios
+    ADD CONSTRAINT management_tarefa_fu_funcionario_id_81a43c3c_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefa_funcionarios management_tarefa_fu_tarefa_id_1b4fd1c4_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefa_funcionarios
+    ADD CONSTRAINT management_tarefa_fu_tarefa_id_1b4fd1c4_fk_managemen FOREIGN KEY (tarefa_id) REFERENCES public.management_tarefa(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefaanexo management_tarefaane_tarefa_id_3e316151_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefaanexo
+    ADD CONSTRAINT management_tarefaane_tarefa_id_3e316151_fk_managemen FOREIGN KEY (tarefa_id) REFERENCES public.management_tarefa(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefaresposta management_tarefares_funcionario_id_14bad833_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefaresposta
+    ADD CONSTRAINT management_tarefares_funcionario_id_14bad833_fk_core_func FOREIGN KEY (funcionario_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefarespostaanexo management_tarefares_resposta_id_c53702e5_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefarespostaanexo
+    ADD CONSTRAINT management_tarefares_resposta_id_c53702e5_fk_managemen FOREIGN KEY (resposta_id) REFERENCES public.management_tarefaresposta(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: management_tarefaresposta management_tarefares_tarefa_id_750b6388_fk_managemen; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.management_tarefaresposta
+    ADD CONSTRAINT management_tarefares_tarefa_id_750b6388_fk_managemen FOREIGN KEY (tarefa_id) REFERENCES public.management_tarefa(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_aula pedagogical_aula_professor_disciplina_45ce1ebb_fk_core_prof; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_aula
+    ADD CONSTRAINT pedagogical_aula_professor_disciplina_45ce1ebb_fk_core_prof FOREIGN KEY (professor_disciplina_turma_id) REFERENCES public.core_professordisciplinaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_avaliacao pedagogical_avaliaca_professor_disciplina_d6581024_fk_core_prof; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_avaliacao
+    ADD CONSTRAINT pedagogical_avaliaca_professor_disciplina_d6581024_fk_core_prof FOREIGN KEY (professor_disciplina_turma_id) REFERENCES public.core_professordisciplinaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_controlevisto pedagogical_controle_instrumento_avaliati_1837df71_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_controlevisto
+    ADD CONSTRAINT pedagogical_controle_instrumento_avaliati_1837df71_fk_pedagogic FOREIGN KEY (instrumento_avaliativo_id) REFERENCES public.pedagogical_instrumentoavaliativo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_controlevisto pedagogical_controle_matricula_turma_id_60d3df7b_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_controlevisto
+    ADD CONSTRAINT pedagogical_controle_matricula_turma_id_60d3df7b_fk_academic_ FOREIGN KEY (matricula_turma_id) REFERENCES public.academic_matriculaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_controlevisto pedagogical_controle_professor_disciplina_93b5e757_fk_core_prof; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_controlevisto
+    ADD CONSTRAINT pedagogical_controle_professor_disciplina_93b5e757_fk_core_prof FOREIGN KEY (professor_disciplina_turma_id) REFERENCES public.core_professordisciplinaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_descritorocorrenciapedagogica pedagogical_descrito_gestor_id_7d075a73_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_descritorocorrenciapedagogica
+    ADD CONSTRAINT pedagogical_descrito_gestor_id_7d075a73_fk_core_func FOREIGN KEY (gestor_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_faltas pedagogical_faltas_aula_id_3fc456ba_fk_pedagogical_aula_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_faltas
+    ADD CONSTRAINT pedagogical_faltas_aula_id_3fc456ba_fk_pedagogical_aula_id FOREIGN KEY (aula_id) REFERENCES public.pedagogical_aula(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_faltas pedagogical_faltas_estudante_id_cacf9e7c_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_faltas
+    ADD CONSTRAINT pedagogical_faltas_estudante_id_cacf9e7c_fk_academic_ FOREIGN KEY (estudante_id) REFERENCES public.academic_estudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_instrumentoavaliativo pedagogical_instrume_avaliacao_id_f9ee5536_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_instrumentoavaliativo
+    ADD CONSTRAINT pedagogical_instrume_avaliacao_id_f9ee5536_fk_pedagogic FOREIGN KEY (avaliacao_id) REFERENCES public.pedagogical_avaliacao(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notaavaliacao pedagogical_notaaval_avaliacao_id_541388b3_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notaavaliacao
+    ADD CONSTRAINT pedagogical_notaaval_avaliacao_id_541388b3_fk_pedagogic FOREIGN KEY (avaliacao_id) REFERENCES public.pedagogical_avaliacao(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notaavaliacao pedagogical_notaaval_matricula_turma_id_3061c106_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notaavaliacao
+    ADD CONSTRAINT pedagogical_notaaval_matricula_turma_id_3061c106_fk_academic_ FOREIGN KEY (matricula_turma_id) REFERENCES public.academic_matriculaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notabimestral pedagogical_notabime_matricula_turma_id_710e9fa7_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notabimestral
+    ADD CONSTRAINT pedagogical_notabime_matricula_turma_id_710e9fa7_fk_academic_ FOREIGN KEY (matricula_turma_id) REFERENCES public.academic_matriculaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notabimestral pedagogical_notabime_professor_disciplina_800de48d_fk_core_prof; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notabimestral
+    ADD CONSTRAINT pedagogical_notabime_professor_disciplina_800de48d_fk_core_prof FOREIGN KEY (professor_disciplina_turma_id) REFERENCES public.core_professordisciplinaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notainstrumentoavaliativo pedagogical_notainst_instrumento_avaliati_5df6482d_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notainstrumentoavaliativo
+    ADD CONSTRAINT pedagogical_notainst_instrumento_avaliati_5df6482d_fk_pedagogic FOREIGN KEY (instrumento_avaliativo_id) REFERENCES public.pedagogical_instrumentoavaliativo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notainstrumentoavaliativo pedagogical_notainst_matricula_turma_id_1aa0de08_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notainstrumentoavaliativo
+    ADD CONSTRAINT pedagogical_notainst_matricula_turma_id_1aa0de08_fk_academic_ FOREIGN KEY (matricula_turma_id) REFERENCES public.academic_matriculaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notificacaorecuperacao pedagogical_notifica_estudante_id_3d9a2b58_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notificacaorecuperacao
+    ADD CONSTRAINT pedagogical_notifica_estudante_id_3d9a2b58_fk_academic_ FOREIGN KEY (estudante_id) REFERENCES public.academic_estudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_notificacaorecuperacao pedagogical_notifica_professor_disciplina_67a2ca65_fk_core_prof; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_notificacaorecuperacao
+    ADD CONSTRAINT pedagogical_notifica_professor_disciplina_67a2ca65_fk_core_prof FOREIGN KEY (professor_disciplina_turma_id) REFERENCES public.core_professordisciplinaturma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica pedagogical_ocorrenc_autor_id_959a9a6f_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciapedagogica
+    ADD CONSTRAINT pedagogical_ocorrenc_autor_id_959a9a6f_fk_core_func FOREIGN KEY (autor_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica pedagogical_ocorrenc_estudante_id_4c3be7f4_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciapedagogica
+    ADD CONSTRAINT pedagogical_ocorrenc_estudante_id_4c3be7f4_fk_academic_ FOREIGN KEY (estudante_id) REFERENCES public.academic_estudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente pedagogical_ocorrenc_ocorrencia_id_a0779f60_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciaresponsavelciente
+    ADD CONSTRAINT pedagogical_ocorrenc_ocorrencia_id_a0779f60_fk_pedagogic FOREIGN KEY (ocorrencia_id) REFERENCES public.pedagogical_ocorrenciapedagogica(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_ocorrenciaresponsavelciente pedagogical_ocorrenc_responsavel_id_eaa3f2d6_fk_academic_; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciaresponsavelciente
+    ADD CONSTRAINT pedagogical_ocorrenc_responsavel_id_eaa3f2d6_fk_academic_ FOREIGN KEY (responsavel_id) REFERENCES public.academic_responsavel(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_ocorrenciapedagogica pedagogical_ocorrenc_tipo_id_bf9e428c_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_ocorrenciapedagogica
+    ADD CONSTRAINT pedagogical_ocorrenc_tipo_id_bf9e428c_fk_pedagogic FOREIGN KEY (tipo_id) REFERENCES public.pedagogical_descritorocorrenciapedagogica(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_planoaula pedagogical_planoaul_disciplina_id_6203c6ae_fk_core_disc; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula
+    ADD CONSTRAINT pedagogical_planoaul_disciplina_id_6203c6ae_fk_core_disc FOREIGN KEY (disciplina_id) REFERENCES public.core_disciplina(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_planoaula_habilidades pedagogical_planoaul_habilidade_id_e78fd94c_fk_core_habi; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_habilidades
+    ADD CONSTRAINT pedagogical_planoaul_habilidade_id_e78fd94c_fk_core_habi FOREIGN KEY (habilidade_id) REFERENCES public.core_habilidade(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_planoaula_turmas pedagogical_planoaul_planoaula_id_3a17c7da_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_turmas
+    ADD CONSTRAINT pedagogical_planoaul_planoaula_id_3a17c7da_fk_pedagogic FOREIGN KEY (planoaula_id) REFERENCES public.pedagogical_planoaula(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_planoaula_habilidades pedagogical_planoaul_planoaula_id_87c1d53d_fk_pedagogic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_habilidades
+    ADD CONSTRAINT pedagogical_planoaul_planoaula_id_87c1d53d_fk_pedagogic FOREIGN KEY (planoaula_id) REFERENCES public.pedagogical_planoaula(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_planoaula pedagogical_planoaul_professor_id_81dc1fb6_fk_core_func; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula
+    ADD CONSTRAINT pedagogical_planoaul_professor_id_81dc1fb6_fk_core_func FOREIGN KEY (professor_id) REFERENCES public.core_funcionario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: pedagogical_planoaula_turmas pedagogical_planoaula_turmas_turma_id_baa02398_fk_core_turma_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pedagogical_planoaula_turmas
+    ADD CONSTRAINT pedagogical_planoaula_turmas_turma_id_baa02398_fk_core_turma_id FOREIGN KEY (turma_id) REFERENCES public.core_turma(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: permanent_dadospermanenteresponsavel permanent_dadosperma_estudante_id_6711e4a2_fk_permanent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_dadospermanenteresponsavel
+    ADD CONSTRAINT permanent_dadosperma_estudante_id_6711e4a2_fk_permanent FOREIGN KEY (estudante_id) REFERENCES public.permanent_dadospermanenteestudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: permanent_historicoescolarnotas permanent_historicoe_ano_letivo_ref_id_9940c1ac_fk_permanent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolarnotas
+    ADD CONSTRAINT permanent_historicoe_ano_letivo_ref_id_9940c1ac_fk_permanent FOREIGN KEY (ano_letivo_ref_id) REFERENCES public.permanent_historicoescolaranoletivo(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: permanent_historicoescolar permanent_historicoe_estudante_id_3b3f4b9d_fk_permanent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolar
+    ADD CONSTRAINT permanent_historicoe_estudante_id_3b3f4b9d_fk_permanent FOREIGN KEY (estudante_id) REFERENCES public.permanent_dadospermanenteestudante(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: permanent_historicoescolaranoletivo permanent_historicoe_historico_id_4e976066_fk_permanent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_historicoescolaranoletivo
+    ADD CONSTRAINT permanent_historicoe_historico_id_4e976066_fk_permanent FOREIGN KEY (historico_id) REFERENCES public.permanent_historicoescolar(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: permanent_registroprontuario permanent_registropr_pai_ocorrencia_id_971a9543_fk_permanent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_registroprontuario
+    ADD CONSTRAINT permanent_registropr_pai_ocorrencia_id_971a9543_fk_permanent FOREIGN KEY (pai_ocorrencia_id) REFERENCES public.permanent_registroprontuario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: permanent_registroprontuarioanexo permanent_registropr_registro_prontuario__b6e90955_fk_permanent; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.permanent_registroprontuarioanexo
+    ADD CONSTRAINT permanent_registropr_registro_prontuario__b6e90955_fk_permanent FOREIGN KEY (registro_prontuario_id) REFERENCES public.permanent_registroprontuario(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: users_user_groups users_user_groups_group_id_9afc8d0e_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_groups
+    ADD CONSTRAINT users_user_groups_group_id_9afc8d0e_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: users_user_groups users_user_groups_user_id_5f6f5a90_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_groups
+    ADD CONSTRAINT users_user_groups_user_id_5f6f5a90_fk_users_user_id FOREIGN KEY (user_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: users_user_user_permissions users_user_user_perm_permission_id_0b93982e_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_user_permissions
+    ADD CONSTRAINT users_user_user_perm_permission_id_0b93982e_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: users_user_user_permissions users_user_user_permissions_user_id_20aca447_fk_users_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_user_user_permissions
+    ADD CONSTRAINT users_user_user_permissions_user_id_20aca447_fk_users_user_id FOREIGN KEY (user_id) REFERENCES public.users_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+\unrestrict LYSf8RWmBBFcHofu4wWUWb4DCMOXKriOkVjZh5C7vpOTA4uIlaEZ7Kmd2eXR1mu
+
