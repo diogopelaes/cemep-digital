@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { HiArrowLeft, HiSave, HiTrash } from 'react-icons/hi'
+import { HiSave, HiTrash } from 'react-icons/hi'
 import { Button, Card, Input, Loading, Select, MultiCombobox, Modal, ModalFooter } from '../components/ui'
 import { coreAPI } from '../services/api'
 import { useReferences } from '../contexts/ReferenceContext'
@@ -219,12 +219,7 @@ export default function TurmaForm() {
     <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button
-          onClick={() => navigate('/turmas')}
-          className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-        >
-          <HiArrowLeft className="h-6 w-6" />
-        </button>
+
         <div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
             {isEditing ? 'Editar Turma' : 'Nova Turma'}

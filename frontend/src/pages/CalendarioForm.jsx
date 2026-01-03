@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import {
     Card, Button, DateInput, Checkbox, Loading, Input, Select
 } from '../components/ui'
-import { HiArrowLeft, HiSave, HiTrash } from 'react-icons/hi'
+import { HiSave, HiTrash } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import { formatDateBR } from '../utils/date'
 import toast from 'react-hot-toast'
@@ -249,12 +249,7 @@ export default function CalendarioForm() {
         <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
             {/* Header */}
             <div className="flex items-center gap-4">
-                <button
-                    onClick={() => navigate('/configuracoes?tab=calendario')}
-                    className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                >
-                    <HiArrowLeft className="h-6 w-6" />
-                </button>
+
                 <div>
                     <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
                         Editar Ano Letivo {ano}

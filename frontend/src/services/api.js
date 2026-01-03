@@ -226,6 +226,12 @@ export const coreAPI = {
     get: () => api.get('/core/ano-letivo-selecionado/'),
     update: (anoLetivoId) => api.post('/core/ano-letivo-selecionado/', { ano_letivo_id: anoLetivoId }),
   },
+
+  // Minhas Turmas (apenas turmas onde o professor leciona)
+  minhasTurmas: {
+    list: () => api.get('/core/minhas-turmas/'),
+    get: (id) => api.get(`/core/minhas-turmas/${id}/`),
+  },
 }
 
 export const academicAPI = {

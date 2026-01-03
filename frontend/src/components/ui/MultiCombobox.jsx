@@ -36,17 +36,10 @@ export default function MultiCombobox({
     const wrapperRef = useRef(null)
     const inputRef = useRef(null)
 
-    // Sincroniza options externas se mudarem (e não estiver buscando)
+    // Sincroniza options externas para o modo async (reset quando query vazia)
     useEffect(() => {
-        if (!onSearch) {
+        if (onSearch && query === '' && options.length > 0) {
             setInternalOptions(options)
-        } else if (query === '' && options.length > 0) {
-            // Se tem onSearch mas a query tá vazia, mostra as options iniciais (ex: selecionados)
-            setInternalOptions(prev => {
-                // Mantém as atuais se já tiver, ou atualiza. 
-                // Simplificação: Atualiza com as props se query vazia
-                return options
-            })
         }
     }, [options, onSearch, query])
 
@@ -96,11 +89,13 @@ export default function MultiCombobox({
     }, [])
 
     // Filtragem Local (apenas se NÃO tiver onSearch)
+    // Se tiver onSearch, usamos internalOptions (resultados do servidor)
+    // Se NÃO tiver, usamos options (props) diretamente filtrados
     const filteredOptions = onSearch
         ? internalOptions // Se é async, o servidor já filtrou
         : (query === ''
-            ? internalOptions
-            : internalOptions.filter((opt) => {
+            ? options
+            : options.filter((opt) => {
                 const normalize = (str) => String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '')
                 const search = normalize(query)
                 const labelNorm = normalize(opt.label)
@@ -114,7 +109,7 @@ export default function MultiCombobox({
         [...internalOptions, ...options].filter(o => value.includes(o.value))
             // Remove duplicatas de display
             .filter((v, i, a) => a.findIndex(t => (t.value === v.value)) === i)
-        : internalOptions.filter(opt => value.includes(opt.value))
+        : options.filter(opt => value.includes(opt.value))
     )
 
     // Fallback: Se o valor está selecionado mas não temos o label (pq não veio na busca), 
@@ -127,10 +122,8 @@ export default function MultiCombobox({
             : [...value, optionValue]
         onChange(newValue)
 
-        // Não limpa a query no modo async para não perder a lista instantaneamente
-        if (!onSearch) {
-            setQuery('')
-        }
+        // Limpa a query sempre para evitar que o texto persista
+        setQuery('')
         inputRef.current?.focus()
     }
 
@@ -189,9 +182,17 @@ export default function MultiCombobox({
                         }}
                         onFocus={() => setIsOpen(true)}
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter' && value.length > 0 && onEnter) {
-                                e.preventDefault()
-                                onEnter()
+                            if (e.key === 'Enter') {
+                                // Se está buscando/filtrando e tem opções -> Seleciona a primeira
+                                if (query && filteredOptions.length > 0) {
+                                    e.preventDefault()
+                                    toggleOption(filteredOptions[0].value)
+                                }
+                                // Se não está buscando (ou não achou nada), tenta executar a ação do pai (ex: Enturmar)
+                                else if (onEnter) {
+                                    e.preventDefault()
+                                    onEnter()
+                                }
                             }
                         }}
                         disabled={disabled}

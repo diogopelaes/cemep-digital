@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Card, Button, Input, Loading } from '../components/ui'
-import { HiArrowLeft, HiSave } from 'react-icons/hi'
+import { HiSave } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -80,12 +80,7 @@ export default function CursoForm() {
     <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button
-          onClick={() => navigate('/cursos')}
-          className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-        >
-          <HiArrowLeft className="h-6 w-6" />
-        </button>
+
         <div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
             {isEditing ? 'Editar Curso' : 'Novo Curso'}

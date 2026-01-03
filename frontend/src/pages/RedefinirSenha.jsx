@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { Button, Card } from '../components/ui'
-import { HiArrowLeft, HiLockClosed, HiCheck } from 'react-icons/hi'
+import { HiLockClosed, HiCheck } from 'react-icons/hi'
 import { authAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -139,7 +139,6 @@ export default function RedefinirSenha() {
                         to="/login"
                         className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-primary-600"
                     >
-                        <HiArrowLeft className="h-4 w-4" />
                         Voltar ao login
                     </Link>
                 </div>

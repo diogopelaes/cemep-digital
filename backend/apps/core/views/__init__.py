@@ -15,6 +15,7 @@ from .habilidade import HabilidadeViewSet
 from .horario_aula import HorarioAulaViewSet
 from .grade_horaria import GradeHorariaViewSet
 from .ano_letivo_selecionado import AnoLetivoSelecionadoViewSet
+from .professor import MinhasTurmasViewSet
 
 
 __all__ = [
@@ -30,4 +31,5 @@ __all__ = [
     'HorarioAulaViewSet',
     'GradeHorariaViewSet',
     'AnoLetivoSelecionadoViewSet',
+    'MinhasTurmasViewSet',
 ]

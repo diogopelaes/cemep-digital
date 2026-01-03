@@ -30,10 +30,15 @@ import Configuracoes from './pages/Configuracoes'
 import CalendarioDetalhes from './pages/CalendarioDetalhes'
 import CalendarioForm from './pages/CalendarioForm'
 
+// Pages do Professor
+import MinhasTurmas from './pages/professor/MinhasTurmas'
+import MinhaTurmaDetalhes from './pages/professor/MinhaTurmaDetalhes'
+
 // Constantes de perfis para evitar repetição
 const GESTAO_ONLY = ['GESTAO']
 const GESTAO_SECRETARIA = ['GESTAO', 'SECRETARIA']
 const FUNCIONARIOS = ['GESTAO', 'SECRETARIA', 'PROFESSOR', 'MONITOR']
+const PROFESSOR_ONLY = ['PROFESSOR']
 
 function App() {
   return (
@@ -88,7 +93,7 @@ function App() {
           <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><EstudanteForm /></ProtectedRoute>
         } />
         <Route path="/estudantes/:id" element={
-          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><EstudanteDetalhes /></ProtectedRoute>
+          <ProtectedRoute allowedRoles={FUNCIONARIOS}><EstudanteDetalhes /></ProtectedRoute>
         } />
         <Route path="/estudantes/:id/editar" element={
           <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><EstudanteForm /></ProtectedRoute>
@@ -137,7 +142,13 @@ function App() {
         <Route path="/configuracoes/calendario/:ano/editar" element={
           <ProtectedRoute allowedRoles={GESTAO_ONLY}><CalendarioForm /></ProtectedRoute>
         } />
-        <Route path="/minhas-turmas" element={<PlaceholderPage title="Minhas Turmas" />} />
+        {/* Rotas exclusivas do Professor */}
+        <Route path="/minhas-turmas" element={
+          <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><MinhasTurmas /></ProtectedRoute>
+        } />
+        <Route path="/minhas-turmas/:id" element={
+          <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><MinhaTurmaDetalhes /></ProtectedRoute>
+        } />
         <Route path="/diario" element={<PlaceholderPage title="Diário de Classe" />} />
         <Route path="/notas" element={<PlaceholderPage title="Notas" />} />
         <Route path="/boletim" element={<PlaceholderPage title="Boletim" />} />

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Card, Button } from '../components/ui'
-import { HiPrinter, HiMail, HiArrowLeft, HiCheckCircle, HiUserCircle, HiKey, HiClipboardCopy, HiPencil } from 'react-icons/hi'
+import { HiPrinter, HiMail, HiCheckCircle, HiUserCircle, HiKey, HiClipboardCopy, HiPencil } from 'react-icons/hi'
 import { usersAPI } from '../services/api'
 import { formatDateBR } from '../utils/date'
 import toast from 'react-hot-toast'
@@ -380,14 +380,7 @@ export default function FuncionarioCredenciais() {
         </Button>
       </div>
 
-      <Button
-        onClick={() => navigate('/funcionarios')}
-        variant="ghost"
-        icon={HiArrowLeft}
-        className="w-full"
-      >
-        Voltar para Lista de Funcionários
-      </Button>
+
     </div>
   )
 }

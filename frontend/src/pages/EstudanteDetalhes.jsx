@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { Card, Button, Badge, Loading } from '../components/ui'
+import { useAuth } from '../contexts/AuthContext'
 import { InfoItem, BooleanItem } from '../components/common'
 import {
     HiArrowLeft, HiPencil, HiPrinter, HiDownload, HiPhone, HiMail,
@@ -21,6 +22,7 @@ import toast from 'react-hot-toast'
  * Página de detalhes do estudante
  */
 export default function EstudanteDetalhes() {
+    const { isSecretaria } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
     const { id } = useParams()
@@ -47,14 +49,6 @@ export default function EstudanteDetalhes() {
             navigate('/estudantes')
         }
         setLoading(false)
-    }
-
-    const handleBack = () => {
-        if (location.state?.from) {
-            navigate(location.state.from, { state: { tab: location.state.tab } })
-        } else {
-            navigate('/estudantes')
-        }
     }
 
     const gerarPDF = async (download = true) => {
@@ -229,14 +223,9 @@ export default function EstudanteDetalhes() {
     return (
         <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
             {/* Header */}
+            {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <button
-                        onClick={handleBack}
-                        className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                    >
-                        <HiArrowLeft className="h-6 w-6" />
-                    </button>
                     <div>
                         <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
                             Detalhes do Estudante
@@ -264,12 +253,14 @@ export default function EstudanteDetalhes() {
                     >
                         Baixar PDF
                     </Button>
-                    <Button
-                        icon={HiPencil}
-                        onClick={() => navigate(`/estudantes/${id}/editar`)}
-                    >
-                        Editar
-                    </Button>
+                    {isSecretaria && (
+                        <Button
+                            icon={HiPencil}
+                            onClick={() => navigate(`/estudantes/${id}/editar`)}
+                        >
+                            Editar
+                        </Button>
+                    )}
                 </div>
             </div>
 

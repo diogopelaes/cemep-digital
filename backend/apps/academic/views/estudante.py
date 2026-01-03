@@ -19,11 +19,11 @@ from apps.academic.serializers import (
     ResponsavelEstudanteSerializer, MatriculaCEMEPSerializer,
     MatriculaTurmaSerializer
 )
-from apps.users.permissions import GestaoSecretariaCRUMixin
+from apps.users.permissions import GestaoSecretariaWriteFuncionarioReadMixin
 from apps.users.utils import send_credentials_email
 
 
-class EstudanteViewSet(GestaoSecretariaCRUMixin, viewsets.ModelViewSet):
+class EstudanteViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
     """ViewSet de Estudantes. CRU: Gestão/Secretaria | Delete: Bloqueado"""
     queryset = Estudante.objects.select_related('usuario').all()
     # lookup_field padrão = 'pk' (UUID) - funciona para todos, inclusive sem CPF

@@ -1,4 +1,4 @@
-import { HiArrowLeft, HiPencil } from 'react-icons/hi'
+import { HiPencil } from 'react-icons/hi'
 import { Button } from '../ui'
 
 /**
@@ -14,12 +14,7 @@ export default function TurmaHeader({ turma, onBack, onEdit }) {
 
     return (
         <div className="flex items-center gap-4">
-            <button
-                onClick={onBack}
-                className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-            >
-                <HiArrowLeft className="h-6 w-6" />
-            </button>
+
             <div className="flex-1">
                 <div className="flex items-center gap-3">
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-lg">

@@ -6,7 +6,7 @@ import {
 } from '../components/ui'
 import { InfoItem } from '../components/common'
 import {
-    HiArrowLeft, HiPencil, HiPrinter, HiDownload, HiPhone, HiMail,
+    HiPencil, HiPrinter, HiDownload, HiPhone, HiMail,
     HiLocationMarker, HiCalendar, HiUser, HiIdentification, HiBriefcase
 } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
@@ -176,12 +176,7 @@ export default function FuncionarioDetalhes() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => navigate('/funcionarios')}
-                        className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                    >
-                        <HiArrowLeft className="h-6 w-6" />
-                    </button>
+
                     <div>
                         <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
                             Detalhes do Funcionário
