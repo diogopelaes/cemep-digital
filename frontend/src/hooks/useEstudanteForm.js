@@ -1,4 +1,19 @@
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import toast from 'react-hot-toast'
+import { academicAPI } from '../services/api'
 import { useReferences } from '../contexts/ReferenceContext'
+import { validateCPF } from '../utils/validators'
+import { formatCEP, formatMatricula } from '../utils/formatters'
+
+// Helper simples para senha
+const generatePassword = () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&'
+    let password = ''
+    for (let i = 0; i < 12; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    return password
+}
 
 /**
  * Hook para gerenciar o formulário de estudante
@@ -16,14 +31,56 @@ export function useEstudanteForm(idParam, navigate) {
     const [saving, setSaving] = useState(false)
     const [fotoBlob, setFotoBlob] = useState(null)
     const [fotoPreview, setFotoPreview] = useState(null)
-    // Cursos removido do state local
     const [cepLoading, setCepLoading] = useState(false)
     const [cpfError, setCpfError] = useState('')
     const [showPassword, setShowPassword] = useState(false)
 
-    // ... (rest json)
+    // Form Data Inicial (Movido para cima do isMenor)
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: '',
+        first_name: '',
+        cpf: '',
+        cin: '',
+        nome_social: '',
+        data_nascimento: '',
+        telefone: '',
+        bolsa_familia: false,
+        pe_de_meia: true,
+        usa_onibus: true,
+        linha_onibus: '',
+        permissao_sair_sozinho: false,
+        logradouro: '',
+        numero: '',
+        complemento: '',
+        bairro: '',
+        cidade: 'Paulínia',
+        estado: 'SP',
+        cep: '',
+    })
 
-    // Efeito de carregar cursos removido pois vem do context
+    const [responsaveis, setResponsaveis] = useState([{ nome: '', cpf: '', telefone: '', email: '', parentesco: '' }])
+    const [matriculas, setMatriculas] = useState([{
+        numero_matricula: '',
+        curso_id: '',
+        data_entrada: new Date().toISOString().split('T')[0],
+        data_saida: '',
+        status: 'MATRICULADO'
+    }])
+
+    // Calcula se é menor de idade (Depende de formData)
+    const isMenor = useMemo(() => {
+        if (!formData.data_nascimento) return false
+        const hoje = new Date()
+        const nasc = new Date(formData.data_nascimento + 'T00:00:00')
+        let idade = hoje.getFullYear() - nasc.getFullYear()
+        const m = hoje.getMonth() - nasc.getMonth()
+        if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) {
+            idade--
+        }
+        return idade < 18
+    }, [formData.data_nascimento])
 
     // Inicialização
     useEffect(() => {

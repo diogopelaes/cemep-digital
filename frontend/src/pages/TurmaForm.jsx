@@ -1,4 +1,17 @@
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import { HiArrowLeft, HiSave, HiTrash } from 'react-icons/hi'
+import { Button, Card, Input, Loading, Select, MultiCombobox, Modal, ModalFooter } from '../components/ui'
+import { coreAPI } from '../services/api'
 import { useReferences } from '../contexts/ReferenceContext'
+
+const NOMENCLATURAS = [
+  { value: 'SERIE', label: 'Série' },
+  { value: 'ANO', label: 'Ano' },
+  { value: 'MODULO', label: 'Módulo' },
+  { value: 'SEMESTRE', label: 'Semestre' }
+]
 
 export default function TurmaForm() {
   const navigate = useNavigate()

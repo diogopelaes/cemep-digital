@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -24,7 +24,7 @@ export function useDisciplinasTurma(turmaId, turma, isActive = true, pageSize = 
     const [totalPages, setTotalPages] = useState(1)
     const [totalCount, setTotalCount] = useState(0)
 
-    // Professores
+    // Professores (Cache local para autocomplete)
     const [professoresDisponiveis, setProfessoresDisponiveis] = useState([])
     const [salvandoProfessores, setSalvandoProfessores] = useState(null)
 
@@ -37,14 +37,13 @@ export function useDisciplinasTurma(turmaId, turma, isActive = true, pageSize = 
         try {
             const [vinculadasRes, todasRes, atribuicoesRes] = await Promise.all([
                 coreAPI.disciplinasTurma.list({ turma: turmaId, page_size: 100 }),
-                coreAPI.disciplinas.list({ is_active: 'true', page }),
+                coreAPI.disciplinas.list({ is_active: 'true', page, page_size: pageSize }),
                 coreAPI.atribuicoes.list({ turma: turmaId, page_size: 100 }),
             ])
 
             const vinculadas = vinculadasRes.data.results || vinculadasRes.data
             const todas = todasRes.data.results || todasRes.data
             const atribuicoes = atribuicoesRes.data.results || atribuicoesRes.data
-            // Não carregamos mais funcionarios em massa
 
             setTodasDisciplinas(todas)
 
@@ -53,10 +52,7 @@ export function useDisciplinasTurma(turmaId, turma, isActive = true, pageSize = 
                 setTotalPages(Math.ceil(todasRes.data.count / pageSize))
             }
 
-            // setProfessoresDisponiveis não é mais usado globalmente dessa forma
-            // mas podemos manter o estado se quisermos cachear buscas
-
-            // ... (rest of mapping logic) ...
+            // Mapeia disciplinas vinculadas e atribuições
             const vinculadasMap = {}
             const aulasMap = {}
 
@@ -90,6 +86,9 @@ export function useDisciplinasTurma(turmaId, turma, isActive = true, pageSize = 
         }
     }, [turma, turmaId, isActive, page, pageSize])
 
+    // Reload silencioso
+    const reloadSilent = useCallback(() => loadDisciplinas(true), [loadDisciplinas])
+
     // Busca professores sob demanda
     const searchProfessores = useCallback(async (query) => {
         if (!query) return []
@@ -102,13 +101,73 @@ export function useDisciplinasTurma(turmaId, turma, isActive = true, pageSize = 
             })
             return response.data.results || response.data
         } catch (error) {
+
             console.error(error)
             toast.error('Erro ao buscar professores')
             return []
         }
     }, [])
 
-    // ... (rest of effects) ...
+    // Efeito de carga
+    useEffect(() => {
+        loadDisciplinas()
+    }, [loadDisciplinas])
+
+
+    // Handler: Selecionar/Deselecionar Disciplina
+    const toggleDisciplina = useCallback(async (disciplina) => {
+        const isSelected = !!disciplinasVinculadas[disciplina.id]
+        setSaving(true)
+
+        try {
+            if (isSelected) {
+                // Remove
+                const vinculoId = disciplinasVinculadas[disciplina.id].id
+                await coreAPI.disciplinasTurma.delete(vinculoId)
+                toast.success('Disciplina removida da turma')
+            } else {
+                // Adiciona
+                await coreAPI.disciplinasTurma.create({
+                    turma_id: turmaId,
+                    disciplina_id: disciplina.id,
+                    aulas_semanais: 4 // Default
+                })
+                toast.success('Disciplina adicionada à turma')
+            }
+            await reloadSilent()
+        } catch (error) {
+            console.error(error)
+            toast.error('Erro ao atualizar disciplina')
+        } finally {
+            setSaving(false)
+        }
+    }, [disciplinasVinculadas, turmaId, reloadSilent])
+
+    // Handler: Input Aulas Semanais
+    const updateAulasSemanaisInput = useCallback((disciplinaId, valor) => {
+        const apenasNumeros = valor.replace(/\D/g, '').slice(0, 2)
+        setAulasSemanais(prev => ({ ...prev, [disciplinaId]: apenasNumeros }))
+    }, [])
+
+    // Handler: Salvar Aulas Semanais (Blur)
+    const saveAulasSemanais = useCallback(async (disciplinaId) => {
+        const vinculo = disciplinasVinculadas[disciplinaId]
+        const valorAtual = aulasSemanais[disciplinaId]
+
+        if (!vinculo || !valorAtual) return
+        if (parseInt(valorAtual) === vinculo.aulas_semanais) return
+
+        try {
+            await coreAPI.disciplinasTurma.update(vinculo.id, {
+                aulas_semanais: parseInt(valorAtual)
+            })
+            toast.success('Aulas semanais atualizadas', { duration: 2000 })
+            await reloadSilent()
+        } catch (error) {
+            console.error(error)
+            toast.error('Erro ao salvar aulas semanais')
+        }
+    }, [disciplinasVinculadas, aulasSemanais, reloadSilent])
 
     // Atualiza professores
     const updateProfessores = useCallback(async (disciplinaId, novosProfessoresIds) => {
@@ -116,7 +175,6 @@ export function useDisciplinasTurma(turmaId, turma, isActive = true, pageSize = 
         if (!vinculo) return
 
         const anteriores = vinculo.professores || []
-        // ... (diff logic same as before) ...
         const anterioresIds = anteriores.map(p => p.id)
 
         const adicionados = novosProfessoresIds.filter(id => !anterioresIds.includes(id))
@@ -153,7 +211,63 @@ export function useDisciplinasTurma(turmaId, turma, isActive = true, pageSize = 
         }
     }, [disciplinasVinculadas, reloadSilent])
 
-    // ... (rest) ...
+    const changeTipoProfessor = useCallback(async (disciplinaId, professorId, novoTipo) => {
+        const vinculo = disciplinasVinculadas[disciplinaId]
+        if (!vinculo) return
+
+        const professor = vinculo.professores.find(p => p.id === professorId)
+        if (!professor) return
+
+        setSalvandoProfessores(disciplinaId)
+        try {
+            await coreAPI.atribuicoes.update(professor.atribuicao_id, {
+                tipo: novoTipo
+            })
+            toast.success(`Professor alterado para ${novoTipo === 'TITULAR' ? 'Titular' : 'Substituto'}`)
+            await reloadSilent()
+        } catch (error) {
+            console.error(error)
+            toast.error('Erro ao alterar tipo do professor')
+        } finally {
+            setSalvandoProfessores(null)
+        }
+    }, [disciplinasVinculadas, reloadSilent])
+
+    // Cálculos derivados
+    const totalAulasSemanais = useMemo(() => {
+        return Object.values(disciplinasVinculadas).reduce((acc, curr) => {
+            return acc + (parseInt(curr.aulas_semanais) || 0)
+        }, 0)
+    }, [disciplinasVinculadas])
+
+    const disciplinasPorArea = useMemo(() => {
+        const grupos = {}
+        const areaOrder = [
+            'LINGUAGENS',
+            'MATEMATICA',
+            'CIENCIAS_NATUREZA',
+            'CIENCIAS_HUMANAS',
+            'ENSINO_RELIGIOSO',
+            'PARTE_DIVERSIFICADA',
+            'TECNICO'
+        ]
+
+        // Inicializa grupos
+        areaOrder.forEach(area => grupos[area] = [])
+        grupos['OUTROS'] = []
+
+        todasDisciplinas.forEach(d => {
+            const area = d.area_conhecimento || 'OUTROS'
+            if (!grupos[area]) grupos[area] = []
+            grupos[area].push(d)
+        })
+
+        // Remove grupos vazios e retorna objeto ordenado
+        return Object.entries(grupos)
+            .filter(([_, lista]) => lista.length > 0)
+            .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+
+    }, [todasDisciplinas])
 
     return {
         // Estado
@@ -163,7 +277,10 @@ export function useDisciplinasTurma(turmaId, turma, isActive = true, pageSize = 
         loading,
         saving,
         salvandoProfessores,
-        searchProfessores, // Exported
+        professoresDisponiveis, // Mantemos vazio ou cache local se necessário
+
+        // Async Search Exported
+        searchProfessores,
 
         // Paginação
         page,
@@ -177,7 +294,7 @@ export function useDisciplinasTurma(turmaId, turma, isActive = true, pageSize = 
         disciplinasPorArea,
 
         // Handlers
-        isDisciplinaSelecionada,
+        isDisciplinaSelecionada: (id) => !!disciplinasVinculadas[id],
         toggleDisciplina,
         updateAulasSemanaisInput,
         saveAulasSemanais,
