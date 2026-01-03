@@ -192,6 +192,30 @@
     @apply bg-slate-50/50 dark:bg-slate-700/30;
   }
 
+  /* Table Column Utilities */
+  /* Centered header and cell */
+  .th-center {
+    text-align: center !important;
+  }
+
+  .td-center {
+    text-align: center !important;
+  }
+
+  /* Actions column - right aligned with fixed width */
+  .th-actions {
+    width: 5rem;
+    text-align: center !important;
+  }
+
+  .td-actions {
+    text-align: center !important;
+  }
+
+  .td-actions > div {
+    @apply flex items-center justify-center;
+  }
+
   /* Badges */
   .badge {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;

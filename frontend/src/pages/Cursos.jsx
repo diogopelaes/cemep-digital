@@ -116,7 +116,7 @@ export default function Cursos() {
             <TableRow>
               <TableHeader>Nome</TableHeader>
               <TableHeader>Sigla</TableHeader>
-              <TableHeader>Status</TableHeader>
+              <TableHeader className="th-center">Status</TableHeader>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -149,13 +149,13 @@ export default function Cursos() {
                       {curso.sigla}
                     </span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="td-center">
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
                         handleToggleAtivo(curso)
                       }}
-                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${curso.is_active
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${curso.is_active
                         ? 'bg-success-500/10 text-success-600 hover:bg-success-500/20 dark:text-success-400'
                         : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400'
                         }`}

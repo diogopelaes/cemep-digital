@@ -70,9 +70,9 @@ export default function MinhasTurmas() {
                                 <TableHeader>Turma</TableHeader>
                                 <TableHeader>Curso</TableHeader>
                                 <TableHeader>Disciplinas</TableHeader>
-                                <TableHeader>Estudantes</TableHeader>
-                                <TableHeader>Carômetro</TableHeader>
-                                <TableHeader>Grade Horária</TableHeader>
+                                <TableHeader className="th-center">Estudantes</TableHeader>
+                                <TableHeader className="th-center">Carômetro</TableHeader>
+                                <TableHeader className="th-center">Grade Horária</TableHeader>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -113,32 +113,30 @@ export default function MinhasTurmas() {
                                                 ))}
                                             </div>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="td-center">
                                             <Link
                                                 to={`/minhas-turmas/${turma.id}`}
-                                                className="flex items-center gap-1 text-sm text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                                className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                                             >
                                                 <HiUserGroup className="h-4 w-4" />
                                                 <span>{turma.estudantes_count || 0}</span>
                                             </Link>
                                         </TableCell>
-                                        <TableCell>
-                                            <div className="flex justify-center">
-                                                <Link
-                                                    to={`/turmas/${turma.id}/carometro`}
-                                                    className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
-                                                    title="Visualizar Carômetro"
-                                                >
-                                                    <HiPhotograph className="h-5 w-5" />
-                                                </Link>
-                                            </div>
+                                        <TableCell className="td-center">
+                                            <Link
+                                                to={`/turmas/${turma.id}/carometro`}
+                                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
+                                                title="Visualizar Carômetro"
+                                            >
+                                                <HiPhotograph className="h-5 w-5" />
+                                            </Link>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="td-center">
                                             {temGradeHoraria(turma) ? (
                                                 <Link
                                                     to={`/minhas-turmas/${turma.id}`}
                                                     state={{ tab: 'gradeHoraria' }}
-                                                    className="flex items-center justify-center w-8 h-8 rounded-lg text-success-600 hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors"
+                                                    className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-success-600 hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors"
                                                     title="Ver Grade Horária"
                                                 >
                                                     <HiTable className="h-5 w-5" />

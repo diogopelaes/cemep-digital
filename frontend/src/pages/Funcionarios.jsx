@@ -304,8 +304,8 @@ export default function Funcionarios() {
             <TableHeader>Funcionário</TableHeader>
             <TableHeader>Cargo</TableHeader>
             <TableHeader>Área</TableHeader>
-            <TableHeader>Status</TableHeader>
-            <TableHeader className="w-40 text-right">Ações</TableHeader>
+            <TableHeader className="th-center">Status</TableHeader>
+            <TableHeader className="th-center">Ações</TableHeader>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -344,13 +344,13 @@ export default function Funcionarios() {
                 <TableCell>
                   {func.area_atuacao || '-'}
                 </TableCell>
-                <TableCell>
+                <TableCell className="td-center">
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
                       handleToggleAtivo(func)
                     }}
-                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${func.usuario?.is_active
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${func.usuario?.is_active
                       ? 'bg-success-500/10 text-success-600 hover:bg-success-500/20 dark:text-success-400'
                       : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400'
                       }`}
@@ -369,8 +369,8 @@ export default function Funcionarios() {
                     )}
                   </button>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-end gap-2">
+                <TableCell className="td-center">
+                  <div className="inline-flex items-center gap-2">
                     <button
                       onClick={() => handleGeneratePDF(func.id)}
                       disabled={generatingPDF === func.id}
@@ -390,7 +390,6 @@ export default function Funcionarios() {
                     >
                       <HiCalendar className="h-5 w-5" />
                     </button>
-
                   </div>
                 </TableCell>
               </TableRow>

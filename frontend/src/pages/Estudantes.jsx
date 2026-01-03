@@ -265,8 +265,8 @@ export default function Estudantes() {
             <TableHeader>CPF</TableHeader>
             <TableHeader>E-mail</TableHeader>
             <TableHeader>Cursos</TableHeader>
-            <TableHeader>Bolsa Família</TableHeader>
-            <TableHeader className="w-20 text-right">Ações</TableHeader>
+            <TableHeader className="th-center">Bolsa Família</TableHeader>
+            <TableHeader className="th-center">Ações</TableHeader>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -319,26 +319,24 @@ export default function Estudantes() {
                     )}
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="td-center">
                   <Badge variant={estudante.bolsa_familia ? 'success' : 'default'}>
                     {estudante.bolsa_familia ? 'Sim' : 'Não'}
                   </Badge>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-end">
-                    <button
-                      onClick={() => handleGeneratePDF(estudante.id)}
-                      disabled={generatingPDF === estudante.id}
-                      className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 disabled:opacity-50"
-                      title="Gerar PDF"
-                    >
-                      {generatingPDF === estudante.id ? (
-                        <Loading size="sm" />
-                      ) : (
-                        <FaFilePdf className="h-5 w-5" />
-                      )}
-                    </button>
-                  </div>
+                <TableCell className="td-center">
+                  <button
+                    onClick={() => handleGeneratePDF(estudante.id)}
+                    disabled={generatingPDF === estudante.id}
+                    className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 disabled:opacity-50"
+                    title="Gerar PDF"
+                  >
+                    {generatingPDF === estudante.id ? (
+                      <Loading size="sm" />
+                    ) : (
+                      <FaFilePdf className="h-5 w-5" />
+                    )}
+                  </button>
                 </TableCell>
               </TableRow>
             ))

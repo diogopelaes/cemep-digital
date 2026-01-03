@@ -131,7 +131,7 @@ export default function Disciplinas() {
               <TableHeader>Nome</TableHeader>
               <TableHeader>Sigla</TableHeader>
               <TableHeader>Área de Conhecimento</TableHeader>
-              <TableHeader>Status</TableHeader>
+              <TableHeader className="th-center">Status</TableHeader>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -169,13 +169,13 @@ export default function Disciplinas() {
                       {disciplina.area_conhecimento_display || '-'}
                     </span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="td-center">
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
                         handleToggleActive(disciplina)
                       }}
-                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${disciplina.is_active
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${disciplina.is_active
                         ? 'bg-success-500/10 text-success-600 hover:bg-success-500/20 dark:text-success-400'
                         : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400'
                         }`}
