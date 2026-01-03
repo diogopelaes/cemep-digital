@@ -86,7 +86,8 @@ export default function Carometro() {
                                     <img
                                         src={estudante.foto}
                                         alt={estudante.nome}
-                                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                                        className="w-full h-full transition-transform group-hover:scale-105"
+                                        style={{ imageRendering: 'auto' }}
                                     />
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 print:hidden">
                                         <HiZoomIn className="text-white drop-shadow-md w-8 h-8 opacity-80" />

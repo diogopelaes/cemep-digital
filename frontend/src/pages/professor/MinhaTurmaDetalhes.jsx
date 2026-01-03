@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
     Card, Table, TableHead, TableBody, TableRow,
-    TableHeader, TableCell, TableEmpty, Loading, Button, Badge
+    TableHeader, TableCell, TableEmpty, Loading, Button, Badge, Avatar
 } from '../../components/ui'
-import { HiUser, HiPhotograph } from 'react-icons/hi'
+import { HiPhotograph } from 'react-icons/hi'
 import { coreAPI, academicAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 
@@ -144,20 +144,11 @@ export default function MinhaTurmaDetalhes() {
                                     <TableRow key={matricula.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-3 group">
-                                                <button
+                                                <Avatar
+                                                    name={usuario?.first_name}
+                                                    size="md"
                                                     onClick={() => navigate(`/estudantes/${estudante?.id}`)}
-                                                    className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center hover:scale-105 transition-all shadow-sm"
-                                                >
-                                                    {usuario?.foto ? (
-                                                        <img
-                                                            src={usuario.foto}
-                                                            alt={usuario.first_name}
-                                                            className="w-full h-full object-cover rounded-full"
-                                                        />
-                                                    ) : (
-                                                        <HiUser className="text-white w-5 h-5" />
-                                                    )}
-                                                </button>
+                                                />
                                                 <button
                                                     onClick={() => navigate(`/estudantes/${estudante?.id}`)}
                                                     className="text-left"

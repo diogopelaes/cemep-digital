@@ -18,7 +18,8 @@ export default function FotoSection({
                         <img
                             src={fotoBlob ? URL.createObjectURL(fotoBlob) : fotoPreview}
                             alt="Foto do estudante"
-                            className="w-full h-full object-cover"
+                            className="w-[150px] h-[200px]"
+                            style={{ imageRendering: 'auto' }}
                         />
                     ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-400">

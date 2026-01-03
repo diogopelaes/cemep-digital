@@ -6,7 +6,7 @@ import { InfoItem, BooleanItem } from '../components/common'
 import {
     HiArrowLeft, HiPencil, HiPrinter, HiDownload, HiPhone, HiMail,
     HiLocationMarker, HiCalendar, HiAcademicCap, HiUser, HiUsers,
-    HiDocumentText, HiBookOpen, HiCheckCircle
+    HiDocumentText, HiBookOpen, HiCheckCircle, HiZoomIn
 } from 'react-icons/hi'
 import { academicAPI } from '../services/api'
 import { formatDateBR, calcularIdade } from '../utils/date'
@@ -269,13 +269,23 @@ export default function EstudanteDetalhes() {
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Foto */}
                     <div className="flex-shrink-0">
-                        <div className="w-[150px] h-[200px] rounded-2xl overflow-hidden shadow-lg border-2 border-slate-200 dark:border-slate-700">
+                        <div
+                            className={`w-[150px] h-[200px] rounded-2xl overflow-hidden shadow-lg border-2 border-slate-200 dark:border-slate-700 relative ${estudante.usuario?.foto ? 'cursor-pointer group' : ''}`}
+                            onClick={() => estudante.usuario?.foto && window.open(estudante.usuario.foto, '_blank')}
+                            title={estudante.usuario?.foto ? "Clique para ampliar" : ""}
+                        >
                             {estudante.usuario?.foto ? (
-                                <img
-                                    src={estudante.usuario.foto}
-                                    alt={estudante.nome_exibicao}
-                                    className="w-full h-full object-cover"
-                                />
+                                <>
+                                    <img
+                                        src={estudante.usuario.foto}
+                                        alt={estudante.nome_exibicao}
+                                        className="w-[150px] h-[200px] transition-transform group-hover:scale-105"
+                                        style={{ imageRendering: 'auto' }}
+                                    />
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                        <HiZoomIn className="text-white drop-shadow-md w-8 h-8 opacity-80" />
+                                    </div>
+                                </>
                             ) : (
                                 <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-400">
                                     <svg viewBox="0 0 24 24" className="w-16 h-16 fill-current opacity-50">

@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Card, Button, Input, Select, Table, TableHead, TableBody, TableRow,
-  TableHeader, TableCell, TableEmpty, Loading, Badge, Modal, ModalFooter, DateInput, Pagination
+  TableHeader, TableCell, TableEmpty, Loading, Badge, Modal, ModalFooter, DateInput, Pagination, Avatar
 } from '../components/ui'
 import {
-  HiPlus, HiPencil, HiCalendar, HiCheck, HiX, HiRefresh, HiUser,
+  HiPlus, HiPencil, HiCalendar, HiCheck, HiX, HiRefresh,
   HiCheckCircle, HiXCircle, HiSearch, HiUpload
 } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
@@ -317,15 +317,10 @@ export default function Funcionarios() {
                     className="flex items-center gap-3 cursor-pointer group"
                     onClick={() => navigate(`/funcionarios/${func.id}`)}
                   >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                      {func.usuario?.first_name ? (
-                        <span className="text-white font-bold text-sm">
-                          {func.usuario.first_name[0]}
-                        </span>
-                      ) : (
-                        <HiUser className="text-white w-5 h-5" />
-                      )}
-                    </div>
+                    <Avatar
+                      name={func.nome_completo || func.usuario?.first_name}
+                      size="md"
+                    />
                     <div>
                       <p className="font-medium text-slate-800 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                         {func.nome_completo || func.usuario?.first_name}

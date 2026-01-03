@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Card, Button, Input, Table, TableHead, TableBody, TableRow,
-  TableHeader, TableCell, TableEmpty, Badge, Loading, Pagination
+  TableHeader, TableCell, TableEmpty, Badge, Loading, Pagination, Avatar
 } from '../components/ui'
-import { HiPlus, HiSearch, HiDownload, HiUser, HiUpload } from 'react-icons/hi'
+import { HiPlus, HiSearch, HiDownload, HiUpload } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
 import BulkUploadModal from '../components/modals/BulkUploadModal'
 import { academicAPI } from '../services/api'
@@ -275,20 +275,11 @@ export default function Estudantes() {
               <TableRow key={estudante.id}>
                 <TableCell>
                   <div className="flex items-center gap-3 group">
-                    <button
+                    <Avatar
+                      name={estudante.nome_exibicao}
+                      size="md"
                       onClick={() => handleView(estudante)}
-                      className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center hover:scale-105 transition-all shadow-sm"
-                    >
-                      {estudante.usuario?.foto ? (
-                        <img
-                          src={estudante.usuario.foto}
-                          alt={estudante.nome_exibicao}
-                          className="w-full h-full object-cover rounded-full"
-                        />
-                      ) : (
-                        <HiUser className="text-white w-5 h-5" />
-                      )}
-                    </button>
+                    />
                     <button
                       onClick={() => handleView(estudante)}
                       className="text-left"
