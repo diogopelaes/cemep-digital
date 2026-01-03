@@ -6,6 +6,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from apps.core.views import ProtectedMediaView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -13,6 +14,9 @@ urlpatterns = [
     # JWT Authentication
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    # Protected Media (requer autenticação)
+    path('api/v1/media/<path:file_path>', ProtectedMediaView.as_view(), name='protected_media'),
     
     # API Routes
     path('api/v1/', include([
@@ -26,7 +30,7 @@ urlpatterns = [
     ])),
 ]
 
-# Serve media files in development
+# Serve media files in development (ainda necessário para DEBUG=True)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

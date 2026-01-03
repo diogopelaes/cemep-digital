@@ -3,8 +3,27 @@ from django.contrib.auth.password_validation import validate_password
 from apps.users.models import User
 
 
+class ProtectedImageField(serializers.ImageField):
+    """
+    Campo de imagem que retorna URL protegida.
+    Converte /media/path para /api/v1/media/path
+    """
+    def to_representation(self, value):
+        if not value:
+            return None
+        
+        request = self.context.get('request')
+        if request is None:
+            # Sem request, retorna o path relativo para a API protegida
+            return f'/api/v1/media/{value.name}'
+        
+        # Com request, retorna URL absoluta
+        return request.build_absolute_uri(f'/api/v1/media/{value.name}')
+
+
 class UserSerializer(serializers.ModelSerializer):
     """Serializer completo do usuário."""
+    foto = ProtectedImageField(read_only=True)
     
     class Meta:
         model = User
