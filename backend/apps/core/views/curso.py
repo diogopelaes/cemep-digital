@@ -13,10 +13,10 @@ import pandas as pd
 
 from apps.core.models import Curso
 from apps.core.serializers import CursoSerializer
-from apps.users.permissions import GestaoSecretariaMixin
+from apps.users.permissions import GestaoSecretariaWritePublicReadMixin
 
 
-class CursoViewSet(GestaoSecretariaMixin, viewsets.ModelViewSet):
+class CursoViewSet(GestaoSecretariaWritePublicReadMixin, viewsets.ModelViewSet):
     """
     ViewSet para Curso.
     Leitura: Gestão / Secretaria | Escrita: Gestão / Secretaria
