@@ -1,4 +1,4 @@
-import { HiPencil } from 'react-icons/hi'
+import { HiPencil, HiPhotograph } from 'react-icons/hi'
 import { Button } from '../ui'
 
 /**
@@ -9,7 +9,7 @@ import { Button } from '../ui'
  * @param {Function} props.onBack - Callback para voltar
  * @param {Function} props.onEdit - Callback para editar
  */
-export default function TurmaHeader({ turma, onBack, onEdit }) {
+export default function TurmaHeader({ turma, onBack, onEdit, onCarometro }) {
     if (!turma) return null
 
     return (
@@ -39,6 +39,15 @@ export default function TurmaHeader({ turma, onBack, onEdit }) {
             >
                 Editar
             </Button>
+            {onCarometro && (
+                <Button
+                    variant="secondary"
+                    icon={HiPhotograph}
+                    onClick={onCarometro}
+                >
+                    Carômetro
+                </Button>
+            )}
         </div>
     )
 }

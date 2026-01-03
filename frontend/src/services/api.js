@@ -270,6 +270,7 @@ export const academicAPI = {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
     downloadModelo: () => api.get('/academic/matriculas-turma/download-modelo/', { responseType: 'blob' }),
+    carometro: (turmaId) => api.get(`/academic/turmas/${turmaId}/carometro/`),
   },
 }
 

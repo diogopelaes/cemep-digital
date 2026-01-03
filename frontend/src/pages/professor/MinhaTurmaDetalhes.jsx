@@ -4,7 +4,7 @@ import {
     Card, Table, TableHead, TableBody, TableRow,
     TableHeader, TableCell, TableEmpty, Loading, Button, Badge
 } from '../../components/ui'
-import { HiUser } from 'react-icons/hi'
+import { HiUser, HiPhotograph } from 'react-icons/hi'
 import { coreAPI, academicAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 
@@ -72,6 +72,15 @@ export default function MinhaTurmaDetalhes() {
                             {turma.curso?.nome} • {turma.ano_letivo}
                         </p>
                     </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="secondary"
+                        icon={HiPhotograph}
+                        onClick={() => navigate(`/turmas/${id}/carometro`)}
+                    >
+                        Carômetro
+                    </Button>
                 </div>
             </div>
 

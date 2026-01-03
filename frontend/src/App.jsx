@@ -16,6 +16,7 @@ import Turmas from './pages/Turmas'
 import TurmaForm from './pages/TurmaForm'
 import TurmaDetalhes from './pages/TurmaDetalhes'
 import GradeHorariaForm from './pages/GradeHorariaForm'
+import Carometro from './pages/Carometro'
 import Avisos from './pages/Avisos'
 import Cursos from './pages/Cursos'
 import CursoForm from './pages/CursoForm'
@@ -74,6 +75,9 @@ function App() {
         } />
         <Route path="/turmas/:id/editar" element={
           <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><TurmaForm /></ProtectedRoute>
+        } />
+        <Route path="/turmas/:id/carometro" element={
+          <ProtectedRoute allowedRoles={FUNCIONARIOS}><Carometro /></ProtectedRoute>
         } />
         <Route path="/cursos" element={
           <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><Cursos /></ProtectedRoute>

@@ -80,6 +80,7 @@ export default function TurmaDetalhes() {
         turma={turma}
         onBack={() => navigate('/turmas')}
         onEdit={() => navigate(`/turmas/${id}/editar`)}
+        onCarometro={() => navigate(`/turmas/${id}/carometro`)}
       />
 
       {/* Tabs */}

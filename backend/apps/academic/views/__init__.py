@@ -7,6 +7,8 @@ from .estudante import EstudanteViewSet
 from .responsavel import ResponsavelViewSet
 from .matricula import MatriculaCEMEPViewSet, MatriculaTurmaViewSet
 from .atestado import AtestadoViewSet
+from .carometro import CarometroView
+
 
 
 __all__ = [

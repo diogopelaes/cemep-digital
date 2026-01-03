@@ -5,7 +5,7 @@ import {
   TableHeader, TableCell, TableEmpty, Loading, Pagination,
   DropdownMenu, DropdownItem
 } from '../components/ui'
-import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil, HiCheckCircle, HiXCircle, HiUpload, HiTable } from 'react-icons/hi'
+import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil, HiCheckCircle, HiXCircle, HiUpload, HiTable, HiPhotograph } from 'react-icons/hi'
 import BulkUploadModal from '../components/modals/BulkUploadModal'
 import BulkAssociateDisciplinasModal from '../components/modals/BulkAssociateDisciplinasModal'
 import { coreAPI, academicAPI } from '../services/api'
@@ -122,6 +122,7 @@ export default function Turmas() {
                   <TableHeader>Estudantes</TableHeader>
                   <TableHeader>Disciplinas</TableHeader>
                   <TableHeader>Grade</TableHeader>
+                  <TableHeader>Carômetro</TableHeader>
                   <TableHeader>Status</TableHeader>
                 </TableRow>
               </TableHead>
@@ -189,6 +190,17 @@ export default function Turmas() {
                         >
                           <HiTable className="h-5 w-5" />
                         </Link>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-center">
+                          <Link
+                            to={`/turmas/${turma.id}/carometro`}
+                            className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
+                            title="Visualizar Carômetro"
+                          >
+                            <HiPhotograph className="h-5 w-5" />
+                          </Link>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <button
