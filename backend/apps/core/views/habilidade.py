@@ -6,10 +6,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from apps.core.models import Habilidade
 from apps.core.serializers import HabilidadeSerializer
-from apps.users.permissions import GestaoWriteFuncionarioReadMixin
+from apps.users.permissions import GestaoSecretariaWritePublicReadMixin
 
 
-class HabilidadeViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+class HabilidadeViewSet(GestaoSecretariaWritePublicReadMixin, viewsets.ModelViewSet):
     """
     ViewSet para Habilidade.
     Leitura: Gestão, Secretaria, Professor, Monitor | Escrita: Gestão
