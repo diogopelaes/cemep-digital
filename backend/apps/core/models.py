@@ -319,7 +319,7 @@ class Habilidade(UUIDModel):
 
     """Habilidades BNCC ou internas por disciplina."""
     
-    codigo = models.CharField(max_length=20, unique=True, verbose_name='Código')
+    codigo = models.CharField(max_length=20, verbose_name='Código')
     descricao = RichTextField(verbose_name='Descrição')
     disciplina = models.ForeignKey(
         Disciplina,
@@ -334,6 +334,7 @@ class Habilidade(UUIDModel):
         verbose_name = 'Habilidade'
         verbose_name_plural = 'Habilidades'
         ordering = ['disciplina', 'codigo']
+        unique_together = ['codigo', 'disciplina']
     
     def __str__(self):
         return f"{self.codigo} - {self.descricao[:50]}..."
