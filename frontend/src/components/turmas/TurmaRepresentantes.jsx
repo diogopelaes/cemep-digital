@@ -5,13 +5,23 @@ import { Card, Loading, MultiCombobox } from '../ui'
  * Componente para exibir e gerenciar representantes da turma
  */
 export default function TurmaRepresentantes({
-    todosRepresentantes,
+    todosRepresentantes = [],
     representantesSelecionados,
     loading,
     saving,
     onRepresentantesChange,
     onRemoveRepresentante,
+    onSearchProfessores, // Função Async
 }) {
+    // Mapeamento seguro das options (professores conhecidos)
+    const options = Array.isArray(todosRepresentantes)
+        ? todosRepresentantes.map(p => ({
+            value: p.id,
+            label: p.nome_completo,
+            subLabel: p.apelido
+        }))
+        : []
+
     return (
         <Card hover={false}>
             <div className="mb-6">
@@ -34,11 +44,17 @@ export default function TurmaRepresentantes({
                         label="Selecionar Representantes"
                         value={representantesSelecionados}
                         onChange={onRepresentantesChange}
-                        options={todosRepresentantes.map(p => ({
-                            value: p.id,
-                            label: p.nome_completo,
-                            subLabel: p.apelido
-                        }))}
+                        // Options aqui servem como cache inicial e itens selecionados
+                        options={options}
+                        // Função de busca async
+                        onSearch={async (query) => {
+                            const results = await onSearchProfessores(query)
+                            return results.map(p => ({
+                                value: p.id,
+                                label: p.nome_completo,
+                                subLabel: p.apelido
+                            }))
+                        }}
                         placeholder="Pesquise por nome ou apelido... (Enter para confirmar)"
                         disabled={saving}
                     />

@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import AuthLayout from './layouts/AuthLayout'
 import MainLayout from './layouts/MainLayout'
 import ProtectedRoute from './components/ProtectedRoute'
+import { ReferenceProvider } from './contexts/ReferenceContext'
 
 // Pages
 import Login from './pages/Login'
@@ -45,7 +46,11 @@ function App() {
       </Route>
 
       {/* Protected Routes */}
-      <Route element={<MainLayout />}>
+      <Route element={
+        <ReferenceProvider>
+          <MainLayout />
+        </ReferenceProvider>
+      }>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/avisos" element={<Avisos />} />
 

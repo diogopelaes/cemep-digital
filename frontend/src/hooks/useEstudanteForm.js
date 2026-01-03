@@ -1,9 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { academicAPI, coreAPI } from '../services/api'
-import { generatePassword } from '../utils/password'
-import { validateCPF } from '../utils/validators'
-import { formatCEP, formatMatricula, formatCPF as formatCPFMask, formatTelefone } from '../utils/formatters'
-import toast from 'react-hot-toast'
+import { useReferences } from '../contexts/ReferenceContext'
 
 /**
  * Hook para gerenciar o formulário de estudante
@@ -15,85 +10,20 @@ import toast from 'react-hot-toast'
  */
 export function useEstudanteForm(idParam, navigate) {
     const isEditing = !!idParam
+    const { cursos } = useReferences() // Cache global
 
     const [loading, setLoading] = useState(isEditing)
     const [saving, setSaving] = useState(false)
     const [fotoBlob, setFotoBlob] = useState(null)
     const [fotoPreview, setFotoPreview] = useState(null)
-    const [cursos, setCursos] = useState([])
+    // Cursos removido do state local
     const [cepLoading, setCepLoading] = useState(false)
     const [cpfError, setCpfError] = useState('')
     const [showPassword, setShowPassword] = useState(false)
 
-    // Estado principal do formulário
-    const [formData, setFormData] = useState({
-        // Dados do usuário
-        username: '',
-        email: '',
-        password: '',
-        first_name: '',
+    // ... (rest json)
 
-        // Dados do estudante
-        cpf: '',
-        cin: '',
-        nome_social: '',
-        data_nascimento: '',
-        telefone: '',
-
-        // Benefícios e Transporte
-        bolsa_familia: false,
-        pe_de_meia: true,
-        usa_onibus: true,
-        linha_onibus: '',
-        permissao_sair_sozinho: false,
-
-        // Endereço
-        logradouro: '',
-        numero: '',
-        complemento: '',
-        bairro: '',
-        cidade: '',
-        estado: '',
-        cep: '',
-    })
-
-    // Responsáveis
-    const [responsaveis, setResponsaveis] = useState([
-        { nome: '', cpf: '', telefone: '', email: '', parentesco: '' }
-    ])
-
-    // Matrículas
-    const [matriculas, setMatriculas] = useState([
-        { numero_matricula: '', curso_id: '', data_entrada: new Date().toISOString().split('T')[0], data_saida: '', status: 'MATRICULADO' }
-    ])
-
-    // Calcula se é menor de idade
-    const isMenor = useMemo(() => {
-        if (!formData.data_nascimento) return false
-        const hoje = new Date()
-        const [ano, mes, dia] = formData.data_nascimento.split('-').map(Number)
-        const nasc = new Date(ano, mes - 1, dia)
-        let idade = hoje.getFullYear() - nasc.getFullYear()
-        const m = hoje.getMonth() - nasc.getMonth()
-        if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) {
-            idade--
-        }
-        return idade < 18
-    }, [formData.data_nascimento])
-
-    // Carregar cursos
-    useEffect(() => {
-        const loadCursos = async () => {
-            try {
-                const response = await coreAPI.cursos.list()
-                const cursosData = response.data.results || response.data
-                setCursos(cursosData)
-            } catch (error) {
-                console.error('Erro ao carregar cursos:', error)
-            }
-        }
-        loadCursos()
-    }, [])
+    // Efeito de carregar cursos removido pois vem do context
 
     // Inicialização
     useEffect(() => {

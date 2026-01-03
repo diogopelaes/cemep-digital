@@ -1,22 +1,90 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { HiX, HiCheck, HiChevronDown } from 'react-icons/hi'
+import Loading from './Loading' // Fix: Default export
+
+// Hook de Debounce simples
+function useDebounce(value, delay) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+    return debouncedValue;
+}
 
 export default function MultiCombobox({
     label,
     value = [], // Array of selected values (IDs)
     onChange,   // (newValue) => void
-    onEnter,    // () => void - chamado quando Enter é pressionado com seleções
-    options = [], // { value, label, subLabel }
+    onEnter,    // () => void
+    options = [], // { value, label, subLabel } (opções iniciais ou pré-carregadas)
+    onSearch,   // (query) => Promise<options[]> (Função Opcional para busca async)
     placeholder = 'Selecione...',
     error,
-    loading = false,
+    loading: externalLoading = false,
     disabled = false
 }) {
     const [query, setQuery] = useState('')
     const [isOpen, setIsOpen] = useState(false)
+    const [internalOptions, setInternalOptions] = useState(options)
+    const [isSearching, setIsSearching] = useState(false)
+
     const wrapperRef = useRef(null)
     const inputRef = useRef(null)
 
+    // Sincroniza options externas se mudarem (e não estiver buscando)
+    useEffect(() => {
+        if (!onSearch) {
+            setInternalOptions(options)
+        } else if (query === '' && options.length > 0) {
+            // Se tem onSearch mas a query tá vazia, mostra as options iniciais (ex: selecionados)
+            setInternalOptions(prev => {
+                // Mantém as atuais se já tiver, ou atualiza. 
+                // Simplificação: Atualiza com as props se query vazia
+                return options
+            })
+        }
+    }, [options, onSearch, query])
+
+    // Debounced Search
+    const debouncedQuery = useDebounce(query, 500)
+
+    useEffect(() => {
+        if (!onSearch) return
+
+        let isActive = true
+
+        const doSearch = async () => {
+            // Se query vazia, não busca (ou busca default se quiser)
+            if (!debouncedQuery) {
+                setInternalOptions(options) // Volta para iniciais
+                return
+            }
+
+            setIsSearching(true)
+            try {
+                const results = await onSearch(debouncedQuery)
+                if (isActive) {
+                    setInternalOptions(results || [])
+                }
+            } catch (err) {
+                console.error("Erro no autocomplete:", err)
+            } finally {
+                if (isActive) setIsSearching(false)
+            }
+        }
+
+        doSearch()
+
+        return () => { isActive = false }
+    }, [debouncedQuery, onSearch, options])
+
+
+    // Fecha ao clicar fora
     useEffect(() => {
         function handleClickOutside(event) {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -27,27 +95,42 @@ export default function MultiCombobox({
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
-    const filteredOptions = query === ''
-        ? options
-        : options.filter((opt) => {
-            // Função para normalizar strings: remove tudo que não for letra ou número e converte para minúsculo
-            const normalize = (str) => String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+    // Filtragem Local (apenas se NÃO tiver onSearch)
+    const filteredOptions = onSearch
+        ? internalOptions // Se é async, o servidor já filtrou
+        : (query === ''
+            ? internalOptions
+            : internalOptions.filter((opt) => {
+                const normalize = (str) => String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+                const search = normalize(query)
+                const labelNorm = normalize(opt.label)
+                const subLabelNorm = normalize(opt.subLabel)
+                return labelNorm.includes(search) || subLabelNorm.includes(search)
+            })
+        )
 
-            const search = normalize(query)
-            const labelNorm = normalize(opt.label)
-            const subLabelNorm = normalize(opt.subLabel)
+    const selectedOptionsLabels = (onSearch ?
+        // No modo async, tentamos achar user nas options atuais OU nas props options (cache inicial)
+        [...internalOptions, ...options].filter(o => value.includes(o.value))
+            // Remove duplicatas de display
+            .filter((v, i, a) => a.findIndex(t => (t.value === v.value)) === i)
+        : internalOptions.filter(opt => value.includes(opt.value))
+    )
 
-            return labelNorm.includes(search) || subLabelNorm.includes(search)
-        })
-
-    const selectedOptions = options.filter(opt => value.includes(opt.value))
+    // Fallback: Se o valor está selecionado mas não temos o label (pq não veio na busca), 
+    // idealmente o pai deveria passar em 'options' os itens selecionados inicialmente.
+    // Aqui tentamos mostrar o ID ou algo genérico se faltar, mas o ideal é o pai gerenciar.
 
     const toggleOption = (optionValue) => {
         const newValue = value.includes(optionValue)
             ? value.filter(v => v !== optionValue)
             : [...value, optionValue]
         onChange(newValue)
-        setQuery('') // Clear input after selection
+
+        // Não limpa a query no modo async para não perder a lista instantaneamente
+        if (!onSearch) {
+            setQuery('')
+        }
         inputRef.current?.focus()
     }
 
@@ -71,7 +154,8 @@ export default function MultiCombobox({
                 }}
             >
                 <div className="flex flex-wrap gap-2 p-2 pr-8">
-                    {selectedOptions.map(opt => (
+                    {/* Renderiza os itens selecionados que conseguimos identificar */}
+                    {selectedOptionsLabels.map(opt => (
                         <span
                             key={opt.value}
                             className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-sm font-medium bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300 animate-fade-in"
@@ -97,7 +181,7 @@ export default function MultiCombobox({
                         ref={inputRef}
                         type="text"
                         className="flex-1 bg-transparent border-none outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 min-w-[120px] disabled:cursor-not-allowed"
-                        placeholder={selectedOptions.length === 0 ? placeholder : ''}
+                        placeholder={selectedOptionsLabels.length === 0 ? placeholder : ''}
                         value={query}
                         onChange={(e) => {
                             setQuery(e.target.value)
@@ -124,11 +208,14 @@ export default function MultiCombobox({
             {/* Dropdown */}
             {isOpen && (
                 <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg max-h-60 overflow-auto animate-fade-in">
-                    {loading ? (
-                        <div className="p-3 text-center text-slate-500 text-sm">Carregando...</div>
+                    {externalLoading || isSearching ? (
+                        <div className="p-3 text-center text-slate-500 text-sm flex items-center justify-center gap-2">
+                            <div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+                            Buscando...
+                        </div>
                     ) : filteredOptions.length === 0 ? (
                         <div className="p-3 text-center text-slate-500 text-sm">
-                            Nenhuma opção encontrada para "{query}"
+                            {query ? `Nenhuma opção encontrada para "${query}"` : 'Digite para buscar...'}
                         </div>
                     ) : (
                         <ul className="py-1">

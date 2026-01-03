@@ -30,6 +30,7 @@ export default function TurmaDisciplinas({
     onTipoChange,
     onImport,
     onNewDisciplina,
+    onSearchProfessores, // Async Search
 }) {
     const hasDisciplinas = Object.keys(disciplinasPorArea).length > 0
 
@@ -78,8 +79,11 @@ export default function TurmaDisciplinas({
                                             selecionada={selecionada}
                                             vinculo={vinculo}
                                             aulasSemanais={aulasSemanais[disciplina.id] || ''}
+                                            // Passamos também vinculo.professores para garantir labels 
+                                            // se nao estiverem em professoresDisponiveis
                                             professoresDisponiveis={professoresDisponiveis}
                                             salvandoProfessores={salvandoProfessores}
+                                            onSearchProfessores={onSearchProfessores} // Pass down
                                             onToggle={() => onToggleDisciplina(disciplina)}
                                             onAulasChange={(valor) => onAulasSemanaisChange(disciplina.id, valor)}
                                             onAulasBlur={() => onAulasSemanaisBlur(disciplina.id)}
@@ -133,12 +137,31 @@ function DisciplinaCard({
     aulasSemanais,
     professoresDisponiveis,
     salvandoProfessores,
+    onSearchProfessores, // Async
     onToggle,
     onAulasChange,
     onAulasBlur,
     onProfessoresChange,
     onTipoChange,
 }) {
+    // Mescla cache global + professores já vinculados para garantir options
+    const professoresLocais = vinculo?.professores || []
+
+    // Mapeamento para options
+    const options = [
+        ...professoresDisponiveis,
+        ...professoresLocais // Adiciona os já vinculados caso não estejam na lista global
+    ]
+        // Remover duplicatas por ID
+        .filter((p, index, self) =>
+            index === self.findIndex((t) => (t.id === p.id))
+        )
+        .map(p => ({
+            value: p.id,
+            label: p.nome_completo || p.usuario?.first_name || 'Sem nome',
+            subLabel: p.apelido
+        }))
+
     return (
         <div
             className={`p-4 rounded-xl border-2 transition-all ${selecionada
@@ -232,13 +255,23 @@ function DisciplinaCard({
                         </span>
                         <div className="flex-1">
                             <MultiCombobox
+                                // Valor
                                 value={vinculo?.professores?.map(p => p.id) || []}
                                 onChange={onProfessoresChange}
-                                options={professoresDisponiveis.map(p => ({
-                                    value: p.id,
-                                    label: p.nome_completo,
-                                    subLabel: p.apelido
-                                }))}
+
+                                // Opções Iniciais (Cache + Vinculados)
+                                options={options}
+
+                                // Busca Async
+                                onSearch={async (query) => {
+                                    const results = await onSearchProfessores(query)
+                                    return results.map(p => ({
+                                        value: p.id,
+                                        label: p.nome_completo,
+                                        subLabel: p.apelido
+                                    }))
+                                }}
+
                                 placeholder="Pesquise por nome ou apelido..."
                                 disabled={salvandoProfessores === disciplina.id}
                             />

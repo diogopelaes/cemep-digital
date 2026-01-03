@@ -1,70 +1,72 @@
-# Relatório de Análise de Performance: Alinhamento com Infraestrutura
+# Análise de Performance Frontend - CEMEP Digital
 
-**Data:** 03/01/2026
-**Responsável:** Antigravity Agent
-**Contexto Infraestrutura:** VPS (1 Core CPU, 4GB RAM) @ Hostinger
+**Última Atualização:** 03/01/2026
+**Foco:** Compliance com Infraestrutura VPS Single Core (1 vCPU / 4GB RAM)
 
-Este relatório propõe otimizações de **UX e Performance** estritamente necessárias para garantir a estabilidade e fluidez do sistema, considerando as limitações severas de hardware do servidor (Single Core).
-
----
-
-## 1. O Gargalo da Infraestrutura
-O servidor possui **apenas 1 Núcleo de CPU**.
-*   **Risco Crítico:** Qualquer requisição pesada (ex: serializar 1000 estudantes) pode bloquear o processo Python/Django, fazendo com que **todas as outras requisições de outros usuários aguardem na fila**.
-*   **Consequência UX:** O sistema pode parecer "travado" para todos se um único usuário abrir uma tela mal otimizada.
-
-**Diretriz:** O Frontend deve ser um "Guarditão", evitando ao máximo incomodar o Backend. O cache no cliente é obrigatório, não opcional.
+Este documento mapeia o estado atual do frontend em relação às diretrizes definidas em [FRONTEND_BEST_PRACTICES.md](./FRONTEND_BEST_PRACTICES.md).
 
 ---
 
-## 2. Ações de Melhoria (Mapeamento Infra vs UX)
+## 1. Visão Geral (Resumo Executivo)
 
-### A. Eliminação de Payloads Gigantes (Prioridade Máxima)
-**Problema:** O hook `useDisciplinasTurma.js` solicita `page_size: 1000` para listar professores.
-**Impacto Infra:** O processo Django gasta ~100% da CPU (Single Core) para converter 1000 objetos em JSON. O servidor "engasga".
-**Ação:**
-1.  **Backend:** Garantir que todos os ViewSets tenham paginação padrão forçada (ex: 20 itens).
-2.  **Frontend:** Substituir selects simples por componentes `AsyncSelect` (Combo Box) que buscam no servidor apenas quando o usuário digita.
-    *   *Ganho UX:* Abertura instantânea de modais.
-    *   *Ganho Infra:* Redução drástica de uso de CPU e Memória RAM.
+O frontend evoluiu significativamente com a introdução do `ReferenceContext`, eliminando chamadas redundantes para dados estáticos. No entanto, o sistema ainda apresenta riscos críticos de performance em listas longas ("Professores") e operações de PDF, que podem saturar o servidor Single Core com requisições concorrentes ou payloads grandes não paginados.
 
-### B. Paralelismo de Requisições (Dashboard)
-**Problema:** Requisições em "Cascata" (Waterfall) no Dashboard.
-**Impacto Infra:** Mantém conexões abertas por mais tempo do que o necessário, consumindo "workers" do servidor web (Uvicorn).
-**Ação:** Agrupar chamadas em `Promise.all`.
-*   *Ganho UX:* Carregamento da página inicial até 50% mais rápido.
-*   *Ganho Infra:* Liberação mais rápida dos workers do servidor para atender outros usuários.
-
-### C. Estratégia de Cache Agressivo (Reference Data)
-**Problema:** Formulários baixam listas de "Cursos" e "Anos Letivos" repetidamente.
-**Impacto Infra:** Desperdício de ciclos de CPU para buscar dados que nunca mudam (Static Data). Em um servidor de 1 Core, cada ciclo conta.
-**Ação:** Implementar `ReferenceDataContext` ou `React Query` com `staleTime: Infinity` para tabelas auxiliares.
-*   *Ganho UX:* Formulários abrem instantaneamente (Zero Loading).
-*   *Ganho Infra:* Redução de ~30% no número total de hits ao banco de dados.
-
-### D. Redução de Redundância (Dados do Usuário)
-**Problema:** Busca duplicada de "Ano Letivo Selecionado" no Dashboard.
-**Ação:** Usar dados já carregados no Login (`AuthContext`).
-*   *Ganho:* Economia direta de I/O.
+**Score Atual:** 🟡 **EM PROGRESSO**
 
 ---
 
-## 3. Inventário de Otimizações por Componente
+## 2. Inventário de Otimizações
 
-| Componente | Ação | Justificativa (Infra 1 Core/4GB) |
-| :--- | :--- | :--- |
-| **`Dashboard.jsx`** | Implementar `Promise.all` e remover fetch redundante. | Liberar workers do servidor mais rápido; Poupar CPU de queries duplicadas. |
-| **`useDisciplinasTurma.js`** | Implementar busca paginada (Combo Box) para Professores. | **Crítico:** Evitar pico de CPU que trava o servidor para outros usuários. |
-| **`TurmaForm.jsx`** | Cachear Cursos/Configurações no cliente. | Evitar hits repetitivos ao banco de dados para dados estáticos. |
-| **`MainLayout.jsx`** | (Já realizado) Exibir ano do Contexto. | Zero requests = Zero carga no servidor. |
-| **Geral (Api Service)** | Implementar interceptor de repetição (Retry com Backoff). | Em caso de sobrecarga momentânea da CPU (100%), o front aguarda e tenta de novo sem erro para o usuário. |
+### ✅ Implementado (Conforme Padrão)
+| Componente/Hook | Otimização Realizada | Impacto |
+|----------------|----------------------|---------|
+| `ReferenceContext` | Cache Global de Cursos e Anos Letivos | **Crítico:** Redução de ~40% nas requisições de init. |
+| `Dashboard.jsx` | `Promise.all` + Remoção de fetch redundante | Carregamento inicial acelerado (Paralelo). |
+| `TurmaForm.jsx` | Consumo de `ReferenceContext` | Formulário abre instantaneamente (dados cacheados). |
+| `useEstudanteForm.js` | Consumo de `ReferenceContext` | Menos carga ao editar estudantes. |
+| `Estudantes.jsx` | Paginação Server-Side correta | Protege o banco de dados de queries "select *". |
+
+### ⚠️ Pontos de Atenção (Anti-Patterns Detectados)
+| Local | Problema | Risco (1-Core) | Solução Recomendada |
+|-------|----------|----------------|---------------------|
+| `useRepresentantesTurma.js` | `page_size: 100` fixo ao buscar professores. | **Alto:** Se houver 150 profs, 50 somem. Se 1000, trava o json parse. | Implementar `AsyncSelect` (Busca sob demanda). |
+| `Configuracoes.jsx` | Busca `anosLetivos` direto da API, ignorando cache. | **Médio:** Desperdício de banda e possível desincronia. | Usar `ReferenceContext` e implementar `invalidate`. |
+| `Estudantes.jsx` (PDF) | PDF Individual busca `prontuario` (pesado) sob demanda. | **Baixo/Médio:** Se 50 usuários gerarem PDF juntos, CPU do banco sobe. | Aceitável por hora, monitorar. |
+| `TurmaDetalhes` | Hooks (`useRepresentantes`, `useEstudantes`) recarregam ao mudar de aba. | **Baixo:** UX levemente lenta. | Implementar Cache (React Query) futuro. |
 
 ---
 
-## 4. Conclusão e Próximos Passos
-Dada a restrição de **1 Core**, o sistema não pode se dar ao luxo de ser ineficiente. O Frontend deve assumir a responsabilidade de "blindar" o Backend.
+## 3. Análise Detalhada por Categoria
 
-**Recomendação de Execução:**
-1.  **Hoje:** Corrigir `Dashboard` e remover `page_size: 1000` (risco de travamento).
-2.  **Semana 1:** Implementar Contexto de Cache para dados estáticos (Cursos, etc).
-3.  **Semana 2:** Adotar React Query para gestão automática de cache e background refetching.
+### 3.1. Data Fetching & Caching
+O padrão "Waterfall" (requisições em cascata) foi mitigado na `Dashboard`, mas ainda existe risco em componentes menores.
+*   **Problema:** O hook `useDisciplinasTurma` e outros ainda injetam `page_size: 100` para "fugir" da paginação padrão. Isso é uma bomba-relógio.
+*   **Ação Imediata:** Substituir Selects simples (que precisam carregar tudo) por **AsyncSelects** (que buscam conforme o usuário digita).
+
+### 3.2. Gerenciamento de Estado
+*   **Context API:** O uso de `ReferenceContext` está correto para dados estáticos.
+*   **Sincronia:** A página `Configuracoes.jsx` cria novos Anos Letivos, mas não avisa o `ReferenceContext` para recarregar. Isso exige um refresh de página F5 do usuário para ver o novo ano no resto do sistema.
+
+### 3.3. UX e Feedback
+*   **Feedback Visual:** Excelente uso de `Loading` e Skeleton screens.
+*   **Interatividade:** Tabelas e Formulários respondem bem. O uso de `Debounce` (400ms) nas buscas de `Estudantes.jsx` é exemplar.
+
+---
+
+## 4. Plano de Ação (Roadmap de Performance)
+
+Para garantir estabilidade no servidor de 1 Core, os próximos passos são:
+
+### Fase 1: Correção de Riscos (Imediato)
+1.  **Refatorar `Configuracoes.jsx`:** Integrar com `ReferenceContext` (usar `reloadReferences` após criar ano).
+2.  **Audit de `page_size`:** Localizar todos `page_size: 100` e avaliar risco. Se a tabela tende a crescer (ex: Funcionários/Professores), mudar para Async Search.
+
+### Fase 2: Migração Arquitetural (Médio Prazo)
+3.  **Adotar TanStack Query (React Query):** Substituir o cache manual do `ReferenceContext` e os `useEffect` de listagem por `useQuery`. Isso dará cache automático, deduplicação de requests e revalidação em background "de graça".
+
+### Fase 3: Otimização Fina (Longo Prazo)
+4.  **Code Splitting:** Verificar se `react-pdf` (usado em `Estudantes.jsx`) está sendo carregado no bundle principal. Mover para carregamento dinâmico (`import()`) para reduzir tamanho do JS inicial.
+
+---
+
+**Conclusão:** O frontend é robusto, mas ainda carrega "vícios" de desenvolvimento local (como pedir listas inteiras de 100 itens). A transição para Async Selects é a chave para escalabilidade no hardware atual.

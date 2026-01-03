@@ -97,9 +97,13 @@ export default function TurmaDetalhes() {
           disciplinasVinculadas={disciplinas.disciplinasVinculadas}
           aulasSemanais={disciplinas.aulasSemanais}
           loading={disciplinas.loading}
-          professoresDisponiveis={disciplinas.professoresDisponiveis}
+          // professoresDisponiveis agora é legado/cache, mas passamos se tiver
+          professoresDisponiveis={disciplinas.professoresDisponiveis || []}
           salvandoProfessores={disciplinas.salvandoProfessores}
           totalAulasSemanais={disciplinas.totalAulasSemanais}
+
+          // Busca Async
+          onSearchProfessores={disciplinas.searchProfessores}
 
           // Paginação
           page={disciplinas.page}
@@ -122,10 +126,12 @@ export default function TurmaDetalhes() {
 
       {activeTab === 'representantes' && (
         <TurmaRepresentantes
-          todosRepresentantes={representantes.todosRepresentantes}
+          todosRepresentantes={representantes.todosRepresentantes || []}
           representantesSelecionados={representantes.representantesSelecionados}
           loading={representantes.loading}
           saving={representantes.saving}
+          // Busca Async
+          onSearchProfessores={representantes.searchProfessores}
           onRepresentantesChange={representantes.updateRepresentantes}
           onRemoveRepresentante={representantes.removeRepresentante}
         />

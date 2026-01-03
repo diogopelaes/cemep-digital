@@ -330,17 +330,41 @@ const [estudante, prontuario] = await Promise.all([
 |---------|------------------|
 | `AuthContext.jsx` | Autenticação, login/logout, dados do usuário logado |
 | `ThemeContext.jsx` | Tema claro/escuro |
+| `ReferenceContext.jsx` | Cache global de dados estáticos (Cursos, Anos Letivos) |
 
 **Uso:**
 ```jsx
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
+import { useReferences } from '../contexts/ReferenceContext'
 
 function Component() {
-    const { user, logout, isAuthenticated } = useAuth()
-    const { theme, toggleTheme } = useTheme()
+    const { user } = useAuth()
+    const { cursos, anosLetivos } = useReferences() // Dados cacheados
 }
 ```
+
+---
+
+## ⚡ Performance e Cache
+
+Devido à infraestrutura de servidor único (1 Core/4GB), o frontend deve minimizar requisições.
+
+### Diretrizes de Cache
+1. **Dados de Referência (Static Data):**
+   - Tabelas que mudam pouco (Cursos, Anos, Configurações) devem ser cacheadas.
+   - Use `ReferenceContext` para acessá-las globalmente.
+   - **Nunca** faça fetch desses dados dentro de um componente de formulário repetidamente.
+
+2. **Paginação e Payloads:**
+   - Evite solicitar listas completas (`page_size: 1000`).
+   - Use paginação padrão (20 itens) ou Selects Assíncronos (`AsyncCombobox`).
+
+3. **Data Fetching:**
+   - Evite "Waterfalls" (requisições sequenciais).
+   - Use `Promise.all` para buscar dados independentes em paralelo.
+
+> Para detalhes completos de implementação, consulte [`Documentation/FRONTEND_BEST_PRACTICES.md`](./FRONTEND_BEST_PRACTICES.md).
 
 ---
 

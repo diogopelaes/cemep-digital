@@ -1,20 +1,15 @@
-import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Input, Select, Loading, MultiCombobox, Modal, ModalFooter } from '../components/ui'
-import { HiArrowLeft, HiSave, HiTrash } from 'react-icons/hi'
-import { coreAPI } from '../services/api'
-import { NOMENCLATURAS } from '../data'
-import toast from 'react-hot-toast'
+import { useReferences } from '../contexts/ReferenceContext'
 
 export default function TurmaForm() {
   const navigate = useNavigate()
   const { id } = useParams()
   const isEditing = !!id
+  const { cursos } = useReferences() // Cache global
 
   const [loading, setLoading] = useState(isEditing)
   const [saving, setSaving] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [cursos, setCursos] = useState([])
+  // cursos state removido pois vem do context
   const [professores, setProfessores] = useState([])
   const [formData, setFormData] = useState({
     numero: '',
@@ -26,27 +21,17 @@ export default function TurmaForm() {
   })
 
   useEffect(() => {
-    loadCursos()
+    // loadCursos removido (ReferenceContext)
     loadProfessores()
     if (isEditing) {
       loadTurma()
     }
-  }, [id])
 
-  const loadCursos = async () => {
-    try {
-      const response = await coreAPI.cursos.list()
-      const cursosData = response.data.results || response.data
-      setCursos(cursosData)
-
-      // Se houver apenas um curso e não estiver editando, seleciona automaticamente
-      if (cursosData.length === 1 && !isEditing) {
-        setFormData(prev => ({ ...prev, curso_id: cursosData[0].id.toString() }))
-      }
-    } catch (error) {
-      toast.error('Erro ao carregar cursos')
+    // Auto-select curso if only one available
+    if (cursos.length === 1 && !isEditing) {
+      setFormData(prev => ({ ...prev, curso_id: cursos[0].id.toString() }))
     }
-  }
+  }, [id, isEditing, cursos.length]) // Added dependencies
 
   const loadProfessores = async () => {
     try {

@@ -5,10 +5,15 @@ import { Loading, Badge, Modal, Button, Card } from '../ui'
 import IniciarAnoModal from './IniciarAnoModal'
 import CalendarioDetalhes from '../../pages/CalendarioDetalhes'
 
+import { useReferences } from '../../contexts/ReferenceContext'
+
 export default function CalendarioTab() {
     const [anos, setAnos] = useState([])
     const [selectedAno, setSelectedAno] = useState(null)
     const [loading, setLoading] = useState(true)
+
+    // Context synchronization
+    const { reloadReferences } = useReferences()
 
     // Modals
     const [showIniciarModal, setShowIniciarModal] = useState(false)
@@ -36,7 +41,10 @@ export default function CalendarioTab() {
         }
     }
 
-    const handleAnoCreated = (novoAno) => {
+    const handleAnoCreated = async (novoAno) => {
+        // Sync global context
+        await reloadReferences()
+
         const novaLista = [novoAno, ...anos].sort((a, b) => b.ano - a.ano)
         setAnos(novaLista)
         setSelectedAno(novoAno)

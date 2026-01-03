@@ -25,58 +25,58 @@ export default function Dashboard() {
 
   const loadDashboardData = async () => {
     try {
-      // Carrega ano letivo selecionado
-      try {
-        const anoRes = await coreAPI.anoLetivoSelecionado.get()
-        setAnoSelecionado(anoRes.data.ano_letivo_details)
-      } catch (e) {
-        console.warn('Erro ao carregar ano letivo selecionado:', e)
-      }
-
       // Carrega anos disponíveis (para o modal de troca)
-      try {
-        const anosRes = await coreAPI.anosLetivos.list()
-        const lista = Array.isArray(anosRes.data) ? anosRes.data : (anosRes.data.results || [])
-        setAnosDisponiveis(lista)
-      } catch (e) {
-        console.warn('Erro ao carregar anos disponíveis:', e)
+      // O ano selecionado já vem no objeto 'user' do AuthContext, não precisamos buscar de novo
+      if (user?.ano_letivo_selecionado) {
+        setAnoSelecionado({ ano: user.ano_letivo_selecionado }) // Mock visual simples ou buscar detalhes se precisar
       }
 
+      // Arrays de Promises para execução paralela
+      const promises = []
+
+      // 1. Anos Disponíveis
+      promises.push(coreAPI.anosLetivos.list().then(res => {
+        const lista = Array.isArray(res.data) ? res.data : (res.data.results || [])
+        setAnosDisponiveis(lista)
+        // Atualiza objeto ano selecionado com dados completos se encontrar na lista
+        if (user?.ano_letivo_selecionado) {
+          const current = lista.find(a => a.ano === user.ano_letivo_selecionado)
+          if (current) setAnoSelecionado(current)
+        }
+      }))
+
+      // 2. Estatísticas (Gestão)
       if (isGestao) {
-        // Carrega estatísticas do Dashboard (já filtradas pelo ano selecionado)
-        try {
-          const estatisticasRes = await managementAPI.dashboard.estatisticas()
+        promises.push(managementAPI.dashboard.estatisticas().then(res => {
           setStats({
-            totalEstudantes: estatisticasRes.data.total_estudantes || 0,
-            totalTurmas: estatisticasRes.data.total_turmas || 0,
-            total: estatisticasRes.data.tarefas_total || 0,
-            pendentes: estatisticasRes.data.tarefas_pendentes || 0,
-            concluidas: estatisticasRes.data.tarefas_concluidas || 0,
-            atrasadas: estatisticasRes.data.tarefas_atrasadas || 0,
+            totalEstudantes: res.data.total_estudantes || 0,
+            totalTurmas: res.data.total_turmas || 0,
+            total: res.data.tarefas_total || 0,
+            pendentes: res.data.tarefas_pendentes || 0,
+            concluidas: res.data.tarefas_concluidas || 0,
+            atrasadas: res.data.tarefas_atrasadas || 0,
           })
-        } catch (e) {
+        }).catch(e => {
           console.warn('Erro ao carregar estatísticas:', e)
           setStats({ total: 0, pendentes: 0, concluidas: 0, totalEstudantes: 0, totalTurmas: 0 })
-        }
+        }))
       }
 
-      // Avisos para todos
-      try {
-        const avisosRes = await managementAPI.avisos.meus()
-        setAvisos(avisosRes.data.results?.slice(0, 5) || avisosRes.data?.slice?.(0, 5) || [])
-      } catch (e) {
-        console.warn('Erro ao carregar avisos:', e)
-      }
+      // 3. Avisos (Todos)
+      promises.push(managementAPI.avisos.meus().then(res => {
+        setAvisos(res.data.results?.slice(0, 5) || res.data?.slice?.(0, 5) || [])
+      }).catch(e => console.warn('Erro ao carregar avisos:', e)))
 
-      // Tarefas para funcionários
+      // 4. Tarefas (Funcionários)
       if (isFuncionario) {
-        try {
-          const tarefasRes = await managementAPI.tarefas.minhas()
-          setTarefas(tarefasRes.data.results?.slice(0, 5) || tarefasRes.data?.slice?.(0, 5) || [])
-        } catch (e) {
-          console.warn('Erro ao carregar tarefas (usuário pode não ter perfil de funcionário):', e)
-        }
+        promises.push(managementAPI.tarefas.minhas().then(res => {
+          setTarefas(res.data.results?.slice(0, 5) || res.data?.slice?.(0, 5) || [])
+        }).catch(e => console.warn('Erro ao carregar tarefas:', e)))
       }
+
+      // Executa tudo em paralelo
+      await Promise.all(promises)
+
     } catch (error) {
       console.error('Erro ao carregar dashboard:', error)
     }
@@ -142,8 +142,8 @@ export default function Dashboard() {
                   key={ano.id}
                   onClick={() => handleChangeYear(ano.id)}
                   className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors ${anoSelecionado?.id === ano.id
-                      ? 'bg-primary-500 text-white'
-                      : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-white'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-white'
                     }`}
                 >
                   <span className="font-medium">{ano.ano}</span>

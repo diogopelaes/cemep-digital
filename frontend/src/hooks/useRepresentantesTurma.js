@@ -17,39 +17,54 @@ export function useRepresentantesTurma(turmaId, turma, isActive = true, reloadTu
     const [loading, setLoading] = useState(false)
     const [saving, setSaving] = useState(false)
 
-    // Carrega representantes disponíveis
-    const loadRepresentantes = useCallback(async () => {
+    // Carrega os representantes já selecionados
+    const loadRepresentantesAtuais = useCallback(async () => {
         if (!turma || !isActive) return
 
-        setLoading(true)
+        // Se já temos detalhes na turma, usamos eles
+        if (turma?.professores_representantes_details) {
+            setTodosRepresentantes(turma.professores_representantes_details)
+            setRepresentantesSelecionados(turma.professores_representantes_details.map(p => p.id))
+            return
+        }
 
-        try {
-            const response = await coreAPI.funcionarios.list({
-                usuario__tipo_usuario: 'PROFESSOR',
-                page_size: 100
-            })
-            const professoresData = response.data.results || response.data
-            setTodosRepresentantes(professoresData)
-
-            // Carrega os representantes já selecionados
-            if (turma?.professores_representantes_details) {
-                setRepresentantesSelecionados(turma.professores_representantes_details.map(p => p.id))
-            } else if (turma?.professores_representantes) {
+        // Se só temos IDs (caso raro se o serializer estiver light), buscamos os detalhes
+        if (turma?.professores_representantes && turma.professores_representantes.length > 0) {
+            setLoading(true)
+            try {
+                // Aqui teríamos que buscar ID por ID ou filtrar, mas o padrão do projeto 
+                // é entregar _details. Se não tiver, assumimos que está vazio ou lidamos depois.
                 setRepresentantesSelecionados(turma.professores_representantes)
+            } finally {
+                setLoading(false)
             }
-        } catch (error) {
-            toast.error('Erro ao carregar representantes')
-        } finally {
-            setLoading(false)
         }
     }, [turma, isActive])
+
+    // Busca professores sob demanda (Async Autocomplete)
+    const searchProfessores = useCallback(async (query) => {
+        if (!query) return []
+        try {
+            const response = await coreAPI.funcionarios.list({
+                search: query,
+                usuario__tipo_usuario: 'PROFESSOR',
+                page_size: 20, // Limite seguro
+                usuario__is_active: true
+            })
+            return response.data.results || response.data
+        } catch (error) {
+            console.error(error)
+            toast.error('Erro ao buscar professores')
+            return []
+        }
+    }, [])
 
     // Carrega quando turma mudar ou aba ativar
     useEffect(() => {
         if (turma && isActive) {
-            loadRepresentantes()
+            loadRepresentantesAtuais()
         }
-    }, [turma, isActive])
+    }, [turma, isActive, loadRepresentantesAtuais])
 
     // Atualiza representantes
     const updateRepresentantes = useCallback(async (novosRepresentantes) => {
@@ -97,6 +112,8 @@ export function useRepresentantesTurma(turmaId, turma, isActive = true, reloadTu
         saving,
         updateRepresentantes,
         removeRepresentante,
+        searchProfessores, // Exported to be used in UI
+        reloadRepresentantes: loadRepresentantesAtuais
     }
 }
 

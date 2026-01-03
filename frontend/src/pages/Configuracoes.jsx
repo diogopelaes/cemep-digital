@@ -3,28 +3,17 @@ import { useSearchParams } from 'react-router-dom'
 import { HiCalendar, HiUserGroup, HiAcademicCap, HiClock } from 'react-icons/hi'
 import CalendarioTab from '../components/configuracoes/CalendarioTab'
 import HorarioAulaTab from '../components/configuracoes/HorarioAulaTab'
-import { coreAPI } from '../services/api'
+import { useReferences } from '../contexts/ReferenceContext'
 
 export default function Configuracoes() {
     const [searchParams] = useSearchParams()
     const [activeTab, setActiveTab] = useState(() => {
         return searchParams.get('tab') || 'calendario'
     })
-    const [hasActiveCalendar, setHasActiveCalendar] = useState(false)
 
-    useEffect(() => {
-        checkCalendar()
-    }, [])
-
-    const checkCalendar = async () => {
-        try {
-            const { data } = await coreAPI.anosLetivos.list()
-            const lista = Array.isArray(data) ? data : (data.results || [])
-            if (lista.length > 0) setHasActiveCalendar(true)
-        } catch (e) {
-            console.error(e)
-        }
-    }
+    // Usage of Global Context avoids extra fetch
+    const { anosLetivos } = useReferences()
+    const hasActiveCalendar = anosLetivos && anosLetivos.length > 0
 
     const tabs = [
         { id: 'calendario', label: 'Calendário', icon: HiCalendar },
