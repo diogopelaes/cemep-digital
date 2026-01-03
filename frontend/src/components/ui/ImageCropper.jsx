@@ -81,9 +81,9 @@ export default function ImageCropper({
         const scaleX = image.naturalWidth / image.width
         const scaleY = image.naturalHeight / image.height
 
-        // Dimensões finais: 300x400 pixels (3:4)
-        const targetWidth = 300
-        const targetHeight = 400
+        // Dimensões finais: 900x1200 pixels (3:4) - Alta Resolução (aprox 1MP)
+        const targetWidth = 900
+        const targetHeight = 1200
 
         canvas.width = targetWidth
         canvas.height = targetHeight

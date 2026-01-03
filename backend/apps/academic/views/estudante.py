@@ -21,6 +21,7 @@ from apps.academic.serializers import (
 )
 from apps.users.permissions import GestaoSecretariaWriteFuncionarioReadMixin
 from apps.users.utils import send_credentials_email
+from apps.core.validators import clean_digits
 
 
 class EstudanteViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
@@ -110,9 +111,12 @@ class EstudanteViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.Model
                     if not resp_data or not resp_data.get('cpf'):
                         continue
                     
-                    resp_cpf = resp_data.get('cpf')
+                    resp_cpf = clean_digits(resp_data.get('cpf'))
+                    if not resp_cpf:
+                        continue
+                        
                     resp_nome = resp_data.get('nome', '')
-                    resp_telefone = resp_data.get('telefone', '')
+                    resp_telefone = clean_digits(resp_data.get('telefone', ''))
                     resp_email = resp_data.get('email', '')
                     resp_parentesco = resp_data.get('parentesco', 'OUTRO')
                     resp_password = resp_cpf
@@ -532,6 +536,7 @@ class EstudanteViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.Model
     @action(detail=True, methods=['put'], url_path='atualizar-completo')
     def atualizar_completo(self, request, pk=None):
         """Atualiza usuário e estudante em uma transação atômica."""
+        User = get_user_model()
         estudante = self.get_object()
         data = request.data
         
@@ -556,6 +561,69 @@ class EstudanteViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.Model
                     if campo in data:
                         setattr(estudante, campo, data[campo])
                 estudante.save()
+
+                # Processar Responsáveis
+                responsaveis_data = data.get('responsaveis', [])
+                if data.get('responsavel'):
+                    responsaveis_data.append(data['responsavel'])
+                
+                cpfs_enviados = []
+                for resp_data in responsaveis_data:
+                    if not resp_data or not resp_data.get('cpf'):
+                        continue
+                    
+                    resp_cpf = clean_digits(resp_data.get('cpf'))
+                    if not resp_cpf:
+                        continue
+                        
+                    cpfs_enviados.append(resp_cpf)
+                    
+                    resp_nome = resp_data.get('nome', '')
+                    resp_telefone = clean_digits(resp_data.get('telefone', ''))
+                    resp_email = resp_data.get('email', '')
+                    resp_parentesco = resp_data.get('parentesco', 'OUTRO')
+                    
+                    # 1. Tratar Usuário do Responsável
+                    resp_user = User.objects.filter(username=resp_cpf).first()
+                    if not resp_user:
+                        resp_user = User(
+                            username=resp_cpf,
+                            email=resp_email,
+                            first_name=resp_nome,
+                            last_name='',
+                            tipo_usuario='RESPONSAVEL'
+                        )
+                        resp_user.set_password(resp_cpf)
+                        resp_user.save()
+                    else:
+                        # Atualiza dados básicos se necessário
+                        if resp_nome: resp_user.first_name = resp_nome
+                        if resp_email: resp_user.email = resp_email
+                        resp_user.save()
+
+                    # 2. Tratar Registro de Responsável
+                    responsavel, _ = Responsavel.objects.update_or_create(
+                        cpf=resp_cpf,
+                        defaults={
+                            'usuario': resp_user,
+                            'telefone': resp_telefone
+                        }
+                    )
+                    
+                    # 3. Tratar Vínculo
+                    ResponsavelEstudante.objects.update_or_create(
+                        responsavel=responsavel,
+                        estudante=estudante,
+                        defaults={
+                            'parentesco': resp_parentesco,
+                            'telefone': resp_telefone
+                        }
+                    )
+                
+                # 4. Remover vínculos que não estão mais na lista
+                ResponsavelEstudante.objects.filter(estudante=estudante).exclude(
+                    responsavel__cpf__in=cpfs_enviados
+                ).delete()
                 
                 matriculas_data = data.get('matriculas', [])
                 for mat_data in matriculas_data:

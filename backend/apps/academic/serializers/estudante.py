@@ -74,6 +74,7 @@ class EstudanteCreateSerializer(serializers.ModelSerializer):
     telefone = serializers.CharField(write_only=True, required=False, allow_blank=True)
     cin = serializers.CharField(required=False, allow_blank=True)
     responsavel = serializers.JSONField(required=False, write_only=True)
+    responsaveis = serializers.JSONField(required=False, write_only=True)
     
     class Meta:
         model = Estudante
@@ -83,28 +84,43 @@ class EstudanteCreateSerializer(serializers.ModelSerializer):
             'bolsa_familia', 'pe_de_meia', 'usa_onibus', 'linha_onibus',
             'permissao_sair_sozinho',
             'logradouro', 'numero', 'bairro', 'cidade', 'estado', 'cep', 'complemento',
-            'responsavel'
+            'responsavel', 'responsaveis'
         ]
     
     def create(self, validated_data):
         from django.contrib.auth import get_user_model
+        from apps.core.validators import clean_digits
         User = get_user_model()
         
+        # Remove campos que não pertencem ao model Estudante
         first_name = validated_data.pop('first_name')
+        username = validated_data.pop('username')
+        email = validated_data.pop('email')
+        password = validated_data.pop('password')
+        telefone_user = validated_data.pop('telefone', '')
+        
+        # Captura responsáveis para processamento posterior (ou apenas ignora para não dar erro)
+        responsaveis_data = validated_data.pop('responsaveis', [])
+        responsavel_data = validated_data.pop('responsavel', None)
+        if responsavel_data:
+            responsaveis_data.append(responsavel_data)
         
         user_data = {
-            'username': validated_data.pop('username'),
-            'email': validated_data.pop('email'),
+            'username': username,
+            'email': email,
             'first_name': first_name,
             'last_name': '',
-            'telefone': validated_data.pop('telefone', ''),
-            'tipo_usuario': 'ESTUDANTE'
+            'tipo_usuario': 'ESTUDANTE',
+            'telefone': clean_digits(telefone_user)
         }
-        password = validated_data.pop('password')
         
         user = User(**user_data)
         user.set_password(password)
         user.save()
         
         estudante = Estudante.objects.create(usuario=user, **validated_data)
+        
+        # Se desejar processar responsáveis aqui também, poderia replicar a lógica do ViewSet
+        # Por enquanto, apenas removemos do validated_data para evitar o erro de 'field unexpected'
+        
         return estudante
