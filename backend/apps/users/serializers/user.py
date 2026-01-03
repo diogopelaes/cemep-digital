@@ -10,10 +10,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
-            'tipo_usuario', 'foto', 'dark_mode',
+            'tipo_usuario', 'foto', 'dark_mode', 'ano_letivo_selecionado',
             'is_active', 'date_joined', 'last_login'
         ]
-        read_only_fields = ['id', 'date_joined', 'last_login']
+        read_only_fields = ['id', 'date_joined', 'last_login', 'ano_letivo_selecionado']
+
+    ano_letivo_selecionado = serializers.IntegerField(source='get_ano_letivo_selecionado', read_only=True)
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

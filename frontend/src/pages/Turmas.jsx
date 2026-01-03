@@ -16,9 +16,6 @@ export default function Turmas() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [turmas, setTurmas] = useState([])
-  const [anosDisponiveis, setAnosDisponiveis] = useState([])
-  const [anoLetivo, setAnoLetivo] = useState(null)
-  const [filtroAtivo, setFiltroAtivo] = useState('')
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [showEnturmarModal, setShowEnturmarModal] = useState(false)
   const [showDisciplinasModal, setShowDisciplinasModal] = useState(false)
@@ -29,48 +26,15 @@ export default function Turmas() {
   const [totalCount, setTotalCount] = useState(0)
   const pageSize = 20
 
-  // Carrega anos disponíveis na primeira montagem
+  // Carrega turmas quando página muda
   useEffect(() => {
-    loadAnosDisponiveis()
-  }, [])
-
-  // Carrega turmas quando o ano muda ou página muda
-  useEffect(() => {
-    if (anoLetivo) {
-      loadTurmas()
-    }
-  }, [anoLetivo, currentPage, filtroAtivo])
-
-  const loadAnosDisponiveis = async () => {
-    try {
-      // Busca anos disponíveis diretamente do backend
-      const response = await coreAPI.turmas.anosDisponiveis()
-      const anos = response.data
-
-      if (anos && anos.length > 0) {
-        setAnosDisponiveis(anos)
-        setAnoLetivo(anos[0]) // Seleciona o ano mais recente
-      } else {
-        // Nenhuma turma cadastrada - usa ano atual como padrão
-        const anoAtual = new Date().getFullYear()
-        setAnosDisponiveis([anoAtual])
-        setAnoLetivo(anoAtual)
-        setLoading(false)
-      }
-    } catch (error) {
-      console.error(error)
-      toast.error('Erro ao carregar anos letivos')
-      setLoading(false)
-    }
-  }
+    loadTurmas()
+  }, [currentPage])
 
   const loadTurmas = async (silent = false) => {
     if (!silent) setLoading(true)
     try {
-      const params = { ano_letivo: anoLetivo, page: currentPage }
-      if (filtroAtivo !== '') {
-        params.is_active = filtroAtivo
-      }
+      const params = { page: currentPage }
       const response = await coreAPI.turmas.list(params)
       const data = response.data
       setTurmas(data.results || data)
@@ -86,16 +50,7 @@ export default function Turmas() {
     setCurrentPage(page)
   }
 
-  // Reset página quando muda o ano
-  const handleAnoChange = (e) => {
-    setAnoLetivo(parseInt(e.target.value))
-    setCurrentPage(1)
-  }
 
-  const handleFiltroActiveChange = (e) => {
-    setFiltroAtivo(e.target.value)
-    setCurrentPage(1)
-  }
 
   const handleToggleAtivo = async (turma) => {
     try {
@@ -155,32 +110,7 @@ export default function Turmas() {
             </div>
           </div>
 
-          {/* Filtro de Ano */}
-          {anosDisponiveis.length > 0 && (
-            <Card key="filtro-ano" hover={false}>
-              <div className="flex items-center gap-4">
-                {/* Ano Letivo Filter Removed */}
-                <div className="w-40">
-                  <Select
-                    label="Status"
-                    value={filtroAtivo}
-                    onChange={handleFiltroActiveChange}
-                    options={[
-                      { value: 'true', label: 'Ativas' },
-                      { value: 'false', label: 'Inativas' },
-                    ]}
-                    placeholder="Todas"
-                    allowClear
-                  />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm text-slate-500 mt-6">
-                    {turmas.length} turma{turmas.length !== 1 ? 's' : ''} encontrada{turmas.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              </div>
-            </Card>
-          )}
+
 
           {/* Tabela de Turmas */}
           <Card key="tabela-turmas" hover={false}>
@@ -290,10 +220,7 @@ export default function Turmas() {
                 ) : (
                   <TableEmpty
                     colSpan={4}
-                    message={anosDisponiveis.length > 0
-                      ? `Nenhuma turma encontrada para ${anoLetivo}`
-                      : 'Nenhuma turma cadastrada'
-                    }
+                    message="Nenhuma turma encontrada"
                   />
                 )}
               </TableBody>
@@ -321,7 +248,7 @@ export default function Turmas() {
             toast.error('Alguns registros não foram importados. Verifique os erros.')
           }
           loadTurmas(true)
-          loadAnosDisponiveis()
+          loadTurmas(true)
           return response
         }}
         entityName="Turmas"
