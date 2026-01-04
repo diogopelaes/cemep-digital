@@ -232,6 +232,17 @@ export const coreAPI = {
     list: () => api.get('/core/minhas-turmas/'),
     get: (id) => api.get(`/core/minhas-turmas/${id}/`),
   },
+
+  // Controle de Registros e Visualizações
+  controleRegistros: {
+    list: (params) => api.get('/core/controle-registros/', { params }),
+    get: (id) => api.get(`/core/controle-registros/${id}/`),
+    create: (data) => api.post('/core/controle-registros/', data),
+    update: (id, data) => api.patch(`/core/controle-registros/${id}/`, data),
+    delete: (id) => api.delete(`/core/controle-registros/${id}/`),
+    porAno: (ano) => api.get(`/core/controle-registros/por-ano/${ano}/`),
+    salvarLote: (data) => api.post('/core/controle-registros/salvar-lote/', data),
+  },
 }
 
 export const academicAPI = {

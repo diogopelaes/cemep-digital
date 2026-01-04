@@ -3,6 +3,7 @@ App Core - Cadastros Base (Funcionários, Cursos, Turmas, Disciplinas, Calendár
 """
 import uuid
 from django.db import models
+from django.utils import timezone
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from ckeditor.fields import RichTextField
@@ -421,6 +422,51 @@ class AnoLetivo(UUIDModel):
 
     def total_dias_letivos(self):
         return self.dias_letivos_extras.count()
+
+    def save(self, *args, **kwargs):
+        """
+        Ao criar um novo AnoLetivo, cria automaticamente os registros de 
+        ControleRegistrosVisualizacao para todos os tipos e bimestres.
+        """
+        # Verifica se é criação (novo registro)
+        is_new = self._state.adding
+        
+        super().save(*args, **kwargs)
+        
+        # Só cria controles se for um novo registro
+        if is_new:
+            self._criar_controles_iniciais()
+    
+    def _criar_controles_iniciais(self):
+        """Cria os registros de controle para todos os tipos e bimestres."""
+        # Import local para evitar importação circular
+        from apps.core.models import ControleRegistrosVisualizacao
+        
+        # Bimestres: 1-4 para AULA, 1-5 para NOTA e BOLETIM
+        tipos_bimestres = {
+            ControleRegistrosVisualizacao.TipoControle.REGISTRO_AULA: [1, 2, 3, 4],
+            ControleRegistrosVisualizacao.TipoControle.REGISTRO_NOTA: [1, 2, 3, 4, 5],
+            ControleRegistrosVisualizacao.TipoControle.VISUALIZACAO_BOLETIM: [1, 2, 3, 4, 5],
+        }
+        
+        controles_a_criar = []
+        for tipo, bimestres in tipos_bimestres.items():
+            for bimestre in bimestres:
+                controles_a_criar.append(
+                    ControleRegistrosVisualizacao(
+                        ano_letivo=self,
+                        bimestre=bimestre,
+                        tipo=tipo,
+                        data_inicio=None,
+                        data_fim=None
+                    )
+                )
+        
+        # Cria em lote para melhor performance
+        ControleRegistrosVisualizacao.objects.bulk_create(
+            controles_a_criar,
+            ignore_conflicts=True  # Ignora se já existir (segurança extra)
+        )
     
     class Meta:
         verbose_name = 'Ano Letivo'
@@ -602,3 +648,109 @@ class AnoLetivoSelecionado(UUIDModel):
 
     def __str__(self):
         return f"{self.usuario} - {self.ano_letivo.ano}"
+
+
+class ControleRegistrosVisualizacao(UUIDModel):
+    """
+    Controle de períodos para registros e visualizações.
+    Define quando professores podem registrar aulas/notas e quando boletins ficam disponíveis.
+    
+    Regras de liberação (baseadas apenas nas datas):
+    - Com data_inicio e data_fim: Liberado no período (data_inicio até data_fim)
+    - Só data_inicio: Liberado dessa data em diante
+    - Só data_fim: Liberado até essa data
+    - Sem datas: Não liberado
+    """
+    
+    class TipoControle(models.TextChoices):
+        REGISTRO_AULA = 'AULA', 'Registro de Aula (falta e conteúdo)'
+        REGISTRO_NOTA = 'NOTA', 'Registro de Nota final do bimestre'
+        VISUALIZACAO_BOLETIM = 'BOLETIM', 'Visualização do boletim'
+
+    BIMESTRE_CHOICES = [
+        (1, '1º Bimestre'),
+        (2, '2º Bimestre'),
+        (3, '3º Bimestre'),
+        (4, '4º Bimestre'),
+        (5, 'Resultado Final'),
+    ]
+
+    ano_letivo = models.ForeignKey(
+        AnoLetivo,
+        on_delete=models.CASCADE,
+        related_name='controle_registros_visualizacao',
+        verbose_name='Ano Letivo'
+    )
+    bimestre = models.IntegerField(
+        verbose_name='Bimestre',
+        choices=BIMESTRE_CHOICES,
+        default=1
+    )
+    tipo = models.CharField(
+        max_length=10,
+        choices=TipoControle.choices,
+        default=TipoControle.REGISTRO_AULA,
+        verbose_name='Tipo'
+    )
+    data_inicio = models.DateField(verbose_name='Data de Início', null=True, blank=True)
+    data_fim = models.DateField(verbose_name='Data de Fim', null=True, blank=True)
+
+    def clean(self):
+        """Valida que a data de fim é posterior à data de início."""
+        if self.data_fim and self.data_inicio and self.data_fim < self.data_inicio:
+            raise ValidationError('A data de fim deve ser posterior à data de início.')
+
+    def esta_liberado(self, data_referencia=None):
+        """
+        Verifica se está liberado para uma data específica.
+        
+        Args:
+            data_referencia: Data para verificar (default: hoje)
+        
+        Returns:
+            bool: True se liberado, False caso contrário
+        """
+        if data_referencia is None:
+            data_referencia = timezone.localdate()
+        
+        # Sem datas = não liberado
+        if not self.data_inicio and not self.data_fim:
+            return False
+        
+        # Só data_inicio = liberado dessa data em diante
+        if self.data_inicio and not self.data_fim:
+            return data_referencia >= self.data_inicio
+        
+        # Só data_fim = liberado até essa data
+        if not self.data_inicio and self.data_fim:
+            return data_referencia <= self.data_fim
+        
+        # Ambas as datas = liberado no período
+        return self.data_inicio <= data_referencia <= self.data_fim
+
+    @property
+    def status_liberacao(self):
+        """Retorna o status atual de liberação."""
+        if not self.data_inicio and not self.data_fim:
+            return 'Bloqueado'
+        
+        if self.esta_liberado():
+            return 'Liberado'
+        
+        hoje = timezone.localdate()
+        if self.data_inicio and hoje < self.data_inicio:
+            return 'Aguardando início'
+        
+        return 'Encerrado'
+
+    class Meta:
+        verbose_name = 'Controle de Registro/Visualização'
+        verbose_name_plural = 'Controles de Registros/Visualizações'
+        unique_together = ['ano_letivo', 'bimestre', 'tipo']
+        ordering = ['ano_letivo', 'bimestre', 'tipo']
+
+    def __str__(self):
+        bimestre_display = dict(self.BIMESTRE_CHOICES).get(self.bimestre, str(self.bimestre))
+        return f"{self.ano_letivo.ano} - {bimestre_display} - {self.get_tipo_display()} ({self.status_liberacao})"
+
+

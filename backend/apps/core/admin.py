@@ -6,7 +6,7 @@ from .models import (
     Funcionario, PeriodoTrabalho, Disciplina, Curso, Turma,
     DisciplinaTurma, ProfessorDisciplinaTurma, Habilidade,
     AnoLetivo, DiaLetivoExtra, DiaNaoLetivo, HorarioAula, GradeHoraria,
-    GradeHorariaValidade
+    GradeHorariaValidade, ControleRegistrosVisualizacao
 )
 
 
@@ -140,3 +140,13 @@ class GradeHorariaAdmin(admin.ModelAdmin):
     search_fields = ['validade__turma__numero', 'validade__turma__letra', 'disciplina__nome']
 
 
+@admin.register(ControleRegistrosVisualizacao)
+class ControleRegistrosVisualizacaoAdmin(admin.ModelAdmin):
+    list_display = ['ano_letivo', 'bimestre', 'tipo', 'data_inicio', 'data_fim', 'status_liberacao']
+    list_filter = ['ano_letivo', 'bimestre', 'tipo']
+    list_editable = ['data_inicio', 'data_fim']
+    ordering = ['ano_letivo', 'bimestre', 'tipo']
+
+    @admin.display(description='Status')
+    def status_liberacao(self, obj):
+        return obj.status_liberacao

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { HiCalendar, HiUserGroup, HiAcademicCap, HiClock } from 'react-icons/hi'
+import { HiCalendar, HiClock, HiAdjustments } from 'react-icons/hi'
 import CalendarioTab from '../components/configuracoes/CalendarioTab'
 import HorarioAulaTab from '../components/configuracoes/HorarioAulaTab'
+import ControleTab from '../components/configuracoes/ControleTab'
 import { useReferences } from '../contexts/ReferenceContext'
 
 export default function Configuracoes() {
@@ -18,8 +19,7 @@ export default function Configuracoes() {
     const tabs = [
         { id: 'calendario', label: 'Calendário', icon: HiCalendar },
         ...(hasActiveCalendar ? [{ id: 'horarios', label: 'Horários de Aula', icon: HiClock }] : []),
-        { id: 'professores', label: 'Controle de Professores', icon: HiAcademicCap },
-        { id: 'estudantes', label: 'Controle - Estudantes/Responsáveis', icon: HiUserGroup },
+        ...(hasActiveCalendar ? [{ id: 'controle', label: 'Controle', icon: HiAdjustments }] : []),
     ]
 
     return (
@@ -54,18 +54,7 @@ export default function Configuracoes() {
             <div className="glass p-6 rounded-2xl min-h-[400px]">
                 {activeTab === 'calendario' && <CalendarioTab />}
                 {activeTab === 'horarios' && hasActiveCalendar && <HorarioAulaTab />}
-
-                {activeTab === 'professores' && (
-                    <div className="text-center py-12 text-slate-500 dark:text-slate-400">
-                        Controle de Professores em desenvolvimento...
-                    </div>
-                )}
-
-                {activeTab === 'estudantes' && (
-                    <div className="text-center py-12 text-slate-500 dark:text-slate-400">
-                        Controle de Estudantes/Responsáveis em desenvolvimento...
-                    </div>
-                )}
+                {activeTab === 'controle' && hasActiveCalendar && <ControleTab />}
             </div>
         </div>
     )
