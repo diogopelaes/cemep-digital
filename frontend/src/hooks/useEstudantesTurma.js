@@ -31,7 +31,7 @@ export function useEstudantesTurma(turmaId, turma, isActive = true, onUpdate = n
             setEstudantesElegiveis(eligiveisResp.data || [])
 
             // Carregar estudantes já enturmados
-            const enturmadosResp = await academicAPI.matriculasTurma.list({ turma: turmaId })
+            const enturmadosResp = await academicAPI.matriculasTurma.list({ turma: turmaId, page_size: 1000 })
             const enturmados = enturmadosResp.data.results || enturmadosResp.data || []
             // Ordenar por nome
             enturmados.sort((a, b) => {

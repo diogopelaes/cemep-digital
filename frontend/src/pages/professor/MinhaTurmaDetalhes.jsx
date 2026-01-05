@@ -38,7 +38,7 @@ export default function MinhaTurmaDetalhes() {
         try {
             const [turmaRes, estudantesRes] = await Promise.all([
                 coreAPI.minhasTurmas.get(id),
-                academicAPI.matriculasTurma.list({ turma_id: id })
+                academicAPI.matriculasTurma.list({ turma: id, page_size: 1000 })
             ])
 
             setTurma(turmaRes.data)
@@ -85,6 +85,27 @@ export default function MinhaTurmaDetalhes() {
             setGeneratingPDF(false)
         }
     }
+
+    // Helper de status
+    const getStatusVariant = (status) => {
+        switch (status) {
+            case 'CURSANDO': return 'success'
+            case 'PROMOVIDO': return 'primary'
+            case 'TRANSFERIDO': return 'warning'
+            case 'RETIDO':
+            case 'ABANDONO': return 'danger'
+            default: return 'default'
+        }
+    }
+
+    // Contagem de status
+    const statusCounts = estudantes.reduce((acc, curr) => {
+        const key = curr.status
+        const label = curr.status_display || curr.status
+        if (!acc[key]) acc[key] = { label, count: 0 }
+        acc[key].count += 1
+        return acc
+    }, {})
 
     // Card de estudante para mobile
     const EstudanteCard = ({ matricula }) => {
@@ -139,7 +160,7 @@ export default function MinhaTurmaDetalhes() {
                         {/* Status */}
                         <div className="flex items-center gap-2 mt-1">
                             <Badge
-                                variant={matricula.status === 'CURSANDO' ? 'success' : 'default'}
+                                variant={getStatusVariant(matricula.status)}
                                 className="text-[10px] px-1.5 py-0"
                             >
                                 {matricula.status_display || matricula.status}
@@ -205,10 +226,11 @@ export default function MinhaTurmaDetalhes() {
                         <span className="hidden sm:inline">Lista PDF</span>
                     </Button>
                     <Button
-                        variant="primary"
+                        variant="secondary"
                         icon={HiPhotograph}
                         onClick={() => navigate(`/turmas/${id}/carometro`)}
                         className="shrink-0"
+                        title="Visualizar Carômetro"
                     >
                         <span className="hidden sm:inline">Carômetro</span>
                     </Button>
@@ -243,17 +265,26 @@ export default function MinhaTurmaDetalhes() {
                     {/* Desktop: Tabela */}
                     <Card hover={false} className="hidden md:block">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-700">
-                            <h2 className="text-lg font-semibold text-slate-800 dark:text-white">
-                                Estudantes da Turma ({estudantes.length})
-                            </h2>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <h2 className="text-lg font-semibold text-slate-800 dark:text-white">
+                                    Estudantes da Turma
+                                </h2>
+                                <div className="flex flex-wrap gap-2">
+                                    {Object.entries(statusCounts).map(([key, { label, count }]) => (
+                                        <Badge key={key} variant={getStatusVariant(key)}>
+                                            {label}: {count}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                         <Table>
                             <TableHead>
                                 <TableRow>
                                     <TableHeader>Nome</TableHeader>
+                                    <TableHeader>Status</TableHeader>
                                     <TableHeader>Email</TableHeader>
                                     <TableHeader>Data Nasc.</TableHeader>
-                                    <TableHeader>Status</TableHeader>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -285,6 +316,13 @@ export default function MinhaTurmaDetalhes() {
                                                 </div>
                                             </TableCell>
                                             <TableCell>
+                                                <Badge
+                                                    variant={getStatusVariant(matricula.status)}
+                                                >
+                                                    {matricula.status_display || matricula.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
                                                 <div className="flex items-center gap-2 max-w-[200px]">
                                                     <span className="truncate" title={usuario?.email}>
                                                         {usuario?.email || '-'}
@@ -304,13 +342,6 @@ export default function MinhaTurmaDetalhes() {
                                                 <span className="text-sm text-slate-600 dark:text-slate-400">
                                                     {formatDateBR(estudante?.data_nascimento)}
                                                 </span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge
-                                                    variant={matricula.status === 'CURSANDO' ? 'success' : 'default'}
-                                                >
-                                                    {matricula.status_display || matricula.status}
-                                                </Badge>
                                             </TableCell>
                                         </TableRow>
                                     )

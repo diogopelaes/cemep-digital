@@ -31,6 +31,7 @@ class MatriculaTurmaViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.
         'matricula_cemep__estudante__usuario', 'turma__curso'
     ).all()
     serializer_class = MatriculaTurmaSerializer
+    pagination_class = None
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['status', 'turma', 'matricula_cemep', 'turma__ano_letivo']
     search_fields = ['matricula_cemep__estudante__usuario__first_name', 'matricula_cemep__numero_matricula']

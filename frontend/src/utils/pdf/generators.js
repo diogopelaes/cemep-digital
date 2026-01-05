@@ -222,48 +222,78 @@ export async function generateListaTurmaPDF(turma, estudantes) {
         }
 
         // Dados
-        doc.setTextColor(...COLORS.text)
+        // Lógica de Estilo Condicional
+        const statusRaw = est.status || '-'
+        const statusUpper = statusRaw.toUpperCase()
+
+        let textColor = COLORS.text
+        let fontStyle = 'normal'
+        let isStrike = false
+
+        if (statusUpper === 'RETIDO') {
+            textColor = [220, 38, 38] // Red
+            fontStyle = 'bold'
+        } else if (['TRANSFERIDO', 'ABANDONO', 'OUTRO', 'CANCELADO'].includes(statusUpper)) {
+            isStrike = true
+            textColor = [100, 100, 100] // Cinza escuro para tachados
+        }
+
+        doc.setTextColor(...textColor)
+        doc.setFont('helvetica', fontStyle)
 
         let rowX = margin
 
+        // Função auxiliar para desenhar célula
+        const drawCell = (text, width, align = 'left', forceNoStrike = false, fullText = null) => {
+            // Truncar ou ajustar texto
+            let displayText = text
+            if (fullText && doc.getTextWidth(fullText) > width - 2) {
+                displayText = doc.splitTextToSize(fullText, width - 2)[0]
+                // Se foi cortado, talvez adicionar ...? O splitTextToSize não adiciona.
+                // Vamos deixar simples conforme código anterior ou usar o text passado
+            }
+
+            const xPos = align === 'center' ? rowX + (width / 2) : rowX + 2
+            doc.text(displayText, xPos, y + 4.5, { align })
+
+            if (isStrike && !forceNoStrike && displayText && displayText !== '-') {
+                const txtWidth = doc.getTextWidth(displayText)
+                const lineStart = align === 'center' ? xPos - (txtWidth / 2) : xPos
+                const lineEnd = lineStart + txtWidth
+
+                doc.setDrawColor(...textColor)
+                doc.setLineWidth(0.1)
+                doc.line(lineStart, y + 4.5 - 1, lineEnd, y + 4.5 - 1)
+            }
+            rowX += width
+        }
+
         // #
-        doc.text((index + 1).toString(), rowX + (cols[0].width / 2), y + 4.5, { align: 'center' })
-        rowX += cols[0].width
+        drawCell((index + 1).toString(), cols[0].width, 'center')
 
         // Nome
         const nomeDisplay = est.nome || est.nome_social || '-'
-        const nomeFinal = doc.splitTextToSize(nomeDisplay, cols[1].width - 3)[0] // Pega só primeira linha se quebrar
-        doc.text(nomeFinal, rowX + 2, y + 4.5)
-        rowX += cols[1].width
+        // Truncate manual prévio para evitar sobreposição
+        const nomeFinal = doc.splitTextToSize(nomeDisplay, cols[1].width - 3)[0]
+        drawCell(nomeFinal, cols[1].width, 'left')
 
         // Matricula
-        const matricula = est.matricula || '-'
-        doc.text(matricula, rowX + (cols[2].width / 2), y + 4.5, { align: 'center' })
-        rowX += cols[2].width
+        drawCell(est.matricula || '-', cols[2].width, 'center')
 
         // Nascimento
-        const nasc = est.data_nascimento || '-'
-        doc.text(nasc, rowX + (cols[3].width / 2), y + 4.5, { align: 'center' })
-        rowX += cols[3].width
+        drawCell(est.data_nascimento || '-', cols[3].width, 'center')
 
         // Email
         const email = est.email || '-'
-        // Cortar email
         let emailFinal = email
-        if (doc.getTextWidth(emailFinal) > cols[4].width - 3) {
-            // estratégia rústica de truncate
-            const maxChars = Math.floor((cols[4].width - 3) / 1.5) // approx
-            emailFinal = email.substring(0, maxChars) + '...'
-            // ou usar splitTextToSize mas só pegar primeira parte
+        // Lógica de truncate de email do código original
+        if (doc.getTextWidth(email) > cols[4].width - 3) {
             emailFinal = doc.splitTextToSize(email, cols[4].width - 3)[0]
         }
+        drawCell(emailFinal, cols[4].width, 'left')
 
-        doc.text(emailFinal, rowX + 2, y + 4.5)
-        rowX += cols[4].width
-
-        // Status
-        const status = est.status || '-'
-        doc.text(status, rowX + (cols[5].width / 2), y + 4.5, { align: 'center' })
+        // Status (forceNoStrike = true)
+        drawCell(statusRaw, cols[5].width, 'center', true)
 
         y += rowHeight
 

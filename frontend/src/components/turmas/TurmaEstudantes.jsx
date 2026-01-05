@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { HiUserGroup, HiTrash, HiAcademicCap, HiUser, HiCheck, HiX } from 'react-icons/hi'
+import { HiUserGroup, HiTrash, HiAcademicCap, HiUser, HiCheck, HiX, HiUserRemove } from 'react-icons/hi'
 import { Card, Loading, MultiCombobox, DateInput, Avatar, Badge } from '../ui'
 import Table, { TableHead, TableBody, TableRow, TableCell, TableHeader, TableEmpty } from '../ui/Table'
 import { formatDateBR } from '../../utils/date'
@@ -44,6 +44,15 @@ export default function TurmaEstudantes({
             default: return 'default'
         }
     }
+
+    // Contagem de status
+    const statusCounts = estudantesEnturmados.reduce((acc, curr) => {
+        const key = curr.status
+        const label = curr.status_display || curr.status
+        if (!acc[key]) acc[key] = { label, count: 0 }
+        acc[key].count += 1
+        return acc
+    }, {})
 
     return (
         <Card hover={false}>
@@ -106,9 +115,18 @@ export default function TurmaEstudantes({
                     {/* Tabela de estudantes enturmados */}
                     {estudantesEnturmados.length > 0 ? (
                         <div className="mt-6">
-                            <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-3">
-                                Estudantes Enturmados ({estudantesEnturmados.length})
-                            </h3>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3">
+                                <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                    Estudantes Enturmados
+                                </h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {Object.entries(statusCounts).map(([key, { label, count }]) => (
+                                        <Badge key={key} variant={getStatusVariant(key)}>
+                                            {label}: {count}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
                             <Table>
                                 <TableHead>
                                     <TableRow>
@@ -116,7 +134,7 @@ export default function TurmaEstudantes({
                                         <TableHeader>Status</TableHeader>
                                         <TableHeader>Email</TableHeader>
                                         <TableHeader>Data Nasc.</TableHeader>
-                                        <TableHeader className="w-20 text-right">Ações</TableHeader>
+                                        <TableHeader className="w-20 text-right">Remover</TableHeader>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -178,7 +196,7 @@ export default function TurmaEstudantes({
                                                             className={`p-2 text-danger-600 hover:bg-danger-50 rounded-lg transition-all duration-200 ${confirmingRemove === mt.id ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                                                             disabled={saving}
                                                         >
-                                                            <HiTrash className="h-5 w-5" />
+                                                            <HiUserRemove className="h-5 w-5" />
                                                         </button>
 
                                                         {/* Confirmation overlay - slides in from right */}

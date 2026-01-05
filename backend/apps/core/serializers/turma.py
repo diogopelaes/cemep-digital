@@ -42,4 +42,4 @@ class TurmaSerializer(serializers.ModelSerializer):
     
     def get_estudantes_count(self, obj):
         """Conta apenas estudantes com matrícula status CURSANDO."""
-        return obj.matriculas.filter(status='CURSANDO').count()
+        return obj.matriculas.filter(status__in=['CURSANDO', 'RETIDO', 'PROMOVIDO']).count()

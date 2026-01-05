@@ -38,7 +38,7 @@ class MatriculaCEMEPAdmin(admin.ModelAdmin):
 @admin.register(MatriculaTurma)
 class MatriculaTurmaAdmin(admin.ModelAdmin):
     list_display = ['matricula_cemep', 'turma', 'status', 'data_entrada']
-    list_filter = ['status', 'turma__ano_letivo', 'turma__curso']
+    list_filter = ['status', 'turma__ano_letivo', 'turma__curso', 'turma']
     search_fields = ['matricula_cemep__estudante__usuario__first_name', 'matricula_cemep__numero_matricula']
 
 
