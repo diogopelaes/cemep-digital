@@ -16,7 +16,7 @@ import { TIPOS_USUARIO, TIPOS_USUARIO_COLORS } from '../data'
 import {
   createPDF, addHeader, addFooter, addSectionTitle, addField,
   addTable, checkNewPage, downloadPDF, CONFIG
-} from '../utils/pdf'
+} from '../utils/pdf/index'
 import toast from 'react-hot-toast'
 
 export default function Funcionarios() {
@@ -168,7 +168,10 @@ export default function Funcionarios() {
       const pageWidth = doc.internal.pageSize.getWidth()
 
       // Cabeçalho
-      let y = addHeader(doc, 'Ficha do Funcionário', funcionario.nome_completo || funcionario.usuario?.first_name)
+      let y = await addHeader(doc, {
+        title: 'Ficha do Funcionário',
+        subtitle1: funcionario.nome_completo || funcionario.usuario?.first_name
+      })
 
       // === DADOS PESSOAIS ===
       y = addSectionTitle(doc, 'Dados Pessoais', y)

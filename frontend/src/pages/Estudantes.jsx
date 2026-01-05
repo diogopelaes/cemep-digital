@@ -13,7 +13,7 @@ import {
   createPDF, addHeader, addFooter, addSectionTitle, addField,
   addPhoto, addTable, checkNewPage, imageToBase64, downloadPDF,
   CONFIG
-} from '../utils/pdf'
+} from '../utils/pdf/index'
 import toast from 'react-hot-toast'
 
 export default function Estudantes() {
@@ -74,7 +74,11 @@ export default function Estudantes() {
       const pageWidth = doc.internal.pageSize.getWidth()
 
       // Cabeçalho
-      let y = addHeader(doc, 'Ficha do Estudante', estudante.nome_exibicao || estudante.usuario?.first_name)
+      // Cabeçalho
+      let y = await addHeader(doc, {
+        title: 'Ficha do Estudante',
+        subtitle1: estudante.nome_exibicao || estudante.usuario?.first_name
+      })
 
       // === DADOS PESSOAIS ===
       y = addSectionTitle(doc, 'Dados Pessoais', y)
@@ -88,9 +92,9 @@ export default function Estudantes() {
 
       // Adiciona foto
       let fotoBase64 = null
-      if (estudante.usuario?.foto) {
+      if (estudante.foto) {
         try {
-          fotoBase64 = await imageToBase64(estudante.usuario.foto)
+          fotoBase64 = await imageToBase64(estudante.foto)
         } catch (e) {
           console.log('Erro ao carregar foto para PDF')
         }

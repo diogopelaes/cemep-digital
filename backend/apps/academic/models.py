@@ -302,6 +302,8 @@ class MatriculaTurma(UUIDModel):
         TRANSFERIDO = 'TRANSFERIDO', 'Transferido'
         RETIDO = 'RETIDO', 'Retido'
         PROMOVIDO = 'PROMOVIDO', 'Promovido'
+        ABANDONO = 'ABANDONO', 'Abandono'
+        OUTRO = 'OUTRO', 'Outro'
     
     matricula_cemep = models.ForeignKey(
         MatriculaCEMEP,

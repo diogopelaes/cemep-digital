@@ -16,7 +16,7 @@ import {
     createPDF, addHeader, addFooter, addSectionTitle, addField,
     addPhoto, addTable, checkNewPage, imageToBase64, downloadPDF, openPDF,
     CONFIG
-} from '../utils/pdf'
+} from '../utils/pdf/index'
 import toast from 'react-hot-toast'
 
 /**
@@ -61,7 +61,11 @@ export default function EstudanteDetalhes() {
             const pageWidth = doc.internal.pageSize.getWidth()
 
             // Cabeçalho
-            let y = addHeader(doc, 'Ficha do Estudante', estudante.nome_exibicao || estudante.usuario?.first_name, true)
+            // Cabeçalho
+            let y = await addHeader(doc, {
+                title: 'Ficha do Estudante',
+                subtitle1: estudante.nome_exibicao || estudante.usuario?.first_name
+            })
 
             // === DADOS PESSOAIS ===
             y = addSectionTitle(doc, 'Dados Pessoais', y)
