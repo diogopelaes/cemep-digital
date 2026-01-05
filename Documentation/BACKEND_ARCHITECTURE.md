@@ -1,7 +1,7 @@
 # CEMEP Digital - Documentação do Backend
 
-**Última atualização:** 29/12/2024  
-**Tecnologias:** Django 4, Django REST Framework, PostgreSQL, Simple JWT, django-filter, django-ckeditor
+**Última atualização:** 05/01/2026  
+**Tecnologias:** Python 3.14+, Django 6, Django REST Framework, PostgreSQL 18+, Simple JWT, django-filter, django-ckeditor
 
 ---
 
@@ -75,32 +75,57 @@ class User(AbstractUser):
 
 ### Sistema de Permissões (`permissions.py`)
 
-| Classe Base | Perfis Permitidos |
-|-------------|-------------------|
+> **Arquivo:** `apps/users/permissions.py` - Centraliza TODA a lógica de controle de acesso.
+
+#### Classes de Permissão Base (Verificam o Perfil)
+
+| Classe | Perfis Permitidos |
+|--------|-------------------|
 | `IsGestao` | GESTAO |
 | `IsGestaoOrSecretaria` | GESTAO, SECRETARIA |
 | `IsFuncionario` | GESTAO, SECRETARIA, PROFESSOR, MONITOR |
 | `IsProfessor` | GESTAO, PROFESSOR |
-| `IsOwnerOrGestao` | Dono do objeto OU GESTAO |
+| `IsEstudanteOrResponsavel` | ESTUDANTE, RESPONSAVEL |
+| `IsOwnerOrGestao` | Dono do objeto OU GESTAO (object-level) |
+| `NeverAllow` | Ninguém (usado para bloquear operações específicas) |
 
-### Mixins para ViewSets
+#### Mixins para ViewSets (Controle CRUD Automático)
 
-| Mixin | Escrita | Leitura |
-|-------|---------|---------|
+| Mixin | Escrita (CUD) | Leitura (R) |
+|-------|---------------|-------------|
 | `GestaoOnlyMixin` | GESTAO | GESTAO |
 | `GestaoSecretariaMixin` | GESTAO, SECRETARIA | GESTAO, SECRETARIA |
-| `GestaoSecretariaCRUMixin` | GESTAO, SECRETARIA | GESTAO, SECRETARIA (sem delete) |
+| `GestaoSecretariaCRUMixin` | GESTAO, SECRETARIA (sem delete) | GESTAO, SECRETARIA |
+| `GestaoWriteSecretariaReadMixin` | GESTAO | GESTAO, SECRETARIA |
 | `GestaoWriteFuncionarioReadMixin` | GESTAO | Todos funcionários |
 | `GestaoSecretariaWriteFuncionarioReadMixin` | GESTAO, SECRETARIA | Todos funcionários |
-| `ProfessorWriteFuncionarioReadMixin` | GESTAO, PROFESSOR | Todos funcionários |
 | `GestaoWritePublicReadMixin` | GESTAO | Qualquer autenticado |
+| `GestaoSecretariaWritePublicReadMixin` | GESTAO, SECRETARIA | Qualquer autenticado |
+| `ProfessorWriteFuncionarioReadMixin` | GESTAO, PROFESSOR | Todos funcionários |
+| `FuncionarioMixin` | Todos funcionários | Todos funcionários |
+
+#### Mixin de Filtro por Ano Letivo
+
+```python
+class AnoLetivoFilterMixin:
+    """
+    Filtra querysets pelo ano letivo selecionado do usuário.
+    Defina 'ano_letivo_field' para especificar o campo de filtro.
+    """
+    ano_letivo_field = 'ano_letivo'  # Padrão, sobrescreva na view
+    
+    # Exemplos de uso:
+    # ano_letivo_field = 'ano_letivo'           # Modelo Turma
+    # ano_letivo_field = 'turma__ano_letivo'    # Modelo DisciplinaTurma
+    # ano_letivo_field = 'ano_letivo__ano'      # Modelo HorarioAula
+```
 
 **Uso em ViewSet:**
 ```python
-from apps.users.permissions import GestaoWriteFuncionarioReadMixin
+from apps.users.permissions import GestaoWriteFuncionarioReadMixin, AnoLetivoFilterMixin
 
-class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
-    # Herda permissões automaticamente
+class TurmaViewSet(AnoLetivoFilterMixin, GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+    ano_letivo_field = 'ano_letivo'  # Campo para filtrar pelo ano selecionado
     ...
 ```
 
@@ -110,19 +135,24 @@ class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet)
 
 ### Modelos Principais
 
-| Modelo                    | Descrição                              | Campos Chave                                       |
-|---------------------------|----------------------------------------|----------------------------------------------------|
-| `Funcionario`             | Funcionário vinculado a User           | `usuario`, `matricula`, `cpf`, `area_atuacao`      |
-| `PeriodoTrabalho`         | Períodos de vínculo                    | `funcionario`, `data_entrada`, `data_saida`        |
-| `Disciplina`              | Disciplina curricular                  | `nome`, `sigla`, `area_conhecimento`, `is_active`  |
-| `Curso`                   | Curso oferecido                        | `nome`, `sigla`, `is_active`                       |
-| `Turma`                   | Turma de estudantes                    | `numero`, `letra`, `ano_letivo`, `curso`           |
-| `DisciplinaTurma`         | Vínculo disciplina-turma               | `disciplina`, `turma`, `aulas_semanais`            |
-| `ProfessorDisciplinaTurma`| Atribuição de professor                | `professor`, `disciplina_turma`, `tipo`            |
-| `Habilidade`              | Habilidades BNCC                       | `codigo`, `descricao`, `disciplina`                |
-| `AnoLetivo`               | Ano letivo com bimestres               | `ano` (PK), `data_inicio/fim_Xbim`, `is_active`    |
-| `DiaLetivoExtra`          | Dia letivo extra (sábado/feriado)      | `data`, `descricao`                                |
-| `DiaNaoLetivo`            | Feriado ou recesso                     | `data`, `tipo`, `descricao`                        |
+| Modelo                         | Descrição                              | Campos Chave                                       |
+|--------------------------------|----------------------------------------|----------------------------------------------------|
+| `Funcionario`                  | Funcionário vinculado a User           | `usuario`, `matricula`, `cpf`, `area_atuacao`      |
+| `PeriodoTrabalho`              | Períodos de vínculo                    | `funcionario`, `data_entrada`, `data_saida`        |
+| `Disciplina`                   | Disciplina curricular                  | `nome`, `sigla`, `area_conhecimento`, `is_active`  |
+| `Curso`                        | Curso oferecido                        | `nome`, `sigla`, `is_active`                       |
+| `Turma`                        | Turma de estudantes                    | `numero`, `letra`, `ano_letivo`, `curso`           |
+| `DisciplinaTurma`              | Vínculo disciplina-turma               | `disciplina`, `turma`, `aulas_semanais`            |
+| `ProfessorDisciplinaTurma`     | Atribuição de professor                | `professor`, `disciplina_turma`, `tipo`            |
+| `Habilidade`                   | Habilidades BNCC                       | `codigo`, `descricao`, `disciplina`                |
+| `AnoLetivo`                    | Ano letivo com bimestres               | `ano` (PK), `data_inicio/fim_Xbim`, `is_active`    |
+| `DiaLetivoExtra`               | Dia letivo extra (sábado/feriado)      | `data`, `descricao`                                |
+| `DiaNaoLetivo`                 | Feriado ou recesso                     | `data`, `tipo`, `descricao`                        |
+| `HorarioAula`                  | Horário de aula de referência          | `ano_letivo`, `dia_semana`, `hora_inicio`, `hora_fim` |
+| `GradeHorariaValidade`         | Vigência de grade horária              | `turma`, `data_inicio`, `data_fim`                 |
+| `GradeHoraria`                 | Item da grade horária                  | `validade`, `horario_aula`, `disciplina`           |
+| `AnoLetivoSelecionado`         | Ano letivo selecionado pelo usuário    | `usuario`, `ano_letivo`                            |
+| `ControleRegistrosVisualizacao`| Controle de períodos (aulas/notas/boletim) | `ano_letivo`, `tipo`, `bimestre`, `data_inicio/fim` |
 
 ### Relacionamentos Importantes
 
@@ -133,23 +163,33 @@ Curso 1:N Turma
 Turma N:M Disciplina (via DisciplinaTurma)
 DisciplinaTurma 1:N ProfessorDisciplinaTurma
 Disciplina 1:N Habilidade
-AnoLetivo N:M DiaLetivoExtra
-AnoLetivo N:M DiaNaoLetivo
+AnoLetivo 1:N DiaLetivoExtra
+AnoLetivo 1:N DiaNaoLetivo
+AnoLetivo 1:N HorarioAula
+AnoLetivo 1:N ControleRegistrosVisualizacao
+Turma 1:N GradeHorariaValidade
+GradeHorariaValidade 1:N GradeHoraria
+User 1:1 AnoLetivoSelecionado
 ```
 
 ### ViewSets Disponíveis (`views/`)
 
-| ViewSet                          | Arquivo                        | Ações Customizadas                                                       |
-|----------------------------------|--------------------------------|--------------------------------------------------------------------------|
-| `FuncionarioViewSet`             | `funcionario.py`               | `criar_completo`, `atualizar_completo`, `toggle_ativo`, `importar_arquivo`, `resetar_senha` |
-| `DisciplinaViewSet`              | `disciplina.py`                | `toggle_active`, `importar_arquivo`, `download_modelo`                   |
-| `CursoViewSet`                   | `curso.py`                     | `toggle_active`, `importar_arquivo`, `download_modelo`                   |
-| `TurmaViewSet`                   | `turma.py`                     | `toggle_active`, `importar_arquivo`, `download_modelo`                   |
-| `DisciplinaTurmaViewSet`         | `disciplina_turma.py`          | `importar_arquivo`, `download_modelo`                                    |
-| `ProfessorDisciplinaTurmaViewSet`| `professor_disciplina_turma.py`| -                                                                        |
-| `AnoLetivoViewSet`               | `calendario.py`                | `calendario`, `dia_nao_letivo`, `dia_letivo_extra`, `remover_dia`        |
-| `HabilidadeViewSet`              | `habilidade.py`                | -                                                                        |
-| `PeriodoTrabalhoViewSet`         | `periodo_trabalho.py`          | -                                                                        |
+| ViewSet                               | Arquivo                        | Ações Customizadas                                                       |
+|---------------------------------------|--------------------------------|--------------------------------------------------------------------------|
+| `FuncionarioViewSet`                  | `funcionario.py`               | `criar_completo`, `atualizar_completo`, `toggle_ativo`, `importar_arquivo`, `resetar_senha` |
+| `DisciplinaViewSet`                   | `disciplina.py`                | `toggle_active`, `importar_arquivo`, `download_modelo`                   |
+| `CursoViewSet`                        | `curso.py`                     | `toggle_active`, `importar_arquivo`, `download_modelo`                   |
+| `TurmaViewSet`                        | `turma.py`                     | `toggle_active`, `importar_arquivo`, `download_modelo`                   |
+| `DisciplinaTurmaViewSet`              | `disciplina_turma.py`          | `importar_arquivo`, `download_modelo`                                    |
+| `ProfessorDisciplinaTurmaViewSet`     | `professor_disciplina_turma.py`| -                                                                        |
+| `AnoLetivoViewSet`                    | `calendario.py`                | `calendario`, `dia_nao_letivo`, `dia_letivo_extra`, `remover_dia`        |
+| `HabilidadeViewSet`                   | `habilidade.py`                | -                                                                        |
+| `PeriodoTrabalhoViewSet`              | `periodo_trabalho.py`          | -                                                                        |
+| `HorarioAulaViewSet`                  | `horario_aula.py`              | -                                                                        |
+| `GradeHorariaViewSet`                 | `grade_horaria.py`             | Gerencia validades e itens da grade                                      |
+| `AnoLetivoSelecionadoViewSet`         | `ano_letivo_selecionado.py`    | `get`, `set` (ano selecionado pelo usuário)                              |
+| `MinhasTurmasViewSet`                 | `professor/`                   | Lista turmas do professor logado                                         |
+| `ControleRegistrosVisualizacaoViewSet`| `controle.py`                  | Controle de períodos para registros/visualizações                        |
 
 ---
 
@@ -174,15 +214,16 @@ Estudante → MatriculaCEMEP (1:N) → MatriculaTurma (1:N por matrícula)
                 Curso                    Turma
 ```
 
-### ViewSets Disponíveis (`views/`)
+### ViewSets e Views Disponíveis (`views/`)
 
-| ViewSet | Ações Customizadas |
-|---------|--------------------|
-| `EstudanteViewSet` | `criar_completo`, `atualizar_completo`, `upload_foto`, `remover_foto`, `prontuario` |
+| ViewSet / View | Ações Customizadas |
+|----------------|--------------------|
+| `EstudanteViewSet` | `criar_completo`, `atualizar_completo`, `upload_foto`, `remover_foto`, `prontuario`, `contagem_ano_letivo` |
 | `ResponsavelViewSet` | `vincular_estudante` |
 | `MatriculaCEMEPViewSet` | - |
 | `MatriculaTurmaViewSet` | - |
 | `AtestadoViewSet` | `download` |
+| `CarometroView` | Retorna fotos dos estudantes de uma turma (APIView) |
 
 ---
 
@@ -236,6 +277,8 @@ Estudante → MatriculaCEMEP (1:N) → MatriculaTurma (1:N por matrícula)
 | `NotificacaoTarefaViewSet` | `marcar_visualizado`, `minhas_notificacoes` |
 | `ReuniaoHTPCViewSet` | `registrar_presenca` |
 | `AvisoViewSet` | `meus_avisos` |
+| `AvisoVisualizacaoViewSet` | Controle de visualização de avisos |
+| `DashboardViewSet` | `stats` (estatísticas para o dashboard) |
 
 ---
 

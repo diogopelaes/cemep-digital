@@ -695,6 +695,12 @@ class ControleRegistrosVisualizacao(UUIDModel):
     data_inicio = models.DateField(verbose_name='Data de Início', null=True, blank=True)
     data_fim = models.DateField(verbose_name='Data de Fim', null=True, blank=True)
 
+    # Permite digitação futura serve apenas para tipo = REGISTRO_AULA
+    digitacao_futura = models.BooleanField(
+        verbose_name='Permite digitação futura',
+        default=True
+    )
+
     def clean(self):
         """Valida que a data de fim é posterior à data de início."""
         if self.data_fim and self.data_inicio and self.data_fim < self.data_inicio:

@@ -1,7 +1,7 @@
 # CEMEP Digital - Documentação do Frontend
 
-**Última atualização:** 29/12/2024  
-**Tecnologias:** React 18, Vite, TailwindCSS, React Router DOM, Axios, jsPDF
+**Última atualização:** 05/01/2026  
+**Tecnologias:** React 18, Vite, TailwindCSS 3, React Router DOM 6, Axios, jsPDF
 
 ---
 
