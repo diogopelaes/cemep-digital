@@ -198,14 +198,6 @@ export default function FuncionarioDetalhes() {
                         Visualizar PDF
                     </Button>
                     <Button
-                        variant="outline"
-                        icon={HiDownload}
-                        onClick={() => gerarPDF(true)}
-                        loading={generatingPDF}
-                    >
-                        Baixar PDF
-                    </Button>
-                    <Button
                         icon={HiPencil}
                         onClick={() => navigate(`/funcionarios/${id}/editar`)}
                     >

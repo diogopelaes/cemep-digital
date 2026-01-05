@@ -4,7 +4,7 @@ import { Card, Button, Badge, Loading } from '../components/ui'
 import { useAuth } from '../contexts/AuthContext'
 import { InfoItem, BooleanItem } from '../components/common'
 import {
-    HiArrowLeft, HiPencil, HiDownload, HiPhone, HiMail,
+    HiArrowLeft, HiPencil, HiPhone, HiMail,
     HiLocationMarker, HiCalendar, HiAcademicCap, HiUser, HiUsers,
     HiDocumentText, HiBookOpen, HiCheckCircle, HiZoomIn
 } from 'react-icons/hi'
@@ -61,7 +61,7 @@ export default function EstudanteDetalhes() {
             const pageWidth = doc.internal.pageSize.getWidth()
 
             // Cabeçalho
-            let y = addHeader(doc, 'Ficha do Estudante', estudante.nome_exibicao || estudante.usuario?.first_name)
+            let y = addHeader(doc, 'Ficha do Estudante', estudante.nome_exibicao || estudante.usuario?.first_name, true)
 
             // === DADOS PESSOAIS ===
             y = addSectionTitle(doc, 'Dados Pessoais', y)
@@ -246,14 +246,7 @@ export default function EstudanteDetalhes() {
                     >
                         Visualizar PDF
                     </Button>
-                    <Button
-                        variant="outline"
-                        icon={HiDownload}
-                        onClick={() => gerarPDF(true)}
-                        loading={generatingPDF}
-                    >
-                        Baixar PDF
-                    </Button>
+
                     {isSecretaria && (
                         <Button
                             icon={HiPencil}

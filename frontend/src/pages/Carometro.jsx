@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { academicAPI } from '../services/api'
 import { Button, Card } from '../components/ui'
-import { HiPrinter, HiUser, HiPhotograph, HiZoomIn } from 'react-icons/hi'
+import { HiUser, HiZoomIn, HiDownload } from 'react-icons/hi'
+import { FaFilePdf } from 'react-icons/fa'
+import { generateCarometroPDF } from '../utils/pdf'
 import toast from 'react-hot-toast'
 
 export default function Carometro() {
@@ -27,9 +29,7 @@ export default function Carometro() {
         }
     }
 
-    const handlePrint = () => {
-        window.print()
-    }
+
 
     if (loading) {
         return (
@@ -44,32 +44,30 @@ export default function Carometro() {
     const { turma, estudantes } = data
 
     return (
-        <div className="animate-fade-in p-6 print:p-0">
+        <div className="animate-fade-in p-6">
             {/* Header */}
-            <div className="flex justify-between items-center mb-6 print:hidden">
+            <div className="flex justify-between items-center mb-6">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
                         Carômetro
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-1">
-                        {turma.nome} • {turma.ano_letivo}
+                        {turma.nome}
                     </p>
                 </div>
 
-                <Button icon={HiPrinter} onClick={handlePrint}>
-                    Imprimir
+                <Button
+                    icon={FaFilePdf}
+                    onClick={() => generateCarometroPDF(turma, estudantes)}
+                >
+                    <span className="hidden md:inline">Visualizar PDF</span>
                 </Button>
             </div>
 
-            {/* Header Impressão */}
-            <div className="hidden print:block mb-8 text-center border-b pb-4">
-                <h1 className="text-2xl font-bold text-black">Carômetro da Turma</h1>
-                <p className="text-lg text-gray-600">{turma.nome} • {turma.ano_letivo}</p>
-                <p className="text-sm mt-2 text-gray-400">Total de Estudantes: {estudantes.length}</p>
-            </div>
+
 
             {/* Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 print:grid-cols-5 print:gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 print:grid-cols-5 print:gap-4">
                 {estudantes.map((estudante) => (
                     <Card
                         key={estudante.id}

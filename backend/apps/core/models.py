@@ -239,7 +239,7 @@ class Turma(UUIDModel):
     
     @property
     def nome_completo(self):
-        return f"{self.nome} - {self.curso.sigla} - {self.ano_letivo}"
+        return f"{self.nome} - {self.curso.sigla}"
 
 
 class DisciplinaTurma(UUIDModel):

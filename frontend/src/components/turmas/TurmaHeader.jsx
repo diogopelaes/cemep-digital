@@ -27,7 +27,7 @@ export default function TurmaHeader({ turma, onBack, onEdit, onCarometro }) {
                             {turma.nome_completo || `${turma.numero}º ${turma.nomenclatura === 'SERIE' ? 'Série' : (turma.nomenclatura === 'ANO' ? 'Ano' : 'Módulo')} ${turma.letra}`}
                         </h1>
                         <p className="text-slate-500 dark:text-slate-400">
-                            {turma.curso?.nome} • {turma.ano_letivo}
+                            {turma.curso?.nome}
                         </p>
                     </div>
                 </div>

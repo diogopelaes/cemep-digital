@@ -61,24 +61,45 @@ export function createPDF(options = {}) {
  * @param {string} subtitle - Subtítulo opcional
  * @returns {number} Posição Y após o cabeçalho
  */
-export function addHeader(doc, title, subtitle = '') {
+export function addHeader(doc, title, subtitle = '', compact = false) {
     const pageWidth = doc.internal.pageSize.getWidth()
     let y = CONFIG.margin
 
+    // Configurações baseadas no modo compacto
+    const headerHeight = compact ? 25 : 35
+    const logoSize = compact ? 20 : 30
+    const logoY = compact ? 2.5 : 5
+    const titleSize = compact ? 18 : CONFIG.fontSize.title
+    const subtitleSize = compact ? 12 : CONFIG.fontSize.normal
+    const headerBaseY = compact ? 35 : 45
+
     // Faixa de gradiente no topo
     doc.setFillColor(...COLORS.primary)
-    doc.rect(0, 0, pageWidth, 35, 'F')
+    doc.rect(0, 0, pageWidth, headerHeight, 'F')
+
+    // Carregar Logo (Assumindo que já foi carregado ou usar placeholder se não houver lógica aqui para carregar async dentro do sync)
+    // NOTA: A função original não carregava logo, apenas desenhava texto. O Carometro faz desenhar logo manualmente.
+    // Vamos manter o padrão de desenhar texto institucional
 
     // Logo / Nome da instituição
     doc.setTextColor(...COLORS.white)
-    doc.setFontSize(CONFIG.fontSize.title)
+    doc.setFontSize(titleSize)
     doc.setFont('helvetica', 'bold')
-    doc.text(INSTITUTION_FANTASY, CONFIG.margin, 15)
 
-    doc.setFontSize(CONFIG.fontSize.small)
+    // Ajuste de posição vertical se compacto
+    const titleY = compact ? 10 : 15
+    const instY = compact ? 16 : 22
+    const addrY = compact ? 20 : 28
+
+    doc.text(INSTITUTION_FANTASY, CONFIG.margin, titleY)
+
+    doc.setFontSize(compact ? 9 : CONFIG.fontSize.small)
     doc.setFont('helvetica', 'normal')
-    doc.text(INSTITUTION_NAME, CONFIG.margin, 22)
-    doc.text(`${ADDRESS_CITY} - ${ADDRESS_STATE}`, CONFIG.margin, 28)
+    doc.text(INSTITUTION_NAME, CONFIG.margin, instY)
+
+    if (!compact) {
+        doc.text(`${ADDRESS_CITY} - ${ADDRESS_STATE}`, CONFIG.margin, addrY)
+    }
 
     // Data de geração (lado direito)
     const dataAtual = new Date().toLocaleDateString('pt-BR', {
@@ -88,14 +109,14 @@ export function addHeader(doc, title, subtitle = '') {
         hour: '2-digit',
         minute: '2-digit'
     })
-    doc.setFontSize(CONFIG.fontSize.small)
-    doc.text(`Gerado em: ${dataAtual}`, pageWidth - CONFIG.margin, 15, { align: 'right' })
+    doc.setFontSize(compact ? 7 : CONFIG.fontSize.small)
+    doc.text(`Gerado em: ${dataAtual}`, pageWidth - CONFIG.margin, titleY, { align: 'right' })
 
-    y = 45
+    y = headerBaseY
 
     // Título do documento
     doc.setTextColor(...COLORS.text)
-    doc.setFontSize(CONFIG.fontSize.title)
+    doc.setFontSize(titleSize)
     doc.setFont('helvetica', 'bold')
     doc.text(title, pageWidth / 2, y, { align: 'center' })
     y += 8
@@ -103,7 +124,7 @@ export function addHeader(doc, title, subtitle = '') {
     // Subtítulo (se houver)
     if (subtitle) {
         doc.setTextColor(...COLORS.textLight)
-        doc.setFontSize(CONFIG.fontSize.subtitle)
+        doc.setFontSize(compact ? 10 : CONFIG.fontSize.subtitle)
         doc.setFont('helvetica', 'normal')
         doc.text(subtitle, pageWidth / 2, y, { align: 'center' })
         y += 6
@@ -361,6 +382,158 @@ export function openPDF(doc) {
     const pdfBlob = doc.output('blob')
     const pdfUrl = URL.createObjectURL(pdfBlob)
     window.open(pdfUrl, '_blank')
+}
+
+
+/**
+ * Gera o PDF do Carômetro
+ * @param {Object} turma - Dados da turma
+ * @param {Array} estudantes - Lista de estudantes
+ */
+export async function generateCarometroPDF(turma, estudantes) {
+    const doc = createPDF({ orientation: 'landscape' })
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
+
+    // Carregar Logo
+    let logoBase64 = null
+    try {
+        logoBase64 = await imageToBase64('/logo.jpeg')
+    } catch (e) {
+        console.error('Erro ao carregar logo:', e)
+    }
+
+    // Gerenciamento de cursor Y
+    let y = CONFIG.margin
+
+    // === CABEÇALHO ===
+    // Fundo do cabeçalho
+    doc.setFillColor(...COLORS.primary)
+    doc.rect(0, 0, pageWidth, 25, 'F')
+
+    // Logo (se houver) ou apenas texto
+    if (logoBase64) {
+        doc.addImage(logoBase64, 'JPEG', CONFIG.margin, 2.5, 20, 20) // Logo 20x20
+    }
+
+    // Textos do Cabeçalho
+    const textX = logoBase64 ? CONFIG.margin + 25 : CONFIG.margin
+
+    doc.setTextColor(...COLORS.white)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(18)
+    doc.text('CARÔMETRO', textX, 8)
+
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`${turma.nome}`, textX, 14)
+
+    doc.setFontSize(8)
+    doc.text(`${INSTITUTION_NAME}`, textX, 19)
+
+    // Data de geração
+    const dataAtual = new Date().toLocaleDateString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    })
+    doc.setFontSize(7)
+    doc.text(`Gerado em: ${dataAtual}`, pageWidth - CONFIG.margin, 7, { align: 'right' })
+    doc.text(`Total de Estudantes: ${estudantes.length}`, pageWidth - CONFIG.margin, 11, { align: 'right' })
+
+    y = 35 // Início do conteúdo após cabeçalho reduzido
+
+    // === GRID DE ESTUDANTES ===
+    const colCount = 10
+    const gap = 3
+    const margin = 10 // Margem lateral reduzida
+    const boxWidth = (pageWidth - (margin * 2) - ((colCount - 1) * gap)) / colCount
+    const boxHeight = boxWidth * 1.9 // Aumentado para caber texto sem sobrepor
+    const photoHeight = boxWidth * 1.33 // Proporção 3:4
+
+    let col = 0
+
+    // Carregar todas as fotos em paralelo antes de gerar o PDF
+    const fotosMap = new Map()
+
+    const promises = estudantes.map(async (est) => {
+        if (est.foto) {
+            try {
+                const base64 = await imageToBase64(est.foto)
+                fotosMap.set(est.id, base64)
+            } catch (e) {
+                // Silently fail
+            }
+        }
+    })
+
+    await Promise.all(promises)
+
+    // Desenhar Grid
+    for (const est of estudantes) {
+        // Verificar nova página
+        if (y + boxHeight > pageHeight - 10) { // Margem inferior reduzida
+            addFooter(doc)
+            doc.addPage()
+            y = margin // Resetando para margem reduzida
+            col = 0
+        }
+
+        const x = margin + (col * (boxWidth + gap))
+
+        // Box do estudante
+        // Foto
+        const photoBase64 = fotosMap.get(est.id)
+
+        if (photoBase64) {
+            try {
+                doc.addImage(photoBase64, 'JPEG', x, y, boxWidth, photoHeight)
+            } catch (e) {
+                addPlaceholderPhoto(doc, x, y, boxWidth, photoHeight)
+            }
+        } else {
+            addPlaceholderPhoto(doc, x, y, boxWidth, photoHeight)
+        }
+
+        // Borda da foto
+        doc.setDrawColor(...COLORS.grayDark)
+        doc.setLineWidth(0.1)
+        doc.rect(x, y, boxWidth, photoHeight)
+
+        // Nome
+        doc.setTextColor(...COLORS.text)
+        doc.setFontSize(7) // Reduzido
+        doc.setFont('helvetica', 'bold')
+
+        const nomeDisplay = est.nome || est.nome_social
+        const splitNome = doc.splitTextToSize(nomeDisplay, boxWidth + 2) // +2 margem segurança
+
+        // Centralizar nome abaixo da foto
+        const nomeY = y + photoHeight + 3
+        // Limitando a 2 linhas
+        const linhasNome = splitNome.slice(0, 2)
+        doc.text(linhasNome, x + (boxWidth / 2), nomeY, { align: 'center' })
+
+        // Data de Nascimento
+        if (est.data_nascimento) {
+            doc.setTextColor(...COLORS.textLight)
+            doc.setFontSize(6) // Reduzido
+            doc.setFont('helvetica', 'normal')
+
+            // Calcula Y baseado em quantas linhas o nome ocupou
+            const dateY = nomeY + (linhasNome.length * 2.5) + 1
+
+            doc.text(est.data_nascimento, x + (boxWidth / 2), dateY, { align: 'center' })
+        }
+
+        col++
+        if (col >= colCount) {
+            col = 0
+            y += boxHeight + gap
+        }
+    }
+
+    addFooter(doc)
+    openPDF(doc)
 }
 
 // Exporta configurações para uso externo
