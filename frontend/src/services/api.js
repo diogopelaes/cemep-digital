@@ -310,6 +310,15 @@ export const pedagogicalAPI = {
     list: (params) => api.get('/pedagogical/ocorrencias/', { params }),
     create: (data) => api.post('/pedagogical/ocorrencias/', data),
   },
+  // Planos de Aula
+  planosAula: {
+    list: (params) => api.get('/pedagogical/planos-aula/', { params }),
+    get: (id) => api.get(`/pedagogical/planos-aula/${id}/`),
+    create: (data) => api.post('/pedagogical/planos-aula/', data),
+    update: (id, data) => api.patch(`/pedagogical/planos-aula/${id}/`, data),
+    delete: (id) => api.delete(`/pedagogical/planos-aula/${id}/`),
+    getContextoFormulario: () => api.get('/pedagogical/planos-aula/contexto-formulario/'),
+  },
 }
 
 export const managementAPI = {

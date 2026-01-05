@@ -24,7 +24,8 @@ class PlanoAula(UUIDModel):
     )
     turmas = models.ManyToManyField(
         Turma,
-        related_name='planos_aula'
+        related_name='planos_aula',
+        blank=True
     )
     data_inicio = models.DateField(verbose_name='Data Início')
     data_fim = models.DateField(verbose_name='Data Fim')
@@ -34,16 +35,44 @@ class PlanoAula(UUIDModel):
         related_name='planos_aula',
         blank=True
     )
-    criado_em = models.DateTimeField(auto_now_add=True)
-    atualizado_em = models.DateTimeField(auto_now=True)
+    ano_letivo = models.ForeignKey(
+        'core.AnoLetivo',
+        on_delete=models.CASCADE,
+        related_name='planos_aula',
+        verbose_name='Ano Letivo',
+        null=True,
+        blank=True
+    )
+
+    bimestre = models.PositiveSmallIntegerField(
+        choices=[(0, 'Anual'), (1, '1º Bimestre'), (2, '2º Bimestre'), (3, '3º Bimestre'), (4, '4º Bimestre')],
+        default=0,
+        verbose_name='Bimestre'
+    )
     
     class Meta:
         verbose_name = 'Plano de Aula'
         verbose_name_plural = 'Planos de Aula'
         ordering = ['-data_inicio']
+
+    def save(self, *args, **kwargs):
+        if self.ano_letivo and self.data_inicio:
+            # Tenta calcular o bimestre automaticamente
+            try:
+                b = self.ano_letivo.bimestre(self.data_inicio)
+                self.bimestre = b if b else 0
+            except Exception:
+                pass # Mantém o padrão se der erro
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.professor} - {self.disciplina} ({self.data_inicio} a {self.data_fim})"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.data_inicio and self.data_fim:
+            if self.data_inicio > self.data_fim:
+                raise ValidationError('A data de início não pode ser posterior à data de fim.')
 
 
 class Aula(UUIDModel):

@@ -26,5 +26,6 @@ class AnoLetivoSelecionadoSerializer(serializers.ModelSerializer):
                 'id': str(obj.ano_letivo.id),
                 'ano': obj.ano_letivo.ano,
                 'is_active': obj.ano_letivo.is_active,
+                'bimestre_atual': obj.ano_letivo.bimestre()
             }
         return None

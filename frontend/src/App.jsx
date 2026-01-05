@@ -34,6 +34,8 @@ import CalendarioForm from './pages/CalendarioForm'
 // Pages do Professor
 import MinhasTurmas from './pages/professor/MinhasTurmas'
 import MinhaTurmaDetalhes from './pages/professor/MinhaTurmaDetalhes'
+import PlanoAula from './pages/professor/PlanoAula'
+import PlanoAulaForm from './pages/professor/PlanoAulaForm'
 
 // Constantes de perfis para evitar repetição
 const GESTAO_ONLY = ['GESTAO']
@@ -152,6 +154,15 @@ function App() {
         } />
         <Route path="/minhas-turmas/:id" element={
           <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><MinhaTurmaDetalhes /></ProtectedRoute>
+        } />
+        <Route path="/plano-aula" element={
+          <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><PlanoAula /></ProtectedRoute>
+        } />
+        <Route path="/plano-aula/novo" element={
+          <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><PlanoAulaForm /></ProtectedRoute>
+        } />
+        <Route path="/plano-aula/:id/editar" element={
+          <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><PlanoAulaForm /></ProtectedRoute>
         } />
         <Route path="/diario" element={<PlaceholderPage title="Diário de Classe" />} />
         <Route path="/notas" element={<PlaceholderPage title="Notas" />} />

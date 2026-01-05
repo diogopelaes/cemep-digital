@@ -17,5 +17,7 @@ export { default as Checkbox } from './Checkbox'
 export { DropdownMenu, DropdownItem } from './DropdownMenu'
 export { default as PopConfirm } from './PopConfirm'
 export { default as Switch } from './Switch'
+export { default as ToggleSwitch } from '../common/ToggleSwitch'
+export { default as TurmaSelector } from './TurmaSelector'
 export { default as Toaster } from './Toaster'
 

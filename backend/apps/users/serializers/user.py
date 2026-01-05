@@ -30,11 +30,26 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
             'tipo_usuario', 'foto', 'dark_mode', 'ano_letivo_selecionado',
-            'is_active', 'date_joined', 'last_login'
+            'bimestre_atual', 'is_active', 'date_joined', 'last_login'
         ]
-        read_only_fields = ['id', 'date_joined', 'last_login', 'ano_letivo_selecionado']
+        read_only_fields = ['id', 'date_joined', 'last_login', 'ano_letivo_selecionado', 'bimestre_atual']
 
     ano_letivo_selecionado = serializers.IntegerField(source='get_ano_letivo_selecionado', read_only=True)
+    bimestre_atual = serializers.SerializerMethodField()
+
+    def get_bimestre_atual(self, obj):
+        from apps.core.models import AnoLetivo, AnoLetivoSelecionado
+        try:
+            # Tenta pegar o ano selecionado pelo usuário
+            selecao = obj.ano_letivo_selecionado
+            ano_letivo = selecao.ano_letivo
+        except Exception:
+            # Caso não tenha selecionado, pega o ano ativo do sistema
+            ano_letivo = AnoLetivo.objects.filter(is_active=True).first()
+        
+        if ano_letivo:
+            return ano_letivo.bimestre()
+        return None
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

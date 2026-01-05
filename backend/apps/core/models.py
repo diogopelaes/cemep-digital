@@ -400,6 +400,27 @@ class AnoLetivo(UUIDModel):
     dias_letivos_extras = models.ManyToManyField(DiaLetivoExtra, blank=True, verbose_name='Dias Letivos Especiais')
     dias_nao_letivos = models.ManyToManyField(DiaNaoLetivo, blank=True, verbose_name='Feriados e Recessos')
 
+    def bimestre(self, data=None):
+        if data is None:
+            data = timezone.now().date()
+        
+        if data < self.data_inicio_1bim:
+            return None
+        
+        if data < self.data_fim_1bim:
+            return 1
+        
+        if data < self.data_fim_2bim:
+            return 2
+        
+        if data < self.data_fim_3bim:
+            return 3
+        
+        if data < self.data_fim_4bim:
+            return 4
+        
+        return None
+
     def clean(self):
         """Valida a sequência dos bimestres."""
         bimestres = [

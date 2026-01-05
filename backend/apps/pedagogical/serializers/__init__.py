@@ -3,7 +3,8 @@ Serializers para o App Pedagogical
 
 Re-exporta todos os Serializers para manter compatibilidade com imports existentes.
 """
-from .aula import PlanoAulaSerializer, AulaSerializer
+from .plano_aula import PlanoAulaSerializer
+from .aula import AulaSerializer
 from .faltas import FaltasSerializer, FaltasRegistroSerializer
 from .ocorrencia import (
     DescritorOcorrenciaPedagogicaSerializer,

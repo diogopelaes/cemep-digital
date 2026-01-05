@@ -33,7 +33,7 @@ const menuItems = {
     { path: '/dashboard', label: 'Dashboard', icon: HiHome },
     { path: '/minhas-turmas', label: 'Minhas Turmas', icon: HiUsers },
     { path: '/estudantes', label: 'Estudantes', icon: HiAcademicCap },
-    { path: '/diario', label: 'Diário de Classe', icon: HiDocumentText },
+    { path: '/plano-aula', label: 'Plano de Aula', icon: HiDocumentText },
     { path: '/notas', label: 'Notas', icon: HiClipboardList },
     { path: '/tarefas', label: 'Tarefas', icon: HiClipboardList },
     { path: '/avisos', label: 'Avisos', icon: HiBell },
@@ -101,11 +101,15 @@ export default function MainLayout() {
               />
               <div>
                 <h1 className="font-bold text-xl text-slate-800 dark:text-white">{INSTITUTION_FANTASY}</h1>
-                <div className="flex items-center gap-2">
-                  <p className="text-xs text-slate-500">Digital</p>
+                <div className="flex items-center gap-1.5 mt-1">
                   {user?.ano_letivo_selecionado && (
                     <span className="px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400 text-[10px] font-bold border border-primary-500/20">
                       {user.ano_letivo_selecionado}
+                    </span>
+                  )}
+                  {user?.bimestre_atual > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-500/20 animate-pulse-subtle">
+                      {user.bimestre_atual}º Bimestre
                     </span>
                   )}
                 </div>
