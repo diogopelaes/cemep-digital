@@ -254,9 +254,16 @@ export default function MinhaTurmaDetalhes() {
                 <>
                     {/* Mobile: Cards */}
                     <div className="md:hidden space-y-2">
-                        <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-400 px-1">
-                            {estudantes.length} estudante{estudantes.length !== 1 ? 's' : ''}
-                        </h2>
+                        <div className="px-1 mb-3">
+
+                            <div className="flex flex-wrap gap-1.5">
+                                {Object.entries(statusCounts).map(([key, { label, count }]) => (
+                                    <Badge key={key} variant={getStatusVariant(key)} className="text-[10px] py-0 px-1.5">
+                                        {label}: {count}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </div>
                         {estudantes.map((matricula) => (
                             <EstudanteCard key={matricula.id} matricula={matricula} />
                         ))}
