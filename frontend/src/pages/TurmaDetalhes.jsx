@@ -140,6 +140,7 @@ export default function TurmaDetalhes() {
 
       {activeTab === 'estudantes' && (
         <TurmaEstudantes
+          turma={turma}
           estudantesElegiveis={estudantes.estudantesElegiveis}
           estudantesEnturmados={estudantes.estudantesEnturmados}
           loading={estudantes.loading}

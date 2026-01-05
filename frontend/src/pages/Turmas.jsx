@@ -77,7 +77,7 @@ export default function Turmas() {
     setGeneratingPDF(turma.id)
     try {
       // Busca estudantes da turma
-      const response = await academicAPI.matriculasTurma.list({ turma_id: turma.id, page_size: 1000 })
+      const response = await academicAPI.matriculasTurma.list({ turma: turma.id, page_size: 1000 })
       const estudantes = response.data.results || response.data
 
       const listaEstudantes = estudantes.map(m => {
@@ -230,10 +230,10 @@ export default function Turmas() {
                         <button
                           onClick={(e) => handleGerarLista(turma, e)}
                           disabled={generatingPDF === turma.id}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-danger-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-danger-400 transition-colors disabled:opacity-50"
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors disabled:opacity-50"
                           title="Lista de Estudantes (PDF)"
                         >
-                          {generatingPDF === turma.id ? <Loading size="sm" /> : <FaFilePdf className="h-4 w-4" />}
+                          {generatingPDF === turma.id ? <Loading size="sm" /> : <FaFilePdf className="h-5 w-5" />}
                         </button>
                       </TableCell>
                       <TableCell className="td-center">

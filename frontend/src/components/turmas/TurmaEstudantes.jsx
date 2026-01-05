@@ -1,14 +1,18 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { HiUserGroup, HiTrash, HiAcademicCap, HiUser, HiCheck, HiX, HiUserRemove } from 'react-icons/hi'
-import { Card, Loading, MultiCombobox, DateInput, Avatar, Badge } from '../ui'
+import { Card, Loading, MultiCombobox, DateInput, Avatar, Badge, Button } from '../ui'
 import Table, { TableHead, TableBody, TableRow, TableCell, TableHeader, TableEmpty } from '../ui/Table'
+import { FaFilePdf } from 'react-icons/fa'
 import { formatDateBR } from '../../utils/date'
+import { generateListaTurmaPDF } from '../../utils/pdf'
+import toast from 'react-hot-toast'
 
 /**
  * Componente para exibir e gerenciar estudantes da turma
  */
 export default function TurmaEstudantes({
+    turma,
     estudantesElegiveis,
     estudantesEnturmados,
     loading,
@@ -21,6 +25,32 @@ export default function TurmaEstudantes({
     const location = useLocation()
     const [selecionados, setSelecionados] = useState([])
     const [confirmingRemove, setConfirmingRemove] = useState(null)
+    const [generatingPDF, setGeneratingPDF] = useState(false)
+
+    const handleGerarLista = async () => {
+        if (!turma || estudantesEnturmados.length === 0) return
+        setGeneratingPDF(true)
+        try {
+            const listaEstudantes = estudantesEnturmados.map(m => {
+                const est = m.matricula_cemep?.estudante
+                return {
+                    nome: est.nome_exibicao || est.usuario?.first_name || est.nome_social,
+                    matricula: m.matricula_cemep?.numero_matricula_formatado || m.matricula_cemep?.numero_matricula,
+                    data_nascimento: formatDateBR(est.data_nascimento),
+                    email: est.usuario?.email,
+                    status: m.status_display || m.status
+                }
+            })
+
+            await generateListaTurmaPDF(turma, listaEstudantes)
+            toast.success('Lista gerada com sucesso!')
+        } catch (error) {
+            console.error(error)
+            toast.error('Erro ao gerar lista')
+        } finally {
+            setGeneratingPDF(false)
+        }
+    }
 
     const handleEnturmar = async () => {
         if (selecionados.length === 0) return
@@ -56,14 +86,25 @@ export default function TurmaEstudantes({
 
     return (
         <Card hover={false}>
-            <div className="mb-6">
-                <h2 className="text-lg font-semibold text-slate-800 dark:text-white">
-                    Estudantes da Turma
-                </h2>
-                <p className="text-sm text-slate-500">
-                    Adicione estudantes matriculados no mesmo curso
-                    {saving && <span className="text-primary-600 ml-2">(salvando...)</span>}
-                </p>
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-lg font-semibold text-slate-800 dark:text-white">
+                        Estudantes da Turma
+                    </h2>
+                    <p className="text-sm text-slate-500">
+                        Adicione estudantes matriculados no mesmo curso
+                        {saving && <span className="text-primary-600 ml-2">(salvando...)</span>}
+                    </p>
+                </div>
+                <Button
+                    variant="secondary"
+                    icon={FaFilePdf}
+                    onClick={handleGerarLista}
+                    disabled={generatingPDF || estudantesEnturmados.length === 0}
+                    loading={generatingPDF}
+                >
+                    Lista PDF
+                </Button>
             </div>
 
             {loading ? (

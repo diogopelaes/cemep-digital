@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Input, Select, Loading, Badge, PopConfirm } from '../components/ui'
-import { ToggleSwitch } from '../components/common'
+import { Card, Button, Input, Select, Loading, Badge, PopConfirm, Switch } from '../components/ui'
 import { HiSave, HiPlus, HiTrash, HiAcademicCap } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import { AREAS_CONHECIMENTO } from '../data'
@@ -185,12 +184,22 @@ export default function DisciplinaForm() {
           />
 
           {/* Switch Ativa */}
-          <ToggleSwitch
-            label="Disciplina Ativa"
-            description="Desative para impedir novos usos desta disciplina"
-            checked={formData.is_active}
-            onChange={(checked) => setFormData({ ...formData, is_active: checked })}
-          />
+          <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+            <div>
+              <span className="font-medium text-slate-700 dark:text-slate-300">
+                Disciplina Ativa
+              </span>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                Desative para impedir novos usos desta disciplina
+              </p>
+            </div>
+            <Switch
+              checked={formData.is_active}
+              onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+              labelTrue="Ativa"
+              labelFalse="Inativa"
+            />
+          </div>
 
           {/* Botões */}
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">

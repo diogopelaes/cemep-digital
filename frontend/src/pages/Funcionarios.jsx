@@ -372,7 +372,7 @@ export default function Funcionarios() {
                     <button
                       onClick={() => handleGeneratePDF(func.id)}
                       disabled={generatingPDF === func.id}
-                      className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 disabled:opacity-50"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors disabled:opacity-50"
                       title="Gerar PDF"
                     >
                       {generatingPDF === func.id ? (
@@ -383,7 +383,7 @@ export default function Funcionarios() {
                     </button>
                     <button
                       onClick={() => handleOpenPeriodosModal(func)}
-                      className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
                       title="Períodos de Trabalho"
                     >
                       <HiCalendar className="h-5 w-5" />

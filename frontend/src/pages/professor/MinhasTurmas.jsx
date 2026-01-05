@@ -56,7 +56,7 @@ export default function MinhasTurmas() {
         e.stopPropagation()
         setGeneratingPDF(turma.id)
         try {
-            const response = await academicAPI.matriculasTurma.list({ turma_id: turma.id, page_size: 1000 })
+            const response = await academicAPI.matriculasTurma.list({ turma: turma.id, page_size: 1000 })
             const estudantes = response.data.results || response.data
 
             const listaEstudantes = estudantes.map(m => {

@@ -264,6 +264,24 @@ slate: { 50-900 }      // Cinzas neutros para fundo e texto
 | `.th-center`, `.td-center` | Célula centralizada |
 | `.th-actions`, `.td-actions` | Coluna de ações |
 
+### Padrão de Ícones em Tabelas (Ações)
+> **⚠️ IMPORTANTE:** Seguir este padrão para botões de ação (ícones) dentro de células de tabela:
+
+```jsx
+// Exemplo de botão de ação (PDF, Editar, Deletar)
+<button
+    className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
+>
+    <IconClassName className="h-5 w-5" />
+</button>
+```
+
+- **Tamanho do container:** `w-8 h-8`
+- **Tamanho do ícone:** `h-5 w-5`
+- **Cor base:** `text-slate-500`
+- **Hover:** `bg-slate-100` (light), `bg-slate-800` (dark)
+- **Hover Texto:** `text-primary-600` (light), `text-primary-400` (dark) - *Exceto delete (danger)*
+
 ### Componentes UI Disponíveis (`components/ui/`)
 
 ```jsx
