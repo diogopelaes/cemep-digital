@@ -6,9 +6,10 @@ import {
 } from '../components/ui'
 import { InfoItem } from '../components/common'
 import {
-    HiPencil, HiPrinter, HiDownload, HiPhone, HiMail,
+    HiPencil, HiDownload, HiPhone, HiMail,
     HiLocationMarker, HiCalendar, HiUser, HiIdentification, HiBriefcase
 } from 'react-icons/hi'
+import { FaFilePdf } from 'react-icons/fa'
 import { coreAPI } from '../services/api'
 import { formatDateBR } from '../utils/date'
 import { displayCPF, displayTelefone, displayCEP } from '../utils/formatters'
@@ -190,7 +191,7 @@ export default function FuncionarioDetalhes() {
                 <div className="flex gap-3">
                     <Button
                         variant="secondary"
-                        icon={HiPrinter}
+                        icon={FaFilePdf}
                         onClick={() => gerarPDF(false)}
                         loading={generatingPDF}
                     >

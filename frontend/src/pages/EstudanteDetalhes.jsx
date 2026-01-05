@@ -4,10 +4,11 @@ import { Card, Button, Badge, Loading } from '../components/ui'
 import { useAuth } from '../contexts/AuthContext'
 import { InfoItem, BooleanItem } from '../components/common'
 import {
-    HiArrowLeft, HiPencil, HiPrinter, HiDownload, HiPhone, HiMail,
+    HiArrowLeft, HiPencil, HiDownload, HiPhone, HiMail,
     HiLocationMarker, HiCalendar, HiAcademicCap, HiUser, HiUsers,
     HiDocumentText, HiBookOpen, HiCheckCircle, HiZoomIn
 } from 'react-icons/hi'
+import { FaFilePdf } from 'react-icons/fa'
 import { academicAPI } from '../services/api'
 import { formatDateBR, calcularIdade } from '../utils/date'
 import { displayCPF, displayTelefone, displayCEP } from '../utils/formatters'
@@ -239,7 +240,7 @@ export default function EstudanteDetalhes() {
                 <div className="flex gap-3">
                     <Button
                         variant="secondary"
-                        icon={HiPrinter}
+                        icon={FaFilePdf}
                         onClick={() => gerarPDF(false)}
                         loading={generatingPDF}
                     >
