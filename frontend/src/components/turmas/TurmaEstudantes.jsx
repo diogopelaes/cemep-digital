@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { HiUserGroup, HiTrash, HiAcademicCap, HiUser, HiCheck, HiX } from 'react-icons/hi'
-import { Card, Loading, MultiCombobox, DateInput } from '../ui'
+import { Card, Loading, MultiCombobox, DateInput, Avatar, Badge } from '../ui'
 import Table, { TableHead, TableBody, TableRow, TableCell, TableHeader, TableEmpty } from '../ui/Table'
 import { formatDateBR } from '../../utils/date'
 
@@ -33,10 +33,16 @@ export default function TurmaEstudantes({
         setConfirmingRemove(null)
     }
 
-    // Formata CPF para exibição
-    const formatCPF = (cpf) => {
-        if (!cpf || cpf.length !== 11) return cpf || '-'
-        return `${cpf.slice(0, 3)}.${cpf.slice(3, 6)}.${cpf.slice(6, 9)}-${cpf.slice(9)}`
+    // Mapeamento de status para variantes do Badge
+    const getStatusVariant = (status) => {
+        switch (status) {
+            case 'CURSANDO': return 'success'
+            case 'PROMOVIDO': return 'primary'
+            case 'TRANSFERIDO': return 'warning'
+            case 'RETIDO':
+            case 'ABANDONO': return 'danger'
+            default: return 'default'
+        }
     }
 
     return (
@@ -107,7 +113,7 @@ export default function TurmaEstudantes({
                                 <TableHead>
                                     <TableRow>
                                         <TableHeader>Nome</TableHeader>
-                                        <TableHeader>CPF</TableHeader>
+                                        <TableHeader>Status</TableHeader>
                                         <TableHeader>Email</TableHeader>
                                         <TableHeader>Data Nasc.</TableHeader>
                                         <TableHeader className="w-20 text-right">Ações</TableHeader>
@@ -119,7 +125,8 @@ export default function TurmaEstudantes({
                                         const usuario = estudante?.usuario
                                         const nome = usuario?.first_name || 'Estudante'
                                         const matricula = mt.matricula_cemep?.numero_matricula_formatado || mt.matricula_cemep?.numero_matricula
-                                        const cpf = estudante?.cpf_formatado || formatCPF(estudante?.cpf)
+                                        const status = mt.status
+                                        const statusDisplay = mt.status_display || status
                                         const email = usuario?.email || '-'
                                         const dataNasc = estudante?.data_nascimento
                                             ? formatDateBR(estudante.data_nascimento)
@@ -135,17 +142,7 @@ export default function TurmaEstudantes({
                                                                 state={{ from: location.pathname, tab: 'estudantes' }}
                                                                 className="flex items-center gap-3 group/link"
                                                             >
-                                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center flex-shrink-0 group-hover/link:ring-2 ring-primary-500 transition-all">
-                                                                    {usuario?.foto ? (
-                                                                        <img
-                                                                            src={usuario.foto}
-                                                                            alt={nome}
-                                                                            className="w-10 h-10 rounded-full object-cover"
-                                                                        />
-                                                                    ) : (
-                                                                        <HiUser className="text-white w-5 h-5" />
-                                                                    )}
-                                                                </div>
+                                                                <Avatar name={nome} size="md" className="shrink-0 group-hover/link:ring-2 ring-primary-500 transition-all" />
                                                                 <div>
                                                                     <p className="font-medium text-slate-800 dark:text-white group-hover/link:text-primary-600 dark:group-hover/link:text-primary-400 transition-colors">
                                                                         {nome}
@@ -159,9 +156,9 @@ export default function TurmaEstudantes({
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="text-sm text-slate-600 dark:text-slate-300">
-                                                        {cpf}
-                                                    </span>
+                                                    <Badge variant={getStatusVariant(status)}>
+                                                        {statusDisplay}
+                                                    </Badge>
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="text-sm text-slate-600 dark:text-slate-300">

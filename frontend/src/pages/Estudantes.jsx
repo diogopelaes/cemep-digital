@@ -4,9 +4,10 @@ import {
   Card, Button, Input, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Badge, Loading, Pagination, Avatar
 } from '../components/ui'
-import { HiPlus, HiSearch, HiDownload, HiUpload } from 'react-icons/hi'
+import { HiPlus, HiSearch, HiUpload, HiUserGroup, HiDuplicate } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
 import BulkUploadModal from '../components/modals/BulkUploadModal'
+import { useAuth } from '../contexts/AuthContext'
 import { academicAPI } from '../services/api'
 import { formatDateBR, calcularIdade } from '../utils/date'
 import {
@@ -16,7 +17,15 @@ import {
 } from '../utils/pdf/index'
 import toast from 'react-hot-toast'
 
+/**
+ * Estudantes - Listagem de estudantes
+ * 
+ * Layout responsivo:
+ * - Mobile: Cards empilhados
+ * - Desktop: Tabela tradicional
+ */
 export default function Estudantes() {
+  const { isSecretaria } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [estudantes, setEstudantes] = useState([])
@@ -59,7 +68,8 @@ export default function Estudantes() {
     navigate(`/estudantes/${estudante.id}`)
   }
 
-  const handleGeneratePDF = async (id) => {
+  const handleGeneratePDF = async (id, e) => {
+    if (e) e.stopPropagation()
     setGeneratingPDF(id)
     try {
       // Carrega dados completos e prontuário
@@ -221,6 +231,119 @@ export default function Estudantes() {
     setGeneratingPDF(null)
   }
 
+  // Função para copiar email
+  const handleCopyEmail = (email, e) => {
+    e.stopPropagation()
+    navigator.clipboard.writeText(email)
+    toast.success('Email copiado!')
+  }
+
+  // Componente Card para Mobile
+  const EstudanteCard = ({ estudante }) => (
+    <Card
+      padding={false}
+      className="p-3 overflow-hidden"
+    >
+      <div className="flex items-start gap-3">
+        {/* Avatar - clicável para ver detalhes */}
+        <Avatar
+          name={estudante.nome_exibicao}
+          size="md"
+          className="shrink-0 cursor-pointer"
+          onClick={() => handleView(estudante)}
+        />
+
+        {/* Informações */}
+        <div className="flex-1 min-w-0">
+          {/* Nome - clicável para ver detalhes */}
+          <div className="flex items-center gap-2">
+            <h3
+              className="font-semibold text-slate-800 dark:text-white text-sm cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              title={estudante.nome_exibicao}
+              onClick={() => handleView(estudante)}
+            >
+              {estudante.nome_exibicao?.length > 25
+                ? estudante.nome_exibicao.substring(0, 25) + '...'
+                : estudante.nome_exibicao}
+            </h3>
+            {estudante.nome_social && (
+              <span className="text-[10px] text-primary-500 font-medium bg-primary-50 dark:bg-primary-900/20 px-1.5 py-0.5 rounded shrink-0">
+                Social
+              </span>
+            )}
+          </div>
+
+          {/* Email com botão de copiar */}
+          {estudante.usuario?.email && (
+            <div className="flex items-center gap-1 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate" title={estudante.usuario.email}>
+                {estudante.usuario.email.length > 24
+                  ? estudante.usuario.email.substring(0, 24) + '...'
+                  : estudante.usuario.email}
+              </p>
+              <button
+                onClick={(e) => handleCopyEmail(estudante.usuario.email, e)}
+                className="p-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                title="Copiar email"
+              >
+                <HiDuplicate className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+
+          {/* Cursos e Ações */}
+          <div className="flex items-center flex-wrap gap-1 mt-2">
+            {estudante.cursos_matriculados?.length > 0 ? (
+              <>
+                {estudante.cursos_matriculados.slice(0, 3).map((curso, idx) => (
+                  <Badge key={idx} variant="primary" className="text-[10px] px-1.5 py-0">
+                    {curso.sigla}
+                  </Badge>
+                ))}
+                {estudante.cursos_matriculados.length > 3 && (
+                  <span className="text-[10px] text-slate-400">
+                    +{estudante.cursos_matriculados.length - 3}
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="text-[10px] text-slate-400">Sem curso</span>
+            )}
+
+            {/* PDF */}
+            <button
+              onClick={(e) => handleGeneratePDF(estudante.id, e)}
+              disabled={generatingPDF === estudante.id}
+              className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-danger-600 dark:hover:text-danger-400 transition-colors disabled:opacity-50"
+              title="Gerar PDF"
+            >
+              {generatingPDF === estudante.id ? (
+                <Loading size="sm" />
+              ) : (
+                <FaFilePdf className="h-3.5 w-3.5" />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Card>
+  )
+
+  // Estado vazio
+  const EmptyState = () => (
+    <Card className="p-8 text-center">
+      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+        <HiUserGroup className="h-8 w-8 text-slate-400" />
+      </div>
+      <h3 className="text-lg font-medium text-slate-800 dark:text-white mb-2">
+        Nenhum estudante encontrado
+      </h3>
+      <p className="text-slate-500 dark:text-slate-400">
+        {search ? 'Tente ajustar os termos da busca' : (isSecretaria ? 'Cadastre o primeiro estudante' : 'Nenhum estudante cadastrado no sistema')}
+      </p>
+    </Card>
+  )
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -241,163 +364,198 @@ export default function Estudantes() {
             Gerencie os estudantes matriculados
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <Button variant="secondary" icon={HiUpload} onClick={() => setShowUploadModal(true)}>
-            Cadastro em massa
-          </Button>
-          <Button icon={HiPlus} onClick={() => navigate('/estudantes/novo')}>
-            Novo Estudante
-          </Button>
-        </div>
+        {isSecretaria && (
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Button variant="secondary" icon={HiUpload} onClick={() => setShowUploadModal(true)} className="text-sm sm:text-base">
+              <span className="hidden sm:inline">Cadastro em massa</span>
+              <span className="sm:hidden">Importar</span>
+            </Button>
+            <Button icon={HiPlus} onClick={() => navigate('/estudantes/novo')} className="text-sm sm:text-base">
+              <span className="hidden sm:inline">Novo Estudante</span>
+              <span className="sm:hidden">Novo</span>
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Search */}
-      <Card hover={false}>
+      <Card hover={false} className="max-w-sm mx-auto md:max-w-none">
         <Input
-          placeholder="Buscar por nome, CPF ou nome social..."
+          placeholder="Buscar por nome, CPF..."
           icon={HiSearch}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </Card>
 
-      {/* Table */}
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableHeader>Nome</TableHeader>
-            <TableHeader>CPF</TableHeader>
-            <TableHeader>E-mail</TableHeader>
-            <TableHeader>Cursos</TableHeader>
-            <TableHeader className="th-center">Bolsa Família</TableHeader>
-            <TableHeader className="th-center">Ações</TableHeader>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {estudantes.length > 0 ? (
-            estudantes.map((estudante) => (
-              <TableRow key={estudante.id}>
-                <TableCell>
-                  <div className="flex items-center gap-3 group">
-                    <Avatar
-                      name={estudante.nome_exibicao}
-                      size="md"
-                      onClick={() => handleView(estudante)}
-                    />
-                    <button
-                      onClick={() => handleView(estudante)}
-                      className="text-left"
-                    >
-                      <p className="font-medium text-slate-800 dark:text-white group-hover:text-primary-500 transition-colors">
-                        {estudante.nome_exibicao}
-                      </p>
-                      {estudante.nome_social && (
-                        <p className="text-xs text-slate-500">
-                          Nome Social
-                        </p>
-                      )}
-                    </button>
-                  </div>
-                </TableCell>
-                <TableCell>{estudante.cpf_formatado || estudante.cpf}</TableCell>
-                <TableCell>{estudante.usuario?.email}</TableCell>
-                <TableCell>
-                  <div className="flex flex-wrap gap-1">
-                    {estudante.cursos_matriculados?.length > 0 ? (
-                      estudante.cursos_matriculados.map((curso, idx) => (
-                        <Badge key={idx} variant="primary" title={curso.nome}>
-                          {curso.sigla}
-                        </Badge>
-                      ))
-                    ) : (
-                      <span className="text-slate-400 text-sm">-</span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="td-center">
-                  <Badge variant={estudante.bolsa_familia ? 'success' : 'default'}>
-                    {estudante.bolsa_familia ? 'Sim' : 'Não'}
-                  </Badge>
-                </TableCell>
-                <TableCell className="td-center">
-                  <button
-                    onClick={() => handleGeneratePDF(estudante.id)}
-                    disabled={generatingPDF === estudante.id}
-                    className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 disabled:opacity-50"
-                    title="Gerar PDF"
-                  >
-                    {generatingPDF === estudante.id ? (
-                      <Loading size="sm" />
-                    ) : (
-                      <FaFilePdf className="h-5 w-5" />
-                    )}
-                  </button>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableEmpty colSpan={6} message="Nenhum estudante encontrado" />
-          )}
-        </TableBody>
-      </Table>
+      {/* Conteúdo */}
+      {estudantes.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <>
+          {/* Mobile: Cards */}
+          <div className="md:hidden space-y-3 max-w-sm mx-auto">
+            {estudantes.map((estudante) => (
+              <EstudanteCard key={estudante.id} estudante={estudante} />
+            ))}
+          </div>
+
+          {/* Desktop: Tabela */}
+          <Card hover={false} className="hidden md:block">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeader>Nome</TableHeader>
+                  <TableHeader>CPF</TableHeader>
+                  <TableHeader>E-mail</TableHeader>
+                  <TableHeader>Cursos</TableHeader>
+                  <TableHeader className="th-center">Bolsa Família</TableHeader>
+                  <TableHeader className="th-center">Ações</TableHeader>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {estudantes.map((estudante) => (
+                  <TableRow key={estudante.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3 group">
+                        <Avatar
+                          name={estudante.nome_exibicao}
+                          size="md"
+                          onClick={() => handleView(estudante)}
+                        />
+                        <button
+                          onClick={() => handleView(estudante)}
+                          className="text-left"
+                        >
+                          <p className="font-medium text-slate-800 dark:text-white group-hover:text-primary-500 transition-colors">
+                            {estudante.nome_exibicao}
+                          </p>
+                          {estudante.nome_social && (
+                            <p className="text-xs text-slate-500">
+                              Nome Social
+                            </p>
+                          )}
+                        </button>
+                      </div>
+                    </TableCell>
+                    <TableCell>{estudante.cpf_formatado || estudante.cpf}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2 max-w-[200px]">
+                        <span className="truncate" title={estudante.usuario?.email}>
+                          {estudante.usuario?.email || '-'}
+                        </span>
+                        {estudante.usuario?.email && (
+                          <button
+                            onClick={(e) => handleCopyEmail(estudante.usuario.email, e)}
+                            className="text-slate-400 hover:text-primary-600 dark:text-slate-500 dark:hover:text-primary-400 transition-colors p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"
+                            title="Copiar email"
+                          >
+                            <HiDuplicate className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {estudante.cursos_matriculados?.length > 0 ? (
+                          estudante.cursos_matriculados.map((curso, idx) => (
+                            <Badge key={idx} variant="primary" title={curso.nome}>
+                              {curso.sigla}
+                            </Badge>
+                          ))
+                        ) : (
+                          <span className="text-slate-400 text-sm">-</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="td-center">
+                      <Badge variant={estudante.bolsa_familia ? 'success' : 'default'}>
+                        {estudante.bolsa_familia ? 'Sim' : 'Não'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="td-center">
+                      <button
+                        onClick={() => handleGeneratePDF(estudante.id)}
+                        disabled={generatingPDF === estudante.id}
+                        className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 disabled:opacity-50"
+                        title="Gerar PDF"
+                      >
+                        {generatingPDF === estudante.id ? (
+                          <Loading size="sm" />
+                        ) : (
+                          <FaFilePdf className="h-5 w-5" />
+                        )}
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+        </>
+      )}
 
       {/* Paginação */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalCount}
-        pageSize={pageSize}
-        onPageChange={handlePageChange}
-      />
+      {estudantes.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalCount}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+        />
+      )}
 
-      <BulkUploadModal
-        isOpen={showUploadModal}
-        onClose={() => setShowUploadModal(false)}
-        onUpload={async (formData) => {
-          const response = await academicAPI.estudantes.uploadFile(formData)
-          if (response.data.errors?.length > 0) {
-            toast.error('Alguns registros não foram importados. Verifique os erros.')
+      {isSecretaria && (
+        <BulkUploadModal
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          onUpload={async (formData) => {
+            const response = await academicAPI.estudantes.uploadFile(formData)
+            if (response.data.errors?.length > 0) {
+              toast.error('Alguns registros não foram importados. Verifique os erros.')
+            }
+            loadEstudantes()
+            return response
+          }}
+          entityName="Estudantes"
+          templateHeaders={[
+            'NOME_COMPLETO', 'EMAIL', 'CPF', 'SENHA', 'CIN', 'LINHA_ONIBUS',
+            'BOLSA_FAMILIA', 'PE_DE_MEIA', 'SAIDA_SOZINHO',
+            'LOGRADOURO', 'NUMERO', 'BAIRRO', 'CIDADE', 'ESTADO', 'CEP',
+            'COMPLEMENTO', 'TELEFONE',
+            'NUMERO_MATRICULA', 'DATA_NASCIMENTO', 'CURSO_SIGLA', 'DATA_ENTRADA_CURSO', 'DATA_SAIDA_CURSO', 'STATUS_MATRICULA'
+          ]}
+          onDownloadTemplate={async () => {
+            try {
+              const response = await academicAPI.estudantes.downloadModel()
+              const url = window.URL.createObjectURL(new Blob([response.data]))
+              const link = document.createElement('a')
+              link.href = url
+              link.setAttribute('download', 'modelo_estudantes.xlsx')
+              document.body.appendChild(link)
+              link.click()
+              link.remove()
+            } catch (error) {
+              console.error(error)
+              toast.error('Erro ao baixar o modelo.')
+            }
+          }}
+          instructions={
+            <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
+              <li>Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong>.</li>
+              <li><strong>EMAIL</strong> será usado como Nome de Usuário (Login).</li>
+              <li>Colunas Obrigatórias do Estudante: <strong>NOME_COMPLETO, EMAIL, CPF, DATA_NASCIMENTO</strong>.</li>
+              <li>Se a <strong>SENHA</strong> estiver vazia, uma aleatória será gerada (para novos usuários).</li>
+              <li>Campos Booleanos: <strong>BOLSA_FAMILIA, PE_DE_MEIA, SAIDA_SOZINHO</strong>. Use <strong>Sim</strong> ou <strong>Não</strong>.</li>
+              <li className="mt-2 font-semibold">Campos de Matrícula (opcionais, mas se preenchidos exigem todos os obrigatórios):</li>
+              <li className="ml-4">Obrigatórios: <strong>NUMERO_MATRICULA</strong> (10 dígitos), <strong>CURSO_SIGLA</strong>, <strong>DATA_ENTRADA_CURSO</strong>, <strong>STATUS_MATRICULA</strong>.</li>
+              <li className="ml-4">Opcional: <strong>DATA_SAIDA_CURSO</strong>.</li>
+              <li className="ml-4">Opções de STATUS_MATRICULA: <strong>MATRICULADO, CONCLUIDO, ABANDONO, TRANSFERIDO, OUTRO</strong>.</li>
+            </ul>
           }
-          loadEstudantes()
-          return response
-        }}
-        entityName="Estudantes"
-        templateHeaders={[
-          'NOME_COMPLETO', 'EMAIL', 'CPF', 'SENHA', 'CIN', 'LINHA_ONIBUS',
-          'BOLSA_FAMILIA', 'PE_DE_MEIA', 'SAIDA_SOZINHO',
-          'LOGRADOURO', 'NUMERO', 'BAIRRO', 'CIDADE', 'ESTADO', 'CEP',
-          'COMPLEMENTO', 'TELEFONE',
-          'NUMERO_MATRICULA', 'DATA_NASCIMENTO', 'CURSO_SIGLA', 'DATA_ENTRADA_CURSO', 'DATA_SAIDA_CURSO', 'STATUS_MATRICULA'
-        ]}
-        onDownloadTemplate={async () => {
-          try {
-            const response = await academicAPI.estudantes.downloadModel()
-            const url = window.URL.createObjectURL(new Blob([response.data]))
-            const link = document.createElement('a')
-            link.href = url
-            link.setAttribute('download', 'modelo_estudantes.xlsx')
-            document.body.appendChild(link)
-            link.click()
-            link.remove()
-          } catch (error) {
-            console.error(error)
-            toast.error('Erro ao baixar o modelo.')
-          }
-        }}
-        instructions={
-          <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600 dark:text-slate-300">
-            <li>Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong>.</li>
-            <li><strong>EMAIL</strong> será usado como Nome de Usuário (Login).</li>
-            <li>Colunas Obrigatórias do Estudante: <strong>NOME_COMPLETO, EMAIL, CPF, DATA_NASCIMENTO</strong>.</li>
-            <li>Se a <strong>SENHA</strong> estiver vazia, uma aleatória será gerada (para novos usuários).</li>
-            <li>Campos Booleanos: <strong>BOLSA_FAMILIA, PE_DE_MEIA, SAIDA_SOZINHO</strong>. Use <strong>Sim</strong> ou <strong>Não</strong>.</li>
-            <li className="mt-2 font-semibold">Campos de Matrícula (opcionais, mas se preenchidos exigem todos os obrigatórios):</li>
-            <li className="ml-4">Obrigatórios: <strong>NUMERO_MATRICULA</strong> (10 dígitos), <strong>CURSO_SIGLA</strong>, <strong>DATA_ENTRADA_CURSO</strong>, <strong>STATUS_MATRICULA</strong>.</li>
-            <li className="ml-4">Opcional: <strong>DATA_SAIDA_CURSO</strong>.</li>
-            <li className="ml-4">Opções de STATUS_MATRICULA: <strong>MATRICULADO, CONCLUIDO, ABANDONO, TRANSFERIDO, OUTRO</strong>.</li>
-          </ul>
-        }
-      />
+        />
+      )}
     </div>
   )
 }

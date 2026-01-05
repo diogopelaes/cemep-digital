@@ -284,7 +284,23 @@ class MatriculaCEMEP(UUIDModel):
         if self.numero_matricula:
             # Remove formatação mas mantém X/x (converte para maiúsculo)
             self.numero_matricula = re.sub(r'[^0-9Xx]', '', str(self.numero_matricula)).upper()
+        
         super().save(*args, **kwargs)
+
+        # Propagação automática de status para turmas
+        # Se o aluno sair da escola, encerra turmas ativas
+        STATUS_SAIDA = [self.Status.ABANDONO, self.Status.TRANSFERIDO, self.Status.OUTRO]
+        
+        if self.status in STATUS_SAIDA:
+            from datetime import date
+            # Define data de saída (usa a data da matrícula ou hoje)
+            data_fim = self.data_saida or date.today()
+            
+            # Atualiza matrículas em turma com status CURSANDO para o novo status
+            self.matriculas_turma.filter(status='CURSANDO').update(
+                status=self.status,
+                data_saida=data_fim
+            )
 
     @property
     def numero_matricula_formatado(self):
@@ -353,6 +369,9 @@ class MatriculaTurma(UUIDModel):
         if not self.data_saida and self.status != self.Status.CURSANDO:
             self.status = self.Status.CURSANDO
         super().save(*args, **kwargs)
+
+    def get_status_display(self):
+        return self.Status(self.status).label
     
     def __str__(self):
         return f"{self.matricula_cemep.estudante} - {self.turma}"

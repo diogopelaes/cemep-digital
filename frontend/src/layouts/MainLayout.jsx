@@ -32,6 +32,7 @@ const menuItems = {
   PROFESSOR: [
     { path: '/dashboard', label: 'Dashboard', icon: HiHome },
     { path: '/minhas-turmas', label: 'Minhas Turmas', icon: HiUsers },
+    { path: '/estudantes', label: 'Estudantes', icon: HiAcademicCap },
     { path: '/diario', label: 'Diário de Classe', icon: HiDocumentText },
     { path: '/notas', label: 'Notas', icon: HiClipboardList },
     { path: '/tarefas', label: 'Tarefas', icon: HiClipboardList },

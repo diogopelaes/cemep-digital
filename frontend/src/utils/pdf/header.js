@@ -13,10 +13,9 @@ import { INSTITUTION_NAME, SYSTEM_NAME } from '../../config/constants'
  * @param {string} options.info2 - Informação extra 2 (Lado direito)
  * @returns {Promise<number>} Posição Y após o cabeçalho
  */
-export async function addHeader(doc, { title, subtitle1 = '', subtitle2 = '', info1 = '', info2 = '' } = {}) {
+export async function addHeader(doc, { title, subtitle1 = '', subtitle2 = '', info1 = '', info2 = '', margin = CONFIG.margin } = {}) {
     const pageWidth = doc.internal.pageSize.getWidth()
     const headerHeight = 25 // Altura fixa e compacta
-    const margin = CONFIG.margin
 
     // === FUNDO ===
     doc.setFillColor(...COLORS.primary)
@@ -89,7 +88,7 @@ export async function addHeader(doc, { title, subtitle1 = '', subtitle2 = '', in
  * Adiciona rodapé padrão ao PDF
  * @param {jsPDF} doc - Instância do jsPDF
  */
-export function addFooter(doc) {
+export function addFooter(doc, margin = CONFIG.margin) {
     const pageWidth = doc.internal.pageSize.getWidth()
     const pageHeight = doc.internal.pageSize.getHeight()
     const pageCount = doc.internal.getNumberOfPages()
@@ -100,14 +99,14 @@ export function addFooter(doc) {
         // Linha divisória
         doc.setDrawColor(...COLORS.grayDark)
         doc.setLineWidth(0.3)
-        doc.line(CONFIG.margin, pageHeight - 15, pageWidth - CONFIG.margin, pageHeight - 15)
+        doc.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15)
 
         // Texto do rodapé
         doc.setTextColor(...COLORS.textLight)
         doc.setFontSize(CONFIG.fontSize.small)
         doc.setFont('helvetica', 'normal')
 
-        doc.text(`${SYSTEM_NAME} - Sistema de Gestão Escolar`, CONFIG.margin, pageHeight - 10)
-        doc.text(`Página ${i} de ${pageCount}`, pageWidth - CONFIG.margin, pageHeight - 10, { align: 'right' })
+        doc.text(`${SYSTEM_NAME} - Sistema de Gestão Escolar`, margin, pageHeight - 10)
+        doc.text(`Página ${i} de ${pageCount}`, pageWidth - margin, pageHeight - 10, { align: 'right' })
     }
 }

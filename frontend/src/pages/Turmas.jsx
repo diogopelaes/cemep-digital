@@ -6,11 +6,14 @@ import {
   DropdownMenu, DropdownItem
 } from '../components/ui'
 import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil, HiCheckCircle, HiXCircle, HiUpload, HiTable, HiPhotograph } from 'react-icons/hi'
+import { FaFilePdf } from 'react-icons/fa'
 import BulkUploadModal from '../components/modals/BulkUploadModal'
 import BulkAssociateDisciplinasModal from '../components/modals/BulkAssociateDisciplinasModal'
 import { coreAPI, academicAPI } from '../services/api'
 import { getNomenclaturaLabel } from '../data'
 import toast from 'react-hot-toast'
+import { generateListaTurmaPDF } from '../utils/pdf'
+import { formatDateBR } from '../utils/date'
 
 export default function Turmas() {
   const navigate = useNavigate()
@@ -18,7 +21,9 @@ export default function Turmas() {
   const [turmas, setTurmas] = useState([])
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [showEnturmarModal, setShowEnturmarModal] = useState(false)
+
   const [showDisciplinasModal, setShowDisciplinasModal] = useState(false)
+  const [generatingPDF, setGeneratingPDF] = useState(null)
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
@@ -62,9 +67,38 @@ export default function Turmas() {
     }
   }
 
-  // Formata o nome da turma
   const formatTurmaNome = (turma) => {
     return `${turma.nome}`
+  }
+
+  const handleGerarLista = async (turma, e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setGeneratingPDF(turma.id)
+    try {
+      // Busca estudantes da turma
+      const response = await academicAPI.matriculasTurma.list({ turma_id: turma.id, page_size: 1000 })
+      const estudantes = response.data.results || response.data
+
+      const listaEstudantes = estudantes.map(m => {
+        const est = m.matricula_cemep?.estudante
+        return {
+          nome: est.nome_exibicao || est.usuario?.first_name || est.nome_social,
+          matricula: m.matricula_cemep?.numero_matricula_formatado || m.matricula_cemep?.numero_matricula,
+          data_nascimento: formatDateBR(est.data_nascimento),
+          email: est.usuario?.email,
+          status: m.status_display || m.status
+        }
+      })
+
+      await generateListaTurmaPDF(turma, listaEstudantes)
+      toast.success('Lista gerada com sucesso!')
+    } catch (error) {
+      console.error(error)
+      toast.error('Erro ao gerar lista')
+    } finally {
+      setGeneratingPDF(null)
+    }
   }
 
   return (
@@ -122,6 +156,7 @@ export default function Turmas() {
                   <TableHeader className="th-center">Estudantes</TableHeader>
                   <TableHeader className="th-center">Disciplinas</TableHeader>
                   <TableHeader className="th-center">Grade</TableHeader>
+                  <TableHeader className="th-center">Lista</TableHeader>
                   <TableHeader className="th-center">Carômetro</TableHeader>
                   <TableHeader className="th-center">Status</TableHeader>
                 </TableRow>
@@ -190,6 +225,16 @@ export default function Turmas() {
                         >
                           <HiTable className="h-5 w-5" />
                         </Link>
+                      </TableCell>
+                      <TableCell className="td-center">
+                        <button
+                          onClick={(e) => handleGerarLista(turma, e)}
+                          disabled={generatingPDF === turma.id}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-danger-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-danger-400 transition-colors disabled:opacity-50"
+                          title="Lista de Estudantes (PDF)"
+                        >
+                          {generatingPDF === turma.id ? <Loading size="sm" /> : <FaFilePdf className="h-4 w-4" />}
+                        </button>
                       </TableCell>
                       <TableCell className="td-center">
                         <Link

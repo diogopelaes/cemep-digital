@@ -91,7 +91,7 @@ function App() {
 
         {/* Rotas de Estudantes */}
         <Route path="/estudantes" element={
-          <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><Estudantes /></ProtectedRoute>
+          <ProtectedRoute allowedRoles={FUNCIONARIOS}><Estudantes /></ProtectedRoute>
         } />
         <Route path="/estudantes/novo" element={
           <ProtectedRoute allowedRoles={GESTAO_SECRETARIA}><EstudanteForm /></ProtectedRoute>
