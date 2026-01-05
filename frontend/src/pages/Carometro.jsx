@@ -113,7 +113,7 @@ export default function Carometro() {
                                 </p>
                             )}
                             <div className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 print:bg-transparent print:text-gray-500 print:border print:border-gray-200 mt-2">
-                                {estudante.matricula}
+                                {estudante.data_nascimento}
                             </div>
                         </div>
                     </Card>

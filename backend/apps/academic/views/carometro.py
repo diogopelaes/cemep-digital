@@ -36,7 +36,7 @@ class CarometroView(APIView):
                 'id': estudante.id,
                 'nome': usuario.get_full_name(),
                 'nome_social': estudante.nome_social,
-                'matricula': mat.matricula_cemep.numero_matricula, # Usando matricula CEMEP
+                'data_nascimento': estudante.data_nascimento_formatada,
                 'foto': photo_url,
                 'status': mat.get_status_display()
             })

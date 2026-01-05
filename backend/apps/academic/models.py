@@ -66,6 +66,12 @@ class Estudante(UUIDModel):
         super().save(*args, **kwargs)
 
     @property
+    def data_nascimento_formatada(self):
+        if not self.data_nascimento:
+            return ""
+        return self.data_nascimento.strftime('%d/%m/%Y')
+
+    @property
     def endereco_completo(self):
         partes = [self.logradouro, self.numero]
         if self.complemento:
