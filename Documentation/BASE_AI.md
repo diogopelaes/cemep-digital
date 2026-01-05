@@ -189,6 +189,115 @@ import { useFuncionarioForm, useEstudanteForm } from '../hooks'
 
 ---
 
+## 🎨 Design System e Estilo Visual
+
+> **⚠️ MUITO IMPORTANTE:** Sempre manter consistência visual. Antes de criar novos componentes, **verificar se já existe algo similar** e seguir os mesmos padrões.
+
+### Arquivos de Referência
+
+| Arquivo | Descrição |
+|---------|-----------|
+| `frontend/tailwind.config.js` | Paleta de cores, fontes, sombras, animações |
+| `frontend/src/index.css` | Classes utilitárias customizadas (glassmorphism, botões, inputs, etc.) |
+| `frontend/src/components/ui/` | Componentes primitivos de interface |
+| `frontend/index.html` | Fonte Outfit do Google Fonts |
+
+### Paleta de Cores (Tailwind)
+
+```javascript
+// Cores principais - SEMPRE usar essas, nunca cores genéricas
+primary: { 50-900 }    // Azul Sky (#0ea5e9) - cor principal
+accent: { 50-900 }     // Fuchsia (#d946ef) - destaque/ação especial
+success: { 500, 600 }  // Verde (#22c55e) - sucesso
+warning: { 500, 600 }  // Amarelo (#f59e0b) - alerta
+danger: { 500, 600 }   // Vermelho (#ef4444) - erro/perigo
+
+// Fundos e texto
+slate: { 50-900 }      // Cinzas neutros para fundo e texto
+```
+
+### Tipografia
+
+- **Fonte principal:** `Outfit` (Google Fonts)
+- **Dark Mode:** Suportado via classe `dark` no HTML
+
+### Características Visuais do Sistema
+
+1. **Glassmorphism** - Fundo semi-transparente com blur
+   ```jsx
+   <div className="glass">...</div>  // bg com blur e borda sutil
+   ```
+
+2. **Cards Premium** - Com hover suave
+   ```jsx
+   <div className="card">...</div>  // glass + rounded-2xl + hover:scale
+   ```
+
+3. **Gradientes** - Nos botões e fundos
+   ```jsx
+   <button className="btn-primary">...</button>  // gradiente azul
+   ```
+
+4. **Animações** - Transições suaves
+   - `animate-fade-in` - Fade in
+   - `animate-slide-up` - Slide de baixo
+   - `animate-slide-in-right` - Slide da direita
+
+### Classes CSS Utilitárias (index.css)
+
+| Classe | Uso |
+|--------|-----|
+| `.glass` | Efeito glassmorphism |
+| `.card` | Card com glass + hover |
+| `.btn-primary` | Botão azul principal |
+| `.btn-secondary` | Botão cinza |
+| `.btn-danger` | Botão vermelho |
+| `.btn-ghost` | Botão transparente |
+| `.btn-accent` | Botão roxo/fuchsia |
+| `.input` | Estilo padrão de input |
+| `.label` | Label de campo |
+| `.badge-*` | Badges coloridos (success, warning, danger, primary) |
+| `.table-container` | Container de tabela com glass |
+| `.sidebar-link` | Links da sidebar |
+| `.text-link` | Link colorido |
+| `.text-link-subtle` | Link sutil com hover |
+| `.th-center`, `.td-center` | Célula centralizada |
+| `.th-actions`, `.td-actions` | Coluna de ações |
+
+### Componentes UI Disponíveis (`components/ui/`)
+
+```jsx
+import {
+  // Básicos
+  Button, Input, Select, DateInput, TimeInput, Checkbox,
+  
+  // Containers
+  Card, CardHeader, CardTitle, CardContent, CardFooter,
+  Modal, ModalFooter,
+  
+  // Tabelas
+  Table, TableHead, TableBody, TableRow, TableHeader, TableCell, TableEmpty,
+  
+  // Seleção e Busca
+  Combobox, MultiCombobox,
+  
+  // Feedback
+  Badge, Loading, PageLoading, Skeleton,
+  
+  // Interação
+  Avatar, ImageCropper, Pagination, PopConfirm,
+  DropdownMenu, DropdownItem,
+} from '../components/ui'
+```
+
+### Regra de Ouro para Novos Componentes
+
+> **Antes de criar qualquer componente ou página:**
+> 1. Procure um componente similar existente no projeto
+> 2. Use as mesmas classes CSS e padrões visuais
+> 3. Use os componentes de `components/ui/` e `components/common/`
+> 4. Nunca use cores hardcoded - use a paleta do Tailwind
+
 ## 🔗 URLs da API
 
 | Prefixo | App | Principais Endpoints |
