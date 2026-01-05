@@ -10,6 +10,7 @@ class EstudanteSerializer(serializers.ModelSerializer):
     usuario = UserSerializer(read_only=True)
     endereco_completo = serializers.CharField(read_only=True)
     nome_exibicao = serializers.SerializerMethodField()
+    foto = serializers.SerializerMethodField()
     responsaveis = serializers.SerializerMethodField()
     cursos_matriculados = serializers.SerializerMethodField()
     
@@ -17,13 +18,21 @@ class EstudanteSerializer(serializers.ModelSerializer):
         model = Estudante
         fields = [
             'id', 'cpf', 'usuario', 'cpf_formatado', 'cin', 'nome_social', 'nome_exibicao',
-            'data_nascimento',
+            'data_nascimento', 'foto',
             'bolsa_familia', 'pe_de_meia', 'usa_onibus', 'linha_onibus',
             'permissao_sair_sozinho',
             'logradouro', 'numero', 'bairro', 'cidade', 'estado', 'cep', 'complemento',
             'telefone', 'telefone_formatado', 'endereco_completo', 'responsaveis',
             'cursos_matriculados'
         ]
+    
+    def get_foto(self, obj):
+        if obj.usuario and obj.usuario.foto:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.usuario.foto.url)
+            return obj.usuario.foto.url
+        return None
     
     def get_nome_exibicao(self, obj):
         return obj.nome_social or obj.usuario.get_full_name()

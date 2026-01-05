@@ -183,8 +183,8 @@ export function useEstudanteForm(idParam, navigate) {
             }
 
             // Carrega foto
-            if (est.usuario?.foto) {
-                setFotoPreview(est.usuario.foto)
+            if (est.foto) {
+                setFotoPreview(est.foto)
             }
         } catch (error) {
             toast.error('Erro ao carregar estudante')

@@ -74,9 +74,9 @@ export default function EstudanteDetalhes() {
 
             // Adiciona foto
             let fotoBase64 = null
-            if (estudante.usuario?.foto) {
+            if (estudante.foto) {
                 try {
-                    fotoBase64 = await imageToBase64(estudante.usuario.foto)
+                    fotoBase64 = await imageToBase64(estudante.foto)
                 } catch (e) {
                     console.log('Erro ao carregar foto para PDF')
                 }
@@ -271,14 +271,14 @@ export default function EstudanteDetalhes() {
                     {/* Foto */}
                     <div className="flex-shrink-0">
                         <div
-                            className={`w-[150px] h-[200px] rounded-2xl overflow-hidden shadow-lg border-2 border-slate-200 dark:border-slate-700 relative ${estudante.usuario?.foto ? 'cursor-pointer group' : ''}`}
-                            onClick={() => estudante.usuario?.foto && window.open(estudante.usuario.foto, '_blank')}
-                            title={estudante.usuario?.foto ? "Clique para ampliar" : ""}
+                            className={`w-[150px] h-[200px] rounded-2xl overflow-hidden shadow-lg border-2 border-slate-200 dark:border-slate-700 relative ${estudante.foto ? 'cursor-pointer group' : ''}`}
+                            onClick={() => estudante.foto && window.open(estudante.foto, '_blank')}
+                            title={estudante.foto ? "Clique para ampliar" : ""}
                         >
-                            {estudante.usuario?.foto ? (
+                            {estudante.foto ? (
                                 <>
                                     <img
-                                        src={estudante.usuario.foto}
+                                        src={estudante.foto}
                                         alt={estudante.nome_exibicao}
                                         className="w-[150px] h-[200px] transition-transform group-hover:scale-105"
                                         style={{ imageRendering: 'auto' }}
