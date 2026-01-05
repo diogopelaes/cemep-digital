@@ -3,7 +3,7 @@ import { HiChevronDown, HiChevronRight, HiRefresh, HiInformationCircle } from 'r
 import { coreAPI } from '../../services/api'
 import { Loading, Badge } from '../ui'
 import ControleForm from '../../pages/ControleForm'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { useReferences } from '../../contexts/ReferenceContext'
 
 const BIMESTRES = [
@@ -85,7 +85,8 @@ export default function ControleTab() {
                 bimestre: c.bimestre,
                 tipo: c.tipo,
                 data_inicio: c.data_inicio || null,
-                data_fim: c.data_fim || null
+                data_fim: c.data_fim || null,
+                digitacao_futura: c.digitacao_futura
             }))
 
             console.log('Salvando controles:', payload)
@@ -95,7 +96,7 @@ export default function ControleTab() {
             const { data } = await coreAPI.controleRegistros.porAno(currentAno?.ano)
             setControles(Array.isArray(data) ? data : [])
 
-            toast.success('Salvo automaticamente', { duration: 1500, icon: '✓' })
+            toast.success('Salvo automaticamente')
         } catch (error) {
             console.error('Erro ao salvar:', error)
             toast.error('Erro ao salvar alterações')

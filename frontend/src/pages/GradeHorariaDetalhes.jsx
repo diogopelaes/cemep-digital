@@ -3,7 +3,7 @@ import { HiTable, HiPlus, HiPencil, HiCalendar, HiX, HiCheck } from 'react-icons
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell, Modal, Button, DateInput, Select } from '../components/ui'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useGradeHoraria } from '../hooks/useGradeHoraria'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 
 const DAYS = [
     { value: 0, label: 'Segunda' },

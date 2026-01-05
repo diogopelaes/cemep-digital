@@ -13,7 +13,7 @@ class ControleRegistrosVisualizacaoViewSet(GestaoOnlyMixin, viewsets.ModelViewSe
     """
     queryset = ControleRegistrosVisualizacao.objects.all()
     serializer_class = ControleRegistrosVisualizacaoSerializer
-    filterset_fields = ['ano_letivo', 'bimestre', 'tipo']
+    filterset_fields = ['ano_letivo', 'bimestre', 'tipo', 'digitacao_futura']
     pagination_class = None
 
     def get_queryset(self):

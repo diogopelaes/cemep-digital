@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { HiPlus, HiTrash, HiSave, HiClock, HiCheck, HiPause } from 'react-icons/hi'
 import { Button, Card, Input, TimeInput, Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '../components/ui'
 import { coreAPI } from '../services/api'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import HorarioAulaDetalhes from './HorarioAulaDetalhes'
 
 const DAYS = [

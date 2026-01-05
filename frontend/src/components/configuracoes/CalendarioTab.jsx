@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { coreAPI } from '../../services/api'
 import { HiPlus, HiCalendar, HiRefresh, HiCheckCircle } from 'react-icons/hi'
 import { Loading, Badge, Modal, Button, Card } from '../ui'
@@ -17,7 +18,7 @@ export default function CalendarioTab() {
 
     // Modals
     const [showIniciarModal, setShowIniciarModal] = useState(false)
-    const [showTrocarModal, setShowTrocarModal] = useState(false)
+
 
     useEffect(() => {
         loadAnos()
@@ -91,22 +92,14 @@ export default function CalendarioTab() {
 
     return (
         <div className="space-y-6">
-            {/* Header com Trocar Calendário */}
+            {/* Header com Novo Ano */}
             <div className="flex justify-end items-center gap-2">
-                <Button
-                    variant="secondary"
-                    size="sm"
-                    icon={HiRefresh}
-                    onClick={() => setShowTrocarModal(true)}
-                >
-                    Trocar Calendário
-                </Button>
                 <Button
                     size="sm"
                     icon={HiPlus}
                     onClick={() => setShowIniciarModal(true)}
                 >
-                    Novo Ano
+                    Novo Ano Letivo
                 </Button>
             </div>
 
@@ -120,64 +113,14 @@ export default function CalendarioTab() {
                 </div>
             )}
 
-            {/* Modal de Troca */}
-            <Modal
-                isOpen={showTrocarModal}
-                onClose={() => setShowTrocarModal(false)}
-                title="Selecionar Ano Letivo"
-                size="md"
-            >
-                <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-                    {anos.map(ano => (
-                        <button
-                            key={ano.ano}
-                            onClick={() => {
-                                setSelectedAno(ano)
-                                setShowTrocarModal(false)
-                            }}
-                            className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left
-                            ${selectedAno?.ano === ano.ano
-                                    ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-900/20'
-                                    : 'border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-700 bg-white dark:bg-slate-800'
-                                }
-                            `}
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-lg ${selectedAno?.ano === ano.ano ? 'bg-primary-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}`}>
-                                    <HiCalendar className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <span className={`font-bold text-lg ${selectedAno?.ano === ano.ano ? 'text-primary-700 dark:text-primary-300' : 'text-slate-700 dark:text-slate-300'}`}>
-                                        {ano.ano}
-                                    </span>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                                        {ano.is_active ? 'Ano Letivo Corrente' : 'Ano Letivo'}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {ano.is_active && (
-                                    <Badge variant="success">
-                                        <div className="flex items-center gap-1">
-                                            <HiCheckCircle className="w-3 h-3" />
-                                            Ativo
-                                        </div>
-                                    </Badge>
-                                )}
-                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedAno?.ano === ano.ano ? 'border-primary-500 bg-primary-500' : 'border-slate-300 dark:border-slate-600'}`}>
-                                    {selectedAno?.ano === ano.ano && <div className="w-2 h-2 rounded-full bg-white" />}
-                                </div>
-                            </div>
-                        </button>
-                    ))}
-                </div>
-            </Modal>
-
-            <IniciarAnoModal
-                isOpen={showIniciarModal}
-                onClose={() => setShowIniciarModal(false)}
-                onSuccess={handleAnoCreated}
-            />
+            {createPortal(
+                <IniciarAnoModal
+                    isOpen={showIniciarModal}
+                    onClose={() => setShowIniciarModal(false)}
+                    onSuccess={handleAnoCreated}
+                />,
+                document.body
+            )}
         </div>
     )
 }

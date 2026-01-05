@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { academicAPI } from '../services/api'
 import { Button, Card } from '../components/ui'
 import { HiPrinter, HiUser, HiPhotograph, HiZoomIn } from 'react-icons/hi'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 
 export default function Carometro() {
     const { id } = useParams()

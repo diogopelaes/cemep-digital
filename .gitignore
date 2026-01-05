@@ -40,3 +40,4 @@ backend/db.sqlite3
 # Desenvolvimento
 # db_backup/
 # env.production.json
+# .agent

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-    Card, Button, DateInput, Checkbox, Loading, Input, Select
+    Card, Button, DateInput, Switch, Loading, Input, Select
 } from '../components/ui'
 import { HiSave, HiTrash } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
@@ -392,15 +392,21 @@ export default function CalendarioForm() {
                                 Configurações do Ano
                             </h2>
                         </div>
-                        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                            <Checkbox
-                                label="Ano Letivo Ativo (Corrente)"
+                        <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/20">
+                            <div>
+                                <span className="font-medium text-slate-700 dark:text-slate-300">
+                                    Ano Letivo Ativo (Corrente)
+                                </span>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                                    Ao marcar este ano como ativo, ele se tornará o ano padrão para matrículas e visualizações.
+                                </p>
+                            </div>
+                            <Switch
                                 checked={formData.is_active}
-                                onChange={(checked) => handleChange('is_active', checked)}
+                                onChange={(e) => handleChange('is_active', e.target.checked)}
+                                labelTrue="Ativo"
+                                labelFalse="Inativo"
                             />
-                            <p className="text-sm text-slate-500 mt-2 ml-8">
-                                Ao marcar este ano como ativo, ele se tornará o ano padrão para matrículas e visualizações.
-                            </p>
                         </div>
                     </div>
                 </div>

@@ -15,7 +15,7 @@ class ControleRegistrosVisualizacaoSerializer(serializers.ModelSerializer):
         model = ControleRegistrosVisualizacao
         fields = [
             'id', 'ano_letivo', 'ano_letivo_ano', 'bimestre', 'bimestre_display',
-            'tipo', 'tipo_display', 'data_inicio', 'data_fim', 
+            'tipo', 'tipo_display', 'data_inicio', 'data_fim', 'digitacao_futura',
             'status_liberacao', 'esta_liberado'
         ]
         read_only_fields = ['id', 'status_liberacao', 'esta_liberado']

@@ -1,13 +1,13 @@
 import { useEffect } from 'react'
 import { HiX } from 'react-icons/hi'
 
-export default function Modal({ 
-  isOpen, 
-  onClose, 
-  title, 
+export default function Modal({
+  isOpen,
+  onClose,
+  title,
   children,
   size = 'md',
-  showClose = true 
+  showClose = true
 }) {
   const sizes = {
     sm: 'max-w-md',
@@ -28,11 +28,13 @@ export default function Modal({
     }
   }, [isOpen])
 
+
+
   if (!isOpen) return null
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div 
+      <div
         className={`modal ${sizes[size]}`}
         onClick={(e) => e.stopPropagation()}
       >

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { HiSave, HiX } from 'react-icons/hi'
 import { Button, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, DateInput } from '../components/ui'
 import { useGradeHoraria } from '../hooks/useGradeHoraria'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 const DAYS = [

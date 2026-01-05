@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { coreAPI } from '../../services/api'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { Modal, Input, Button } from '../ui'
 
 export default function IniciarAnoModal({ isOpen, onClose, onSuccess }) {

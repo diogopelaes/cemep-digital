@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import api from '../services/api'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 
 /**

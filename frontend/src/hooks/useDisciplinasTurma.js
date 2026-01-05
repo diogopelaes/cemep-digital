@@ -161,7 +161,7 @@ export function useDisciplinasTurma(turmaId, turma, isActive = true, pageSize = 
             await coreAPI.disciplinasTurma.update(vinculo.id, {
                 aulas_semanais: parseInt(valorAtual)
             })
-            toast.success('Aulas semanais atualizadas', { duration: 2000 })
+            toast.success('Aulas semanais atualizadas')
             await reloadSilent()
         } catch (error) {
             console.error(error)

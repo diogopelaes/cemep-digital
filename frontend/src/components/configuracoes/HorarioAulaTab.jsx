@@ -4,7 +4,7 @@ import { coreAPI } from '../../services/api'
 import { Button, Loading, Badge } from '../ui'
 import HorarioAulaForm from '../../pages/HorarioAulaForm'
 import HorarioAulaDetalhes from '../../pages/HorarioAulaDetalhes'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 
 export default function HorarioAulaTab() {
     const [view, setView] = useState('list') // list (actually details) or form

@@ -142,9 +142,9 @@ class GradeHorariaAdmin(admin.ModelAdmin):
 
 @admin.register(ControleRegistrosVisualizacao)
 class ControleRegistrosVisualizacaoAdmin(admin.ModelAdmin):
-    list_display = ['ano_letivo', 'bimestre', 'tipo', 'data_inicio', 'data_fim', 'status_liberacao']
+    list_display = ['ano_letivo', 'bimestre', 'tipo', 'data_inicio', 'data_fim', 'digitacao_futura', 'status_liberacao']
     list_filter = ['ano_letivo', 'bimestre', 'tipo']
-    list_editable = ['data_inicio', 'data_fim']
+    list_editable = ['data_inicio', 'data_fim', 'digitacao_futura']
     ordering = ['ano_letivo', 'bimestre', 'tipo']
 
     @admin.display(description='Status')

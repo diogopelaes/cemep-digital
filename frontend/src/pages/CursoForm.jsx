@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Input, Loading } from '../components/ui'
+import { Card, Button, Input, Loading, Switch } from '../components/ui'
 import { HiSave } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
@@ -128,19 +128,12 @@ export default function CursoForm() {
                 Desative para impedir novos cadastros neste curso
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.is_active
-                ? 'bg-success-500'
-                : 'bg-slate-300 dark:bg-slate-600'
-                }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.is_active ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-              />
-            </button>
+            <Switch
+              checked={formData.is_active}
+              onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+              labelTrue="Ativo"
+              labelFalse="Inativo"
+            />
           </div>
 
           {/* Botões */}
