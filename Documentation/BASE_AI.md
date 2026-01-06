@@ -4,6 +4,32 @@
 
 ---
 
+## ⚠️ AMBIENTE E TERMINAL (MUITO IMPORTANTE)
+
+**Sistema Operacional:** Windows 10/11
+**Terminal Padrão:** PowerShell
+**Separador de Caminho:** Backslash (`\`)
+
+> **REGRAS RÍGIDAS PARA COMANDOS:**
+> 1. **NUNCA** sugira comandos Bash (`ls`, `cp`, `mv`, `rm -rf`, `sudo`, `grep`, `cat`, `touch`, `nano`).
+> 2. **NUNCA** use `source` para ativar ambientes virtuais.
+> 3. **SEMPRE** use sintaxe PowerShell (`Get-ChildItem`, `Copy-Item`, `Remove-Item`, `New-Item`).
+> 4. **SEMPRE** use `.\` para executar scripts no diretório atual (ex: `.\start-dev.ps1`).
+> 5. Ao sugerir caminhos de arquivo em código ou comandos, use `\` (ex: `backend\manage.py`).
+
+**Tabela de Tradução Obrigatória:**
+| Linux/Bash | Windows/PowerShell |
+|------------|--------------------|
+| `source .venv/bin/activate` | `.\.venv\Scripts\Activate.ps1` |
+| `./script.sh` | `.\script.ps1` |
+| `ls -la` | `ls` ou `Get-ChildItem` |
+| `rm -rf folder` | `Remove-Item -Recurse -Force folder` |
+| `cp file dest` | `Copy-Item file dest` |
+| `export VAR=val` | `$env:VAR="val"` |
+| `touch file.txt` | `New-Item -ItemType File file.txt` |
+
+---
+
 ## 🎯 Visão Geral do Projeto
 
 **Sistema:** CEMEP Digital - Sistema de Gestão Escolar
