@@ -6,7 +6,7 @@ from .models import (
     Funcionario, PeriodoTrabalho, Disciplina, Curso, Turma,
     DisciplinaTurma, ProfessorDisciplinaTurma, Habilidade,
     AnoLetivo, DiaLetivoExtra, DiaNaoLetivo, HorarioAula, GradeHoraria,
-    GradeHorariaValidade, ControleRegistrosVisualizacao
+    GradeHorariaValidade, ControleRegistrosVisualizacao, AnoLetivoSelecionado
 )
 
 
@@ -138,6 +138,13 @@ class GradeHorariaAdmin(admin.ModelAdmin):
     list_display = ['validade', 'horario_aula', 'disciplina']
     list_filter = ['validade__turma__ano_letivo', 'validade__turma__curso', 'horario_aula__dia_semana']
     search_fields = ['validade__turma__numero', 'validade__turma__letra', 'disciplina__nome']
+
+
+@admin.register(AnoLetivoSelecionado)
+class AnoLetivoSelecionadoAdmin(admin.ModelAdmin):
+    list_display = ['usuario', 'ano_letivo']
+    list_filter = ['ano_letivo']
+    search_fields = ['usuario__username', 'usuario__first_name']
 
 
 @admin.register(ControleRegistrosVisualizacao)

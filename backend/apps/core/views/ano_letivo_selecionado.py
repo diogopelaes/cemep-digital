@@ -22,20 +22,22 @@ class AnoLetivoSelecionadoViewSet(viewsets.ViewSet):
 
     def list(self, request):
         """Retorna o ano letivo selecionado do usuário atual."""
-        try:
-            selecionado = request.user.ano_letivo_selecionado
-        except AnoLetivoSelecionado.DoesNotExist:
-            # Cria seleção padrão com o ano ativo
-            ano_ativo = AnoLetivo.objects.filter(is_active=True).first()
+        # Garante que existe uma seleção ou cria a padrão
+        ano_ativo = AnoLetivo.objects.filter(is_active=True).first()
+        if not ano_ativo:
+            # Tenta buscar qualquer ano se não tiver um ativo marcado, apenas para não quebrar (fallback de segurança)
+            ano_ativo = AnoLetivo.objects.order_by('-ano').first()
+            
             if not ano_ativo:
-                return Response(
-                    {'detail': 'Nenhum ano letivo ativo encontrado.'},
+                 return Response(
+                    {'detail': 'Nenhum ano letivo encontrado.'},
                     status=status.HTTP_404_NOT_FOUND
                 )
-            selecionado = AnoLetivoSelecionado.objects.create(
-                usuario=request.user,
-                ano_letivo=ano_ativo
-            )
+
+        selecionado, created = AnoLetivoSelecionado.objects.get_or_create(
+            usuario=request.user,
+            defaults={'ano_letivo': ano_ativo}
+        )
         
         serializer = AnoLetivoSelecionadoSerializer(selecionado)
         return Response(serializer.data)

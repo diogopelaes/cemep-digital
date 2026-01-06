@@ -2,6 +2,7 @@
 View para Plano de Aula
 """
 from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 from apps.pedagogical.models import PlanoAula
@@ -10,9 +11,10 @@ from apps.users.permissions import ProfessorWriteFuncionarioReadMixin
 
 
 from apps.users.permissions import ProfessorWriteFuncionarioReadMixin, IsOwnerOrGestao, IsProfessor, IsGestao
-from apps.core.models import Funcionario, ProfessorDisciplinaTurma, Disciplina
+from apps.core.models import Funcionario, ProfessorDisciplinaTurma, Disciplina, Habilidade
 from apps.core.serializers.disciplina import DisciplinaSerializer
 from apps.core.serializers.turma import TurmaSerializer
+from apps.core.serializers.habilidade import HabilidadeSerializer
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -26,8 +28,11 @@ class PlanoAulaViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet
     """
     queryset = PlanoAula.objects.select_related('professor__usuario', 'disciplina').prefetch_related('turmas', 'habilidades')
     serializer_class = PlanoAulaSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['professor', 'disciplina', 'turmas', 'ano_letivo', 'bimestre']
+    search_fields = ['titulo', 'conteudo']
+    ordering_fields = ['data_inicio', 'disciplina__nome', 'titulo']
+    ordering = ['data_inicio']  # Ordenação padrão
 
     def get_permissions(self):
         if self.action == 'create':
@@ -56,6 +61,32 @@ class PlanoAulaViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet
         
         return qs
 
+    def list(self, request, *args, **kwargs):
+        """Override list to include discipline count for the professor."""
+        response = super().list(request, *args, **kwargs)
+        
+        # Conta quantas disciplinas distintas o professor leciona no ano selecionado
+        user = request.user
+        disciplinas_count = 1  # Default: assume apenas uma
+        
+        if hasattr(user, 'funcionario'):
+            ano_letivo = user.get_ano_letivo_selecionado()
+            if ano_letivo:
+                disciplinas_count = ProfessorDisciplinaTurma.objects.filter(
+                    professor=user.funcionario,
+                    disciplina_turma__turma__ano_letivo=ano_letivo,
+                    disciplina_turma__turma__is_active=True
+                ).values('disciplina_turma__disciplina').distinct().count()
+        
+        # Adiciona a contagem ao response (metadata)
+        if isinstance(response.data, dict):
+            response.data['disciplinas_count'] = disciplinas_count
+        else:
+            # Se paginação está desativada e retorna lista direta
+            response.data = {'results': response.data, 'disciplinas_count': disciplinas_count}
+        
+        return response
+
     @action(detail=False, methods=['get'], url_path='contexto-formulario')
     def contexto_formulario(self, request):
         """
@@ -73,6 +104,7 @@ class PlanoAulaViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet
             )
         
         ano_letivo = user.get_ano_letivo_selecionado()
+        
         if not ano_letivo:
              return Response(
                 {'detail': 'Nenhum ano letivo selecionado.'},
@@ -126,8 +158,16 @@ class PlanoAulaViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet
         # 4. Serializa
         disciplinas_list = sorted(list(disciplinas_map.values()), key=lambda d: d.nome)
         disciplinas_data = DisciplinaSerializer(disciplinas_list, many=True).data
+        
+        # Busca habilidades das disciplinas encontradas
+        habilidades = Habilidade.objects.filter(
+            disciplina__in=list(disciplinas_map.values()),
+            is_active=True
+        ).select_related('disciplina')
+        habilidades_data = HabilidadeSerializer(habilidades, many=True).data
 
         return Response({
             'disciplinas': disciplinas_data,
-            'turmas_por_disciplina': turmas_por_disciplina
+            'turmas_por_disciplina': turmas_por_disciplina,
+            'habilidades': habilidades_data
         })

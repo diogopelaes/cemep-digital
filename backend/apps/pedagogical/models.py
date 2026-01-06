@@ -27,9 +27,10 @@ class PlanoAula(UUIDModel):
         related_name='planos_aula',
         blank=True
     )
+    titulo = models.CharField(max_length=100, verbose_name='Título')
     data_inicio = models.DateField(verbose_name='Data Início')
     data_fim = models.DateField(verbose_name='Data Fim')
-    conteudo = RichTextField(verbose_name='Conteúdo')
+    conteudo = RichTextField(verbose_name='Conteúdo', blank=True)
     habilidades = models.ManyToManyField(
         Habilidade,
         related_name='planos_aula',

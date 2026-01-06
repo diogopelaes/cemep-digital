@@ -141,17 +141,15 @@ export default function MinhasTurmas() {
                         >
                             {generatingPDF === turma.id ? <Loading size="sm" /> : <FaFilePdf className="h-3.5 w-3.5" />}
                         </button>
-                        {temGradeHoraria(turma) && (
-                            <Link
-                                to={`/minhas-turmas/${turma.id}`}
-                                state={{ tab: 'gradeHoraria' }}
-                                onClick={(e) => e.stopPropagation()}
-                                className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-success-500 hover:text-success-600 dark:text-success-400 transition-colors"
-                                title="Grade Horária"
-                            >
-                                <HiTable className="h-3.5 w-3.5" />
-                            </Link>
-                        )}
+                        <Link
+                            to={`/minhas-turmas/${turma.id}`}
+                            state={{ tab: 'gradeHoraria' }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                            title="Grade Horária"
+                        >
+                            <HiTable className="h-3.5 w-3.5" />
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -264,7 +262,7 @@ export default function MinhasTurmas() {
                                             <button
                                                 onClick={(e) => handleGerarLista(turma, e)}
                                                 disabled={generatingPDF === turma.id}
-                                                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-danger-600 dark:hover:text-danger-400 transition-colors disabled:opacity-50"
+                                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-danger-600 dark:hover:text-danger-400 transition-colors disabled:opacity-50"
                                                 title="Lista de Estudantes (PDF)"
                                             >
                                                 {generatingPDF === turma.id ? <Loading size="sm" /> : <FaFilePdf className="h-4 w-4" />}
@@ -273,23 +271,21 @@ export default function MinhasTurmas() {
                                         <TableCell className="td-center">
                                             <Link
                                                 to={`/turmas/${turma.id}/carometro`}
-                                                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                                                 title="Visualizar Carômetro"
                                             >
                                                 <HiPhotograph className="h-5 w-5" />
                                             </Link>
                                         </TableCell>
                                         <TableCell className="td-center">
-                                            {temGradeHoraria(turma) && (
-                                                <Link
-                                                    to={`/minhas-turmas/${turma.id}`}
-                                                    state={{ tab: 'gradeHoraria' }}
-                                                    className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-success-600 dark:text-success-400 transition-colors"
-                                                    title="Ver Grade Horária"
-                                                >
-                                                    <HiTable className="h-5 w-5" />
-                                                </Link>
-                                            )}
+                                            <Link
+                                                to={`/minhas-turmas/${turma.id}`}
+                                                state={{ tab: 'gradeHoraria' }}
+                                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                                title="Ver Grade Horária"
+                                            >
+                                                <HiTable className="h-5 w-5" />
+                                            </Link>
                                         </TableCell>
                                     </TableRow>
                                 ))}

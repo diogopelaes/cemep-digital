@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-    Card, Button, Loading, Select,
+    Card, Button, Loading, Select, Input,
     DateInput, TurmaSelector, MultiCombobox
 } from '../../components/ui'
 import { HiSave, HiInformationCircle } from 'react-icons/hi'
@@ -18,9 +18,11 @@ export default function PlanoAulaForm() {
     const [disciplinas, setDisciplinas] = useState([])
     const [turmasDisponiveis, setTurmasDisponiveis] = useState([]) // Turmas exibidas no seletor
     const [turmasMap, setTurmasMap] = useState({}) // Mapa completo { disciplinaId: [turmas] }
-    const [habilidades, setHabilidades] = useState([])
+    const [allHabilidades, setAllHabilidades] = useState([]) // Todas as habilidades pré-carregadas
+    const [habilidades, setHabilidades] = useState([]) // Habilidades filtradas por disciplina
 
     const [formData, setFormData] = useState({
+        titulo: '',
         disciplina: '',
         turmas: [],
         data_inicio: '',
@@ -42,12 +44,19 @@ export default function PlanoAulaForm() {
             const turmasDisc = turmasMap[formData.disciplina] || []
             setTurmasDisponiveis(turmasDisc)
 
-            // Carrega habilidades
-            loadHabilidades(formData.disciplina)
+            // Filtra habilidades localmente
+            if (allHabilidades.length > 0) {
+                const filtered = allHabilidades.filter(h =>
+                    h.disciplina?.id === formData.disciplina ||
+                    h.disciplina === formData.disciplina
+                )
+                setHabilidades(filtered)
+            }
         } else {
             setTurmasDisponiveis([])
+            setHabilidades([])
         }
-    }, [formData.disciplina, turmasMap])
+    }, [formData.disciplina, turmasMap, allHabilidades])
 
     const loadInitialData = async () => {
         try {
@@ -57,6 +66,7 @@ export default function PlanoAulaForm() {
             const loadedDisciplinas = res.data.disciplinas || []
             setDisciplinas(loadedDisciplinas)
             setTurmasMap(res.data.turmas_por_disciplina || {})
+            setAllHabilidades(res.data.habilidades || [])
 
             // Se houver apenas uma disciplina, seleciona automaticamente se não estiver editando
             if (loadedDisciplinas.length === 1 && !isEditing) {
@@ -75,6 +85,7 @@ export default function PlanoAulaForm() {
             const res = await pedagogicalAPI.planosAula.get(id)
             const plano = res.data
             setFormData({
+                titulo: plano.titulo || '',
                 disciplina: plano.disciplina?.id || plano.disciplina,
                 turmas: plano.turmas?.map(t => t.id || t) || [],
                 data_inicio: plano.data_inicio,
@@ -90,20 +101,19 @@ export default function PlanoAulaForm() {
         setLoading(false)
     }
 
-    const loadHabilidades = async (disciplinaId) => {
-        try {
-            const res = await coreAPI.habilidades.list({ disciplina: disciplinaId, page_size: 1000 })
-            setHabilidades(res.data.results || [])
-        } catch (error) {
-            console.error(error)
-            toast.error('Erro ao carregar habilidades')
-        }
-    }
+
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!formData.disciplina || !formData.data_inicio || !formData.data_fim || !formData.conteudo) {
-            return toast.error('Preencha os campos obrigatórios')
+
+        // Validação obrigatória
+        if (!formData.titulo || !formData.disciplina || !formData.data_inicio || !formData.data_fim) {
+            return toast.error('Preencha os campos obrigatórios (Título, Disciplina e Datas)')
+        }
+
+        // Regra de Negócio: Conteúdo ou Habilidades
+        if (!formData.conteudo && formData.habilidades.length === 0) {
+            return toast.error('Preencha o Conteúdo ou selecione Habilidades')
         }
 
         if (new Date(formData.data_inicio) > new Date(formData.data_fim)) {
@@ -151,6 +161,16 @@ export default function PlanoAulaForm() {
             <Card hover={false}>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                            <Input
+                                label="Título do Plano"
+                                placeholder="Ex: Introdução à Programação Orientada a Objetos"
+                                value={formData.titulo}
+                                onChange={(e) => setFormData({ ...formData, titulo: e.target.value })}
+                                required
+                            />
+                        </div>
+
                         <div className="md:col-span-2">
                             <Select
                                 label="Disciplina"
@@ -212,7 +232,7 @@ export default function PlanoAulaForm() {
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            Conteúdo
+                            Conteúdo <span className="text-xs font-normal text-slate-500 ml-1">(Obrigatório se nenhuma habilidade for selecionada)</span>
                         </label>
                         <div className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-600">
                             <textarea

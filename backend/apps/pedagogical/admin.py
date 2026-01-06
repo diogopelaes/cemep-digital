@@ -10,8 +10,9 @@ from .models import (
 
 @admin.register(PlanoAula)
 class PlanoAulaAdmin(admin.ModelAdmin):
-    list_display = ['professor', 'disciplina', 'data_inicio', 'data_fim']
+    list_display = ['professor', 'titulo', 'disciplina', 'data_inicio', 'data_fim']
     list_filter = ['disciplina', 'data_inicio']
+    search_fields = ['titulo', 'conteudo', 'professor__usuario__first_name']
     filter_horizontal = ['turmas', 'habilidades']
 
 

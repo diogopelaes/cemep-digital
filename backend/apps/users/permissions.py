@@ -64,12 +64,21 @@ class IsEstudanteOrResponsavel(BasePermission):
 class IsOwnerOrGestao(BasePermission):
     """
     REGRA: O próprio usuário dono do dado OU alguém do perfil GESTAO.
+    
+    Verifica ownership em ordem:
+    1. obj.usuario (Funcionario, Estudante, etc.)
+    2. obj.professor.usuario (PlanoAula, onde professor é Funcionario)
+    3. obj == request.user (Se o objeto for o próprio User)
     """
     def has_object_permission(self, request, view, obj):
         if request.user.tipo_usuario == 'GESTAO':
             return True
+        # Check direct usuario attribute
         if hasattr(obj, 'usuario'):
             return obj.usuario == request.user
+        # Check professor.usuario (for PlanoAula)
+        if hasattr(obj, 'professor') and hasattr(obj.professor, 'usuario'):
+            return obj.professor.usuario == request.user
         return obj == request.user
 
 
