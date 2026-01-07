@@ -4,8 +4,7 @@ Views para o App Pedagogical
 Re-exporta todos os ViewSets para manter compatibilidade com imports existentes.
 """
 from .plano_aula import PlanoAulaViewSet
-from .aula import AulaViewSet
-from .faltas import FaltasViewSet
+from .aula_faltas import AulaFaltasViewSet
 from .ocorrencia import (
     DescritorOcorrenciaPedagogicaViewSet,
     OcorrenciaPedagogicaViewSet,
@@ -17,8 +16,7 @@ from .notificacao import NotificacaoRecuperacaoViewSet
 
 __all__ = [
     'PlanoAulaViewSet',
-    'AulaViewSet',
-    'FaltasViewSet',
+    'AulaFaltasViewSet',
     'DescritorOcorrenciaPedagogicaViewSet',
     'OcorrenciaPedagogicaViewSet',
     'OcorrenciaResponsavelCienteViewSet',

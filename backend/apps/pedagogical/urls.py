@@ -4,15 +4,14 @@ URLs para o App Pedagogical
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
-    PlanoAulaViewSet, AulaViewSet, FaltasViewSet, DescritorOcorrenciaPedagogicaViewSet,
+    PlanoAulaViewSet, AulaFaltasViewSet, DescritorOcorrenciaPedagogicaViewSet,
     OcorrenciaPedagogicaViewSet, OcorrenciaResponsavelCienteViewSet,
     NotaBimestralViewSet, NotificacaoRecuperacaoViewSet
 )
 
 router = DefaultRouter()
 router.register('planos-aula', PlanoAulaViewSet)
-router.register('aulas', AulaViewSet)
-router.register('faltas', FaltasViewSet)
+router.register('aulas-faltas', AulaFaltasViewSet, basename='aulas-faltas')
 router.register('descritores-ocorrencia', DescritorOcorrenciaPedagogicaViewSet)
 router.register('ocorrencias', OcorrenciaPedagogicaViewSet)
 router.register('ciencias-ocorrencia', OcorrenciaResponsavelCienteViewSet)

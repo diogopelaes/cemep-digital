@@ -36,6 +36,9 @@ import MinhasTurmas from './pages/professor/MinhasTurmas'
 import MinhaTurmaDetalhes from './pages/professor/MinhaTurmaDetalhes'
 import PlanoAula from './pages/professor/PlanoAula'
 import PlanoAulaForm from './pages/professor/PlanoAulaForm'
+import AulaFaltas from './pages/professor/AulaFaltas'
+import AulaFaltasOptions from './pages/professor/AulaFaltasOptions'
+import AulaFaltasForm from './pages/professor/AulaFaltasForm'
 
 // Constantes de perfis para evitar repetição
 const GESTAO_ONLY = ['GESTAO']
@@ -163,6 +166,18 @@ function App() {
         } />
         <Route path="/plano-aula/:id/editar" element={
           <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><PlanoAulaForm /></ProtectedRoute>
+        } />
+        <Route path="/aula-faltas" element={
+          <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><AulaFaltas /></ProtectedRoute>
+        } />
+        <Route path="/aula-faltas/nova" element={
+          <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><AulaFaltasOptions /></ProtectedRoute>
+        } />
+        <Route path="/aula-faltas/nova/:professorDisciplinaTurmaId" element={
+          <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><AulaFaltasForm /></ProtectedRoute>
+        } />
+        <Route path="/aula-faltas/:id/editar" element={
+          <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><AulaFaltasForm /></ProtectedRoute>
         } />
         <Route path="/diario" element={<PlaceholderPage title="Diário de Classe" />} />
         <Route path="/notas" element={<PlaceholderPage title="Notas" />} />

@@ -286,17 +286,19 @@ export const academicAPI = {
 }
 
 export const pedagogicalAPI = {
-  // Aulas
-  aulas: {
-    list: (params) => api.get('/pedagogical/aulas/', { params }),
-    get: (id) => api.get(`/pedagogical/aulas/${id}/`),
-    create: (data) => api.post('/pedagogical/aulas/', data),
-    listaChamada: (id) => api.get(`/pedagogical/aulas/${id}/lista_chamada/`),
-  },
-  // Faltas
-  faltas: {
-    list: (params) => api.get('/pedagogical/faltas/', { params }),
-    registrarLote: (data) => api.post('/pedagogical/faltas/registrar_lote/', data),
+  // Aulas e Faltas (unificado)
+  aulasFaltas: {
+    list: (params) => api.get('/pedagogical/aulas-faltas/', { params }),
+    get: (id) => api.get(`/pedagogical/aulas-faltas/${id}/`),
+    create: (data) => api.post('/pedagogical/aulas-faltas/', data),
+    update: (id, data) => api.patch(`/pedagogical/aulas-faltas/${id}/`, data),
+    delete: (id) => api.delete(`/pedagogical/aulas-faltas/${id}/`),
+    contextoFormulario: () => api.get('/pedagogical/aulas-faltas/contexto_formulario/'),
+    estudantes: (id) => api.get(`/pedagogical/aulas-faltas/${id}/estudantes/`),
+    estudantesPorTurma: (pdtId) => api.get('/pedagogical/aulas-faltas/estudantes_por_turma/', { params: { professor_disciplina_turma_id: pdtId } }),
+    atualizarFaltas: (id, data) => api.patch(`/pedagogical/aulas-faltas/${id}/atualizar_faltas/`, data),
+    verificarExistente: (data) => api.post('/pedagogical/aulas-faltas/verificar_existente/', data),
+    verificarDataRegistro: (data) => api.get('/pedagogical/aulas-faltas/verificar_data_registro/', { params: { data } }),
   },
   // Notas
   notas: {

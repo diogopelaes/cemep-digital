@@ -737,8 +737,14 @@ class ControleRegistrosVisualizacao(UUIDModel):
         Returns:
             bool: True se liberado, False caso contrário
         """
+        hoje = timezone.localdate()
         if data_referencia is None:
-            data_referencia = timezone.localdate()
+            data_referencia = hoje
+        
+        # Se for para o futuro e não permitir digitação futura, bloqueia
+        # Isso se aplica apenas ao registro de aulas
+        if self.tipo == self.TipoControle.REGISTRO_AULA and not self.digitacao_futura and data_referencia > hoje:
+            return False
         
         # Sem datas = não liberado
         if not self.data_inicio and not self.data_fim:

@@ -87,11 +87,11 @@ class Aula(UUIDModel):
     data = models.DateField(verbose_name='Data')
     conteudo = RichTextField(verbose_name='Conteúdo Ministrado')
     numero_aulas = models.PositiveSmallIntegerField(
-        default=1,
-        validators=[MinValueValidator(1), MaxValueValidator(4)],
+        default=2,
         verbose_name='Número de Aulas (Geminadas)'
     )
     criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = 'Aula'
@@ -116,19 +116,22 @@ class Faltas(UUIDModel):
         on_delete=models.CASCADE,
         related_name='faltas'
     )
-    aula_numero = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(4)],
-        help_text='Número da aula no dia (1, 2, 3 ou 4)',
-        verbose_name='Aula Nº'
+    qtd_faltas = models.PositiveSmallIntegerField(
+        verbose_name='Quantidade de Faltas',
+        default=2
     )
+
+    def clean(self):
+        if self.qtd_faltas > self.aula.numero_aulas:
+            raise ValidationError('A quantidade de faltas não pode ser maior que o número de aulas.')
     
     class Meta:
         verbose_name = 'Falta'
         verbose_name_plural = 'Faltas'
-        unique_together = ['aula', 'estudante', 'aula_numero']
+        unique_together = ['aula', 'estudante']
     
     def __str__(self):
-        return f"{self.estudante} - Falta na aula {self.aula_numero} ({self.aula.data})"
+        return f"{self.estudante} - Falta na aula {self.qtd_faltas} ({self.aula.data})"
 
 
 class DescritorOcorrenciaPedagogica(UUIDModel):

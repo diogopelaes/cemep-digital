@@ -82,6 +82,21 @@ class IsOwnerOrGestao(BasePermission):
         return obj == request.user
 
 
+class IsOwnerProfessorOrGestao(BasePermission):
+    """
+    REGRA: O professor dono da aula OU alguém do perfil GESTAO.
+    Para Aula: verifica obj.professor_disciplina_turma.professor.usuario
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.user.tipo_usuario == 'GESTAO':
+            return True
+        if hasattr(obj, 'professor_disciplina_turma'):
+            pdt = obj.professor_disciplina_turma
+            if hasattr(pdt, 'professor') and hasattr(pdt.professor, 'usuario'):
+                return pdt.professor.usuario == request.user
+        return False
+
+
 # =============================================================================
 # MIXINS PARA VIEWSETS (Controle CRUD Automático)
 # =============================================================================
