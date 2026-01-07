@@ -116,14 +116,31 @@ class Faltas(UUIDModel):
         on_delete=models.CASCADE,
         related_name='faltas'
     )
-    qtd_faltas = models.PositiveSmallIntegerField(
-        verbose_name='Quantidade de Faltas',
-        default=2
+    aulas_faltas = models.JSONField(
+        verbose_name='Índice das Aulas com Falta',
+        default=list,
+        null=True,
+        blank=True
     )
 
+    @property
+    def qtd_faltas(self):
+        """Retorna a quantidade de faltas para compatibilidade."""
+        return len(self.aulas_faltas) if self.aulas_faltas else 0
+
     def clean(self):
-        if self.qtd_faltas > self.aula.numero_aulas:
-            raise ValidationError('A quantidade de faltas não pode ser maior que o número de aulas.')
+        from django.core.exceptions import ValidationError
+        if self.aulas_faltas:
+            # Valida se os índices das faltas são válidos para o número de aulas
+            # Vamos assumir lista de inteiros.
+            for falta_idx in self.aulas_faltas:
+                if not isinstance(falta_idx, int):
+                    raise ValidationError('A lista de faltas deve conter apenas números inteiros.')
+                if falta_idx > self.aula.numero_aulas or falta_idx < 1:
+                     raise ValidationError(f'O índice de falta {falta_idx} é inválido para uma aula com {self.aula.numero_aulas} aulas.')
+
+            if len(self.aulas_faltas) > self.aula.numero_aulas:
+                raise ValidationError('A quantidade de faltas não pode ser maior que o número de aulas.')
     
     class Meta:
         verbose_name = 'Falta'

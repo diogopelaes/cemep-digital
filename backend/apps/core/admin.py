@@ -94,8 +94,9 @@ class DiaNaoLetivoAdmin(admin.ModelAdmin):
 
 @admin.register(AnoLetivo)
 class AnoLetivoAdmin(admin.ModelAdmin):
-    list_display = ['ano', 'is_active', 'total_dias_letivos']
+    list_display = ['ano', 'is_active']
     list_filter = ['is_active']
+    readonly_fields = ['controles']
     fieldsets = (
         (None, {
             'fields': ('ano', 'is_active')
@@ -114,6 +115,10 @@ class AnoLetivoAdmin(admin.ModelAdmin):
         }),
         ('Calendário Especial', {
             'fields': ('dias_letivos_extras', 'dias_nao_letivos')
+        }),
+        ('Cache de Controles', {
+            'fields': ('controles',),
+            'classes': ('collapse',),
         }),
     )
     filter_horizontal = ['dias_letivos_extras', 'dias_nao_letivos']

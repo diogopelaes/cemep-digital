@@ -399,6 +399,14 @@ class AnoLetivo(UUIDModel):
     data_fim_4bim = models.DateField(null=True, blank=True, verbose_name='Fim do 4º Bimestre')
     dias_letivos_extras = models.ManyToManyField(DiaLetivoExtra, blank=True, verbose_name='Dias Letivos Especiais')
     dias_nao_letivos = models.ManyToManyField(DiaNaoLetivo, blank=True, verbose_name='Feriados e Recessos')
+    
+
+    controles = models.JSONField(
+        default=dict,
+        blank=True,
+        null=True,
+        verbose_name='Controles'
+    )
 
     def bimestre(self, data=None):
         if data is None:
@@ -440,9 +448,6 @@ class AnoLetivo(UUIDModel):
                 if last_date and inicio <= last_date:
                     raise ValidationError(f'O {nome} deve começar após o fim do bimestre anterior.')
                 last_date = fim
-
-    def total_dias_letivos(self):
-        return self.dias_letivos_extras.count()
 
     def save(self, *args, **kwargs):
         """
@@ -726,6 +731,69 @@ class ControleRegistrosVisualizacao(UUIDModel):
         """Valida que a data de fim é posterior à data de início."""
         if self.data_fim and self.data_inicio and self.data_fim < self.data_inicio:
             raise ValidationError('A data de fim deve ser posterior à data de início.')
+            
+    def save(self, *args, **kwargs):
+        from datetime import timedelta
+        
+        super().save(*args, **kwargs)
+        
+        # Atualiza o JSON field 'controles' no AnoLetivo
+        ano = self.ano_letivo
+        if not filter(lambda f: f.name == 'controles', AnoLetivo._meta.fields):
+             # Safety check - se o campo ainda não existir no DB (migração pendente)
+             return
+
+        if ano.controles is None:
+            ano.controles = {}
+            
+        bim_key = str(self.bimestre)
+        
+        if bim_key not in ano.controles:
+            ano.controles[bim_key] = {}
+            
+        c_data = {
+            'data_inicio': self.data_inicio.isoformat() if self.data_inicio else None,
+            'data_fim': self.data_fim.isoformat() if self.data_fim else None,
+            'digitacao_futura': self.digitacao_futura
+        }
+        
+        # Lógica para dias letivos (Apenas AULA)
+        if self.tipo == self.TipoControle.REGISTRO_AULA and self.data_inicio and self.data_fim:
+            dias_letivos = []
+            
+            # Busca feriados e extras do ano (sets para performance O(1))
+            feriados = set(d.data for d in ano.dias_nao_letivos.all())
+            extras = set(d.data for d in ano.dias_letivos_extras.all())
+            
+            curr = self.data_inicio
+            while curr <= self.data_fim:
+                # Regra: Seg-Sex (weekday < 5)
+                # Inclui se não for feriado
+                # OU se for Extra (trata exceções)
+                
+                is_weekend = curr.weekday() >= 5
+                
+                if is_weekend:
+                    if curr in extras:
+                        dias_letivos.append(curr.isoformat())
+                else:
+                    if curr not in feriados:
+                        dias_letivos.append(curr.isoformat())
+                    # Se for feriado mas estiver marcado como extra letivo (exceção rara)
+                    elif curr in extras:
+                        dias_letivos.append(curr.isoformat())
+                        
+                curr += timedelta(days=1)
+                
+            c_data['dias_letivos'] = dias_letivos
+            
+        ano.controles[bim_key][self.tipo] = c_data
+        
+        # Salva apenas o campo controles para evitar recursão ou overhead
+        # Importante: AnoLetivo.save() não deve limpar isso.
+        
+        # Update no banco direto para garantir atomicidade/evitar conflitos de save() completo
+        AnoLetivo.objects.filter(pk=ano.pk).update(controles=ano.controles)
 
     def esta_liberado(self, data_referencia=None):
         """
@@ -775,7 +843,7 @@ class ControleRegistrosVisualizacao(UUIDModel):
             return 'Aguardando início'
         
         return 'Encerrado'
-
+        
     class Meta:
         verbose_name = 'Controle de Registro/Visualização'
         verbose_name_plural = 'Controles de Registros/Visualizações'

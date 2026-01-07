@@ -294,6 +294,7 @@ export const pedagogicalAPI = {
     update: (id, data) => api.patch(`/pedagogical/aulas-faltas/${id}/`, data),
     delete: (id) => api.delete(`/pedagogical/aulas-faltas/${id}/`),
     contextoFormulario: () => api.get('/pedagogical/aulas-faltas/contexto_formulario/'),
+    opcoesNovaAula: (params) => api.get('/pedagogical/aulas-faltas/opcoes_nova_aula/', { params }),
     estudantes: (id) => api.get(`/pedagogical/aulas-faltas/${id}/estudantes/`),
     estudantesPorTurma: (pdtId) => api.get('/pedagogical/aulas-faltas/estudantes_por_turma/', { params: { professor_disciplina_turma_id: pdtId } }),
     atualizarFaltas: (id, data) => api.patch(`/pedagogical/aulas-faltas/${id}/atualizar_faltas/`, data),

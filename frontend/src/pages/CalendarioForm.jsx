@@ -578,6 +578,7 @@ export default function CalendarioForm() {
                 cancelTo="/configuracoes?tab=calendario"
                 saving={saving}
                 saveLabel="Salvar Alterações"
+                onSave={handleSave}
             />
         </div>
     )

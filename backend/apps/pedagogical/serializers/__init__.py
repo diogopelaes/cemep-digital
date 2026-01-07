@@ -8,7 +8,6 @@ from .aula_faltas import (
     AulaFaltasSerializer,
     AulaFaltasListSerializer,
     ContextoAulaSerializer,
-    EstudanteChamadaSerializer,
     AtualizarFaltasSerializer
 )
 from .ocorrencia import (
@@ -24,7 +23,6 @@ __all__ = [
     'AulaFaltasSerializer',
     'AulaFaltasListSerializer',
     'ContextoAulaSerializer',
-    'EstudanteChamadaSerializer',
     'AtualizarFaltasSerializer',
     'DescritorOcorrenciaPedagogicaSerializer',
     'OcorrenciaPedagogicaSerializer',

@@ -41,7 +41,7 @@ class AnoLetivoSerializer(serializers.ModelSerializer):
             'data_inicio_4bim', 'data_fim_4bim',
             'dias_letivos_extras', 'dias_nao_letivos',
             'dias_letivos_extras_ids', 'dias_nao_letivos_ids',
-            'bimestre_atual'
+            'bimestre_atual', 'controles'
         ]
 
     def get_bimestre_atual(self, obj):

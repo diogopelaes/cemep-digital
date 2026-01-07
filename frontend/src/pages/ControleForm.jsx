@@ -46,8 +46,6 @@ export default function ControleForm({ tipo, controle, onChange }) {
             </div>
 
             {/* Digitação Futura (apenas para AULA) */}
-            {/* Digitação Futura (apenas para AULA) */}
-            {/* Digitação Futura (apenas para AULA) */}
             {(tipo?.value === 'AULA' || controle?.tipo === 'AULA') && (
                 <div className="flex flex-col gap-1 md:w-40">
                     <label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">

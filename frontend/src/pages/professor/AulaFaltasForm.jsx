@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { Card, Button, Loading, Badge, FormActions } from '../../components/ui'
-import { HiCheck, HiX, HiArrowLeft } from 'react-icons/hi'
+import { HiArrowLeft } from 'react-icons/hi'
 import { pedagogicalAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { formatDateBR } from '../../utils/date'
@@ -105,6 +105,11 @@ export default function AulaFaltasForm() {
 
         saveTimeoutRef.current = setTimeout(async () => {
             try {
+                // Calcula aulas_faltas a partir da mask para enviar ao backend
+                // Backend espera { estudante_id, aulas_faltas: [1, 3] } se usar AtualizarFaltasSerializer
+                // Ou podemos enviar faltas_mask se o serializer suportar (FaltaItemSerializer suporta, AtualizarFaltasSerializer suporta)
+                // O AtualizarFaltasSerializer do backend suporta faltas_mask diretamente.
+
                 await pedagogicalAPI.aulasFaltas.atualizarFaltas(aulaId, {
                     estudante_id: estudanteId,
                     faltas_mask: faltasMask
@@ -118,97 +123,32 @@ export default function AulaFaltasForm() {
         }, 800)
     }, [aulaId])
 
-    // Toggle de presença para uma aula específica
-    const togglePresenca = (estudanteId, aulaIndex, currentTotal) => {
-        const estudante = estudantes.find(e => e.id === estudanteId)
-        if (!estudante) return
-
-        // Calcula nova quantidade baseado no toggle
-        // Se estava presente nessa aula (bit não estava setado), agora falta
-        // Usamos uma lógica simples: cada toggle alterna +1 ou -1
-        const currentQtd = estudante.qtd_faltas || 0
-
-        // Verifica se a aula já está marcada como falta
-        // Lógica: se qtd_faltas >= aulaIndex + 1, significa que tem falta nessa aula
-        // Na verdade, vamos simplificar: o botão C significa todas as aulas presentes
-        // O botão F incrementa a falta daquela aula
-
-        // Nova lógica mais simples: cada aula tem seu próprio estado
-        // Armazenamos como bitmask ou contador simples
-        // Por simplicidade, usamos contador linear
-
-        let newQtd = currentQtd
-
-        // Se clicar no botão da aula específica, toggle falta dessa aula
-        // aulaIndex vai de 0 a numeroAulas-1
-        // Se a falta atual é >= aulaIndex+1, significa que tem falta nessa posição
-        // Na verdade, vamos usar uma abordagem mais direta:
-        // qtd_faltas representa quantas aulas o aluno faltou
-        // Se clicar em F em aula 1, adiciona 1 falta
-        // Se clicar em C na mesma aula, remove 1 falta
-
-        // Determinamos se essa aula específica era falta ou presença
-        // Problema: com qtd_faltas = 1, não sabemos QUAL aula foi a falta
-        // Solução: tratamos como toggle sequencial - F adiciona, C remove
-
-        // Simplificação para MVP: C marca todas presente, F marca todas falta
-        // Botões individuais: C/F toggles por aula
-
-        // Para este MVP, vamos usar:
-        // - Cada estudante tem N botões (1 por aula)
-        // - Clicar em F incrementa qtd_faltas (máximo = numeroAulas)
-        // - Clicar em C decrementa qtd_faltas (mínimo = 0)
-
-        // Vamos criar uma abordagem mais intuitiva:
-        // Mostramos uma checkbox ou botão toggle para cada aula
-        // O estado visual reflete se o aluno faltou ou não
-
-        // Por enquanto, usamos um contador simples
-        // Cada clique em F adiciona falta, cada clique em C remove
-
-        autoSaveFalta(estudanteId, newQtd)
-    }
-
-    // Toggle simples: F adiciona, C remove
-    const handleFaltaClick = (estudanteId, action) => {
-        const estudante = estudantes.find(e => e.id === estudanteId)
-        if (!estudante) return
-
-        const currentQtd = estudante.qtd_faltas || 0
-        let newQtd = currentQtd
-
-        if (action === 'add' && currentQtd < numeroAulas) {
-            newQtd = currentQtd + 1
-        } else if (action === 'remove' && currentQtd > 0) {
-            newQtd = currentQtd - 1
-        }
-
-        if (newQtd !== currentQtd) {
-            // Atualiza UI imediatamente
-            setEstudantes(prev => prev.map(e =>
-                e.id === estudanteId ? { ...e, qtd_faltas: newQtd } : e
-            ))
-
-            autoSaveFalta(estudanteId, newQtd)
-        }
-    }
-
     // Inicializa a máscara de faltas quando os estudantes são carregados
     useEffect(() => {
         if (estudantes.length > 0 && numeroAulas > 0) {
-            // Verifica se precisamos inicializar a máscara
-            // Só inicializa se não tiver sido feito ainda ou se qtd_faltas mudou externamente (não via toggle)
             setEstudantes(prev => prev.map(e => {
                 // Se já tem máscara compatível, mantém
                 if (e.faltas_mask && e.faltas_mask.length === numeroAulas) return e
 
-                // Senão, inicializa sequencialmente baseada no qtd_faltas
-                // Ex: qtd=2, n=4 -> [T, T, F, F]
-                const mask = Array.from({ length: numeroAulas }, (_, i) => i < (e.qtd_faltas || 0))
+                // Backwards Compatibility:
+                // Se o backend retornou qtd_faltas (legado) e aulas_faltas (novo),
+                // tenta reconstruir a máscara.
+                // aulas_faltas deve ser [1, 3] (1-based indices)
+
+                let mask;
+                if (e.aulas_faltas && e.aulas_faltas.length > 0) {
+                    mask = Array.from({ length: numeroAulas }, (_, i) => e.aulas_faltas.includes(i + 1))
+                } else if ((e.qtd_faltas || 0) > 0) {
+                    // Fallback legado: sequencial
+                    mask = Array.from({ length: numeroAulas }, (_, i) => i < e.qtd_faltas)
+                } else {
+                    mask = Array(numeroAulas).fill(false)
+                }
+
                 return { ...e, faltas_mask: mask }
             }))
         }
-    }, [numeroAulas, estudantes.length]) // Dependências simplificadas para evitar loop infinito
+    }, [numeroAulas, estudantes.length])
 
     // Toggle individual de cada aula (COMPORTAMENTO INDEPENDENTE)
     const toggleAulaFalta = (estudanteId, aulaIndex) => { // aulaIndex é 0-based
@@ -216,7 +156,7 @@ export default function AulaFaltasForm() {
             if (e.id !== estudanteId) return e
 
             // Clona a máscara ou cria nova se não existir
-            const currentMask = e.faltas_mask ? [...e.faltas_mask] : Array.from({ length: numeroAulas }, (_, i) => i < (e.qtd_faltas || 0))
+            const currentMask = e.faltas_mask ? [...e.faltas_mask] : Array(numeroAulas).fill(false)
 
             // Toggle do valor específico
             currentMask[aulaIndex] = !currentMask[aulaIndex]
@@ -245,16 +185,12 @@ export default function AulaFaltasForm() {
         try {
             // Prepara dados das faltas
             const faltasData = estudantes
-                .filter(e => e.qtd_faltas > 0)
+                .filter(e => e.qtd_faltas > 0) // Envia apenas quem tem alguma falta
                 .map(e => {
-                    // Se tiver máscara, manda ela. Se não tiver (carregado do banco sequencialmente),
-                    // cria uma sequencial básica.
-                    const mask = e.faltas_mask || Array.from({ length: numeroAulas }, (_, i) => i < e.qtd_faltas)
-
+                    const mask = e.faltas_mask || Array(numeroAulas).fill(false)
                     return {
                         estudante_id: e.id,
                         faltas_mask: mask
-                        // O backend calculará qtd_faltas
                     }
                 })
 
@@ -404,10 +340,10 @@ export default function AulaFaltasForm() {
 
                             <div className="flex items-center gap-2 ml-2">
                                 {Array.from({ length: numeroAulas }, (_, aulaIdx) => {
-                                    // Usa a máscara se disponível, senão fallback para lógica sequencial antiga
+                                    // Usa a máscara se disponível, senão fallback (apenas segurança)
                                     const isFalta = estudante.faltas_mask
                                         ? estudante.faltas_mask[aulaIdx]
-                                        : (estudante.qtd_faltas || 0) > aulaIdx
+                                        : false
 
                                     return (
                                         <button

@@ -50,7 +50,7 @@ export default function AulaFaltas() {
             const [aulasRes, selecRes, contextoRes] = await Promise.all([
                 pedagogicalAPI.aulasFaltas.list({ page_size: 1000 }),
                 coreAPI.anoLetivoSelecionado.get(),
-                pedagogicalAPI.aulasFaltas.contextoFormulario()
+                pedagogicalAPI.aulasFaltas.opcoesNovaAula({ scope: 'simple' })
             ])
 
             setAulas(aulasRes.data.results || [])

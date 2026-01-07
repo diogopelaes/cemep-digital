@@ -82,29 +82,14 @@ class IsOwnerOrGestao(BasePermission):
         return obj == request.user
 
 
-class IsOwnerProfessorOrGestao(BasePermission):
+class IsOwnerProfessorStrict(BasePermission):
     """
-    REGRA: O professor dono da aula OU alguém do perfil GESTAO.
-    Para Aula: verifica obj.professor_disciplina_turma.professor.usuario
-    """
-    def has_object_permission(self, request, view, obj):
-        if request.user.tipo_usuario == 'GESTAO':
-            return True
-        if hasattr(obj, 'professor_disciplina_turma'):
-            pdt = obj.professor_disciplina_turma
-            if hasattr(pdt, 'professor') and hasattr(pdt.professor, 'usuario'):
-                return pdt.professor.usuario == request.user
-        return False
-
-
-class IsOwnerProfessor(BasePermission):
-    """
-    Permissão para recursos de Professor com verificação de ownership.
+    Permissão RESTRITA para recursos de Professor (Aula, Faltas).
     
     Regras:
     - Create: Apenas PROFESSOR
-    - Read: Qualquer funcionário
-    - Update/Delete: Apenas o professor dono (ownership)
+    - Read (list/retrieve): Qualquer funcionário (GESTAO, SECRETARIA, PROFESSOR, MONITOR)
+    - Update/Delete: APENAS o professor proprietário — nem GESTAO pode alterar
     
     Para objetos com 'professor_disciplina_turma' (Aula):
         Verifica obj.professor_disciplina_turma.professor.usuario
@@ -113,7 +98,7 @@ class IsOwnerProfessor(BasePermission):
         if not request.user.is_authenticated:
             return False
         
-        # Create: só professor
+        # Create: apenas PROFESSOR
         if view.action == 'create':
             return request.user.tipo_usuario == 'PROFESSOR'
         
@@ -121,15 +106,15 @@ class IsOwnerProfessor(BasePermission):
         if view.action in ['list', 'retrieve'] or request.method == 'GET':
             return request.user.tipo_usuario in ['GESTAO', 'SECRETARIA', 'PROFESSOR', 'MONITOR']
         
-        # Update/Delete: só professor (verificação de ownership em has_object_permission)
+        # Update/Delete: somente professor (verificação de ownership em has_object_permission)
         return request.user.tipo_usuario == 'PROFESSOR'
     
     def has_object_permission(self, request, view, obj):
-        # Read: qualquer funcionário
-        if view.action == 'retrieve':
+        # Read: qualquer funcionário pode ler
+        if view.action == 'retrieve' or request.method == 'GET':
             return True
         
-        # Update/Delete: verifica ownership
+        # Update/Delete: verifica ownership estrita (sem exceção para GESTAO)
         if hasattr(obj, 'professor_disciplina_turma'):
             pdt = obj.professor_disciplina_turma
             if hasattr(pdt, 'professor') and hasattr(pdt.professor, 'usuario'):

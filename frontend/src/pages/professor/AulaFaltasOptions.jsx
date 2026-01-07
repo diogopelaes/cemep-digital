@@ -52,7 +52,7 @@ export default function AulaFaltasOptions() {
     const loadContexto = async () => {
         setLoading(true)
         try {
-            const res = await pedagogicalAPI.aulasFaltas.contextoFormulario()
+            const res = await pedagogicalAPI.aulasFaltas.opcoesNovaAula()
             setTurmas(res.data.turmas || [])
             setDisciplinasPorTurma(res.data.disciplinas_por_turma || {})
 
