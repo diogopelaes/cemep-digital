@@ -53,12 +53,14 @@ const isValidDate = (brDate) => {
 }
 
 /**
- * DateInput com validação de registro de aula baseado no ano letivo.
- * Valida localmente usando as restrições passadas via props.
+ * DateInput com validação de registro de aula.
+ * Recebe lista de datas permitidas pré-calculada pelo backend.
  * 
  * Props:
- * - restricoesData: objeto retornado pelo backend com { ano, bimestres, hoje_liberados, data_atual }
- * - onValidationChange: callback (isValid, message, bimestre) => void
+ * - datasLiberadas: array de strings ISO ['YYYY-MM-DD', ...] - datas liberadas para registro
+ * - dataAtual: string ISO da data atual do servidor
+ * - mensagemRestricao: mensagem de erro se nenhuma data disponível
+ * - onValidationChange: callback (isValid, message) => void
  */
 const DateInputAnoLetivo = forwardRef(({
     label,
@@ -66,7 +68,9 @@ const DateInputAnoLetivo = forwardRef(({
     className = '',
     value = '',
     onChange,
-    restricoesData = null, // { ano, bimestres, hoje_liberados, data_atual }
+    datasLiberadas = [],     // ['2026-01-07', '2026-01-08', ...]
+    dataAtual = null,         // '2026-01-07'
+    mensagemRestricao = null, // 'Nenhum bimestre liberado...'
     onValidationChange,
     ...props
 }, ref) => {
@@ -75,143 +79,69 @@ const DateInputAnoLetivo = forwardRef(({
     const hiddenInputRef = useRef(null)
     const containerRef = useRef(null)
 
+    // Converte para Set para performance (O(1) lookup)
+    const datasLiberadasSet = useMemo(() => new Set(datasLiberadas), [datasLiberadas])
+
+    // Calcula min/max para o date picker nativo
+    const { minDate, maxDate } = useMemo(() => {
+        if (!datasLiberadas.length) {
+            const ano = new Date().getFullYear()
+            return { minDate: `${ano}-01-01`, maxDate: `${ano}-12-31` }
+        }
+        return {
+            minDate: datasLiberadas[0],
+            maxDate: datasLiberadas[datasLiberadas.length - 1]
+        }
+    }, [datasLiberadas])
+
     // Sincroniza valor externo com display
     useEffect(() => {
         setDisplayValue(formatToBrazilian(value))
     }, [value])
 
-    // Calcula min/max baseado nos bimestres liberados
-    const { minDate, maxDate } = useMemo(() => {
-        if (!restricoesData?.bimestres?.length) {
-            // Fallback: ano inteiro
-            const ano = restricoesData?.ano || new Date().getFullYear()
-            return { minDate: `${ano}-01-01`, maxDate: `${ano}-12-31` }
-        }
-
-        // Encontra o menor início e maior fim entre bimestres liberados
-        const bimestresLiberados = restricoesData.bimestres.filter(b => b.liberado_hoje)
-
-        if (bimestresLiberados.length === 0) {
-            // Nenhum bimestre liberado, usa ano inteiro mas vai mostrar erro
-            const ano = restricoesData.ano
-            return { minDate: `${ano}-01-01`, maxDate: `${ano}-12-31` }
-        }
-
-        let min = null
-        let max = null
-
-        bimestresLiberados.forEach(bim => {
-            if (bim.aula_inicio && (!min || bim.aula_inicio < min)) {
-                min = bim.aula_inicio
-            }
-            if (bim.aula_fim && (!max || bim.aula_fim > max)) {
-                max = bim.aula_fim
-            }
-        })
-
-        return { minDate: min, maxDate: max }
-    }, [restricoesData])
-
-    // Valida a data localmente
+    // Valida a data - lógica SIMPLES: está na lista ou não
     const validateDate = (isoDate) => {
-        if (!isoDate || !restricoesData) {
+        if (!isoDate) {
             setValidationResult(null)
-            onValidationChange?.(false, null, null)
+            onValidationChange?.(false, null)
             return
         }
 
-        const dataRegistro = new Date(isoDate)
-        const ano = dataRegistro.getFullYear()
-
-        // Verifica se é do ano letivo
-        if (ano !== restricoesData.ano) {
-            const result = {
-                liberado: false,
-                bimestre: null,
-                mensagem: `A data deve ser do ano letivo ${restricoesData.ano}.`
-            }
+        // Se tem mensagem de restrição geral, mostra ela
+        if (mensagemRestricao && !datasLiberadas.length) {
+            const result = { liberado: false, mensagem: mensagemRestricao }
             setValidationResult(result)
-            onValidationChange?.(false, result.mensagem, null)
+            onValidationChange?.(false, result.mensagem)
             return
         }
 
-        // Encontra o bimestre da data
-        const bimestreInfo = restricoesData.bimestres.find(bim => {
-            if (!bim.aula_inicio || !bim.aula_fim) return false
-            return isoDate >= bim.aula_inicio && isoDate <= bim.aula_fim
-        })
-
-        if (!bimestreInfo) {
-            const result = {
-                liberado: false,
-                bimestre: null,
-                mensagem: 'A data está fora do período letivo.'
-            }
+        // Verifica se está na lista de datas liberadas
+        if (datasLiberadasSet.has(isoDate)) {
+            const result = { liberado: true, mensagem: 'Data liberada para registro' }
             setValidationResult(result)
-            onValidationChange?.(false, result.mensagem, null)
-            return
-        }
+            onValidationChange?.(true, result.mensagem)
+        } else {
+            // Tenta dar uma mensagem mais específica
+            let msg = 'Data não disponível para registro'
 
-        // Verifica se o bimestre está liberado para registro hoje
-        if (!bimestreInfo.liberado_hoje) {
-            let msg = `O período de registro do ${bimestreInfo.bimestre}º bimestre`
-            if (bimestreInfo.status === 'Aguardando início') {
-                msg += ' ainda não iniciou.'
-                if (bimestreInfo.registro_inicio) {
-                    const dataInicio = new Date(bimestreInfo.registro_inicio)
-                    msg += ` Início: ${dataInicio.toLocaleDateString('pt-BR')}.`
-                }
-            } else if (bimestreInfo.status === 'Encerrado') {
-                msg += ' já encerrou.'
-                if (bimestreInfo.registro_fim) {
-                    const dataFim = new Date(bimestreInfo.registro_fim)
-                    msg += ` Encerrou em: ${dataFim.toLocaleDateString('pt-BR')}.`
-                }
-            } else {
-                msg += ' está bloqueado.'
-            }
+            // Verifica se é fim de semana
+            const date = new Date(isoDate + 'T12:00:00')
+            const diaSemana = date.getDay()
+            if (diaSemana === 0) msg = 'Domingo - não há aula'
+            else if (diaSemana === 6) msg = 'Sábado - não há aula'
 
-            const result = {
-                liberado: false,
-                bimestre: bimestreInfo.bimestre,
-                mensagem: msg
-            }
+            const result = { liberado: false, mensagem: msg }
             setValidationResult(result)
-            onValidationChange?.(false, result.mensagem, bimestreInfo.bimestre)
-            return
+            onValidationChange?.(false, result.mensagem)
         }
-
-        // Verifica digitacao_futura
-        const hoje = restricoesData.data_atual ? new Date(restricoesData.data_atual) : new Date()
-        const hojeStr = hoje.toISOString().split('T')[0]
-
-        if (isoDate > hojeStr && !bimestreInfo.digitacao_futura) {
-            const result = {
-                liberado: false,
-                bimestre: bimestreInfo.bimestre,
-                mensagem: 'Não é permitido registrar aulas para datas futuras neste bimestre.'
-            }
-            setValidationResult(result)
-            onValidationChange?.(false, result.mensagem, bimestreInfo.bimestre)
-            return
-        }
-
-        // Liberado!
-        const result = {
-            liberado: true,
-            bimestre: bimestreInfo.bimestre,
-            mensagem: `Registro liberado para o ${bimestreInfo.bimestre}º bimestre.`
-        }
-        setValidationResult(result)
-        onValidationChange?.(true, result.mensagem, bimestreInfo.bimestre)
     }
 
-    // Revalida quando o valor ou restrições mudam
+    // Revalida quando o valor ou datas permitidas mudam
     useEffect(() => {
         if (value) {
             validateDate(value)
         }
-    }, [value, restricoesData]) // eslint-disable-line react-hooks/exhaustive-deps
+    }, [value, datasLiberadasSet]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleTextChange = (e) => {
         const masked = applyDateMask(e.target.value)
@@ -298,8 +228,8 @@ const DateInputAnoLetivo = forwardRef(({
             {/* Feedback de validação */}
             {validationResult && (
                 <div className={`mt-1 flex items-center gap-1.5 text-sm ${validationResult.liberado
-                        ? 'text-success-600 dark:text-success-400'
-                        : 'text-danger-600 dark:text-danger-400'
+                    ? 'text-success-600 dark:text-success-400'
+                    : 'text-danger-600 dark:text-danger-400'
                     }`}>
                     {validationResult.liberado ? (
                         <HiCheckCircle className="w-4 h-4 flex-shrink-0" />

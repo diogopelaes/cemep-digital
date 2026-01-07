@@ -30,6 +30,38 @@
 
 ---
 
+## 🔒 SEGURANÇA E PERMISSÕES (CRÍTICO!)
+
+> [!CAUTION]
+> **TODA lógica de controle de acesso DEVE estar centralizada em:**
+> ```
+> backend/apps/users/permissions.py
+> ```
+> 
+> **NUNCA** implemente verificações de permissão em outros lugares.
+> **NUNCA** dê acesso a perfis que não foram explicitamente solicitados.
+> **SEMPRE** use as classes de permissão existentes ou crie novas neste arquivo.
+
+### Regras Obrigatórias:
+
+1. **Não inventar permissões** - Use apenas as classes definidas em `permissions.py`
+2. **Não dar acesso a GESTAO automaticamente** - Só se for explicitamente pedido
+3. **Verificar ownership** - Para recursos de professor, use classes como `IsOwnerProfessor`
+4. **Herdar de mixins** - Use os mixins existentes ao invés de reescrever `get_permissions()`
+
+### Classes Disponíveis:
+
+| Classe | Regra |
+|--------|-------|
+| `IsGestao` | Apenas GESTAO |
+| `IsGestaoOrSecretaria` | GESTAO ou SECRETARIA |
+| `IsFuncionario` | Qualquer funcionário |
+| `IsProfessor` | PROFESSOR ou GESTAO |
+| `IsOwnerProfessor` | Create=Professor, Read=Funcionário, Update/Delete=Owner |
+| `IsOwnerOrGestao` | Dono do recurso ou GESTAO |
+
+---
+
 ## 🎯 Visão Geral do Projeto
 
 **Sistema:** CEMEP Digital - Sistema de Gestão Escolar

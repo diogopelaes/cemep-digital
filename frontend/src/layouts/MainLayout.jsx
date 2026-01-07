@@ -102,18 +102,14 @@ export default function MainLayout() {
               />
               <div>
                 <h1 className="font-bold text-xl text-slate-800 dark:text-white">{INSTITUTION_FANTASY}</h1>
-                <div className="flex items-center gap-1.5 mt-1">
-                  {user?.ano_letivo_selecionado && (
+                {user?.ano_letivo_selecionado && (
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Digital</span>
                     <span className="px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400 text-[10px] font-bold border border-primary-500/20">
                       {user.ano_letivo_selecionado}
                     </span>
-                  )}
-                  {user?.bimestre_atual > 0 && (
-                    <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-500/20 animate-pulse-subtle">
-                      {user.bimestre_atual}º Bimestre
-                    </span>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

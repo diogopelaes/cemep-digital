@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Input, Select, Loading, Badge, PopConfirm, Switch } from '../components/ui'
-import { HiSave, HiPlus, HiTrash, HiAcademicCap } from 'react-icons/hi'
+import { Card, Button, Input, Select, Loading, Badge, PopConfirm, Switch, FormActions } from '../components/ui'
+import { HiPlus, HiTrash, HiAcademicCap } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import { AREAS_CONHECIMENTO } from '../data'
 import toast from 'react-hot-toast'
@@ -202,14 +202,12 @@ export default function DisciplinaForm() {
           </div>
 
           {/* Botões */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
-            <Button type="button" variant="secondary" onClick={() => navigate('/disciplinas')}>
-              Cancelar
-            </Button>
-            <Button type="submit" icon={HiSave} loading={saving}>
-              {isEditing ? 'Salvar Alterações' : 'Criar Disciplina'}
-            </Button>
-          </div>
+          <FormActions
+            cancelTo="/disciplinas"
+            saving={saving}
+            isEditing={isEditing}
+            entityName="Disciplina"
+          />
         </form>
       </Card>
 

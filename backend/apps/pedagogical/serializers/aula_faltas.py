@@ -10,7 +10,21 @@ from apps.core.models import ProfessorDisciplinaTurma, Turma, Disciplina
 class FaltaItemSerializer(serializers.Serializer):
     """Serializer para um item de falta (usado em lote)."""
     estudante_id = serializers.UUIDField()
-    qtd_faltas = serializers.IntegerField(min_value=0, max_value=6)
+    faltas_mask = serializers.ListField(
+        child=serializers.BooleanField(),
+        required=False,
+        default=list
+    )
+    qtd_faltas = serializers.IntegerField(required=False, min_value=0)
+
+    def validate(self, attrs):
+        # Se faltas_mask for fornecido, calcula qtd_faltas
+        if 'faltas_mask' in attrs:
+            attrs['qtd_faltas'] = sum(1 for f in attrs['faltas_mask'] if f)
+        elif 'qtd_faltas' not in attrs:
+            attrs['qtd_faltas'] = 0
+            
+        return attrs
 
 
 class AulaFaltasSerializer(serializers.ModelSerializer):
@@ -126,18 +140,20 @@ class AulaFaltasSerializer(serializers.ModelSerializer):
         
         with transaction.atomic():
             # Coletar IDs de estudantes com faltas
-            estudantes_com_faltas = {item['estudante_id'] for item in faltas_data if item['qtd_faltas'] > 0}
+            # Aqui já temos qtd_faltas calculada pelo validate do Serializer
+            estudantes_com_faltas = {item['estudante_id'] for item in faltas_data if item.get('qtd_faltas', 0) > 0}
             
             # Remover faltas de estudantes que agora têm 0 faltas
             Faltas.objects.filter(aula=aula).exclude(estudante_id__in=estudantes_com_faltas).delete()
             
             # Criar ou atualizar faltas
             for item in faltas_data:
-                if item['qtd_faltas'] > 0:
+                qtd = item.get('qtd_faltas', 0)
+                if qtd > 0:
                     Faltas.objects.update_or_create(
                         aula=aula,
                         estudante_id=item['estudante_id'],
-                        defaults={'qtd_faltas': item['qtd_faltas']}
+                        defaults={'qtd_faltas': qtd}
                     )
 
 
@@ -236,4 +252,20 @@ class AtualizarFaltasSerializer(serializers.Serializer):
     """Serializer para atualização rápida de faltas (auto-save)."""
     
     estudante_id = serializers.UUIDField()
-    qtd_faltas = serializers.IntegerField(min_value=0, max_value=4)
+    faltas_mask = serializers.ListField(
+        child=serializers.BooleanField(),
+        required=False,
+        default=list
+    )
+    qtd_faltas = serializers.IntegerField(required=False, min_value=0)
+
+    def validate(self, attrs):
+        # Calcula qtd_faltas baseado na máscara, se fornecida
+        if 'faltas_mask' in attrs:
+            attrs['qtd_faltas'] = sum(1 for f in attrs['faltas_mask'] if f)
+        elif 'qtd_faltas' not in attrs:
+            # Se não mandar nada, falha? Ou assume 0?
+            # Melhor exigir um dos dois. Mas como estamos migrando, vamos deixar opcional e validar.
+            raise serializers.ValidationError("É necessário fornecer 'faltas_mask' ou 'qtd_faltas'.")
+            
+        return attrs

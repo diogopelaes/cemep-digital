@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
-import { Card, Button, Loading, Badge } from '../../components/ui'
-import { HiSave, HiCheck, HiX, HiArrowLeft } from 'react-icons/hi'
+import { Card, Button, Loading, Badge, FormActions } from '../../components/ui'
+import { HiCheck, HiX, HiArrowLeft } from 'react-icons/hi'
 import { pedagogicalAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { formatDateBR } from '../../utils/date'
@@ -87,17 +87,14 @@ export default function AulaFaltasForm() {
     }
 
     // Auto-save para faltas com debounce
-    const autoSaveFalta = useCallback((estudanteId, qtdFaltas) => {
+    const autoSaveFalta = useCallback((estudanteId, faltasMask) => {
         if (!aulaId) {
-            // Aula ainda não foi criada, armazena para depois
-            pendingUpdatesRef.current[estudanteId] = qtdFaltas
+            // Nota: Se a aula não existe, a gente teria que salvar a mask em pending,
+            // mas o create original ainda espera qtd_faltas ou faltas_data array.
+            // Vamos ajustar o create também.
+            pendingUpdatesRef.current[estudanteId] = faltasMask
             return
         }
-
-        // Atualiza UI imediatamente
-        setEstudantes(prev => prev.map(e =>
-            e.id === estudanteId ? { ...e, qtd_faltas: qtdFaltas } : e
-        ))
 
         setSyncStatus('saving')
 
@@ -110,7 +107,7 @@ export default function AulaFaltasForm() {
             try {
                 await pedagogicalAPI.aulasFaltas.atualizarFaltas(aulaId, {
                     estudante_id: estudanteId,
-                    qtd_faltas: qtdFaltas
+                    faltas_mask: faltasMask
                 })
                 setSyncStatus('saved')
             } catch (error) {
@@ -196,30 +193,46 @@ export default function AulaFaltasForm() {
         }
     }
 
-    // Toggle individual de cada aula
-    const toggleAulaFalta = (estudanteId, aulaNum) => {
-        const estudante = estudantes.find(e => e.id === estudanteId)
-        if (!estudante) return
+    // Inicializa a máscara de faltas quando os estudantes são carregados
+    useEffect(() => {
+        if (estudantes.length > 0 && numeroAulas > 0) {
+            // Verifica se precisamos inicializar a máscara
+            // Só inicializa se não tiver sido feito ainda ou se qtd_faltas mudou externamente (não via toggle)
+            setEstudantes(prev => prev.map(e => {
+                // Se já tem máscara compatível, mantém
+                if (e.faltas_mask && e.faltas_mask.length === numeroAulas) return e
 
-        const currentQtd = estudante.qtd_faltas || 0
-        let newQtd
-
-        // Se a aula aulaNum já está com falta (qtd >= aulaNum), remove
-        // Senão, adiciona falta até chegar nessa aula
-        if (currentQtd >= aulaNum) {
-            // Já tem falta nessa posição ou mais, remove até antes dessa aula
-            newQtd = aulaNum - 1
-        } else {
-            // Não tem falta nessa posição, marca falta até essa aula
-            newQtd = aulaNum
+                // Senão, inicializa sequencialmente baseada no qtd_faltas
+                // Ex: qtd=2, n=4 -> [T, T, F, F]
+                const mask = Array.from({ length: numeroAulas }, (_, i) => i < (e.qtd_faltas || 0))
+                return { ...e, faltas_mask: mask }
+            }))
         }
+    }, [numeroAulas, estudantes.length]) // Dependências simplificadas para evitar loop infinito
 
-        // Atualiza UI imediatamente
-        setEstudantes(prev => prev.map(e =>
-            e.id === estudanteId ? { ...e, qtd_faltas: newQtd } : e
-        ))
+    // Toggle individual de cada aula (COMPORTAMENTO INDEPENDENTE)
+    const toggleAulaFalta = (estudanteId, aulaIndex) => { // aulaIndex é 0-based
+        setEstudantes(prev => prev.map(e => {
+            if (e.id !== estudanteId) return e
 
-        autoSaveFalta(estudanteId, newQtd)
+            // Clona a máscara ou cria nova se não existir
+            const currentMask = e.faltas_mask ? [...e.faltas_mask] : Array.from({ length: numeroAulas }, (_, i) => i < (e.qtd_faltas || 0))
+
+            // Toggle do valor específico
+            currentMask[aulaIndex] = !currentMask[aulaIndex]
+
+            // Recalcula total de faltas (apenas para exibição na UI se necessário)
+            const newQtd = currentMask.filter(Boolean).length
+
+            // Agenda auto-save enviando a máscara
+            autoSaveFalta(estudanteId, currentMask)
+
+            return {
+                ...e,
+                faltas_mask: currentMask,
+                qtd_faltas: newQtd
+            }
+        }))
     }
 
     const handleSave = async () => {
@@ -233,10 +246,17 @@ export default function AulaFaltasForm() {
             // Prepara dados das faltas
             const faltasData = estudantes
                 .filter(e => e.qtd_faltas > 0)
-                .map(e => ({
-                    estudante_id: e.id,
-                    qtd_faltas: e.qtd_faltas
-                }))
+                .map(e => {
+                    // Se tiver máscara, manda ela. Se não tiver (carregado do banco sequencialmente),
+                    // cria uma sequencial básica.
+                    const mask = e.faltas_mask || Array.from({ length: numeroAulas }, (_, i) => i < e.qtd_faltas)
+
+                    return {
+                        estudante_id: e.id,
+                        faltas_mask: mask
+                        // O backend calculará qtd_faltas
+                    }
+                })
 
             if (isEditing) {
                 // Atualiza aula existente
@@ -351,12 +371,16 @@ export default function AulaFaltasForm() {
 
                 {/* Legenda */}
                 <div className="flex items-center gap-4 mb-4 text-xs text-slate-500">
-                    <span className="flex items-center gap-1">
-                        <span className="w-6 h-6 rounded-lg bg-success-500 text-white flex items-center justify-center font-bold">C</span>
+                    <span className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-lg bg-success-500/10 border border-success-200 text-success-600 flex items-center justify-center font-bold">
+                            C
+                        </span>
                         Compareceu
                     </span>
-                    <span className="flex items-center gap-1">
-                        <span className="w-6 h-6 rounded-lg bg-danger-500 text-white flex items-center justify-center font-bold">F</span>
+                    <span className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-lg bg-danger-500/10 border border-danger-200 text-danger-600 flex items-center justify-center font-bold">
+                            F
+                        </span>
                         Faltou
                     </span>
                 </div>
@@ -378,26 +402,28 @@ export default function AulaFaltasForm() {
                                 <StatusBadge status={estudante.status} />
                             </div>
 
-                            {/* Botões de presença por aula */}
-                            <div className="flex items-center gap-1 ml-2">
+                            <div className="flex items-center gap-2 ml-2">
                                 {Array.from({ length: numeroAulas }, (_, aulaIdx) => {
-                                    const aulaNum = aulaIdx + 1
-                                    const isFalta = estudante.qtd_faltas >= aulaNum
+                                    // Usa a máscara se disponível, senão fallback para lógica sequencial antiga
+                                    const isFalta = estudante.faltas_mask
+                                        ? estudante.faltas_mask[aulaIdx]
+                                        : (estudante.qtd_faltas || 0) > aulaIdx
 
                                     return (
                                         <button
                                             key={aulaIdx}
-                                            onClick={() => toggleAulaFalta(estudante.id, aulaNum)}
+                                            onClick={() => toggleAulaFalta(estudante.id, aulaIdx)}
                                             className={`
-                                                w-10 h-10 rounded-xl font-bold text-sm
-                                                transition-all duration-200 transform active:scale-95
+                                                w-9 h-9 rounded-lg text-sm font-bold
+                                                transition-all duration-200
                                                 flex items-center justify-center
+                                                border
                                                 ${isFalta
-                                                    ? 'bg-danger-500 text-white shadow-lg shadow-danger-500/30 hover:bg-danger-600'
-                                                    : 'bg-success-500 text-white shadow-lg shadow-success-500/30 hover:bg-success-600'
+                                                    ? 'bg-danger-500/10 text-danger-600 border-danger-200 hover:bg-danger-500/20 dark:bg-danger-500/20 dark:text-danger-400 dark:border-danger-800'
+                                                    : 'bg-success-500/10 text-success-600 border-success-200 hover:bg-success-500/20 dark:bg-success-500/20 dark:text-success-400 dark:border-success-800'
                                                 }
                                             `}
-                                            title={`Aula ${aulaNum}: ${isFalta ? 'Falta - clique para marcar presença' : 'Presente - clique para marcar falta'}`}
+                                            title={`Aula ${aulaIdx + 1}: ${isFalta ? 'Falta - clique para marcar presença' : 'Presente - clique para marcar falta'}`}
                                         >
                                             {isFalta ? 'F' : 'C'}
                                         </button>
@@ -407,25 +433,15 @@ export default function AulaFaltasForm() {
                         </div>
                     ))}
                 </div>
-            </Card>
+            </Card >
 
             {/* Botões de Ação */}
-            <div className="flex justify-between pt-4">
-                <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => navigate('/aula-faltas')}
-                >
-                    Cancelar
-                </Button>
-                <Button
-                    onClick={handleSave}
-                    disabled={saving}
-                    icon={HiSave}
-                >
-                    {saving ? <Loading size="sm" /> : 'Salvar Aula'}
-                </Button>
-            </div>
-        </div>
+            < FormActions
+                cancelTo="/aula-faltas"
+                saving={saving}
+                saveLabel="Salvar Aula"
+                onSave={handleSave}
+            />
+        </div >
     )
 }

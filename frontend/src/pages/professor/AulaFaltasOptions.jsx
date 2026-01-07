@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Card, Button, Loading, DateInputAnoLetivo } from '../../components/ui'
+import { Card, Button, Loading, DateInputAnoLetivo, FormActions } from '../../components/ui'
 import { HiArrowRight } from 'react-icons/hi'
 import { pedagogicalAPI } from '../../services/api'
 import toast from 'react-hot-toast'
@@ -12,7 +12,11 @@ export default function AulaFaltasOptions() {
 
     const [turmas, setTurmas] = useState([])
     const [disciplinasPorTurma, setDisciplinasPorTurma] = useState({})
-    const [restricoesData, setRestricoesData] = useState(null)
+
+    // Datas liberadas pré-calculadas pelo backend
+    const [datasLiberadas, setDatasLiberadas] = useState([])
+    const [dataAtual, setDataAtual] = useState(null)
+    const [mensagemRestricao, setMensagemRestricao] = useState(null)
 
     const [turmaSelecionada, setTurmaSelecionada] = useState('')
     const [disciplinaSelecionada, setDisciplinaSelecionada] = useState('')
@@ -51,17 +55,20 @@ export default function AulaFaltasOptions() {
             const res = await pedagogicalAPI.aulasFaltas.contextoFormulario()
             setTurmas(res.data.turmas || [])
             setDisciplinasPorTurma(res.data.disciplinas_por_turma || {})
-            setRestricoesData(res.data.restricoes_data || null)
+
+            // Datas liberadas (lista simples pré-calculada)
+            setDatasLiberadas(res.data.datas_liberadas || [])
+            setDataAtual(res.data.data_atual)
+            setMensagemRestricao(res.data.mensagem_restricao)
 
             // Se só tem uma turma, seleciona automaticamente
             if (res.data.turmas?.length === 1) {
                 setTurmaSelecionada(res.data.turmas[0].id)
             }
 
-            // Define data inicial como hoje se estiver liberado
-            const restricoes = res.data.restricoes_data
-            if (restricoes?.data_atual) {
-                setData(restricoes.data_atual)
+            // Define data inicial como hoje se estiver na lista de liberadas
+            if (res.data.data_atual && res.data.datas_liberadas?.includes(res.data.data_atual)) {
+                setData(res.data.data_atual)
             }
         } catch (error) {
             console.error(error)
@@ -70,7 +77,7 @@ export default function AulaFaltasOptions() {
         setLoading(false)
     }
 
-    const handleValidationChange = (isValid, message, bimestre) => {
+    const handleValidationChange = (isValid, message) => {
         setDataValida(isValid)
     }
 
@@ -183,7 +190,9 @@ export default function AulaFaltasOptions() {
                             label="Data"
                             value={data}
                             onChange={(e) => setData(e.target.value)}
-                            restricoesData={restricoesData}
+                            datasLiberadas={datasLiberadas}
+                            dataAtual={dataAtual}
+                            mensagemRestricao={mensagemRestricao}
                             onValidationChange={handleValidationChange}
                         />
 
@@ -223,22 +232,14 @@ export default function AulaFaltasOptions() {
                     )}
 
                     {/* Botões */}
-                    <div className="flex justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() => navigate('/aula-faltas')}
-                        >
-                            Cancelar
-                        </Button>
-                        <Button
-                            onClick={handleContinuar}
-                            disabled={submitting || !turmaSelecionada || !dataValida}
-                            icon={HiArrowRight}
-                        >
-                            {submitting ? <Loading size="sm" /> : 'Continuar'}
-                        </Button>
-                    </div>
+                    <FormActions
+                        isEditing={false}
+                        saveLabel={submitting ? <Loading size="sm" /> : 'Continuar'}
+                        onSave={handleContinuar}
+                        onCancel={() => navigate('/aula-faltas')}
+                        disabled={submitting || !turmaSelecionada || !dataValida}
+                        className="pb-0"
+                    />
                 </div>
             </Card>
         </div>

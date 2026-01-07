@@ -21,4 +21,5 @@ export { default as Switch } from './Switch'
 export { default as ToggleSwitch } from '../common/ToggleSwitch'
 export { default as TurmaSelector } from './TurmaSelector'
 export { default as Toaster } from './Toaster'
+export { default as FormActions } from './FormActions'
 

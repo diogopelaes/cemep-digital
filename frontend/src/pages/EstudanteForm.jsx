@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Input, DateInput, Loading } from '../components/ui'
-import { HiSave } from 'react-icons/hi'
+import { Card, Input, DateInput, Loading, FormActions } from '../components/ui'
 
 // Hook e formatters
 import { useEstudanteForm } from '../hooks'
@@ -195,14 +194,12 @@ export default function EstudanteForm() {
                     )}
 
                     {/* Botões */}
-                    <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
-                        <Button type="button" variant="secondary" onClick={() => navigate('/estudantes')}>
-                            Cancelar
-                        </Button>
-                        <Button type="submit" icon={HiSave} loading={form.saving}>
-                            {form.isEditing ? 'Salvar Alterações' : 'Cadastrar Estudante'}
-                        </Button>
-                    </div>
+                    <FormActions
+                        cancelTo="/estudantes"
+                        saving={form.saving}
+                        isEditing={form.isEditing}
+                        entityName="Estudante"
+                    />
                 </form>
             </Card>
         </div>

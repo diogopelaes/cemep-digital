@@ -19,26 +19,22 @@ from apps.pedagogical.serializers.aula_faltas import (
 )
 from apps.academic.models import MatriculaTurma
 from apps.core.models import ProfessorDisciplinaTurma, Funcionario, AnoLetivo, ControleRegistrosVisualizacao
-from apps.core.utils import get_restricoes_controle, verificar_data_registro_aula
-from apps.users.permissions import (
-    IsProfessor, IsFuncionario, IsOwnerProfessorOrGestao, AnoLetivoFilterMixin
-)
+from apps.users.permissions import IsOwnerProfessor, AnoLetivoFilterMixin
 
 
 class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
     """
     ViewSet unificado para Aulas e Faltas.
     
-    Permissões:
-    - Create: Professor/Gestão
-    - Read: Todos funcionários  
-    - Update/Delete: Apenas owner (professor que criou) ou Gestão
+    Permissões (via IsOwnerProfessor):
+    - Create: PROFESSOR ou GESTAO
+    - Read: Qualquer funcionário
+    - Update/Delete: Owner (professor que criou) ou GESTAO
     
     Filtros:
     - turma: ID da turma
     - disciplina: ID da disciplina
     - data: Data da aula
-    - bimestre: 1, 2, 3 ou 4
     """
     
     queryset = Aula.objects.select_related(
@@ -48,6 +44,7 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
     ).prefetch_related('faltas__estudante__usuario')
     
     serializer_class = AulaFaltasSerializer
+    permission_classes = [IsOwnerProfessor]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = {
         'professor_disciplina_turma__disciplina_turma__turma': ['exact'],
@@ -55,14 +52,6 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         'data': ['exact', 'gte', 'lte'],
     }
     ano_letivo_field = 'professor_disciplina_turma__disciplina_turma__turma__ano_letivo'
-    
-    def get_permissions(self):
-        """Define permissões por ação."""
-        if self.action in ['create']:
-            return [IsProfessor()]
-        elif self.action in ['update', 'partial_update', 'destroy']:
-            return [IsProfessor(), IsOwnerProfessorOrGestao()]
-        return [IsFuncionario()]
     
     def get_queryset(self):
         """Filtra aulas do professor logado (se for professor)."""
@@ -120,11 +109,11 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def contexto_formulario(self, request):
         """
-        Retorna turmas e disciplinas do professor logado para o formulário.
+        Retorna turmas, disciplinas e datas liberadas para o formulário de aula.
         GET /pedagogical/aulas-faltas/contexto-formulario/
-        
-        Também inclui as restrições de datas para registro de aula.
         """
+        from apps.core.utils import get_datas_liberadas_aula
+        
         user = request.user
         
         if user.tipo_usuario not in ['PROFESSOR', 'GESTAO']:
@@ -136,7 +125,7 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         try:
             funcionario = user.funcionario
         except Funcionario.DoesNotExist:
-            return Response({'turmas': [], 'disciplinas_por_turma': {}, 'restricoes_data': {}})
+            return Response({'turmas': [], 'disciplinas_por_turma': {}, 'datas_liberadas': []})
         
         # Busca atribuições do professor no ano letivo selecionado
         ano_selecionado = user.get_ano_letivo_selecionado()
@@ -151,8 +140,11 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         serializer = ContextoAulaSerializer(atribuicoes)
         response_data = serializer.data
         
-        # Adiciona restrições de datas para registro de aula (usando função utilitária centralizada)
-        response_data['restricoes_data'] = get_restricoes_controle(ano_selecionado, 'AULA')
+        # Adiciona datas liberadas para registro
+        resultado = get_datas_liberadas_aula(ano_selecionado)
+        response_data['datas_liberadas'] = resultado['datas']
+        response_data['data_atual'] = resultado['hoje']
+        response_data['mensagem_restricao'] = resultado['mensagem']
         response_data['ano_letivo'] = ano_selecionado
         
         return Response(response_data)
@@ -172,7 +164,7 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         matriculas = MatriculaTurma.objects.filter(
             turma=turma,
             status__in=['CURSANDO', 'RETIDO', 'PROMOVIDO']
-        ).select_related('estudante__usuario').order_by('estudante__usuario__first_name')
+        ).select_related('matricula_cemep__estudante__usuario').order_by('matricula_cemep__estudante__usuario__first_name')
         
         # Mapear faltas existentes
         faltas_map = {
@@ -183,10 +175,10 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         estudantes = []
         for matricula in matriculas:
             estudantes.append({
-                'id': str(matricula.estudante.id),
-                'nome': matricula.estudante.nome_social or matricula.estudante.usuario.get_full_name(),
+                'id': str(matricula.matricula_cemep.estudante.id),
+                'nome': matricula.matricula_cemep.estudante.nome_social or matricula.matricula_cemep.estudante.usuario.get_full_name(),
                 'status': matricula.status,
-                'qtd_faltas': faltas_map.get(matricula.estudante.id, 0)
+                'qtd_faltas': faltas_map.get(matricula.matricula_cemep.estudante.id, 0)
             })
         
         return Response(estudantes)
@@ -207,37 +199,49 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         
         try:
             pdt = ProfessorDisciplinaTurma.objects.select_related(
-                'disciplina_turma__turma'
+                'disciplina_turma__turma__curso',
+                'disciplina_turma__disciplina'
             ).get(id=pdt_id)
         except ProfessorDisciplinaTurma.DoesNotExist:
             return Response(
                 {'error': 'Atribuição não encontrada'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Exception as e:
+            return Response(
+                {'error': f'Erro ao buscar atribuição: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
         turma = pdt.disciplina_turma.turma
         
-        # Buscar matrículas ativas
-        matriculas = MatriculaTurma.objects.filter(
-            turma=turma,
-            status__in=['CURSANDO', 'RETIDO', 'PROMOVIDO']
-        ).select_related('estudante__usuario').order_by('estudante__usuario__first_name')
-        
-        estudantes = [
-            {
-                'id': str(m.estudante.id),
-                'nome': m.estudante.nome_social or m.estudante.usuario.get_full_name(),
-                'status': m.status,
-                'qtd_faltas': 0
-            }
-            for m in matriculas
-        ]
-        
-        return Response({
-            'turma_nome': turma.nome_completo,
-            'disciplina_nome': pdt.disciplina_turma.disciplina.nome,
-            'estudantes': estudantes
-        })
+        try:
+            # Buscar matrículas ativas
+            matriculas = MatriculaTurma.objects.filter(
+                turma=turma,
+                status__in=['CURSANDO', 'RETIDO', 'PROMOVIDO']
+            ).select_related('matricula_cemep__estudante__usuario').order_by('matricula_cemep__estudante__usuario__first_name')
+            
+            estudantes = []
+            for m in matriculas:
+                estudantes.append({
+                    'id': str(m.matricula_cemep.estudante.id),
+                    'nome': m.matricula_cemep.estudante.nome_social or m.matricula_cemep.estudante.usuario.get_full_name(),
+                    'status': m.status,
+                    'qtd_faltas': 0
+                })
+            
+            return Response({
+                'turma_nome': str(turma),
+                'disciplina_nome': pdt.disciplina_turma.disciplina.nome,
+                'estudantes': estudantes
+            })
+        except Exception as e:
+            import traceback
+            return Response(
+                {'error': f'Erro ao listar estudantes: {str(e)}', 'trace': traceback.format_exc()},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     @action(detail=True, methods=['patch'])
     def atualizar_faltas(self, request, pk=None):

@@ -1,147 +1,121 @@
 """
 Funções utilitárias para o App Core
+
+Funções de datas liberadas para registro:
+- get_datas_liberadas_aula(): Datas liberadas para registro de aulas/faltas
+- get_datas_liberadas_nota(): (futuro) Datas liberadas para registro de notas
+- get_datas_liberadas_boletim(): (futuro) Datas liberadas para visualização de boletim
 """
+from datetime import timedelta
 from django.utils import timezone
-from apps.core.models import AnoLetivo, ControleRegistrosVisualizacao
 
 
-def get_restricoes_controle(ano_selecionado, tipo_controle='AULA'):
+def get_datas_liberadas_aula(ano_letivo_id):
     """
-    Retorna as restrições de controle para um ano letivo e tipo específico.
+    Retorna lista de datas liberadas para registro de aulas e faltas.
+    
+    Lógica:
+    1. Busca ControleRegistrosVisualizacao do tipo AULA liberados HOJE
+    2. Para cada bimestre liberado, gera os dias letivos do período
+    3. Se digitacao_futura=False, remove datas posteriores a hoje
+    4. Remove fins de semana (exceto dias letivos extras)
+    5. Remove dias não letivos (feriados, recessos, etc)
     
     Args:
-        ano_selecionado: int - O ano letivo (ex: 2026)
-        tipo_controle: str - Tipo do controle: 'AULA', 'NOTA' ou 'BOLETIM'
+        ano_letivo_id: int - O ano (ex: 2026)
     
     Returns:
-        dict com:
-        - ano: int
-        - bimestres: lista de bimestres com suas datas e status de liberação
-        - hoje_liberados: lista de bimestres que podem ser registrados HOJE
-        - data_atual: str - data de hoje em formato ISO
-        
-    Exemplo de uso:
-        restricoes = get_restricoes_controle(2026, 'AULA')
-        if 1 in restricoes['hoje_liberados']:
-            print('Pode registrar aulas do 1º bimestre')
+        dict:
+        - datas: list[str] - Lista de datas ISO liberadas, ordenadas
+        - hoje: str - Data atual ISO
+        - mensagem: str ou None - Mensagem se houver restrição
     """
-    if not ano_selecionado:
-        return {'ano': None, 'bimestres': [], 'hoje_liberados': [], 'data_atual': None}
+    from apps.core.models import AnoLetivo, ControleRegistrosVisualizacao
     
+    # Resposta padrão para erros
+    erro_response = lambda msg: {'datas': [], 'hoje': timezone.localdate().isoformat(), 'mensagem': msg}
+    
+    if not ano_letivo_id:
+        return erro_response('Nenhum ano letivo selecionado.')
+    
+    # Busca o ano letivo com prefetch dos relacionamentos
     try:
-        ano_letivo = AnoLetivo.objects.get(ano=ano_selecionado)
+        ano_letivo = AnoLetivo.objects.prefetch_related(
+            'dias_nao_letivos',
+            'dias_letivos_extras'
+        ).get(ano=ano_letivo_id)
     except AnoLetivo.DoesNotExist:
-        return {'ano': ano_selecionado, 'bimestres': [], 'hoje_liberados': [], 'data_atual': None}
+        return erro_response(f'Ano letivo {ano_letivo_id} não encontrado.')
     
     hoje = timezone.localdate()
-    bimestres_info = []
-    hoje_liberados = []
     
-    # Busca todos os controles do tipo especificado para o ano
+    # Busca controles de AULA
     controles = ControleRegistrosVisualizacao.objects.filter(
         ano_letivo=ano_letivo,
-        tipo=tipo_controle
-    ).order_by('bimestre')
+        tipo=ControleRegistrosVisualizacao.TipoControle.REGISTRO_AULA
+    )
     
+    # Filtra bimestres liberados hoje e coleta info
+    bimestres_liberados = []
     for controle in controles:
-        bim = controle.bimestre
+        if controle.esta_liberado(hoje):
+            bim = controle.bimestre
+            
+            # Pega datas do bimestre no AnoLetivo
+            inicio = getattr(ano_letivo, f'data_inicio_{bim}bim', None)
+            fim = getattr(ano_letivo, f'data_fim_{bim}bim', None)
+            
+            if inicio and fim:
+                bimestres_liberados.append({
+                    'bimestre': bim,
+                    'inicio': inicio,
+                    'fim': fim,
+                    'permite_futuro': controle.digitacao_futura
+                })
+    
+    if not bimestres_liberados:
+        return erro_response('Nenhum bimestre liberado para registro no momento.')
+    
+    # Prepara conjuntos para lookup O(1)
+    dias_nao_letivos = set(d.data for d in ano_letivo.dias_nao_letivos.all())
+    dias_letivos_extras = set(d.data for d in ano_letivo.dias_letivos_extras.all())
+    
+    # Gera lista de datas válidas
+    datas_liberadas = set()
+    
+    for bim_info in bimestres_liberados:
+        data_atual = bim_info['inicio']
+        data_fim = bim_info['fim']
+        permite_futuro = bim_info['permite_futuro']
         
-        # Datas do bimestre (período de aulas/notas)
-        bim_inicio = getattr(ano_letivo, f'inicio_bim{bim}', None)
-        bim_fim = getattr(ano_letivo, f'fim_bim{bim}', None)
-        
-        # Verifica se está liberado hoje
-        liberado_hoje = controle.esta_liberado(hoje)
-        
-        bimestre_data = {
-            'bimestre': bim,
-            'aula_inicio': bim_inicio.isoformat() if bim_inicio else None,
-            'aula_fim': bim_fim.isoformat() if bim_fim else None,
-            'registro_inicio': controle.data_inicio.isoformat() if controle.data_inicio else None,
-            'registro_fim': controle.data_fim.isoformat() if controle.data_fim else None,
-            'liberado_hoje': liberado_hoje,
-            'digitacao_futura': controle.digitacao_futura if tipo_controle == 'AULA' else None,
-            'status': controle.status_liberacao
-        }
-        bimestres_info.append(bimestre_data)
-        
-        if liberado_hoje:
-            hoje_liberados.append(bim)
+        while data_atual <= data_fim:
+            # Pula se não permite futuro e é data futura
+            if not permite_futuro and data_atual > hoje:
+                data_atual += timedelta(days=1)
+                continue
+            
+            # É dia letivo extra? (sábado/domingo especial) - Sempre válido
+            if data_atual in dias_letivos_extras:
+                datas_liberadas.add(data_atual.isoformat())
+                data_atual += timedelta(days=1)
+                continue
+            
+            # Fim de semana normal? Pula
+            if data_atual.weekday() >= 5:  # 5=sábado, 6=domingo
+                data_atual += timedelta(days=1)
+                continue
+            
+            # Dia não letivo (feriado, recesso)? Pula
+            if data_atual in dias_nao_letivos:
+                data_atual += timedelta(days=1)
+                continue
+            
+            # Dia válido!
+            datas_liberadas.add(data_atual.isoformat())
+            data_atual += timedelta(days=1)
     
     return {
-        'ano': ano_selecionado,
-        'bimestres': bimestres_info,
-        'hoje_liberados': hoje_liberados,
-        'data_atual': hoje.isoformat()
+        'datas': sorted(datas_liberadas),
+        'hoje': hoje.isoformat(),
+        'mensagem': None
     }
-
-
-def verificar_data_registro_aula(ano_selecionado, data_registro):
-    """
-    Verifica se uma data específica pode ser usada para registro de aula.
-    
-    Args:
-        ano_selecionado: int - O ano letivo
-        data_registro: date - A data que se deseja registrar
-    
-    Returns:
-        dict com:
-        - liberado: bool
-        - bimestre: int ou None
-        - mensagem: str
-    """
-    from datetime import date
-    
-    if not ano_selecionado:
-        return {'liberado': False, 'bimestre': None, 'mensagem': 'Nenhum ano letivo selecionado.'}
-    
-    try:
-        ano_letivo = AnoLetivo.objects.get(ano=ano_selecionado)
-    except AnoLetivo.DoesNotExist:
-        return {'liberado': False, 'bimestre': None, 'mensagem': f'Ano letivo {ano_selecionado} não encontrado.'}
-    
-    # Verifica se a data pertence ao ano letivo
-    if data_registro.year != ano_selecionado:
-        return {'liberado': False, 'bimestre': None, 'mensagem': f'A data deve ser do ano letivo {ano_selecionado}.'}
-    
-    # Obtém o bimestre da data
-    bimestre = ano_letivo.bimestre(data_registro)
-    
-    if bimestre is None:
-        return {'liberado': False, 'bimestre': None, 'mensagem': 'A data está fora do período letivo.'}
-    
-    # Busca o controle de registro para esse bimestre
-    controle = ControleRegistrosVisualizacao.objects.filter(
-        ano_letivo=ano_letivo,
-        bimestre=bimestre,
-        tipo='AULA'
-    ).first()
-    
-    if not controle:
-        return {'liberado': False, 'bimestre': bimestre, 'mensagem': f'Não há configuração de registro para o {bimestre}º bimestre.'}
-    
-    # Verifica se HOJE está no período liberado
-    hoje = timezone.localdate()
-    liberado = controle.esta_liberado(hoje)
-    
-    if liberado:
-        # Verifica digitacao_futura se a data_registro for futura
-        if data_registro > hoje and not controle.digitacao_futura:
-            return {'liberado': False, 'bimestre': bimestre, 'mensagem': 'Não é permitido registrar aulas para datas futuras neste bimestre.'}
-        
-        return {'liberado': True, 'bimestre': bimestre, 'mensagem': f'Registro liberado para o {bimestre}º bimestre.'}
-    else:
-        # Monta mensagem explicativa
-        status_liberacao = controle.status_liberacao
-        if status_liberacao == 'Aguardando início':
-            msg = f'O período de registro do {bimestre}º bimestre ainda não iniciou.'
-            if controle.data_inicio:
-                msg += f' Início: {controle.data_inicio.strftime("%d/%m/%Y")}.'
-        elif status_liberacao == 'Encerrado':
-            msg = f'O período de registro do {bimestre}º bimestre já encerrou.'
-            if controle.data_fim:
-                msg += f' Encerrou em: {controle.data_fim.strftime("%d/%m/%Y")}.'
-        else:
-            msg = f'O registro do {bimestre}º bimestre está bloqueado.'
-        
-        return {'liberado': False, 'bimestre': bimestre, 'mensagem': msg}

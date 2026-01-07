@@ -97,6 +97,47 @@ class IsOwnerProfessorOrGestao(BasePermission):
         return False
 
 
+class IsOwnerProfessor(BasePermission):
+    """
+    Permissão para recursos de Professor com verificação de ownership.
+    
+    Regras:
+    - Create: Apenas PROFESSOR
+    - Read: Qualquer funcionário
+    - Update/Delete: Apenas o professor dono (ownership)
+    
+    Para objetos com 'professor_disciplina_turma' (Aula):
+        Verifica obj.professor_disciplina_turma.professor.usuario
+    """
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        
+        # Create: só professor
+        if view.action == 'create':
+            return request.user.tipo_usuario == 'PROFESSOR'
+        
+        # Read (list, retrieve e ações customizadas GET): qualquer funcionário
+        if view.action in ['list', 'retrieve'] or request.method == 'GET':
+            return request.user.tipo_usuario in ['GESTAO', 'SECRETARIA', 'PROFESSOR', 'MONITOR']
+        
+        # Update/Delete: só professor (verificação de ownership em has_object_permission)
+        return request.user.tipo_usuario == 'PROFESSOR'
+    
+    def has_object_permission(self, request, view, obj):
+        # Read: qualquer funcionário
+        if view.action == 'retrieve':
+            return True
+        
+        # Update/Delete: verifica ownership
+        if hasattr(obj, 'professor_disciplina_turma'):
+            pdt = obj.professor_disciplina_turma
+            if hasattr(pdt, 'professor') and hasattr(pdt.professor, 'usuario'):
+                return pdt.professor.usuario == request.user
+        
+        return False
+
+
 # =============================================================================
 # MIXINS PARA VIEWSETS (Controle CRUD Automático)
 # =============================================================================

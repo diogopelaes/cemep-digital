@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Input, Loading, Switch } from '../components/ui'
-import { HiSave } from 'react-icons/hi'
+import { Card, Input, Loading, Switch, FormActions } from '../components/ui'
 import { coreAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -137,14 +136,12 @@ export default function CursoForm() {
           </div>
 
           {/* Botões */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
-            <Button type="button" variant="secondary" onClick={() => navigate('/cursos')}>
-              Cancelar
-            </Button>
-            <Button type="submit" icon={HiSave} loading={saving}>
-              {isEditing ? 'Salvar Alterações' : 'Criar Curso'}
-            </Button>
-          </div>
+          <FormActions
+            cancelTo="/cursos"
+            saving={saving}
+            isEditing={isEditing}
+            entityName="Curso"
+          />
         </form>
       </Card>
     </div>

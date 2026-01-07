@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-    Card, Button, DateInput, Switch, Loading, Input, Select
+    Card, DateInput, Switch, Loading, Input, Select, Button, FormActions
 } from '../components/ui'
-import { HiSave, HiTrash } from 'react-icons/hi'
+import { HiTrash } from 'react-icons/hi'
 import { coreAPI } from '../services/api'
 import { formatDateBR } from '../utils/date'
 import toast from 'react-hot-toast'
@@ -574,14 +574,11 @@ export default function CalendarioForm() {
                 </div>
             </Card>
 
-            <div className="flex justify-end gap-3 pt-4">
-                <Button variant="secondary" onClick={() => navigate('/configuracoes?tab=calendario')}>
-                    Cancelar
-                </Button>
-                <Button icon={HiSave} onClick={handleSave} loading={saving}>
-                    Salvar Alterações
-                </Button>
-            </div>
+            <FormActions
+                cancelTo="/configuracoes?tab=calendario"
+                saving={saving}
+                saveLabel="Salvar Alterações"
+            />
         </div>
     )
 }

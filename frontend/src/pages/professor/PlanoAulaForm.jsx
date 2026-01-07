@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-    Card, Button, Loading, Select, Input,
-    DateInput, TurmaSelector, MultiCombobox
+    Card, Loading, Select, Input,
+    DateInput, TurmaSelector, MultiCombobox, FormActions
 } from '../../components/ui'
-import { HiSave, HiInformationCircle } from 'react-icons/hi'
+import { HiInformationCircle } from 'react-icons/hi'
 import { pedagogicalAPI, coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 
@@ -263,14 +263,12 @@ export default function PlanoAulaForm() {
                         </div>
                     )}
 
-                    <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
-                        <Button type="button" variant="ghost" onClick={() => navigate('/plano-aula')}>
-                            Cancelar
-                        </Button>
-                        <Button type="submit" disabled={submitting} icon={HiSave}>
-                            {submitting ? <Loading size="sm" /> : 'Salvar Plano'}
-                        </Button>
-                    </div>
+                    <FormActions
+                        cancelTo="/plano-aula"
+                        saving={submitting}
+                        isEditing={isEditing}
+                        entityName="Plano"
+                    />
                 </form>
             </Card>
         </div>
