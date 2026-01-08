@@ -1,0 +1,1452 @@
+[
+    {
+        "professor_username": "82759",
+        "disciplina_sigla": "ART",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "82759",
+        "disciplina_sigla": "ART",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "82759",
+        "disciplina_sigla": "ART",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "130176",
+        "disciplina_sigla": "EF",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "130176",
+        "disciplina_sigla": "EF",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "130176",
+        "disciplina_sigla": "EF",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "130176",
+        "disciplina_sigla": "EF",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "130176",
+        "disciplina_sigla": "EF",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "130176",
+        "disciplina_sigla": "EF",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "130176",
+        "disciplina_sigla": "EF",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "130176",
+        "disciplina_sigla": "EF",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "130176",
+        "disciplina_sigla": "EF",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52469",
+        "disciplina_sigla": "QUI",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52469",
+        "disciplina_sigla": "QUI",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52469",
+        "disciplina_sigla": "QUI",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52469",
+        "disciplina_sigla": "QUI",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52469",
+        "disciplina_sigla": "QUI",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52469",
+        "disciplina_sigla": "QUI",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52469",
+        "disciplina_sigla": "QUI",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52469",
+        "disciplina_sigla": "QUI",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52469",
+        "disciplina_sigla": "QUI",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "116270",
+        "disciplina_sigla": "HIST",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "116270",
+        "disciplina_sigla": "HIST",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "116270",
+        "disciplina_sigla": "HIST",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "116270",
+        "disciplina_sigla": "HIST",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "116270",
+        "disciplina_sigla": "HIST",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "116270",
+        "disciplina_sigla": "HIST",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "116270",
+        "disciplina_sigla": "HIST",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "116270",
+        "disciplina_sigla": "HIST",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "116270",
+        "disciplina_sigla": "HIST",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "73920",
+        "disciplina_sigla": "TIC",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "73920",
+        "disciplina_sigla": "LLA I",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "73920",
+        "disciplina_sigla": "LLA I",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "73920",
+        "disciplina_sigla": "TIC",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "73920",
+        "disciplina_sigla": "LLA I",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "73920",
+        "disciplina_sigla": "TIC",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "73920",
+        "disciplina_sigla": "LLA II",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "73920",
+        "disciplina_sigla": "LLA II",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "73920",
+        "disciplina_sigla": "LLA II",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "95109",
+        "disciplina_sigla": "PORT",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "95109",
+        "disciplina_sigla": "PORT",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "95109",
+        "disciplina_sigla": "PORT",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "95109",
+        "disciplina_sigla": "PORT",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "95109",
+        "disciplina_sigla": "PORT",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "95109",
+        "disciplina_sigla": "PORT",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89044",
+        "disciplina_sigla": "GEO",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89044",
+        "disciplina_sigla": "GEO",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89044",
+        "disciplina_sigla": "GEO",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89044",
+        "disciplina_sigla": "GEO",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89044",
+        "disciplina_sigla": "GEO",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89044",
+        "disciplina_sigla": "GEO",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89044",
+        "disciplina_sigla": "GEO",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89044",
+        "disciplina_sigla": "GEO",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89044",
+        "disciplina_sigla": "GEO",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "123242",
+        "disciplina_sigla": "MAT",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "123242",
+        "disciplina_sigla": "MAT",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "123242",
+        "disciplina_sigla": "MAT",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "123242",
+        "disciplina_sigla": "MAT",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "123242",
+        "disciplina_sigla": "MAT",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "123242",
+        "disciplina_sigla": "MAT",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "123242",
+        "disciplina_sigla": "MAT",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52582",
+        "disciplina_sigla": "LP II",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52582",
+        "disciplina_sigla": "LP II",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52582",
+        "disciplina_sigla": "DS II",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52582",
+        "disciplina_sigla": "DS II",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52582",
+        "disciplina_sigla": "LP II",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52582",
+        "disciplina_sigla": "DS II",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52582",
+        "disciplina_sigla": "LP III",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52582",
+        "disciplina_sigla": "LP III",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "52582",
+        "disciplina_sigla": "LP III",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "70980",
+        "disciplina_sigla": "ING",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "70980",
+        "disciplina_sigla": "ING",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "70980",
+        "disciplina_sigla": "ING",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "70980",
+        "disciplina_sigla": "ING",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "70980",
+        "disciplina_sigla": "ING",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "70980",
+        "disciplina_sigla": "ING",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "70980",
+        "disciplina_sigla": "ING",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "70980",
+        "disciplina_sigla": "ING",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "70980",
+        "disciplina_sigla": "ING",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "1000",
+        "disciplina_sigla": "OP",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "1000",
+        "disciplina_sigla": "OP",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "1000",
+        "disciplina_sigla": "OP",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71064",
+        "disciplina_sigla": "DS I",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71064",
+        "disciplina_sigla": "DS I",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71064",
+        "disciplina_sigla": "LOG",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71064",
+        "disciplina_sigla": "DS I",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71064",
+        "disciplina_sigla": "LOG",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71064",
+        "disciplina_sigla": "LOG",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71064",
+        "disciplina_sigla": "TPV I",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71064",
+        "disciplina_sigla": "TPV I",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71064",
+        "disciplina_sigla": "TPV I",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71064",
+        "disciplina_sigla": "TPV II",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71064",
+        "disciplina_sigla": "TPV II",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71064",
+        "disciplina_sigla": "TPV II",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "157775",
+        "disciplina_sigla": "ESI",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "157775",
+        "disciplina_sigla": "LPC I",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "157775",
+        "disciplina_sigla": "ESI",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "157775",
+        "disciplina_sigla": "LPC II",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "157775",
+        "disciplina_sigla": "LPC II",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "157775",
+        "disciplina_sigla": "LPC II",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "157775",
+        "disciplina_sigla": "LPC I",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "157775",
+        "disciplina_sigla": "BD I",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "157775",
+        "disciplina_sigla": "BD I",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "157775",
+        "disciplina_sigla": "BD I",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "157775",
+        "disciplina_sigla": "ESI",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "157775",
+        "disciplina_sigla": "LPC I",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89567",
+        "disciplina_sigla": "FIS",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89567",
+        "disciplina_sigla": "FIS",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89567",
+        "disciplina_sigla": "FIS",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89567",
+        "disciplina_sigla": "FIS",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89567",
+        "disciplina_sigla": "FIS",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89567",
+        "disciplina_sigla": "FIS",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89567",
+        "disciplina_sigla": "FIS",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89567",
+        "disciplina_sigla": "FIS",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "89567",
+        "disciplina_sigla": "FIS",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71081",
+        "disciplina_sigla": "TCC",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71081",
+        "disciplina_sigla": "LP I",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71081",
+        "disciplina_sigla": "LP I",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71081",
+        "disciplina_sigla": "LP I",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71081",
+        "disciplina_sigla": "BD II",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71081",
+        "disciplina_sigla": "BD II",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71081",
+        "disciplina_sigla": "BD II",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71081",
+        "disciplina_sigla": "BD III",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71081",
+        "disciplina_sigla": "TCC",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71081",
+        "disciplina_sigla": "BD III",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71081",
+        "disciplina_sigla": "TCC",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "71081",
+        "disciplina_sigla": "BD III",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "TI",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141161",
+        "disciplina_sigla": "SOC",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141161",
+        "disciplina_sigla": "SOC",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141161",
+        "disciplina_sigla": "SOC",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141161",
+        "disciplina_sigla": "SOC",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141161",
+        "disciplina_sigla": "SOC",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141161",
+        "disciplina_sigla": "SOC",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141161",
+        "disciplina_sigla": "SOC",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141161",
+        "disciplina_sigla": "SOC",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141161",
+        "disciplina_sigla": "SOC",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141488",
+        "disciplina_sigla": "FILO",
+        "turma_numero": 3,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141488",
+        "disciplina_sigla": "FILO",
+        "turma_numero": 3,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141488",
+        "disciplina_sigla": "FILO",
+        "turma_numero": 3,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141488",
+        "disciplina_sigla": "FILO",
+        "turma_numero": 1,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141488",
+        "disciplina_sigla": "FILO",
+        "turma_numero": 2,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141488",
+        "disciplina_sigla": "FILO",
+        "turma_numero": 2,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141488",
+        "disciplina_sigla": "FILO",
+        "turma_numero": 2,
+        "turma_letra": "X",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141488",
+        "disciplina_sigla": "FILO",
+        "turma_numero": 1,
+        "turma_letra": "W",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    },
+    {
+        "professor_username": "141488",
+        "disciplina_sigla": "FILO",
+        "turma_numero": 1,
+        "turma_letra": "Y",
+        "turma_curso_sigla": "EM",
+        "tipo": "TITULAR",
+        "data_inicio": "2026-01-20",
+        "data_fim": null
+    }
+]
