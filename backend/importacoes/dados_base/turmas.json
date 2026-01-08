@@ -1,0 +1,128 @@
+[
+    {
+        "numero": 1,
+        "letra": "W",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "EM"
+    },
+    {
+        "numero": 1,
+        "letra": "X",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "EM"
+    },
+    {
+        "numero": 1,
+        "letra": "Y",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "EM"
+    },
+    {
+        "numero": 2,
+        "letra": "W",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "EM"
+    },
+    {
+        "numero": 2,
+        "letra": "X",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "EM"
+    },
+    {
+        "numero": 2,
+        "letra": "Y",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "EM"
+    },
+    {
+        "numero": 3,
+        "letra": "W",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "EM"
+    },
+    {
+        "numero": 3,
+        "letra": "X",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "EM"
+    },
+    {
+        "numero": 3,
+        "letra": "Y",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "EM"
+    },
+    {
+        "numero": 1,
+        "letra": "W",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "TI"
+    },
+    {
+        "numero": 1,
+        "letra": "X",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "TI"
+    },
+    {
+        "numero": 1,
+        "letra": "Y",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "TI"
+    },
+    {
+        "numero": 2,
+        "letra": "W",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "TI"
+    },
+    {
+        "numero": 2,
+        "letra": "X",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "TI"
+    },
+    {
+        "numero": 2,
+        "letra": "Y",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "TI"
+    },
+    {
+        "numero": 3,
+        "letra": "W",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "TI"
+    },
+    {
+        "numero": 3,
+        "letra": "X",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "TI"
+    },
+    {
+        "numero": 3,
+        "letra": "Y",
+        "ano_letivo": 2026,
+        "nomenclatura": "Série",
+        "sigla_curso": "TI"
+    }
+]
