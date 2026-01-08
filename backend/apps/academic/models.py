@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from apps.core.models import Parentesco, Curso, Turma, UUIDModel
 from apps.core.validators import validate_cpf, clean_digits
 import re
+from django.db.models.functions import Collate
 
 
 class Estudante(UUIDModel):
@@ -332,6 +333,7 @@ class MatriculaTurma(UUIDModel):
         on_delete=models.CASCADE,
         related_name='matriculas'
     )
+    mumero_chamada = models.PositiveSmallIntegerField(verbose_name='Número de Chamada', default=0)
     data_entrada = models.DateField(verbose_name='Data de Entrada na Turma')
     data_saida = models.DateField(null=True, blank=True, verbose_name='Data de Saída da Turma')
     status = models.CharField(
@@ -364,11 +366,55 @@ class MatriculaTurma(UUIDModel):
                     'A data de saída não pode ser anterior à data de entrada.'
                 )
     
+    @classmethod
+    def reordenar_chamada(cls, turma):
+        """Reordena os números de chamada da turma alfabeticamente (PT-BR) via Banco de Dados."""
+        if turma.get_ano_letivo_object.numero_chamadas_turmas_travadas:
+            return
+
+        # Busca e ordena usando Collate no banco para garantir ordem correta (pt-BR-x-icu)
+        # O Collate força a ordenação correta ignorando acentos/case no PostgreSQL
+        qs = cls.objects.filter(turma=turma).select_related(
+            'matricula_cemep__estudante__usuario'
+        ).order_by(
+            Collate('matricula_cemep__estudante__usuario__first_name', 'pt-BR-x-icu'),
+            'matricula_cemep__estudante__usuario__last_name'  # Desempate pelo sobrenome
+        )
+        
+        atualizar = []
+        for i, matricula in enumerate(qs, start=1):
+            if matricula.mumero_chamada != i:
+                matricula.mumero_chamada = i
+                atualizar.append(matricula)
+                
+        if atualizar:
+            cls.objects.bulk_update(atualizar, ['mumero_chamada'])
+
     def save(self, *args, **kwargs):
         # Status automático: CURSANDO se data_saida vazia
         if not self.data_saida and self.status != self.Status.CURSANDO:
             self.status = self.Status.CURSANDO
+        
+        # Se travado e sem número, define o próximo sequencial ao final
+        if not self.mumero_chamada and self.turma.get_ano_letivo_object.numero_chamadas_turmas_travadas:
+            self.mumero_chamada = self.turma.matriculas.count() + 1
+        
         super().save(*args, **kwargs)
+        
+        # Se não estiver travado, reordena toda a turma (incluindo este registro)
+        if not self.turma.get_ano_letivo_object.numero_chamadas_turmas_travadas:
+            self.reordenar_chamada(self.turma)
+
+    def delete(self, *args, **kwargs):
+        turma = self.turma
+        # Verifica se está travado antes de deletar
+        travado = turma.get_ano_letivo_object.numero_chamadas_turmas_travadas
+        
+        super().delete(*args, **kwargs)
+        
+        # Se não estiver travado, reordena os restantes para fechar o buraco na numeração
+        if not travado:
+            self.reordenar_chamada(turma)
 
     def get_status_display(self):
         return self.Status(self.status).label

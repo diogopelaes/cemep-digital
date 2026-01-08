@@ -99,7 +99,7 @@ class AnoLetivoAdmin(admin.ModelAdmin):
     readonly_fields = ['controles']
     fieldsets = (
         (None, {
-            'fields': ('ano', 'is_active')
+            'fields': ('ano', 'is_active', 'numero_chamadas_turmas_travadas')
         }),
         ('1º Bimestre', {
             'fields': (('data_inicio_1bim', 'data_fim_1bim'),)

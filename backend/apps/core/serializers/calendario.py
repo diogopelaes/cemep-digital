@@ -34,7 +34,7 @@ class AnoLetivoSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnoLetivo
         fields = [
-            'id', 'ano', 'is_active', 
+            'id', 'ano', 'is_active', 'numero_chamadas_turmas_travadas',
             'data_inicio_1bim', 'data_fim_1bim',
             'data_inicio_2bim', 'data_fim_2bim',
             'data_inicio_3bim', 'data_fim_3bim',

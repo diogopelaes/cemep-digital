@@ -245,6 +245,10 @@ class Turma(UUIDModel):
     def nome_completo(self):
         return f"{self.nome} - {self.curso.sigla}"
 
+    @property
+    def get_ano_letivo_object(self):
+        return AnoLetivo.objects.get(ano=self.ano_letivo)
+
 
 class DisciplinaTurma(UUIDModel):
     """Vínculo entre Disciplina e Turma com carga horária."""
@@ -403,6 +407,7 @@ class AnoLetivo(UUIDModel):
     data_fim_4bim = models.DateField(null=True, blank=True, verbose_name='Fim do 4º Bimestre')
     dias_letivos_extras = models.ManyToManyField(DiaLetivoExtra, blank=True, verbose_name='Dias Letivos Especiais')
     dias_nao_letivos = models.ManyToManyField(DiaNaoLetivo, blank=True, verbose_name='Feriados e Recessos')
+    numero_chamadas_turmas_travadas = models.BooleanField(default=False, verbose_name='Número de chamadas de turmas travadas')
     
 
     controles = models.JSONField(

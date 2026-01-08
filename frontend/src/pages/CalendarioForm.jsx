@@ -37,7 +37,8 @@ export default function CalendarioForm() {
         data_fim_3bim: '',
         data_inicio_4bim: '',
         data_fim_4bim: '',
-        is_active: true
+        is_active: true,
+        numero_chamadas_turmas_travadas: false
     })
 
     // Eventos do calendário
@@ -64,7 +65,8 @@ export default function CalendarioForm() {
                 data_fim_3bim: data.data_fim_3bim || '',
                 data_inicio_4bim: data.data_inicio_4bim || '',
                 data_fim_4bim: data.data_fim_4bim || '',
-                is_active: data.is_active
+                is_active: data.is_active,
+                numero_chamadas_turmas_travadas: data.numero_chamadas_turmas_travadas || false
             })
             setDiasNaoLetivos(calRes.data.dias_nao_letivos || [])
             setDiasExtras(calRes.data.dias_letivos_extras || [])
@@ -392,6 +394,23 @@ export default function CalendarioForm() {
                                 Configurações do Ano
                             </h2>
                         </div>
+                        <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/20 mb-4">
+                            <div>
+                                <span className="font-medium text-slate-700 dark:text-slate-300">
+                                    Número de Chamadas de Turmas Travadas
+                                </span>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                                    Se ativado, o número de chamadas das turmas não poderá ser alterado livremente.
+                                </p>
+                            </div>
+                            <Switch
+                                checked={!formData.numero_chamadas_turmas_travadas}
+                                onChange={(e) => handleChange('numero_chamadas_turmas_travadas', !e.target.checked)}
+                                labelTrue="Liberado"
+                                labelFalse="Travado"
+                            />
+                        </div>
+
                         <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/20">
                             <div>
                                 <span className="font-medium text-slate-700 dark:text-slate-300">
