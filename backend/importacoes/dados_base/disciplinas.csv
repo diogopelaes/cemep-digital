@@ -1,0 +1,33 @@
+NOME,SIGLA,AREA CONHECIMENTO
+Português,PORT,LINGUAGENS
+Matemática,MAT,MATEMATICA
+Arte,ART,LINGUAGENS
+Inglês,ING,LINGUAGENS
+Educação Física,EF,LINGUAGENS
+Biologia,BIO,CIENCIAS NATUREZA
+Física,FIS,CIENCIAS NATUREZA
+Química,QUI,CIENCIAS NATUREZA
+História,HIST,CIENCIAS HUMANAS
+Geografia,GEO,CIENCIAS HUMANAS
+Filosofia,FILO,CIENCIAS HUMANAS
+Sociologia,SOC,CIENCIAS HUMANAS
+Normatização e Padronização,NP,TEC INFORMATICA
+Tecnologia da Informação e Comunicação,TIC,TEC INFORMATICA
+Linguagem de Programação I,LP I,TEC INFORMATICA
+Laboratório de Lógica Aplicada I,LLA I,TEC INFORMATICA
+Lógica de Programação,LOG,TEC INFORMATICA
+Banco de Dados I,BD I,TEC INFORMATICA
+Desenvolvimento de Sites I,DS I,TEC INFORMATICA
+Linguagem de Programação Comercial I,LPC I,TEC INFORMATICA
+Técnicas de Programação Visual I,TPV I,TEC INFORMATICA
+Linguagem de Programação II,LP II,TEC INFORMATICA
+Laboratório de Lógica Aplicada II,LLA II,TEC INFORMATICA
+Engenharia de Sistemas de Informação,ESI,TEC INFORMATICA
+Banco de Dados II,BD II,TEC INFORMATICA
+Desenvolvimento de Sites II,DS II,TEC INFORMATICA
+Linguagem de Programação Comercial II,LPC II,TEC INFORMATICA
+Técnicas de Programação Visual II,TPV II,TEC INFORMATICA
+Linguagem de Programação III,LP III,TEC INFORMATICA
+Banco de Dados III,BD III,TEC INFORMATICA
+Orientação Profissional em TIC,OP,TEC INFORMATICA
+Trabalho de Conclusão de Curso,TCC,TEC INFORMATICA

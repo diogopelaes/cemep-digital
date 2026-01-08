@@ -1,0 +1,111 @@
+[
+    {
+        "bimestre": 1,
+        "controles": [
+            {
+                "tipo": "AULA",
+                "data_inicio": "2026-02-02",
+                "data_fim": "2026-04-25",
+                "digitacao_futura": false
+            },
+            {
+                "tipo": "NOTA",
+                "data_inicio": "2026-04-15",
+                "data_fim": "2026-04-25",
+                "digitacao_futura": true
+            },
+            {
+                "tipo": "BOLETIM",
+                "data_inicio": "2026-04-29",
+                "data_fim": "2026-12-31",
+                "digitacao_futura": false
+            }
+        ]
+    },
+    {
+        "bimestre": 2,
+        "controles": [
+            {
+                "tipo": "AULA",
+                "data_inicio": "2026-04-23",
+                "data_fim": "2026-07-10",
+                "digitacao_futura": false
+            },
+            {
+                "tipo": "NOTA",
+                "data_inicio": "2026-06-29",
+                "data_fim": "2026-07-10",
+                "digitacao_futura": true
+            },
+            {
+                "tipo": "BOLETIM",
+                "data_inicio": "2026-07-15",
+                "data_fim": "2026-12-31",
+                "digitacao_futura": false
+            }
+        ]
+    },
+    {
+        "bimestre": 3,
+        "controles": [
+            {
+                "tipo": "AULA",
+                "data_inicio": "2026-07-24",
+                "data_fim": "2026-10-07",
+                "digitacao_futura": false
+            },
+            {
+                "tipo": "NOTA",
+                "data_inicio": "2026-09-25",
+                "data_fim": "2026-10-07",
+                "digitacao_futura": true
+            },
+            {
+                "tipo": "BOLETIM",
+                "data_inicio": "2026-10-12",
+                "data_fim": "2026-12-31",
+                "digitacao_futura": false
+            }
+        ]
+    },
+    {
+        "bimestre": 4,
+        "controles": [
+            {
+                "tipo": "AULA",
+                "data_inicio": "2026-10-05",
+                "data_fim": "2026-12-22",
+                "digitacao_futura": false
+            },
+            {
+                "tipo": "NOTA",
+                "data_inicio": "2026-12-11",
+                "data_fim": "2026-12-23",
+                "digitacao_futura": true
+            },
+            {
+                "tipo": "BOLETIM",
+                "data_inicio": "2026-12-23",
+                "data_fim": "2026-12-31",
+                "digitacao_futura": false
+            }
+        ]
+    },
+    {
+        "bimestre": 5,
+        "controles": [
+            {
+                "tipo": "NOTA",
+                "data_inicio": "2026-12-21",
+                "data_fim": "2026-12-24",
+                "digitacao_futura": true
+            },
+            {
+                "tipo": "BOLETIM",
+                "data_inicio": "2026-12-24",
+                "data_fim": "2027-01-31",
+                "digitacao_futura": false
+            }
+        ]
+    }
+]
