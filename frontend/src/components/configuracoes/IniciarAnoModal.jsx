@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { Modal, Input, Button } from '../ui'
 
 export default function IniciarAnoModal({ isOpen, onClose, onSuccess }) {
+    const navigate = useNavigate()
     const [ano, setAno] = useState(new Date().getFullYear() + 1)
     const [loading, setLoading] = useState(false)
 
@@ -24,6 +26,8 @@ export default function IniciarAnoModal({ isOpen, onClose, onSuccess }) {
                 toast.success(`Ano letivo de ${ano} iniciado com sucesso!`)
                 onSuccess(data)
                 onClose()
+                // Redireciona para o formulário de edição do calendário
+                navigate(`/configuracoes/calendario/${ano}/editar`)
             }
         } catch (error) {
             console.error('Erro ao criar ano letivo:', error)

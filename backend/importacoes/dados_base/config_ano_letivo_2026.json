@@ -1,0 +1,115 @@
+{
+    "ano": 2026,
+    "is_active": true,
+    "bimestres": {
+        "1": {
+            "inicio": "2026-02-02",
+            "fim": "2026-04-22"
+        },
+        "2": {
+            "inicio": "2026-04-23",
+            "fim": "2026-07-06"
+        },
+        "3": {
+            "inicio": "2026-07-24",
+            "fim": "2026-10-02"
+        },
+        "4": {
+            "inicio": "2026-10-05",
+            "fim": "2026-12-18"
+        }
+    },
+    "dias_letivos_extras": [
+        {
+            "data": "2026-04-11",
+            "descricao": "Sábado Letivo - Planejamento/Atividades"
+        }
+    ],
+    "dias_nao_letivos": [
+        {
+            "data": "2026-01-01",
+            "tipo": "FERIADO",
+            "descricao": "Confraternização Universal"
+        },
+        {
+            "data": "2026-02-16",
+            "tipo": "PONTO_FACULTATIVO",
+            "descricao": "Carnaval"
+        },
+        {
+            "data": "2026-02-17",
+            "tipo": "PONTO_FACULTATIVO",
+            "descricao": "Carnaval"
+        },
+        {
+            "data": "2026-02-18",
+            "tipo": "PONTO_FACULTATIVO",
+            "descricao": "Quarta-feira de Cinzas"
+        },
+        {
+            "data": "2026-04-03",
+            "tipo": "FERIADO",
+            "descricao": "Paixão de Cristo"
+        },
+        {
+            "data": "2026-04-21",
+            "tipo": "FERIADO",
+            "descricao": "Tiradentes"
+        },
+        {
+            "data": "2026-05-01",
+            "tipo": "FERIADO",
+            "descricao": "Dia Mundial do Trabalho"
+        },
+        {
+            "data": "2026-06-04",
+            "tipo": "PONTO_FACULTATIVO",
+            "descricao": "Corpus Christi"
+        },
+        {
+            "data": "2026-07-09",
+            "tipo": "FERIADO",
+            "descricao": "Revolução Constitucionalista"
+        },
+        {
+            "data": "2026-09-07",
+            "tipo": "FERIADO",
+            "descricao": "Independência do Brasil"
+        },
+        {
+            "data": "2026-10-12",
+            "tipo": "FERIADO",
+            "descricao": "Nossa Senhora Aparecida"
+        },
+        {
+            "data": "2026-10-28",
+            "tipo": "PONTO_FACULTATIVO",
+            "descricao": "Dia do Servidor Público"
+        },
+        {
+            "data": "2026-11-02",
+            "tipo": "FERIADO",
+            "descricao": "Finados"
+        },
+        {
+            "data": "2026-11-20",
+            "tipo": "FERIADO",
+            "descricao": "Dia da Consciência Negra"
+        },
+        {
+            "data": "2026-12-24",
+            "tipo": "PONTO_FACULTATIVO",
+            "descricao": "Véspera de Natal"
+        },
+        {
+            "data": "2026-12-25",
+            "tipo": "FERIADO",
+            "descricao": "Natal"
+        },
+        {
+            "data": "2026-12-31",
+            "tipo": "PONTO_FACULTATIVO",
+            "descricao": "Véspera de Ano Novo"
+        }
+    ]
+}
