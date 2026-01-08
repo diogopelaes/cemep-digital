@@ -20,13 +20,24 @@ if ($LASTEXITCODE -ne 0) {
     # Continue anyway as createdb might fail if it exists, or succeed if drop failed because it didn't exist
 }
 
-Write-Host "2. Limpando migrações antigas..." -ForegroundColor Cyan
+Write-Host "2. Limpando migrações antigas e __pycache__..." -ForegroundColor Cyan
 $appsdata = "C:\Projects\cemep-digital\backend\apps"
 Get-ChildItem -Path $appsdata -Recurse -Directory -Filter "migrations" | ForEach-Object {
     $migrationDir = $_.FullName
     Write-Host "Limpando $migrationDir" -ForegroundColor Gray
     Get-ChildItem -Path $migrationDir -File | Where-Object { $_.Name -ne "__init__.py" } | Remove-Item -Force
+    
+    # Garante que o __init__.py exista para o Django reconhecer como pacote de migrações
+    $initFile = Join-Path $migrationDir "__init__.py"
+    if (-not (Test-Path $initFile)) {
+        Write-Host "Criando __init__.py em $migrationDir" -ForegroundColor Gray
+        New-Item -ItemType File -Path $initFile -Force | Out-Null
+    }
 }
+
+Write-Host "Limpando subdiretórios __pycache__..." -ForegroundColor Gray
+Get-ChildItem -Path "C:\Projects\cemep-digital" -Recurse -Directory -Filter "__pycache__" | Remove-Item -Force -Recurse
+
 
 Write-Host "3. Recriando o Banco de dados..." -ForegroundColor Cyan
 createdb $DB_NAME
@@ -46,8 +57,14 @@ Write-Host "5. Diretório do backend..." -ForegroundColor Cyan
 Set-Location C:\Projects\cemep-digital\backend
 
 Write-Host "6. Criando migrações e migrando..." -ForegroundColor Cyan
-python manage.py makemigrations
-if ($LASTEXITCODE -ne 0) { Write-Error "Falha em makemigrations"; exit }
+# Primeiro cria as migrações do app users (necessário para custom User model)
+python manage.py makemigrations users
+if ($LASTEXITCODE -ne 0) { Write-Error "Falha em makemigrations users"; exit }
+
+# Cria as migrações dos demais apps
+python manage.py makemigrations core academic pedagogical management permanent
+if ($LASTEXITCODE -ne 0) { Write-Error "Falha em makemigrations apps"; exit }
+
 python manage.py migrate
 if ($LASTEXITCODE -ne 0) { Write-Error "Falha em migrate"; exit }
 
