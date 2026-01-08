@@ -118,11 +118,11 @@ class TurmaViewSet(AnoLetivoFilterMixin, GestaoSecretariaMixin, viewsets.ModelVi
                 errors.append(f'Linha {idx + 2}: {str(e)}')
 
         return Response({
-            'criados': created_count,
-            'atualizados': updated_count,
+            'created_count': created_count,
+            'updated_count': updated_count,
             'total_processados': created_count + updated_count,
-            'erros': errors[:20],
-            'total_erros': len(errors)
+            'errors': errors[:20],
+            'message': f'Processamento concluído. {created_count} criados, {updated_count} atualizados.'
         })
 
     @action(detail=False, methods=['get'], url_path='download-modelo')

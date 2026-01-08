@@ -102,14 +102,30 @@ class DisciplinaTurmaViewSet(AnoLetivoFilterMixin, GestaoSecretariaMixin, viewse
     @transaction.atomic
     def importar_em_massa(self, request):
         """
-        Importa disciplinas para múltiplas turmas via CSV/XLSX.
-        Colunas: NUMERO_TURMA, LETRA_TURMA, ANO_LETIVO_TURMA, SIGLA_CURSO, SIGLA_DISCIPLINA, AULAS_SEMANAIS (opcional)
+        Importa disciplinas para múltiplas turmas selecionadas via CSV/XLSX.
+        Espera: file (arquivo) e turmas_ids (lista de IDs separada por vírgula).
+        Colunas do arquivo: SIGLA_DISCIPLINA, AULAS_SEMANAIS (opcional)
         """
         file = request.FILES.get('file')
+        turmas_ids_str = request.data.get('turmas_ids', '')
 
         if not file:
             return Response({'error': 'Nenhum arquivo enviado'}, status=400)
+        
+        if not turmas_ids_str:
+            return Response({'error': 'Nenhuma turma selecionada (turmas_ids)'}, status=400)
 
+        # Processa IDs das turmas
+        try:
+            turmas_ids = [id.strip() for id in turmas_ids_str.split(',') if id.strip()]
+            turmas = list(Turma.objects.filter(id__in=turmas_ids))
+        except Exception:
+            return Response({'error': 'Formato de IDs de turmas inválido.'}, status=400)
+
+        if not turmas:
+            return Response({'error': 'Nenhuma turma válida encontrada.'}, status=400)
+
+        # Lê o arquivo
         try:
             if file.name.endswith('.csv'):
                 df = pd.read_csv(io.BytesIO(file.read()))
@@ -118,81 +134,61 @@ class DisciplinaTurmaViewSet(AnoLetivoFilterMixin, GestaoSecretariaMixin, viewse
         except Exception as e:
             return Response({'error': f'Erro ao ler arquivo: {str(e)}'}, status=400)
 
-        required_cols = ['NUMERO_TURMA', 'LETRA_TURMA', 'ANO_LETIVO_TURMA', 'SIGLA_CURSO', 'SIGLA_DISCIPLINA']
-        missing = [c for c in required_cols if c not in df.columns]
-        if missing:
-            return Response({'error': f'Colunas obrigatórias faltando: {missing}'}, status=400)
+        if 'SIGLA_DISCIPLINA' not in df.columns:
+            return Response({'error': 'Coluna obrigatória "SIGLA_DISCIPLINA" não encontrada'}, status=400)
 
         created_count = 0
         updated_count = 0
         errors = []
         
-        from apps.core.models import Curso
-        cursos_map = {c.sigla.upper(): c for c in Curso.objects.all()}
         disciplinas_map = {d.sigla.upper(): d for d in Disciplina.objects.all()}
-        turmas_cache = {}
 
-        for idx, row in df.iterrows():
-            try:
-                numero = int(row['NUMERO_TURMA'])
-                letra = str(row['LETRA_TURMA']).strip().upper()
-                ano_letivo = int(row['ANO_LETIVO_TURMA'])
-                sigla_curso = str(row['SIGLA_CURSO']).strip().upper()
-                sigla_disciplina = str(row['SIGLA_DISCIPLINA']).strip().upper()
-                aulas_semanais = int(row.get('AULAS_SEMANAIS', 0)) if pd.notna(row.get('AULAS_SEMANAIS')) else 0
+        # Itera sobre cada turma selecionada
+        for turma in turmas:
+            # Itera sobre cada linha do arquivo (disciplinas)
+            for idx, row in df.iterrows():
+                try:
+                    sigla = str(row['SIGLA_DISCIPLINA']).strip().upper()
+                    aulas_semanais = int(row.get('AULAS_SEMANAIS', 4)) if pd.notna(row.get('AULAS_SEMANAIS')) else 4
 
-                turma_key = (numero, letra, ano_letivo, sigla_curso)
-                if turma_key not in turmas_cache:
-                    curso = cursos_map.get(sigla_curso)
-                    if not curso:
-                        errors.append(f'Linha {idx + 2}: Curso "{sigla_curso}" não encontrado')
+                    disciplina = disciplinas_map.get(sigla)
+                    if not disciplina:
+                        # Loga erro apenas uma vez por disciplina, se desejar, ou ignora para não poluir
+                        # Aqui vamos logar erro referenciando a linha
+                        errors.append(f'Linha {idx + 2}: Disciplina "{sigla}" não encontrada')
                         continue
-                    try:
-                        turma = Turma.objects.get(numero=numero, letra=letra, ano_letivo=ano_letivo, curso=curso)
-                        turmas_cache[turma_key] = turma
-                    except Turma.DoesNotExist:
-                        errors.append(f'Linha {idx + 2}: Turma {numero}{letra} do ano {ano_letivo} não encontrada')
-                        continue
-                else:
-                    turma = turmas_cache[turma_key]
 
-                disciplina = disciplinas_map.get(sigla_disciplina)
-                if not disciplina:
-                    errors.append(f'Linha {idx + 2}: Disciplina "{sigla_disciplina}" não encontrada')
-                    continue
+                    dt, created = DisciplinaTurma.objects.update_or_create(
+                        disciplina=disciplina,
+                        turma=turma,
+                        defaults={'aulas_semanais': aulas_semanais}
+                    )
 
-                dt, created = DisciplinaTurma.objects.update_or_create(
-                    disciplina=disciplina,
-                    turma=turma,
-                    defaults={'aulas_semanais': aulas_semanais}
-                )
+                    if created:
+                        created_count += 1
+                    else:
+                        updated_count += 1
 
-                if created:
-                    created_count += 1
-                else:
-                    updated_count += 1
+                except Exception as e:
+                    errors.append(f'Turma {turma.nome} - Linha {idx + 2}: {str(e)}')
 
-            except Exception as e:
-                errors.append(f'Linha {idx + 2}: {str(e)}')
+        # Dedup errors (optional but good UI practice)
+        errors = list(dict.fromkeys(errors))
 
         return Response({
-            'criados': created_count,
-            'atualizados': updated_count,
+            'created_count': created_count,
+            'updated_count': updated_count,
             'total_processados': created_count + updated_count,
-            'erros': errors[:20],
-            'total_erros': len(errors)
+            'errors': errors[:20],
+             'message': f'Processamento concluído. {created_count} vinculos criados, {updated_count} atualizados em {len(turmas)} turmas.'
         })
 
     @action(detail=False, methods=['get'], url_path='download-modelo')
     def download_modelo(self, request):
         """Retorna arquivo modelo para importação em massa de disciplinas."""
         df = pd.DataFrame({
-            'NUMERO_TURMA': [1, 1],
-            'LETRA_TURMA': ['A', 'A'],
-            'ANO_LETIVO_TURMA': [2024, 2024],
-            'SIGLA_CURSO': ['EM', 'EM'],
-            'SIGLA_DISCIPLINA': ['MAT', 'PORT'],
-            'AULAS_SEMANAIS': [4, 4]
+            'SIGLA_DISCIPLINA': ['MAT', 'PORT', 'HIST'],
+            'AULAS_SEMANAIS': [4, 4, 2]
         })
 
         output = io.BytesIO()
@@ -203,5 +199,5 @@ class DisciplinaTurmaViewSet(AnoLetivoFilterMixin, GestaoSecretariaMixin, viewse
             output.getvalue(),
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response['Content-Disposition'] = 'attachment; filename="modelo_importacao_disciplinas_turma.xlsx"'
+        response['Content-Disposition'] = 'attachment; filename="modelo_disciplinas_massa.xlsx"'
         return response
