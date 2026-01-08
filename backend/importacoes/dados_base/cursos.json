@@ -6,5 +6,9 @@
     {
         "nome": "Técnico em Informática",
         "sigla": "TI"
+    },
+    {
+        "nome": "Ensino Médio Integrado com Técnico em Informática",
+        "sigla": "EMTI"
     }
 ]
