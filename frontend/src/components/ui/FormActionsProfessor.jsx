@@ -1,5 +1,5 @@
 import { HiSave } from 'react-icons/hi'
-import { Button } from '../../components/ui'
+import Button from './Button'
 
 /**
  * Componente específico para ações de formulário do Professor (Apenas Salvar).

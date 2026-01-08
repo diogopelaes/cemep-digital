@@ -238,6 +238,10 @@ class Turma(UUIDModel):
         return f"{self.numero}º {self.get_nomenclatura_display()} {self.letra}"
     
     @property
+    def sigla(self):
+        return f"{self.numero}{self.letra} - {self.curso.sigla}"
+    
+    @property
     def nome_completo(self):
         return f"{self.nome} - {self.curso.sigla}"
 

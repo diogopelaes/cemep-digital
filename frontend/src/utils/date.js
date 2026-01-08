@@ -31,6 +31,15 @@ export const formatDateBR = (date, options = {}) => {
 }
 
 /**
+ * Formata uma data para o padrão brasileiro curto (dd/mm), omitindo o ano
+ * @param {string|Date} date - Data em formato ISO, Date object ou qualquer formato válido
+ * @returns {string} Data formatada ou string vazia se inválida
+ */
+export const formatDateShortBR = (date) => {
+  return formatDateBR(date, { year: undefined })
+}
+
+/**
  * Formata uma data para exibição com dia da semana
  * @param {string|Date} date - Data em formato ISO, Date object ou qualquer formato válido
  * @returns {string} Data formatada com dia da semana

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
-import { Card, Button, Loading, Badge } from '../../components/ui'
-import FormActionsProfessor from './FormActionsProfessor'
+import { Card, Button, Loading, Badge, FormActionsProfessor } from '../../components/ui'
 import { pedagogicalAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { formatDateBR } from '../../utils/date'

@@ -8,7 +8,7 @@ import { HiPlus, HiPencil, HiTrash, HiCalendar, HiBookOpen } from 'react-icons/h
 import { pedagogicalAPI, coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../contexts/AuthContext'
-import { formatDateBR } from '../../utils/date'
+import { formatDateBR, formatDateShortBR } from '../../utils/date'
 
 const BIMESTRES = [
     { value: 1, label: '1º Bimestre' },
@@ -108,7 +108,7 @@ export default function PlanoAula() {
                 <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs text-slate-500 flex items-center gap-1">
                         <HiCalendar className="w-3 h-3" />
-                        {formatDateBR(plano.data_inicio)}
+                        {formatDateShortBR(plano.data_inicio)} a {formatDateShortBR(plano.data_fim)}
                     </span>
                     {showDisciplinaColumn && (
                         <Badge variant="outline" className="text-xs font-bold">
@@ -225,7 +225,7 @@ export default function PlanoAula() {
                                     <TableRow key={plano.id} className="group">
                                         <TableCell>
                                             <span className="text-sm text-slate-500 whitespace-nowrap">
-                                                {formatDateBR(plano.data_inicio)}
+                                                {formatDateShortBR(plano.data_inicio)} a {formatDateShortBR(plano.data_fim)}
                                             </span>
                                         </TableCell>
                                         {showDisciplinaColumn && (

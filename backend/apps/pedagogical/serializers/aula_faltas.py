@@ -73,6 +73,7 @@ class AulaFaltasSerializer(serializers.ModelSerializer):
     
     # --- Read Fields ---
     turma_nome = serializers.SerializerMethodField()
+    turma_sigla = serializers.SerializerMethodField()
     turma_id = serializers.SerializerMethodField()
     disciplina_nome = serializers.SerializerMethodField()
     disciplina_sigla = serializers.SerializerMethodField()
@@ -94,6 +95,7 @@ class AulaFaltasSerializer(serializers.ModelSerializer):
             'conteudo', 
             'faltas_data',    # Write payload
             'turma_nome',     # Read
+            'turma_sigla',    # Read
             'turma_id',       # Read
             'disciplina_nome',# Read
             'disciplina_sigla', # Read
@@ -138,6 +140,9 @@ class AulaFaltasSerializer(serializers.ModelSerializer):
         return attrs
 
     # --- Field Methods ---
+
+    def get_turma_sigla(self, obj):
+        return obj.professor_disciplina_turma.disciplina_turma.turma.sigla
 
     def get_turma_nome(self, obj):
         return obj.professor_disciplina_turma.disciplina_turma.turma.nome_completo
@@ -216,6 +221,7 @@ class AulaFaltasListSerializer(serializers.ModelSerializer):
     Serializer otimizado para listagem de aulas (menos campos).
     """
     turma_nome = serializers.SerializerMethodField()
+    turma_sigla = serializers.SerializerMethodField()
     disciplina_sigla = serializers.SerializerMethodField()
     total_faltas = serializers.SerializerMethodField()
     bimestre = serializers.SerializerMethodField()
@@ -228,6 +234,7 @@ class AulaFaltasListSerializer(serializers.ModelSerializer):
             'conteudo',
             'numero_aulas',
             'turma_nome',
+            'turma_sigla',
             'disciplina_sigla',
             'total_faltas',
             'bimestre',
@@ -235,6 +242,9 @@ class AulaFaltasListSerializer(serializers.ModelSerializer):
     
     def get_turma_nome(self, obj):
         return obj.professor_disciplina_turma.disciplina_turma.turma.nome_completo
+    
+    def get_turma_sigla(self, obj):
+        return obj.professor_disciplina_turma.disciplina_turma.turma.sigla
     
     def get_disciplina_sigla(self, obj):
         return obj.professor_disciplina_turma.disciplina_turma.disciplina.sigla

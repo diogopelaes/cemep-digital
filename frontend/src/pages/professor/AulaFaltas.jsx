@@ -8,7 +8,7 @@ import { HiPlus, HiPencil, HiTrash, HiCalendar, HiClipboardCheck } from 'react-i
 import { pedagogicalAPI, coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../contexts/AuthContext'
-import { formatDateBR } from '../../utils/date'
+import { formatDateBR, formatDateShortBR } from '../../utils/date'
 
 const BIMESTRES = [
     { value: 1, label: '1º Bimestre' },
@@ -140,7 +140,7 @@ export default function AulaFaltas() {
                 <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs text-slate-500 flex items-center gap-1">
                         <HiCalendar className="w-3 h-3" />
-                        {formatDateBR(aula.data)}
+                        {formatDateShortBR(aula.data)}
                     </span>
                     {showDisciplinaColumn && (
                         <Badge variant="outline" className="text-xs font-bold">
@@ -278,12 +278,12 @@ export default function AulaFaltas() {
                                     <TableRow key={aula.id} className="group">
                                         <TableCell>
                                             <span className="text-sm text-slate-500 whitespace-nowrap">
-                                                {formatDateBR(aula.data)}
+                                                {formatDateShortBR(aula.data)}
                                             </span>
                                         </TableCell>
                                         <TableCell>
                                             <span className="font-medium text-slate-800 dark:text-white">
-                                                {aula.turma_nome}
+                                                {aula.turma_sigla}
                                             </span>
                                         </TableCell>
                                         {showDisciplinaColumn && (

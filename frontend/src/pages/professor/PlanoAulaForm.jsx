@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
     Card, Loading, Select, Input,
-    DateInput, Button, Badge, TurmaSelector, MultiCombobox
+    DateInput, Button, Badge, TurmaSelector, MultiCombobox, FormActionsProfessor
 } from '../../components/ui'
-import FormActionsProfessor from './FormActionsProfessor'
 import { HiInformationCircle } from 'react-icons/hi'
 import { pedagogicalAPI, coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
