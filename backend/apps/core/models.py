@@ -425,19 +425,22 @@ class AnoLetivo(UUIDModel):
         if data is None:
             data = timezone.now().date()
         
+        if not self.data_inicio_1bim:
+            return None
+            
         if data < self.data_inicio_1bim:
             return None
         
-        if data <= self.data_fim_1bim:
+        if self.data_fim_1bim and data <= self.data_fim_1bim:
             return 1
         
-        if data <= self.data_fim_2bim:
+        if self.data_fim_2bim and data <= self.data_fim_2bim:
             return 2
         
-        if data <= self.data_fim_3bim:
+        if self.data_fim_3bim and data <= self.data_fim_3bim:
             return 3
         
-        if data <= self.data_fim_4bim:
+        if self.data_fim_4bim and data <= self.data_fim_4bim:
             return 4
         
         return None
@@ -580,6 +583,7 @@ class AnoLetivo(UUIDModel):
             
         # Atualiza o campo no banco sem disparar signals recursivos
         AnoLetivo.objects.filter(pk=self.pk).update(controles=novo_controles)
+        self.controles = novo_controles
         
         # Invalida o cache de datas liberadas quando os controles mudam
         self.invalidar_cache_datas_liberadas()
@@ -590,6 +594,7 @@ class AnoLetivo(UUIDModel):
         Deve ser chamado quando os controles forem alterados.
         """
         AnoLetivo.objects.filter(pk=self.pk).update(datas_liberadas_aulas_faltas=None)
+        self.datas_liberadas_aulas_faltas = None
 
     class Meta:
         verbose_name = 'Ano Letivo'
