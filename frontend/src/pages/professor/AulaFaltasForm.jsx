@@ -199,6 +199,7 @@ export default function AulaFaltasForm() {
                                     <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wider">
                                         {bimestre === 0 ? 'ANUAL' : `${bimestre}º BIMESTRE`}
                                     </span>
+                                    <span className="font-medium">{numeroAulas} aulas</span>
                                 </>
                             )}
                         </p>
@@ -208,12 +209,7 @@ export default function AulaFaltasForm() {
                 {/* Conteúdo da Aula */}
                 <Card hover={false} className="overflow-hidden border-none shadow-premium">
                     <div className="p-1">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700/50">
-                                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 block">Aulas dadas</label>
-                                <p className="text-lg font-semibold text-slate-700 dark:text-slate-200">{numeroAulas} {numeroAulas === 1 ? 'aula' : 'aulas'}</p>
-                            </div>
-                        </div>
+
 
                         <div className="relative">
                             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 ml-1">
