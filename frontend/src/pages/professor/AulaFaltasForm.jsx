@@ -26,6 +26,7 @@ export default function AulaFaltasForm() {
 
     // Lista de estudantes com faltas (estado local)
     const [estudantes, setEstudantes] = useState([])
+    const [planosAula, setPlanosAula] = useState([])
 
     useEffect(() => {
         loadData()
@@ -47,8 +48,13 @@ export default function AulaFaltasForm() {
                 setNumeroAulas(aula.numero_aulas || 2)
                 setData(aula.data)
                 setBimestre(aula.bimestre)
-                setTurma({ nome: aula.turma_nome })
+                setBimestre(aula.bimestre)
+                setTurma({
+                    id: aula.turma_id,
+                    nome: aula.turma_nome
+                })
                 setDisciplina({
+                    id: aula.disciplina_id,
                     disciplina_nome: aula.disciplina_nome,
                     disciplina_sigla: aula.disciplina_sigla
                 })
@@ -66,8 +72,24 @@ export default function AulaFaltasForm() {
 
                 setData(stateData.data)
                 setNumeroAulas(stateData.numeroAulas)
-                setTurma(stateData.turma)
-                setDisciplina(stateData.disciplina)
+
+                // stateData.turma provavelmente tem id se vier da seleção
+                // stateData.disciplina provavelmente tem id se vier da seleção
+                // Precisamos garantir que venham com ID. 
+                // As views anteriores (nova) geralmente mandam objeto completo ou IDs.
+                // Vou mapear baseado no que geralmente temos.
+
+                setTurma({
+                    id: stateData.turma?.id || stateData.turmaId,
+                    nome: stateData.turma?.nome || stateData.turmaNome
+                })
+
+                setDisciplina({
+                    id: stateData.disciplina?.id || stateData.disciplinaId,
+                    disciplina_nome: stateData.disciplina?.nome || stateData.disciplinaNome,
+                    disciplina_sigla: stateData.disciplina?.sigla || stateData.disciplinaSigla
+                })
+
                 setBimestre(null)
 
                 // Carregar estudantes da turma
@@ -97,12 +119,89 @@ export default function AulaFaltasForm() {
         })
     }
 
-    // Recalcula máscaras se o número de aulas mudar na tela
     useEffect(() => {
         if (!loading && estudantes.length > 0) {
             setEstudantes(prev => processFaltasMask(prev, numeroAulas))
         }
     }, [numeroAulas]) // Apenas quando mudar o número de aulas manualmente
+
+    // Busca planos de aula sempre que data ou contexto de turma/disciplina mudarem
+    useEffect(() => {
+        const fetchPlanos = async () => {
+            // Verifica se temos os dados mínimos para buscar
+            // isEditing: aula.disciplina_id vem do serializer modificado
+            // New: stateData.disciplina.disciplina_id (precisa verificar estrutura)
+
+            // Precisamos do ID da disciplina e ID da turma. 
+            // disciplina e turma no state são objetos parciais {nome, sigla} ou {nome}.
+            // Mas precisamos ids reais.
+
+            // Melhor estratégia: pegar disciplina_id e turma_id do contexto carregado.
+            // O loadData setou 'disciplina' e 'turma'. Em edit, vem do serializer.
+            // Vou ajustar loadData para garantir salvar IDs no state disciplina/turma.
+
+            if (!data || !disciplina?.id || !turma?.id) return;
+
+            try {
+                const params = {
+                    data: data,
+                    disciplina_id: disciplina.id,
+                    turma_id: turma.id
+                }
+                const res = await pedagogicalAPI.planosAula.list(params)
+                setPlanosAula(res.data.results || res.data || [])
+            } catch (error) {
+                console.error("Erro ao buscar planos de aula:", error)
+            }
+        }
+
+        fetchPlanos()
+    }, [data, disciplina, turma])
+
+    const handlePlanoSelect = (planoId) => {
+        const plano = planosAula.find(p => p.id === planoId)
+        if (!plano) return
+
+        // Formata o conteúdo
+        let novoConteudo = plano.conteudo || ''
+
+        // Adiciona habilidades (siglas)
+        if (plano.habilidades_detalhes && plano.habilidades_detalhes.length > 0) {
+            const siglas = plano.habilidades_detalhes.map(h => h.codigo).join(', ')
+            novoConteudo += `\n\nHabilidades: ${siglas}`
+        }
+
+        // Se usar CKEditor ou similar que salva HTML, pode precisar tratar tags <p>
+        // Mas o componente parece usar textarea simples, então \n funciona.
+        // Se o plano.conteudo vier com HTML (RichText), vai aparecer tags no textarea.
+        // O model diz RichTextField, então vem HTML. 
+        // O textarea mostra HTML cru? O usuario pediu "Isso é pra ser bem simples!".
+        // Se o textarea for raw text, vamos fazer um strip simples ou apenas jogar o valor.
+
+        // Strip tags básico (opcional, se o usuário reclamar de tags HTML no textarea)
+        const stripHtml = (html) => {
+            let tmp = document.createElement("DIV");
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || "";
+        }
+
+        const textoConteudo = stripHtml(novoConteudo)
+
+        // Se quiser manter formatação, teria que usar um editor. 
+        // Mas como o request é "colocar o conteudo... dentro do campo... simples", 
+        // e o campo é um textarea, vou converter para texto puro para ficar legível.
+
+        // Recriação do conteúdo com habilidades limpo
+        const conteudoLimpo = stripHtml(plano.conteudo || '')
+        let textoFinal = conteudoLimpo
+
+        if (plano.habilidades_detalhes && plano.habilidades_detalhes.length > 0) {
+            const siglas = plano.habilidades_detalhes.map(h => h.codigo).join(', ')
+            textoFinal += `\n\nHabilidades: ${siglas}`
+        }
+
+        setConteudo(textoFinal)
+    }
 
     const toggleAulaFalta = (estudanteId, aulaIdx) => {
         setEstudantes(prev => prev.map(e => {
@@ -210,6 +309,29 @@ export default function AulaFaltasForm() {
                 <Card hover={false} className="overflow-hidden border-none shadow-premium">
                     <div className="p-1">
 
+                        <div className="mb-4">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 ml-1">
+                                Selecionar Plano de Aula
+                            </label>
+                            {planosAula.length > 0 ? (
+                                <select
+                                    className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                                    onChange={(e) => handlePlanoSelect(e.target.value)}
+                                    defaultValue=""
+                                >
+                                    <option value="" disabled>Selecione um plano de aula...</option>
+                                    {planosAula.map(plano => (
+                                        <option key={plano.id} value={plano.id}>
+                                            {plano.titulo}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <p className="text-sm text-slate-500 dark:text-slate-400 ml-1 italic">
+                                    Nenhum plano de aula encontrado para esta data.
+                                </p>
+                            )}
+                        </div>
 
                         <div className="relative">
                             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 ml-1">

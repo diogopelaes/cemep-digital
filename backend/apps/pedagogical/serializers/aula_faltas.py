@@ -73,8 +73,10 @@ class AulaFaltasSerializer(serializers.ModelSerializer):
     
     # --- Read Fields ---
     turma_nome = serializers.SerializerMethodField()
+    turma_id = serializers.SerializerMethodField()
     disciplina_nome = serializers.SerializerMethodField()
     disciplina_sigla = serializers.SerializerMethodField()
+    disciplina_id = serializers.SerializerMethodField()
     professor_nome = serializers.SerializerMethodField()
     total_faltas = serializers.SerializerMethodField()
     total_estudantes = serializers.SerializerMethodField()
@@ -92,8 +94,10 @@ class AulaFaltasSerializer(serializers.ModelSerializer):
             'conteudo', 
             'faltas_data',    # Write payload
             'turma_nome',     # Read
+            'turma_id',       # Read
             'disciplina_nome',# Read
             'disciplina_sigla', # Read
+            'disciplina_id',  # Read
             'professor_nome', # Read
             'total_faltas',   # Read
             'total_estudantes',# Read
@@ -138,11 +142,17 @@ class AulaFaltasSerializer(serializers.ModelSerializer):
     def get_turma_nome(self, obj):
         return obj.professor_disciplina_turma.disciplina_turma.turma.nome_completo
     
+    def get_turma_id(self, obj):
+        return obj.professor_disciplina_turma.disciplina_turma.turma.id
+
     def get_disciplina_nome(self, obj):
         return obj.professor_disciplina_turma.disciplina_turma.disciplina.nome
     
     def get_disciplina_sigla(self, obj):
         return obj.professor_disciplina_turma.disciplina_turma.disciplina.sigla
+
+    def get_disciplina_id(self, obj):
+        return obj.professor_disciplina_turma.disciplina_turma.disciplina.id
     
     def get_professor_nome(self, obj):
         return obj.professor_disciplina_turma.professor.usuario.get_full_name()

@@ -58,6 +58,20 @@ class PlanoAulaViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet
              # Vou restringir a visualização para o próprio professor ou gestão.
              if hasattr(user, 'funcionario'):
                  qs = qs.filter(professor=user.funcionario)
+
+        # Filtros adicionais para uso no select de AulaFaltasForm
+        data_aula = self.request.query_params.get('data')
+        turma_id = self.request.query_params.get('turma_id')
+        disciplina_id = self.request.query_params.get('disciplina_id')
+
+        if data_aula:
+            qs = qs.filter(data_inicio__lte=data_aula, data_fim__gte=data_aula)
+        
+        if turma_id:
+            qs = qs.filter(turmas__id=turma_id)
+        
+        if disciplina_id:
+            qs = qs.filter(disciplina_id=disciplina_id)
         
         return qs
 
