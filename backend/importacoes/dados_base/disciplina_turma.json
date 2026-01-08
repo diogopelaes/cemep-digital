@@ -1,0 +1,812 @@
+[
+    {
+        "turma": {
+            "numero": 1,
+            "letra": "X",
+            "curso": "EM",
+            "disciplinas": [
+                {
+                    "sigla": "ART",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "BIO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "EF",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FILO",
+                    "aulas_semanais": 1
+                },
+                {
+                    "sigla": "FIS",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "GEO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "HIST",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "ING",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "PORT",
+                    "aulas_semanais": 4
+                },
+                {
+                    "sigla": "QUI",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "SOC",
+                    "aulas_semanais": 1
+                },
+                {
+                    "sigla": "MAT",
+                    "aulas_semanais": 4
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 1,
+            "letra": "Y",
+            "curso": "EM",
+            "disciplinas": [
+                {
+                    "sigla": "ART",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "BIO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "EF",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FILO",
+                    "aulas_semanais": 1
+                },
+                {
+                    "sigla": "FIS",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "GEO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "HIST",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "ING",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "PORT",
+                    "aulas_semanais": 4
+                },
+                {
+                    "sigla": "QUI",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "SOC",
+                    "aulas_semanais": 1
+                },
+                {
+                    "sigla": "MAT",
+                    "aulas_semanais": 4
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 1,
+            "letra": "W",
+            "curso": "EM",
+            "disciplinas": [
+                {
+                    "sigla": "ART",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "BIO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "EF",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FILO",
+                    "aulas_semanais": 1
+                },
+                {
+                    "sigla": "FIS",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "GEO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "HIST",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "ING",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "PORT",
+                    "aulas_semanais": 4
+                },
+                {
+                    "sigla": "QUI",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "SOC",
+                    "aulas_semanais": 1
+                },
+                {
+                    "sigla": "MAT",
+                    "aulas_semanais": 4
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 1,
+            "letra": "X",
+            "curso": "TI",
+            "disciplinas": [
+                {
+                    "sigla": "BD I",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "DS I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LLA I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LP I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LOG",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "NP",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "TIC",
+                    "aulas_semanais": 4
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 1,
+            "letra": "Y",
+            "curso": "TI",
+            "disciplinas": [
+                {
+                    "sigla": "BD I",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "DS I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LLA I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LP I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LOG",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "NP",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "TIC",
+                    "aulas_semanais": 4
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 1,
+            "letra": "W",
+            "curso": "TI",
+            "disciplinas": [
+                {
+                    "sigla": "BD I",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "DS I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LLA I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LP I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LOG",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "NP",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "TIC",
+                    "aulas_semanais": 4
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 2,
+            "letra": "X",
+            "curso": "EM",
+            "disciplinas": [
+                {
+                    "sigla": "BIO",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "EF",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FILO",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FIS",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "GEO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "HIST",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "ING",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "PORT",
+                    "aulas_semanais": 4
+                },
+                {
+                    "sigla": "QUI",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "SOC",
+                    "aulas_semanais": 1
+                },
+                {
+                    "sigla": "MAT",
+                    "aulas_semanais": 5
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 2,
+            "letra": "Y",
+            "curso": "EM",
+            "disciplinas": [
+                {
+                    "sigla": "BIO",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "EF",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FILO",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FIS",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "GEO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "HIST",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "ING",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "PORT",
+                    "aulas_semanais": 4
+                },
+                {
+                    "sigla": "QUI",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "SOC",
+                    "aulas_semanais": 1
+                },
+                {
+                    "sigla": "MAT",
+                    "aulas_semanais": 5
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 2,
+            "letra": "W",
+            "curso": "EM",
+            "disciplinas": [
+                {
+                    "sigla": "BIO",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "EF",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FILO",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FIS",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "GEO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "HIST",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "ING",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "PORT",
+                    "aulas_semanais": 4
+                },
+                {
+                    "sigla": "QUI",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "SOC",
+                    "aulas_semanais": 1
+                },
+                {
+                    "sigla": "MAT",
+                    "aulas_semanais": 5
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 2,
+            "letra": "X",
+            "curso": "TI",
+            "disciplinas": [
+                {
+                    "sigla": "LPC I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "TPV I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LP II",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LLA II",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "ESI",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "BD II",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "DS II",
+                    "aulas_semanais": 4
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 2,
+            "letra": "Y",
+            "curso": "TI",
+            "disciplinas": [
+                {
+                    "sigla": "LPC I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "TPV I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LP II",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LLA II",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "ESI",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "BD II",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "DS II",
+                    "aulas_semanais": 4
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 2,
+            "letra": "W",
+            "curso": "TI",
+            "disciplinas": [
+                {
+                    "sigla": "LPC I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "TPV I",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LP II",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "LLA II",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "ESI",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "BD II",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "DS II",
+                    "aulas_semanais": 4
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 3,
+            "letra": "X",
+            "curso": "EM",
+            "disciplinas": [
+                {
+                    "sigla": "BIO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "EF",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FILO",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FIS",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "GEO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "HIST",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "ING",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "PORT",
+                    "aulas_semanais": 5
+                },
+                {
+                    "sigla": "QUI",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "SOC",
+                    "aulas_semanais": 1
+                },
+                {
+                    "sigla": "MAT",
+                    "aulas_semanais": 4
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 3,
+            "letra": "Y",
+            "curso": "EM",
+            "disciplinas": [
+                {
+                    "sigla": "BIO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "EF",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FILO",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FIS",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "GEO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "HIST",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "ING",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "PORT",
+                    "aulas_semanais": 5
+                },
+                {
+                    "sigla": "QUI",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "SOC",
+                    "aulas_semanais": 1
+                },
+                {
+                    "sigla": "MAT",
+                    "aulas_semanais": 4
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 3,
+            "letra": "W",
+            "curso": "EM",
+            "disciplinas": [
+                {
+                    "sigla": "BIO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "EF",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FILO",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "FIS",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "GEO",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "HIST",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "ING",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "PORT",
+                    "aulas_semanais": 5
+                },
+                {
+                    "sigla": "QUI",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "SOC",
+                    "aulas_semanais": 1
+                },
+                {
+                    "sigla": "MAT",
+                    "aulas_semanais": 4
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 3,
+            "letra": "X",
+            "curso": "TI",
+            "disciplinas": [
+                {
+                    "sigla": "LPC II",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "TPV II",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "LP III",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "BD III",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "OP",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "TCC",
+                    "aulas_semanais": 3
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 3,
+            "letra": "Y",
+            "curso": "TI",
+            "disciplinas": [
+                {
+                    "sigla": "LPC II",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "TPV II",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "LP III",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "BD III",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "OP",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "TCC",
+                    "aulas_semanais": 3
+                }
+            ]
+        }
+    },
+    {
+        "turma": {
+            "numero": 3,
+            "letra": "W",
+            "curso": "TI",
+            "disciplinas": [
+                {
+                    "sigla": "LPC II",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "TPV II",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "LP III",
+                    "aulas_semanais": 3
+                },
+                {
+                    "sigla": "BD III",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "OP",
+                    "aulas_semanais": 2
+                },
+                {
+                    "sigla": "TCC",
+                    "aulas_semanais": 3
+                }
+            ]
+        }
+    }
+]
