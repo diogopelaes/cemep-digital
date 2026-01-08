@@ -74,7 +74,7 @@ class PlanoAulaViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet
             if ano_letivo:
                 disciplinas_count = ProfessorDisciplinaTurma.objects.filter(
                     professor=user.funcionario,
-                    disciplina_turma__turma__ano_letivo=ano_letivo,
+                    disciplina_turma__turma__ano_letivo=ano_letivo.ano,
                     disciplina_turma__turma__is_active=True
                 ).values('disciplina_turma__disciplina').distinct().count()
         
@@ -116,7 +116,7 @@ class PlanoAulaViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet
         # 2. Busca atribuições (Professor -> Disciplina -> Turma)
         atribuicoes = ProfessorDisciplinaTurma.objects.filter(
             professor=professor,
-            disciplina_turma__turma__ano_letivo=ano_letivo,
+            disciplina_turma__turma__ano_letivo=ano_letivo.ano,
             disciplina_turma__turma__is_active=True
         ).select_related(
             'disciplina_turma__disciplina',

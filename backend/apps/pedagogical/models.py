@@ -85,13 +85,19 @@ class Aula(UUIDModel):
         related_name='aulas'
     )
     data = models.DateField(verbose_name='Data')
-    conteudo = RichTextField(verbose_name='Conteúdo Ministrado')
+    conteudo = RichTextField(verbose_name='Conteúdo Ministrado', blank=True, null=True)
     numero_aulas = models.PositiveSmallIntegerField(
         default=2,
         verbose_name='Número de Aulas (Geminadas)'
     )
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
+    bimestre = models.PositiveSmallIntegerField(
+        choices=[(0, 'Anual'), (1, '1º Bimestre'), (2, '2º Bimestre'), (3, '3º Bimestre'), (4, '4º Bimestre')],
+        default=0,
+        verbose_name='Bimestre'
+    )
+    
     
     class Meta:
         verbose_name = 'Aula'
@@ -101,6 +107,32 @@ class Aula(UUIDModel):
     
     def __str__(self):
         return f"{self.professor_disciplina_turma} - {self.data.strftime('%d/%m/%Y')}"
+
+    def save(self, *args, **kwargs):
+        # Tenta calcular/atualizar o bimestre sempre antes de salvar
+        # Isso garante correção se a data for alterada na edição
+        if self.data and self.professor_disciplina_turma_id:
+            try:
+                # Importação local para evitar ciclo
+                from apps.pedagogical.validators import _identificar_bimestre
+                from apps.core.models import AnoLetivo
+                
+                # Acessa diretamente (se falhar, cai no except)
+                turma = self.professor_disciplina_turma.disciplina_turma.turma
+                
+                # Busca AnoLetivo (cacheado se possível ou query leve)
+                ano_letivo = AnoLetivo.objects.filter(ano=turma.ano_letivo).first()
+                
+                if ano_letivo and ano_letivo.controles:
+                    # Usa validador para identificar bimestre
+                    bim_encontrado = _identificar_bimestre(ano_letivo.controles, self.data.isoformat())
+                    if bim_encontrado:
+                        self.bimestre = bim_encontrado
+            except Exception:
+                # Em caso de erro (ex: dados incompletos), mantém o valor atual ou default
+                pass
+                
+        super().save(*args, **kwargs)
 
 
 class Faltas(UUIDModel):
@@ -190,6 +222,11 @@ class OcorrenciaPedagogica(UUIDModel):
         related_name='ocorrencias'
     )
     data = models.DateTimeField(auto_now_add=True)
+    bimestre = models.PositiveSmallIntegerField(
+        choices=[(0, 'Anual'), (1, '1º Bimestre'), (2, '2º Bimestre'), (3, '3º Bimestre'), (4, '4º Bimestre')],
+        default=0,
+        verbose_name='Bimestre'
+    )
     
     class Meta:
         verbose_name = 'Ocorrência Pedagógica'
@@ -261,6 +298,11 @@ class Avaliacao(UUIDModel):
         ],
         default='SOMA',
         verbose_name='Tipo de Cálculo de Instrumentos'
+    )
+    bimestre = models.PositiveSmallIntegerField(
+        choices=[(0, 'Anual'), (1, '1º Bimestre'), (2, '2º Bimestre'), (3, '3º Bimestre'), (4, '4º Bimestre')],
+        default=0,
+        verbose_name='Bimestre'
     )
     
     class Meta:
@@ -355,7 +397,12 @@ class InstrumentoAvaliativo(UUIDModel):
         decimal_places=2,
         validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('10.00'))],
         verbose_name='Valor Máximo'
-    )   
+    )
+    bimestre = models.PositiveSmallIntegerField(
+        choices=[(0, 'Anual'), (1, '1º Bimestre'), (2, '2º Bimestre'), (3, '3º Bimestre'), (4, '4º Bimestre')],
+        default=0,
+        verbose_name='Bimestre'
+    )
     
     class Meta:
         verbose_name = 'Instrumento Avaliativo'
@@ -417,6 +464,11 @@ class ControleVisto(UUIDModel):
         default=None,
         verbose_name='Visto',
         help_text='True=Feito, False=Não Feito, Vazio=Não Avaliado'
+    )
+    bimestre = models.PositiveSmallIntegerField(
+        choices=[(0, 'Anual'), (1, '1º Bimestre'), (2, '2º Bimestre'), (3, '3º Bimestre'), (4, '4º Bimestre')],
+        default=0,
+        verbose_name='Bimestre'
     )
     
     class Meta:
@@ -577,6 +629,11 @@ class NotaBimestral(UUIDModel):
         decimal_places=2,
         validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('10.00'))],
         verbose_name='Nota'
+    )
+    bimestre = models.PositiveSmallIntegerField(
+        choices=[(0, 'Anual'), (1, '1º Bimestre'), (2, '2º Bimestre'), (3, '3º Bimestre'), (4, '4º Bimestre')],
+        default=0,
+        verbose_name='Bimestre'
     )
     
     class Meta:

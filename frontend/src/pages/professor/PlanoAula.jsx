@@ -82,7 +82,7 @@ export default function PlanoAula() {
             className="group relative flex flex-col h-full hover:border-primary-200 dark:hover:border-primary-800 transition-colors cursor-pointer"
             onClick={() => navigate(`/plano-aula/${plano.id}/editar`)}
         >
-            <div className="absolute top-4 right-4 flex gap-1 z-10">
+            <div className="absolute top-4 right-4 flex gap-3 z-10">
                 <button
                     onClick={(e) => {
                         e.stopPropagation()

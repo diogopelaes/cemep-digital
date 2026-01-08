@@ -114,7 +114,7 @@ export default function AulaFaltas() {
             className="group relative flex flex-col h-full hover:border-primary-200 dark:hover:border-primary-800 transition-colors cursor-pointer"
             onClick={() => navigate(`/aula-faltas/${aula.id}/editar`)}
         >
-            <div className="absolute top-4 right-4 flex gap-1 z-10">
+            <div className="absolute top-4 right-4 flex gap-3 z-10">
                 <button
                     onClick={(e) => {
                         e.stopPropagation()
@@ -267,7 +267,7 @@ export default function AulaFaltas() {
                                     <TableHeader>Data</TableHeader>
                                     <TableHeader>Turma</TableHeader>
                                     {showDisciplinaColumn && <TableHeader>Disciplina</TableHeader>}
-                                    <TableHeader>Conteúdo</TableHeader>
+                                    {bimestreSelecionado === '' && <TableHeader>Bimestre</TableHeader>}
                                     <TableHeader className="th-center">Faltas</TableHeader>
                                     <TableHeader className="th-center">Nº Aulas</TableHeader>
                                     <TableHeader className="th-center">Ações</TableHeader>
@@ -293,15 +293,13 @@ export default function AulaFaltas() {
                                                 </Badge>
                                             </TableCell>
                                         )}
-                                        <TableCell>
-                                            <div
-                                                className="max-w-xs truncate text-slate-600 dark:text-slate-400 cursor-pointer hover:text-primary-600 transition-colors"
-                                                onClick={() => navigate(`/aula-faltas/${aula.id}/editar`)}
-                                                title={aula.conteudo?.replace(/<[^>]*>/g, '')}
-                                            >
-                                                {aula.conteudo ? aula.conteudo.replace(/<[^>]*>/g, '').substring(0, 60) + '...' : 'Sem conteúdo'}
-                                            </div>
-                                        </TableCell>
+                                        {bimestreSelecionado === '' && (
+                                            <TableCell>
+                                                <Badge variant="outline" className="text-xs font-semibold">
+                                                    {aula.bimestre ? `${aula.bimestre}º Bim` : '-'}
+                                                </Badge>
+                                            </TableCell>
+                                        )}
                                         <TableCell className="td-center">
                                             <Badge variant={aula.total_faltas > 0 ? 'warning' : 'success'}>
                                                 {aula.total_faltas}

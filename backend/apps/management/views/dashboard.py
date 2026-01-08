@@ -40,7 +40,7 @@ class DashboardViewSet(viewsets.ViewSet):
         
         # Dados base para todos
         data = {
-            'ano_letivo': ano,
+            'ano_letivo': ano.ano if ano else None,
             'perfil': user.tipo_usuario,
         }
         
@@ -64,10 +64,11 @@ class DashboardViewSet(viewsets.ViewSet):
         """
         # Contagem de estudantes matriculados no ano selecionado
         if ano:
+            ano_num = ano.ano
             total_estudantes = Estudante.objects.filter(
-                matriculas_cemep__matriculas_turma__turma__ano_letivo=ano
+                matriculas_cemep__matriculas_turma__turma__ano_letivo=ano_num
             ).distinct().count()
-            total_turmas = Turma.objects.filter(ano_letivo=ano).count()
+            total_turmas = Turma.objects.filter(ano_letivo=ano_num).count()
         else:
             total_estudantes = 0
             total_turmas = 0

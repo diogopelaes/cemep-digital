@@ -408,6 +408,15 @@ class AnoLetivo(UUIDModel):
         verbose_name='Controles'
     )
 
+    # Cache de datas liberadas com validade diária (recalcula no dia seguinte)
+    # Estrutura: {"datasLiberadas": ["2026-01-08", ...], "validade": "2026-01-08"}
+    datas_liberadas_aulas_faltas = models.JSONField(
+        default=dict,
+        blank=True,
+        null=True,
+        verbose_name='Cache de Datas Liberadas (Aulas/Faltas)'
+    )
+
     def bimestre(self, data=None):
         if data is None:
             data = timezone.now().date()
@@ -462,6 +471,9 @@ class AnoLetivo(UUIDModel):
         # Só cria controles se for um novo registro
         if is_new:
             self._criar_controles_iniciais()
+            
+        # Atualiza o JSON de controles sempre que salvar o AnoLetivo
+        self.atualizar_controles_json()
     
     def _criar_controles_iniciais(self):
         """Cria os registros de controle para todos os tipos e bimestres."""
@@ -494,6 +506,87 @@ class AnoLetivo(UUIDModel):
             ignore_conflicts=True  # Ignora se já existir (segurança extra)
         )
     
+    
+    def atualizar_controles_json(self):
+        """
+        Atualiza o campo JSON 'controles' com base nas configurações de 
+        ControleRegistrosVisualizacao e datas dos bimestres.
+        """
+        from datetime import timedelta
+        from apps.core.models import ControleRegistrosVisualizacao
+        
+        # Recupera todos os controles deste ano letivo
+        controles_db = ControleRegistrosVisualizacao.objects.filter(ano_letivo=self)
+        
+        # Estrutura base
+        novo_controles = {}
+        
+        # Datas dos bimestres (hardcoded campos do model)
+        datas_bimestres = {
+            1: (self.data_inicio_1bim, self.data_fim_1bim),
+            2: (self.data_inicio_2bim, self.data_fim_2bim),
+            3: (self.data_inicio_3bim, self.data_fim_3bim),
+            4: (self.data_inicio_4bim, self.data_fim_4bim),
+        }
+        
+        # Carrega feriados e extras em memória para performance
+        feriados = set(d.data for d in self.dias_nao_letivos.all())
+        extras = set(d.data for d in self.dias_letivos_extras.all())
+        
+        # Processa cada controle
+        for controle in controles_db:
+            bim_key = str(controle.bimestre)
+            if bim_key not in novo_controles:
+                novo_controles[bim_key] = {}
+                
+            c_data = {
+                'data_liberada_inicio': controle.data_inicio.isoformat() if controle.data_inicio else None,
+                'data_liberada_fim': controle.data_fim.isoformat() if controle.data_fim else None,
+                'digitacao_futura': controle.digitacao_futura
+            }
+            
+            # Se for tipo AULA e bimestre 1-4, calcula dias letivos
+            if controle.tipo == ControleRegistrosVisualizacao.TipoControle.REGISTRO_AULA and controle.bimestre in range(1, 5):
+                dias_letivos = []
+                inicio_bim, fim_bim = datas_bimestres.get(controle.bimestre, (None, None))
+                
+                if inicio_bim and fim_bim:
+                    curr = inicio_bim
+                    while curr <= fim_bim:
+                        # Lógica:
+                        # 1. Base: Segunda a Sexta
+                        # 2. Remove: Feriados/Nao letivos
+                        # 3. Adiciona: Extras (se estiver no range)
+                        
+                        is_weekday = curr.weekday() < 5 # 0-4 é Seg-Sex
+                        is_feriado = curr in feriados
+                        is_extra = curr in extras
+                        
+                        # Dia é letivo se:
+                        # (É dia de semana E NÃO é feriado) OU (É extra)
+                        # Nota: Se for feriado E extra, entra como letivo (extra vence)
+                        if (is_weekday and not is_feriado) or is_extra:
+                            dias_letivos.append(curr.isoformat())
+                            
+                        curr += timedelta(days=1)
+                
+                c_data['dias_letivos'] = dias_letivos
+                
+            novo_controles[bim_key][controle.tipo] = c_data
+            
+        # Atualiza o campo no banco sem disparar signals recursivos
+        AnoLetivo.objects.filter(pk=self.pk).update(controles=novo_controles)
+        
+        # Invalida o cache de datas liberadas quando os controles mudam
+        self.invalidar_cache_datas_liberadas()
+
+    def invalidar_cache_datas_liberadas(self):
+        """
+        Força recálculo do cache de datas liberadas na próxima requisição.
+        Deve ser chamado quando os controles forem alterados.
+        """
+        AnoLetivo.objects.filter(pk=self.pk).update(datas_liberadas_aulas_faltas=None)
+
     class Meta:
         verbose_name = 'Ano Letivo'
         verbose_name_plural = 'Anos Letivos'
@@ -733,67 +826,12 @@ class ControleRegistrosVisualizacao(UUIDModel):
             raise ValidationError('A data de fim deve ser posterior à data de início.')
             
     def save(self, *args, **kwargs):
-        from datetime import timedelta
-        
         super().save(*args, **kwargs)
         
-        # Atualiza o JSON field 'controles' no AnoLetivo
-        ano = self.ano_letivo
-        if not filter(lambda f: f.name == 'controles', AnoLetivo._meta.fields):
-             # Safety check - se o campo ainda não existir no DB (migração pendente)
-             return
+        # Atualiza o JSON centralizado no AnoLetivo
+        self.ano_letivo.atualizar_controles_json()
+        
 
-        if ano.controles is None:
-            ano.controles = {}
-            
-        bim_key = str(self.bimestre)
-        
-        if bim_key not in ano.controles:
-            ano.controles[bim_key] = {}
-            
-        c_data = {
-            'data_inicio': self.data_inicio.isoformat() if self.data_inicio else None,
-            'data_fim': self.data_fim.isoformat() if self.data_fim else None,
-            'digitacao_futura': self.digitacao_futura
-        }
-        
-        # Lógica para dias letivos (Apenas AULA)
-        if self.tipo == self.TipoControle.REGISTRO_AULA and self.data_inicio and self.data_fim:
-            dias_letivos = []
-            
-            # Busca feriados e extras do ano (sets para performance O(1))
-            feriados = set(d.data for d in ano.dias_nao_letivos.all())
-            extras = set(d.data for d in ano.dias_letivos_extras.all())
-            
-            curr = self.data_inicio
-            while curr <= self.data_fim:
-                # Regra: Seg-Sex (weekday < 5)
-                # Inclui se não for feriado
-                # OU se for Extra (trata exceções)
-                
-                is_weekend = curr.weekday() >= 5
-                
-                if is_weekend:
-                    if curr in extras:
-                        dias_letivos.append(curr.isoformat())
-                else:
-                    if curr not in feriados:
-                        dias_letivos.append(curr.isoformat())
-                    # Se for feriado mas estiver marcado como extra letivo (exceção rara)
-                    elif curr in extras:
-                        dias_letivos.append(curr.isoformat())
-                        
-                curr += timedelta(days=1)
-                
-            c_data['dias_letivos'] = dias_letivos
-            
-        ano.controles[bim_key][self.tipo] = c_data
-        
-        # Salva apenas o campo controles para evitar recursão ou overhead
-        # Importante: AnoLetivo.save() não deve limpar isso.
-        
-        # Update no banco direto para garantir atomicidade/evitar conflitos de save() completo
-        AnoLetivo.objects.filter(pk=ano.pk).update(controles=ano.controles)
 
     def esta_liberado(self, data_referencia=None):
         """

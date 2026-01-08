@@ -34,7 +34,11 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'date_joined', 'last_login', 'ano_letivo_selecionado']
 
-    ano_letivo_selecionado = serializers.IntegerField(source='get_ano_letivo_selecionado', read_only=True)
+    ano_letivo_selecionado = serializers.SerializerMethodField(read_only=True)
+
+    def get_ano_letivo_selecionado(self, obj):
+        ano = obj.get_ano_letivo_selecionado()
+        return ano.ano if ano else None
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

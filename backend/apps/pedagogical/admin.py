@@ -20,9 +20,10 @@ class PlanoAulaAdmin(admin.ModelAdmin):
 
 @admin.register(Aula)
 class AulaAdmin(admin.ModelAdmin):
-    list_display = ['professor_disciplina_turma', 'data', 'numero_aulas', 'criado_em']
+    list_display = ['professor_disciplina_turma', 'data', 'numero_aulas', 'bimestre', 'criado_em']
     list_filter = [
-        'data', 
+        'data',
+        'bimestre',
         'professor_disciplina_turma__disciplina_turma__turma__ano_letivo',
         'professor_disciplina_turma__disciplina_turma__turma',
         'professor_disciplina_turma__disciplina_turma__disciplina'
@@ -52,8 +53,8 @@ class DescritorOcorrenciaPedagogicaAdmin(admin.ModelAdmin):
 
 @admin.register(OcorrenciaPedagogica)
 class OcorrenciaPedagogicaAdmin(admin.ModelAdmin):
-    list_display = ['estudante', 'tipo', 'autor', 'data']
-    list_filter = ['tipo', 'data']
+    list_display = ['estudante', 'tipo', 'autor', 'bimestre', 'data']
+    list_filter = ['tipo', 'bimestre', 'data']
     date_hierarchy = 'data'
 
 
@@ -65,7 +66,7 @@ class OcorrenciaResponsavelCienteAdmin(admin.ModelAdmin):
 
 @admin.register(Avaliacao)
 class AvaliacaoAdmin(admin.ModelAdmin):
-    list_display = ['professor_disciplina_turma', 'tipo', 'valor', 'tipo_calculo_instrumentos']
+    list_display = ['professor_disciplina_turma', 'tipo', 'bimestre', 'valor', 'tipo_calculo_instrumentos']
     list_filter = [
         'tipo', 
         'tipo_calculo_instrumentos', 
@@ -81,7 +82,7 @@ class AvaliacaoAdmin(admin.ModelAdmin):
 
 @admin.register(InstrumentoAvaliativo)
 class InstrumentoAvaliativoAdmin(admin.ModelAdmin):
-    list_display = ['titulo', 'avaliacao', 'data_inicio', 'data_fim', 'valor', 'peso', 'usa_vistos']
+    list_display = ['titulo', 'avaliacao', 'bimestre', 'data_inicio', 'data_fim', 'valor', 'peso', 'usa_vistos']
     list_filter = [
         'usa_vistos', 
         'data_inicio', 
@@ -99,7 +100,7 @@ class InstrumentoAvaliativoAdmin(admin.ModelAdmin):
 
 @admin.register(ControleVisto)
 class ControleVistoAdmin(admin.ModelAdmin):
-    list_display = ['titulo', 'matricula_turma', 'professor_disciplina_turma', 'instrumento_avaliativo', 'visto', 'data_visto']
+    list_display = ['titulo', 'matricula_turma', 'professor_disciplina_turma', 'bimestre', 'instrumento_avaliativo', 'visto', 'data_visto']
     list_filter = [
         'visto', 
         'data_visto', 
@@ -141,7 +142,7 @@ class NotaAvaliacaoAdmin(admin.ModelAdmin):
 
 @admin.register(NotaBimestral)
 class NotaBimestralAdmin(admin.ModelAdmin):
-    list_display = ['matricula_turma', 'professor_disciplina_turma', 'nota']
+    list_display = ['matricula_turma', 'professor_disciplina_turma', 'bimestre', 'nota']
     list_filter = [
         'professor_disciplina_turma__disciplina_turma__turma__ano_letivo',
         'professor_disciplina_turma__disciplina_turma__turma'

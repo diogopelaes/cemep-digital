@@ -274,5 +274,5 @@ class AnoLetivoFilterMixin:
         qs = super().get_queryset()
         ano = self.request.user.get_ano_letivo_selecionado()
         if ano:
-            qs = qs.filter(**{self.ano_letivo_field: ano})
+            qs = qs.filter(**{self.ano_letivo_field: ano.ano})
         return qs

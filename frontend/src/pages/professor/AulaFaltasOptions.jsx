@@ -29,21 +29,27 @@ export default function AulaFaltasOptions() {
         ? (disciplinasPorTurma[turmaSelecionada] || [])
         : []
 
-    // Mostra select de disciplina se turma tiver mais de uma
+    // Mostra select de disciplina somente se houver mais de uma
     const showDisciplinaSelect = disciplinasDisponiveis.length > 1
 
-    // Se só tem uma disciplina, seleciona automaticamente
+    // Gerencia a seleção da disciplina quando a turma muda
     useEffect(() => {
-        if (disciplinasDisponiveis.length === 1 && !disciplinaSelecionada) {
-            setDisciplinaSelecionada(disciplinasDisponiveis[0].professor_disciplina_turma_id)
-        } else if (disciplinasDisponiveis.length > 1 && disciplinaSelecionada) {
-            // Limpa se mudou de turma
-            const existe = disciplinasDisponiveis.find(d => d.professor_disciplina_turma_id === disciplinaSelecionada)
-            if (!existe) {
+        const idsDisponiveis = disciplinasDisponiveis.map(d => d.professor_disciplina_turma_id)
+
+        if (disciplinasDisponiveis.length === 1) {
+            // Se só tem 1, auto-seleciona (se já não estiver correta)
+            const idUnico = disciplinasDisponiveis[0].professor_disciplina_turma_id
+            if (disciplinaSelecionada !== idUnico) {
+                setDisciplinaSelecionada(idUnico)
+            }
+        } else {
+            // Se tem múltiplas ou nenhuma, verifica se a seleção atual ainda é válida
+            if (disciplinaSelecionada && !idsDisponiveis.includes(disciplinaSelecionada)) {
                 setDisciplinaSelecionada('')
             }
         }
-    }, [turmaSelecionada, disciplinasDisponiveis])
+    }, [turmaSelecionada, disciplinasDisponiveis, disciplinaSelecionada])
+
 
     useEffect(() => {
         loadContexto()
@@ -53,22 +59,59 @@ export default function AulaFaltasOptions() {
         setLoading(true)
         try {
             const res = await pedagogicalAPI.aulasFaltas.opcoesNovaAula()
-            setTurmas(res.data.turmas || [])
-            setDisciplinasPorTurma(res.data.disciplinas_por_turma || {})
 
-            // Datas liberadas (lista simples pré-calculada)
-            setDatasLiberadas(res.data.datas_liberadas || [])
-            setDataAtual(res.data.data_atual)
-            setMensagemRestricao(res.data.mensagem_restricao)
+            // Processa a lista plana de atribuições do backend
+            const atribuicoes = res.data.atribuicoes || []
+            const turmasMap = new Map()
+            const discMap = {}
 
-            // Se só tem uma turma, seleciona automaticamente
-            if (res.data.turmas?.length === 1) {
-                setTurmaSelecionada(res.data.turmas[0].id)
+            atribuicoes.forEach(atrib => {
+                // Extrai Turmas únicas
+                if (!turmasMap.has(atrib.turma_id)) {
+                    turmasMap.set(atrib.turma_id, {
+                        id: atrib.turma_id,
+                        nome: atrib.turma_nome
+                    })
+                }
+
+                // Agrupa Disciplinas por Turma
+                if (!discMap[atrib.turma_id]) {
+                    discMap[atrib.turma_id] = []
+                }
+
+                discMap[atrib.turma_id].push({
+                    professor_disciplina_turma_id: atrib.id, // ID da atribuição PD
+                    disciplina_nome: atrib.disciplina_nome
+                })
+            })
+
+            // Converte Map para Array e atualiza estado
+            const turmasList = Array.from(turmasMap.values())
+            setTurmas(turmasList)
+            setDisciplinasPorTurma(discMap)
+
+            // Backend já envia datasLiberadas processadas (cache com TTL 2h)
+            // Não precisa mais processar controles no frontend
+            const datasDoBackend = res.data.datasLiberadas || []
+            const today = res.data.data_atual || new Date().toISOString().split('T')[0]
+
+            setDatasLiberadas(datasDoBackend)
+            setDataAtual(today)
+
+            if (datasDoBackend.length === 0) {
+                setMensagemRestricao('O registro de aulas não está liberado para nenhum bimestre hoje.')
+            } else {
+                setMensagemRestricao(null)
             }
 
-            // Define data inicial como hoje se estiver na lista de liberadas
-            if (res.data.data_atual && res.data.datas_liberadas?.includes(res.data.data_atual)) {
-                setData(res.data.data_atual)
+            // Se só tem uma turma, seleciona automaticamente
+            if (turmasList.length === 1) {
+                setTurmaSelecionada(turmasList[0].id)
+            }
+
+            // Sempre inicializa com a data atual
+            if (today) {
+                setData(today)
             }
         } catch (error) {
             console.error(error)
@@ -222,8 +265,9 @@ export default function AulaFaltasOptions() {
                             {(disciplinaSelecionada || disciplinasDisponiveis.length === 1) && (
                                 <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                                     <strong>Disciplina:</strong> {
-                                        disciplinasDisponiveis.find(d =>
-                                            d.professor_disciplina_turma_id === (disciplinaSelecionada || disciplinasDisponiveis[0]?.professor_disciplina_turma_id)
+                                        (disciplinasDisponiveis.length === 1
+                                            ? disciplinasDisponiveis[0]
+                                            : disciplinasDisponiveis.find(d => d.professor_disciplina_turma_id === disciplinaSelecionada)
                                         )?.disciplina_nome
                                     }
                                 </p>

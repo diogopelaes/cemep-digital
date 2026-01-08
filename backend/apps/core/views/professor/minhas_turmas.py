@@ -24,9 +24,12 @@ class MinhasTurmasViewSet(viewsets.ViewSet):
         """
         Retorna um dicionário mapeando turma_id -> lista de disciplinas (sigla, nome).
         """
+        if not ano_letivo:
+            return {}
+            
         atribuicoes = ProfessorDisciplinaTurma.objects.filter(
             professor=professor,
-            disciplina_turma__turma__ano_letivo=ano_letivo
+            disciplina_turma__turma__ano_letivo=ano_letivo.ano
         ).select_related(
             'disciplina_turma__disciplina',
             'disciplina_turma__turma'
@@ -107,7 +110,7 @@ class MinhasTurmasViewSet(viewsets.ViewSet):
         leciona_turma = ProfessorDisciplinaTurma.objects.filter(
             professor=funcionario,
             disciplina_turma__turma__id=pk,
-            disciplina_turma__turma__ano_letivo=ano_letivo
+            disciplina_turma__turma__ano_letivo=ano_letivo.ano if ano_letivo else None
         ).exists()
         
         if not leciona_turma:

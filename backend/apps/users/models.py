@@ -71,15 +71,14 @@ class User(AbstractUser):
 
     def get_ano_letivo_selecionado(self):
         """
-        Retorna o número do ano letivo selecionado pelo usuário.
+        Retorna o objeto AnoLetivo selecionado pelo usuário.
         Se não houver seleção, retorna o ano ativo.
         Se não houver ano ativo, retorna None.
         """
         from apps.core.models import AnoLetivo, AnoLetivoSelecionado
         try:
-            return self.ano_letivo_selecionado.ano_letivo.ano
+            return self.ano_letivo_selecionado.ano_letivo
         except AnoLetivoSelecionado.DoesNotExist:
             ano_ativo = AnoLetivo.objects.filter(is_active=True).first()
-            if ano_ativo:
-                return ano_ativo.ano
-            return None
+            return ano_ativo if ano_ativo else None
+

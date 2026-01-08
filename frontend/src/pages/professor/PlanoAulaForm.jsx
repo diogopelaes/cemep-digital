@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
     Card, Loading, Select, Input,
-    DateInput, TurmaSelector, MultiCombobox, FormActions
+    DateInput, Button, Badge, TurmaSelector, MultiCombobox
 } from '../../components/ui'
+import FormActionsProfessor from './FormActionsProfessor'
 import { HiInformationCircle } from 'react-icons/hi'
 import { pedagogicalAPI, coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
@@ -263,8 +264,7 @@ export default function PlanoAulaForm() {
                         </div>
                     )}
 
-                    <FormActions
-                        cancelTo="/plano-aula"
+                    <FormActionsProfessor
                         saving={submitting}
                         isEditing={isEditing}
                         entityName="Plano"

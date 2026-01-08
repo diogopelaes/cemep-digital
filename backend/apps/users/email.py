@@ -21,10 +21,8 @@ class PasswordResetEmail:
         # Djoser view passes 'user' but expects email class to generate these.
         if user:
             if 'uid' not in self.context:
-                print(f"Generating UID for user {user}")
                 self.context['uid'] = utils.encode_uid(user.pk)
             if 'token' not in self.context:
-                print(f"Generating Token for user {user}")
                 self.context['token'] = default_token_generator.make_token(user)
 
         # 2. Site Name
@@ -50,7 +48,6 @@ class PasswordResetEmail:
                 
                 self.context['url'] = full_url
             except Exception as e:
-                print(f"Error generating reset URL: {e}")
                 self.context['url'] = '#'
 
     def send(self, to, *args, **kwargs):
@@ -76,8 +73,6 @@ class PasswordResetEmail:
             to=to
         )
         
-        # DEBUG: Imprimir contexto para verificar URL
-        print(f"DEBUG EMAIL CONTEXT: URL={self.context.get('url')}, SITE_URL={self.context.get('site_url')}")
         
         # Reabilita o HTML (Correção Final)
         msg.attach_alternative(html_content, "text/html")
