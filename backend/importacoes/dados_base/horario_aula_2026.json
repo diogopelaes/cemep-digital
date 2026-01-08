@@ -1,0 +1,129 @@
+[
+    {
+        "numero": 1,
+        "hora_inicio": "07:00",
+        "hora_fim": "07:50",
+        "dias": [
+            0,
+            1,
+            2,
+            3,
+            4
+        ]
+    },
+    {
+        "numero": 2,
+        "hora_inicio": "07:50",
+        "hora_fim": "08:40",
+        "dias": [
+            0,
+            1,
+            2,
+            3,
+            4
+        ]
+    },
+    {
+        "numero": 3,
+        "hora_inicio": "08:40",
+        "hora_fim": "09:30",
+        "dias": [
+            0,
+            1,
+            2,
+            3,
+            4
+        ]
+    },
+    {
+        "numero": 4,
+        "hora_inicio": "09:45",
+        "hora_fim": "10:35",
+        "dias": [
+            0,
+            1,
+            2,
+            3,
+            4
+        ]
+    },
+    {
+        "numero": 5,
+        "hora_inicio": "10:35",
+        "hora_fim": "11:25",
+        "dias": [
+            0,
+            1,
+            2,
+            3,
+            4
+        ]
+    },
+    {
+        "numero": 6,
+        "hora_inicio": "11:25",
+        "hora_fim": "12:15",
+        "dias": [
+            0,
+            1,
+            2,
+            3,
+            4
+        ]
+    },
+    {
+        "numero": 7,
+        "hora_inicio": "13:15",
+        "hora_fim": "14:05",
+        "dias": [
+            0,
+            1,
+            2,
+            3
+        ]
+    },
+    {
+        "numero": 8,
+        "hora_inicio": "14:05",
+        "hora_fim": "14:55",
+        "dias": [
+            0,
+            1,
+            2,
+            3
+        ]
+    },
+    {
+        "numero": 9,
+        "hora_inicio": "14:55",
+        "hora_fim": "15:45",
+        "dias": [
+            0,
+            1,
+            2,
+            3
+        ]
+    },
+    {
+        "numero": 10,
+        "hora_inicio": "16:00",
+        "hora_fim": "16:50",
+        "dias": [
+            0,
+            1,
+            2,
+            3
+        ]
+    },
+    {
+        "numero": 11,
+        "hora_inicio": "16:50",
+        "hora_fim": "17:40",
+        "dias": [
+            0,
+            1,
+            2,
+            3
+        ]
+    }
+]
