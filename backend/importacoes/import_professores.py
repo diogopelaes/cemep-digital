@@ -59,7 +59,8 @@ def import_professores(csv_path):
 
             if not user:
                 # Cria usuário com senha aleatória segura
-                temp_password = User.objects.make_random_password()
+                from django.utils.crypto import get_random_string
+                temp_password = get_random_string(12)
                 user = User.objects.create_user(
                     username=matricula,
                     email=email,
