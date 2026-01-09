@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { HiChevronDown, HiChevronRight, HiRefresh, HiInformationCircle } from 'react-icons/hi'
+import { useState, useEffect, useCallback } from 'react'
+import { HiChevronDown, HiChevronRight, HiInformationCircle } from 'react-icons/hi'
 import { coreAPI } from '../../services/api'
-import { Loading, Badge } from '../ui'
+import { Loading, Badge, FormActions } from '../ui'
 import ControleForm from '../../pages/ControleForm'
 import toast from 'react-hot-toast'
 import { useReferences } from '../../contexts/ReferenceContext'
@@ -24,22 +24,11 @@ export default function ControleTab() {
     const [controles, setControles] = useState([])
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
-    const [expandedBimestres, setExpandedBimestres] = useState([1])
     const [activeAno, setActiveAno] = useState(null)
+    const [hasChanges, setHasChanges] = useState(false)
 
-    const saveTimeoutRef = useRef(null)
-    const controlesRef = useRef(controles)
-    const activeAnoRef = useRef(activeAno)
+    const [expandedBimestres, setExpandedBimestres] = useState([1])
     const { anosLetivos } = useReferences()
-
-    // Mantém refs atualizados
-    useEffect(() => {
-        controlesRef.current = controles
-    }, [controles])
-
-    useEffect(() => {
-        activeAnoRef.current = activeAno
-    }, [activeAno])
 
     useEffect(() => {
         if (anosLetivos && anosLetivos.length > 0) {
@@ -57,8 +46,9 @@ export default function ControleTab() {
     const loadControles = async () => {
         try {
             setLoading(true)
-            const { data } = await coreAPI.controleRegistros.porAno(activeAnoRef.current?.ano || activeAno?.ano)
+            const { data } = await coreAPI.controleRegistros.porAno(activeAno?.ano)
             setControles(Array.isArray(data) ? data : [])
+            setHasChanges(false)
         } catch (error) {
             console.error('Erro ao carregar controles:', error)
             toast.error('Erro ao carregar controles')
@@ -71,17 +61,14 @@ export default function ControleTab() {
         return controles.find(c => c.bimestre === bimestre && c.tipo === tipo)
     }
 
-    const saveChanges = useCallback(async () => {
-        const currentControles = controlesRef.current
-        const currentAno = activeAnoRef.current
-
-        const dirtyControles = currentControles.filter(c => c._dirty)
+    const handleSave = async () => {
+        const dirtyControles = controles.filter(c => c._dirty)
         if (dirtyControles.length === 0) return
 
         setSaving(true)
         try {
             const payload = dirtyControles.map(c => ({
-                ano_letivo: c.ano_letivo || currentAno?.id,
+                ano_letivo: c.ano_letivo || activeAno?.id,
                 bimestre: c.bimestre,
                 tipo: c.tipo,
                 data_inicio: c.data_inicio || null,
@@ -89,21 +76,29 @@ export default function ControleTab() {
                 digitacao_futura: c.digitacao_futura
             }))
 
-            console.log('Salvando controles:', payload)
             await coreAPI.controleRegistros.salvarLote({ controles: payload })
 
             // Recarregar para pegar status atualizado
-            const { data } = await coreAPI.controleRegistros.porAno(currentAno?.ano)
+            const { data } = await coreAPI.controleRegistros.porAno(activeAno?.ano)
             setControles(Array.isArray(data) ? data : [])
+            setHasChanges(false)
 
-            toast.success('Salvo automaticamente')
+            toast.success('Alterações salvas com sucesso!')
         } catch (error) {
             console.error('Erro ao salvar:', error)
             toast.error('Erro ao salvar alterações')
         } finally {
             setSaving(false)
         }
-    }, [])
+    }
+
+    const handleCancel = () => {
+        if (hasChanges) {
+            loadControles()
+            setHasChanges(false)
+            toast('Alterações descartadas', { icon: 'ℹ️' })
+        }
+    }
 
     const handleChange = useCallback((bimestre, tipo, field, value) => {
         setControles(prev => {
@@ -119,7 +114,7 @@ export default function ControleTab() {
             } else {
                 // Criar novo controle local
                 updated = [...prev, {
-                    ano_letivo: activeAnoRef.current?.id,
+                    ano_letivo: activeAno?.id,
                     bimestre,
                     tipo,
                     data_inicio: null,
@@ -130,19 +125,10 @@ export default function ControleTab() {
                 }]
             }
 
-            // Atualiza ref imediatamente
-            controlesRef.current = updated
             return updated
         })
-
-        // Debounce save
-        if (saveTimeoutRef.current) {
-            clearTimeout(saveTimeoutRef.current)
-        }
-        saveTimeoutRef.current = setTimeout(() => {
-            saveChanges()
-        }, 800)
-    }, [saveChanges])
+        setHasChanges(true)
+    }, [activeAno])
 
     const toggleBimestre = (bimestre) => {
         setExpandedBimestres(prev =>
@@ -182,12 +168,6 @@ export default function ControleTab() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    {saving && (
-                        <span className="text-sm text-slate-500 flex items-center gap-1">
-                            <HiRefresh className="w-4 h-4 animate-spin" />
-                            Salvando...
-                        </span>
-                    )}
                 </div>
             </div>
 
@@ -269,6 +249,16 @@ export default function ControleTab() {
                     )
                 })}
             </div>
+
+            <FormActions
+                onSave={handleSave}
+                onCancel={handleCancel}
+                saving={saving}
+                isEditing={true}
+                saveLabel="Salvar Configurações"
+                disabled={!hasChanges}
+                className="mt-6"
+            />
         </div>
     )
 }

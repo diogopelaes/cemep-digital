@@ -189,7 +189,24 @@ export async function generateListaTurmaPDF(turma, estudantes) {
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(8)
 
-    estudantes.forEach((est, index) => {
+    // === ORDENAÇÃO E PREPARAÇÃO ===
+    // Ordenar por número de chamada (se houver) e depois por nome
+    const estudantesOrdenados = [...estudantes].sort((a, b) => {
+        const numA = parseInt(a.numero_chamada) || 0
+        const numB = parseInt(b.numero_chamada) || 0
+
+        if (numA !== numB) {
+            // Se um for 0 (não definido), coloca no final ou mantém ordem? 
+            // Geralmente 0 deve ir para o final se os outros estão numerados.
+            if (numA === 0) return 1
+            if (numB === 0) return -1
+            return numA - numB
+        }
+
+        return (a.nome || '').localeCompare(b.nome || '')
+    })
+
+    estudantesOrdenados.forEach((est, index) => {
         // Verificar quebra de página
         if (y > pageHeight - 15) {
             addFooter(doc, margin) // Passa margem customizada
@@ -249,8 +266,6 @@ export async function generateListaTurmaPDF(turma, estudantes) {
             let displayText = text
             if (fullText && doc.getTextWidth(fullText) > width - 2) {
                 displayText = doc.splitTextToSize(fullText, width - 2)[0]
-                // Se foi cortado, talvez adicionar ...? O splitTextToSize não adiciona.
-                // Vamos deixar simples conforme código anterior ou usar o text passado
             }
 
             const xPos = align === 'center' ? rowX + (width / 2) : rowX + 2
@@ -268,8 +283,9 @@ export async function generateListaTurmaPDF(turma, estudantes) {
             rowX += width
         }
 
-        // # - Inserção do número de chamada vindo do banco (ou índice+1 como fallback)
-        const numChamada = est.numero_chamada || (index + 1)
+        // # - Inserção do número de chamada vindo do banco (ou índice+1 como fallback se for 0/vazio)
+        const numDB = parseInt(est.numero_chamada)
+        const numChamada = (numDB && numDB !== 0) ? numDB : (index + 1)
         drawCell(numChamada.toString(), cols[0].width, 'center')
 
         // Nome
@@ -287,7 +303,6 @@ export async function generateListaTurmaPDF(turma, estudantes) {
         // Email
         const email = est.email || '-'
         let emailFinal = email
-        // Lógica de truncate de email do código original
         if (doc.getTextWidth(email) > cols[4].width - 3) {
             emailFinal = doc.splitTextToSize(email, cols[4].width - 3)[0]
         }

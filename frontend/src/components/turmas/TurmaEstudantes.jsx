@@ -39,9 +39,12 @@ export default function TurmaEstudantes({
                     data_nascimento: formatDateBR(est.data_nascimento),
                     email: est.usuario?.email,
                     status: m.status_display || m.status,
-                    numero_chamada: m.mumero_chamada
+                    numero_chamada: m.mumero_chamada // Mantendo mumero_chamada pois é o nome no backend/serializer
                 }
             })
+
+            // Ordenação garantida antes de enviar para o gerador
+            listaEstudantes.sort((a, b) => (parseInt(a.numero_chamada) || 0) - (parseInt(b.numero_chamada) || 0))
 
             await generateListaTurmaPDF(turma, listaEstudantes)
             toast.success('Lista gerada com sucesso!')

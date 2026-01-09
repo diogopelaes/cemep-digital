@@ -1,11 +1,12 @@
 import { forwardRef } from 'react'
 
-const Input = forwardRef(({ 
+const Input = forwardRef(({
   label,
   error,
   className = '',
   icon: Icon,
-  ...props 
+  rightElement,
+  ...props
 }, ref) => {
   return (
     <div className="w-full">
@@ -20,9 +21,14 @@ const Input = forwardRef(({
         )}
         <input
           ref={ref}
-          className={`input ${Icon ? 'pl-12' : ''} ${error ? 'input-error' : ''} ${className}`}
+          className={`input ${Icon ? 'pl-12' : ''} ${rightElement ? 'pr-12' : ''} ${error ? 'input-error' : ''} ${className}`}
           {...props}
         />
+        {rightElement && (
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+            {rightElement}
+          </div>
+        )}
       </div>
       {error && (
         <p className="mt-1 text-sm text-danger-500">{error}</p>

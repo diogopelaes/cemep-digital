@@ -51,27 +51,26 @@ export default function Login() {
             required
           />
 
-          <div className="relative">
-            <Input
-              label="Senha"
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              placeholder="Digite sua senha"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              autoComplete="current-password"
-              className="pr-12"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-[38px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors z-10"
-              title={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-            >
-              {showPassword ? <HiEyeOff className="h-5 w-5" /> : <HiEye className="h-5 w-5" />}
-            </button>
-          </div>
+          <Input
+            label="Senha"
+            type={showPassword ? 'text' : 'password'}
+            name="password"
+            placeholder="Digite sua senha"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            autoComplete="current-password"
+            required
+            rightElement={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                title={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              >
+                {showPassword ? <HiEyeOff className="h-5 w-5" /> : <HiEye className="h-5 w-5" />}
+              </button>
+            }
+          />
 
           <Button
             type="submit"
