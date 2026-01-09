@@ -51,5 +51,5 @@ class MatriculaTurmaSerializer(serializers.ModelSerializer):
         model = MatriculaTurma
         fields = [
             'id', 'matricula_cemep', 'matricula_cemep_id', 'turma', 'turma_id',
-            'data_entrada', 'data_saida', 'status', 'status_display'
+            'mumero_chamada', 'data_entrada', 'data_saida', 'status', 'status_display'
         ]

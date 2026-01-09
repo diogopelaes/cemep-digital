@@ -346,7 +346,7 @@ class MatriculaTurma(UUIDModel):
     class Meta:
         verbose_name = 'Matrícula na Turma'
         verbose_name_plural = 'Matrículas nas Turmas'
-        ordering = ['-turma__ano_letivo', 'matricula_cemep__estudante__usuario__first_name']
+        ordering = ['mumero_chamada','-turma__ano_letivo', 'matricula_cemep__estudante__usuario__first_name']
         unique_together = ['matricula_cemep', 'turma']
     
     def clean(self):

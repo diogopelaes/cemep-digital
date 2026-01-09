@@ -38,7 +38,8 @@ export default function TurmaEstudantes({
                     matricula: m.matricula_cemep?.numero_matricula_formatado || m.matricula_cemep?.numero_matricula,
                     data_nascimento: formatDateBR(est.data_nascimento),
                     email: est.usuario?.email,
-                    status: m.status_display || m.status
+                    status: m.status_display || m.status,
+                    numero_chamada: m.mumero_chamada
                 }
             })
 

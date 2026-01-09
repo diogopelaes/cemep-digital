@@ -33,8 +33,13 @@ export function useEstudantesTurma(turmaId, turma, isActive = true, onUpdate = n
             // Carregar estudantes já enturmados
             const enturmadosResp = await academicAPI.matriculasTurma.list({ turma: turmaId, page_size: 1000 })
             const enturmados = enturmadosResp.data.results || enturmadosResp.data || []
-            // Ordenar por nome
+            // Ordenar por número de chamada (prioritário) e depois por nome
             enturmados.sort((a, b) => {
+                // Primeiro critério: Número de chamada (mumero_chamada)
+                if (a.mumero_chamada !== b.mumero_chamada) {
+                    return (a.mumero_chamada || 0) - (b.mumero_chamada || 0)
+                }
+                // Segundo critério (desempate): Nome
                 const nomeA = a.matricula_cemep?.estudante?.usuario?.first_name || ''
                 const nomeB = b.matricula_cemep?.estudante?.usuario?.first_name || ''
                 return nomeA.localeCompare(nomeB)

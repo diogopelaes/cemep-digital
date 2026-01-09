@@ -268,8 +268,9 @@ export async function generateListaTurmaPDF(turma, estudantes) {
             rowX += width
         }
 
-        // #
-        drawCell((index + 1).toString(), cols[0].width, 'center')
+        // # - Inserção do número de chamada vindo do banco (ou índice+1 como fallback)
+        const numChamada = est.numero_chamada || (index + 1)
+        drawCell(numChamada.toString(), cols[0].width, 'center')
 
         // Nome
         const nomeDisplay = est.nome || est.nome_social || '-'
