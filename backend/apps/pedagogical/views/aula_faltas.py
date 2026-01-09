@@ -202,7 +202,7 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
             status__in=['CURSANDO', 'RETIDO', 'PROMOVIDO']
         ).select_related(
             'matricula_cemep__estudante__usuario'
-        ).order_by('matricula_cemep__estudante__usuario__first_name')
+        ).order_by('mumero_chamada', 'matricula_cemep__estudante__usuario__first_name')
 
         # Se tiver aula, mapeia as faltas existentes efficiently
         faltas_map = {}
@@ -224,6 +224,7 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
                 'id': str(est_id),
                 'nome': estudante.nome_social or estudante.usuario.get_full_name(),
                 'status': m.status,
+                'numero_chamada': m.mumero_chamada, # Campo numero_chamada para o frontend
                 'qtd_faltas': falta_info['qtd'],
                 'aulas_faltas': falta_info['aulas']
             })

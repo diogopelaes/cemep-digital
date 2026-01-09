@@ -47,7 +47,6 @@ export default function AulaFaltasForm() {
                 setNumeroAulas(aula.numero_aulas || 2)
                 setData(aula.data)
                 setBimestre(aula.bimestre)
-                setBimestre(aula.bimestre)
                 setTurma({
                     id: aula.turma_id,
                     nome: aula.turma_nome
@@ -72,21 +71,15 @@ export default function AulaFaltasForm() {
                 setData(stateData.data)
                 setNumeroAulas(stateData.numeroAulas)
 
-                // stateData.turma provavelmente tem id se vier da seleção
-                // stateData.disciplina provavelmente tem id se vier da seleção
-                // Precisamos garantir que venham com ID. 
-                // As views anteriores (nova) geralmente mandam objeto completo ou IDs.
-                // Vou mapear baseado no que geralmente temos.
-
                 setTurma({
                     id: stateData.turma?.id || stateData.turmaId,
                     nome: stateData.turma?.nome || stateData.turmaNome
                 })
 
                 setDisciplina({
-                    id: stateData.disciplina?.id || stateData.disciplinaId,
-                    disciplina_nome: stateData.disciplina?.nome || stateData.disciplinaNome,
-                    disciplina_sigla: stateData.disciplina?.sigla || stateData.disciplinaSigla
+                    id: stateData.disciplina?.id || stateData.disciplina?.professor_disciplina_turma_id || stateData.disciplinaId,
+                    disciplina_nome: stateData.disciplina?.disciplina_nome || stateData.disciplina?.nome || stateData.disciplinaNome,
+                    disciplina_sigla: stateData.disciplina?.disciplina_sigla || stateData.disciplina?.sigla || stateData.disciplinaSigla
                 })
 
                 setBimestre(null)
@@ -358,7 +351,9 @@ export default function AulaFaltasForm() {
                             >
                                 <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
                                     <span className="text-xs font-bold text-slate-300 dark:text-slate-600 w-6 tabular-nums">
-                                        {(idx + 1).toString().padStart(2, '0')}
+                                        {(estudante.numero_chamada && estudante.numero_chamada !== 0)
+                                            ? estudante.numero_chamada.toString().padStart(2, '0')
+                                            : (idx + 1).toString().padStart(2, '0')}
                                     </span>
                                     <div className="min-w-0">
                                         <p className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">

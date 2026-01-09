@@ -176,16 +176,30 @@ class AulaFaltasSerializer(serializers.ModelSerializer):
         return obj.bimestre
     
     def get_faltas(self, obj):
-        qs = obj.faltas.select_related('estudante__usuario').order_by('estudante__usuario__first_name')
-        return [
-            {
+        turma = obj.professor_disciplina_turma.disciplina_turma.turma
+        
+        # Busca números de chamada da turma para o mapeamento
+        matriculas_map = {
+            m.matricula_cemep.estudante_id: m.mumero_chamada
+            for m in MatriculaTurma.objects.filter(turma=turma).only('matricula_cemep__estudante_id', 'mumero_chamada')
+        }
+
+        qs = obj.faltas.select_related('estudante__usuario')
+        
+        resultado = []
+        for f in qs:
+            num = matriculas_map.get(f.estudante.id, 0)
+            resultado.append({
                 'estudante_id': f.estudante.id,
                 'estudante_nome': f.estudante.nome_social or f.estudante.usuario.get_full_name(),
+                'numero_chamada': num,
                 'qtd_faltas': f.qtd_faltas,
                 'aulas_faltas': f.aulas_faltas
-            }
-            for f in qs
-        ]
+            })
+            
+        # Ordena primariamente pelo número de chamada, secundariamente pelo nome
+        resultado.sort(key=lambda x: (x['numero_chamada'] if x['numero_chamada'] > 0 else 999, x['estudante_nome']))
+        return resultado
     
     # --- CRUD Methods ---
 
