@@ -149,6 +149,7 @@
   input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px white inset !important;
     -webkit-text-fill-color: #1e293b !important;
+    border: 1px solid #e2e8f0 !important;
   }
 
   .dark input:-webkit-autofill,
@@ -157,6 +158,7 @@
   .dark input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px #1e293b inset !important;
     -webkit-text-fill-color: #f1f5f9 !important;
+    border: 1px solid #475569 !important;
   }
 
   /* Disable autocomplete background */

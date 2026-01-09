@@ -41,42 +41,36 @@ export default function Login() {
       {/* Card de Login */}
       <Card hover={false}>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="label">Usuário ou E-mail</label>
-            <input
-              type="text"
-              name="username"
-              placeholder="Digite seu usuário ou e-mail"
-              value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              className="input"
-              autoComplete="username"
+          <Input
+            label="Usuário ou E-mail"
+            name="username"
+            placeholder="Digite seu usuário ou e-mail"
+            value={formData.username}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            autoComplete="username"
+            required
+          />
+
+          <div className="relative">
+            <Input
+              label="Senha"
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Digite sua senha"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              autoComplete="current-password"
+              className="pr-12"
               required
             />
-          </div>
-
-          <div>
-            <label className="label">Senha</label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                name="password"
-                placeholder="Digite sua senha"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                autoComplete="current-password"
-                className="input pr-10"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                title={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-              >
-                {showPassword ? <HiEyeOff className="h-5 w-5" /> : <HiEye className="h-5 w-5" />}
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-[38px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors z-10"
+              title={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+            >
+              {showPassword ? <HiEyeOff className="h-5 w-5" /> : <HiEye className="h-5 w-5" />}
+            </button>
           </div>
 
           <Button
