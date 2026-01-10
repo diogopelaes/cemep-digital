@@ -3,20 +3,20 @@ import { useNavigate } from 'react-router-dom'
 import {
   Card, Button, Input, Select, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading, Badge, Modal, ModalFooter, DateInput, Pagination, Avatar
-} from '../components/ui'
+} from '../../components/ui'
 import {
   HiPlus, HiPencil, HiCalendar, HiCheck, HiX, HiRefresh,
   HiCheckCircle, HiXCircle, HiSearch, HiUpload
 } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
-import { coreAPI } from '../services/api'
-import BulkUploadModal from '../components/modals/BulkUploadModal'
-import { formatDateBR } from '../utils/date'
-import { TIPOS_USUARIO, TIPOS_USUARIO_COLORS } from '../data'
+import { coreAPI } from '../../services/api'
+import BulkUploadModal from '../../components/modals/BulkUploadModal'
+import { formatDateBR } from '../../utils/date'
+import { TIPOS_USUARIO, TIPOS_USUARIO_COLORS } from '../../data'
 import {
   createPDF, addHeader, addFooter, addSectionTitle, addField,
   addTable, checkNewPage, downloadPDF, CONFIG
-} from '../utils/pdf/index'
+} from '../../utils/pdf/index'
 import toast from 'react-hot-toast'
 
 export default function Funcionarios() {

@@ -3,33 +3,41 @@ import AuthLayout from './layouts/AuthLayout'
 import MainLayout from './layouts/MainLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ReferenceProvider } from './contexts/ReferenceContext'
+import { useAuth } from './contexts/AuthContext'
 
-// Pages
+// Pages comuns
 import Login from './pages/Login'
 import RecuperarSenha from './pages/RecuperarSenha'
 import RedefinirSenha from './pages/RedefinirSenha'
-import Dashboard from './pages/Dashboard'
-import Estudantes from './pages/Estudantes'
-import EstudanteForm from './pages/EstudanteForm'
-import EstudanteDetalhes from './pages/EstudanteDetalhes'
-import Turmas from './pages/Turmas'
-import TurmaForm from './pages/TurmaForm'
-import TurmaDetalhes from './pages/TurmaDetalhes'
-import GradeHorariaForm from './pages/GradeHorariaForm'
-import Carometro from './pages/Carometro'
 import Avisos from './pages/Avisos'
-import Cursos from './pages/Cursos'
-import CursoForm from './pages/CursoForm'
-import Disciplinas from './pages/Disciplinas'
-import DisciplinaForm from './pages/DisciplinaForm'
-import Funcionarios from './pages/Funcionarios'
-import FuncionarioForm from './pages/FuncionarioForm'
-import FuncionarioDetalhes from './pages/FuncionarioDetalhes'
-import FuncionarioCredenciais from './pages/FuncionarioCredenciais'
 import NotFound from './pages/NotFound'
-import Configuracoes from './pages/Configuracoes'
-import CalendarioDetalhes from './pages/CalendarioDetalhes'
-import CalendarioForm from './pages/CalendarioForm'
+
+// Dashboards por perfil
+import DashboardGestao from './pages/gestao-secretaria/DashboardGestao'
+import DashboardProfessor from './pages/professor/DashboardProfessor'
+import DashboardMonitor from './pages/monitor/DashboardMonitor'
+import DashboardEstudante from './pages/estudante-responsavel/DashboardEstudante'
+
+// Pages de Gestão/Secretaria
+import Estudantes from './pages/gestao-secretaria/Estudantes'
+import EstudanteForm from './pages/gestao-secretaria/EstudanteForm'
+import EstudanteDetalhes from './pages/gestao-secretaria/EstudanteDetalhes'
+import Turmas from './pages/gestao-secretaria/Turmas'
+import TurmaForm from './pages/gestao-secretaria/TurmaForm'
+import TurmaDetalhes from './pages/gestao-secretaria/TurmaDetalhes'
+import GradeHorariaForm from './pages/gestao-secretaria/GradeHorariaForm'
+import Carometro from './pages/gestao-secretaria/Carometro'
+import Cursos from './pages/gestao-secretaria/Cursos'
+import CursoForm from './pages/gestao-secretaria/CursoForm'
+import Disciplinas from './pages/gestao-secretaria/Disciplinas'
+import DisciplinaForm from './pages/gestao-secretaria/DisciplinaForm'
+import Funcionarios from './pages/gestao-secretaria/Funcionarios'
+import FuncionarioForm from './pages/gestao-secretaria/FuncionarioForm'
+import FuncionarioDetalhes from './pages/gestao-secretaria/FuncionarioDetalhes'
+import FuncionarioCredenciais from './pages/gestao-secretaria/FuncionarioCredenciais'
+import Configuracoes from './pages/gestao-secretaria/Configuracoes'
+import CalendarioDetalhes from './pages/gestao-secretaria/CalendarioDetalhes'
+import CalendarioForm from './pages/gestao-secretaria/CalendarioForm'
 
 // Pages do Professor
 import MinhasTurmas from './pages/professor/MinhasTurmas'
@@ -45,6 +53,19 @@ const GESTAO_ONLY = ['GESTAO']
 const GESTAO_SECRETARIA = ['GESTAO', 'SECRETARIA']
 const FUNCIONARIOS = ['GESTAO', 'SECRETARIA', 'PROFESSOR', 'MONITOR']
 const PROFESSOR_ONLY = ['PROFESSOR']
+
+// Componente que renderiza o Dashboard correto baseado no perfil
+function DashboardRouter() {
+  const { user, isGestao, isSecretaria, isProfessor, isMonitor, isEstudante, isResponsavel } = useAuth()
+
+  if (isGestao || isSecretaria) return <DashboardGestao />
+  if (isProfessor) return <DashboardProfessor />
+  if (isMonitor) return <DashboardMonitor />
+  if (isEstudante || isResponsavel) return <DashboardEstudante />
+
+  // Fallback - não deveria acontecer
+  return <DashboardGestao />
+}
 
 function App() {
   return (
@@ -62,7 +83,7 @@ function App() {
           <MainLayout />
         </ReferenceProvider>
       }>
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<DashboardRouter />} />
         <Route path="/avisos" element={<Avisos />} />
 
         {/* Rotas de Gestão/Secretaria */}

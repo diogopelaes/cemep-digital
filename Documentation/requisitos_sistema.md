@@ -4,12 +4,12 @@
 Para garantir a paridade com o servidor, o ambiente local utiliza:
 
 1. **PostgreSQL 18.1**
-   - **Path:** `C:\Program Files\PostgreSQL\18\bin`
+   - **Path em desenvolvimento:** `C:\Program Files\PostgreSQL\18\bin`
    - **Binários:** `psql`, `pg_dump`, etc.
 2. **Node.js v24.12.0**
 3. **NPM 11.6.2**
 4. **Python 3.14 (Ambiente Virtual)**
-   - **Ativação (PowerShell):** `C:\Projects\cemep-digital\.venv\Scripts\Activate.ps1`
+   - **Ativação em desenvolvimento (PowerShell):** `C:\Projects\cemep-digital\.venv\Scripts\Activate.ps1`
 
 ## Especificações da Máquina VPS (Hostinger)
 - **Hostname:** srv1175442.hstgr.cloud
@@ -20,7 +20,7 @@ Para garantir a paridade com o servidor, o ambiente local utiliza:
 - **Disco:** 50 GB
 
 ## Softwares Necessários
-1. **Python 3.14.2+** (Compilado ou via deadsnakes PPA se disponível).
+1. **Python 3.14.x** (Compilado ou via deadsnakes PPA se disponível).
 2. **PostgreSQL 18** (Verificar disponibilidade no repositório oficial do Postgres para Ubuntu 25.10; caso contrário, usar versão stable 17).
 3. **Node.js + NPM** (Apenas para build do Frontend no deploy, ou buildar local e subir artefatos).
 4. **Caddy Server** (Instalação via repositório oficial).

@@ -1,22 +1,22 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
-import { Card, Button, Badge, Loading } from '../components/ui'
-import { useAuth } from '../contexts/AuthContext'
-import { InfoItem, BooleanItem } from '../components/common'
+import { Card, Button, Badge, Loading } from '../../components/ui'
+import { useAuth } from '../../contexts/AuthContext'
+import { InfoItem, BooleanItem } from '../../components/common'
 import {
     HiArrowLeft, HiPencil, HiPhone, HiMail,
     HiLocationMarker, HiCalendar, HiAcademicCap, HiUser, HiUsers,
     HiDocumentText, HiBookOpen, HiCheckCircle, HiZoomIn
 } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
-import { academicAPI } from '../services/api'
-import { formatDateBR, calcularIdade } from '../utils/date'
-import { displayCPF, displayTelefone, displayCEP } from '../utils/formatters'
+import { academicAPI } from '../../services/api'
+import { formatDateBR, calcularIdade } from '../../utils/date'
+import { displayCPF, displayTelefone, displayCEP } from '../../utils/formatters'
 import {
     createPDF, addHeader, addFooter, addSectionTitle, addField,
     addPhoto, addTable, checkNewPage, imageToBase64, downloadPDF, openPDF,
     CONFIG
-} from '../utils/pdf/index'
+} from '../../utils/pdf/index'
 import toast from 'react-hot-toast'
 
 /**

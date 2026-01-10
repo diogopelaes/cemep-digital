@@ -1,9 +1,9 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Input, DateInput, Loading, FormActions } from '../components/ui'
+import { Card, Input, DateInput, Loading, FormActions } from '../../components/ui'
 
 // Hook e formatters
-import { useEstudanteForm } from '../hooks'
-import { formatTelefone, formatCPF } from '../utils/formatters'
+import { useEstudanteForm } from '../../hooks'
+import { formatTelefone, formatCPF } from '../../utils/formatters'
 
 // Componentes de seção
 import {
@@ -13,7 +13,7 @@ import {
     EnderecoSection,
     BeneficiosSection,
     CredenciaisSection,
-} from '../components/estudantes'
+} from '../../components/estudantes'
 
 /**
  * Formulário de Estudante (Criar/Editar)

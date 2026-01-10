@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Card, Button } from '../components/ui'
+import { Card, Button } from '../../components/ui'
 import { HiPrinter, HiMail, HiCheckCircle, HiUserCircle, HiKey, HiClipboardCopy, HiPencil } from 'react-icons/hi'
-import { usersAPI } from '../services/api'
-import { formatDateBR } from '../utils/date'
+import { usersAPI } from '../../services/api'
+import { formatDateBR } from '../../utils/date'
 import toast from 'react-hot-toast'
-import { SYSTEM_NAME } from '../config/constants'
+import { SYSTEM_NAME } from '../../config/constants'
 
 export default function FuncionarioCredenciais() {
   const navigate = useNavigate()

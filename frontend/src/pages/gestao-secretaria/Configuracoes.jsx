@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { HiCalendar, HiClock, HiAdjustments } from 'react-icons/hi'
-import CalendarioTab from '../components/configuracoes/CalendarioTab'
-import HorarioAulaTab from '../components/configuracoes/HorarioAulaTab'
-import ControleTab from '../components/configuracoes/ControleTab'
-import { useReferences } from '../contexts/ReferenceContext'
+import CalendarioTab from '../../components/configuracoes/CalendarioTab'
+import HorarioAulaTab from '../../components/configuracoes/HorarioAulaTab'
+import ControleTab from '../../components/configuracoes/ControleTab'
+import { useReferences } from '../../contexts/ReferenceContext'
 
 export default function Configuracoes() {
     const [searchParams] = useSearchParams()

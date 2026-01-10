@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '../components/ui'
+import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '../../components/ui'
 
 const DAYS = [
     { value: '0', label: 'Segunda' },

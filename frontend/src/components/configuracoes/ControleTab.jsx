@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { HiChevronDown, HiChevronRight, HiInformationCircle } from 'react-icons/hi'
 import { coreAPI } from '../../services/api'
 import { Loading, Badge, FormActions } from '../ui'
-import ControleForm from '../../pages/ControleForm'
+import ControleForm from '../../pages/gestao-secretaria/ControleForm'
 import toast from 'react-hot-toast'
 import { useReferences } from '../../contexts/ReferenceContext'
 

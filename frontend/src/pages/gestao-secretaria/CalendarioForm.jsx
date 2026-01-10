@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
     Card, DateInput, Switch, Loading, Input, Select, Button, FormActions
-} from '../components/ui'
+} from '../../components/ui'
 import { HiTrash } from 'react-icons/hi'
-import { coreAPI } from '../services/api'
-import { formatDateBR } from '../utils/date'
+import { coreAPI } from '../../services/api'
+import { formatDateBR } from '../../utils/date'
 import toast from 'react-hot-toast'
 
 const TIPOS_DIA_NAO_LETIVO = [

@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
-import { Loading } from '../components/ui'
-import BulkUploadModal from '../components/modals/BulkUploadModal'
-import { coreAPI } from '../services/api'
+import { Loading } from '../../components/ui'
+import BulkUploadModal from '../../components/modals/BulkUploadModal'
+import { coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 
 // Hooks
-import { useTurma, useDisciplinasTurma, useRepresentantesTurma, useEstudantesTurma } from '../hooks'
+import { useTurma, useDisciplinasTurma, useRepresentantesTurma, useEstudantesTurma } from '../../hooks'
 
 // Componentes de domínio
 import {
@@ -16,7 +16,7 @@ import {
   TurmaRepresentantes,
   TurmaEstudantes,
   TurmaGradeHoraria,
-} from '../components/turmas'
+} from '../../components/turmas'
 
 /**
  * Página de detalhes da turma

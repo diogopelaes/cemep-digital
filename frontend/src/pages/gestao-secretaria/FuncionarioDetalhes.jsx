@@ -3,21 +3,21 @@ import { useNavigate, useParams } from 'react-router-dom'
 import {
     Card, Button, Badge, Loading, Modal, ModalFooter,
     Table, TableHead, TableBody, TableRow, TableHeader, TableCell
-} from '../components/ui'
-import { InfoItem } from '../components/common'
+} from '../../components/ui'
+import { InfoItem } from '../../components/common'
 import {
     HiPencil, HiDownload, HiPhone, HiMail,
     HiLocationMarker, HiCalendar, HiUser, HiIdentification, HiBriefcase
 } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
-import { coreAPI } from '../services/api'
-import { formatDateBR } from '../utils/date'
-import { displayCPF, displayTelefone, displayCEP } from '../utils/formatters'
-import { TIPOS_USUARIO_COLORS } from '../data'
+import { coreAPI } from '../../services/api'
+import { formatDateBR } from '../../utils/date'
+import { displayCPF, displayTelefone, displayCEP } from '../../utils/formatters'
+import { TIPOS_USUARIO_COLORS } from '../../data'
 import {
     createPDF, addHeader, addFooter, addSectionTitle, addField,
     addTable, checkNewPage, downloadPDF, openPDF, CONFIG
-} from '../utils/pdf/index'
+} from '../../utils/pdf/index'
 import toast from 'react-hot-toast'
 
 /**

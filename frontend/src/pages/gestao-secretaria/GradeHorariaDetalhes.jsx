@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { HiTable, HiPlus, HiPencil, HiCalendar, HiX, HiCheck } from 'react-icons/hi'
-import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell, Modal, Button, DateInput, Select } from '../components/ui'
+import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell, Modal, Button, DateInput, Select } from '../../components/ui'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useGradeHoraria } from '../hooks/useGradeHoraria'
+import { useGradeHoraria } from '../../hooks/useGradeHoraria'
 import toast from 'react-hot-toast'
 
 const DAYS = [

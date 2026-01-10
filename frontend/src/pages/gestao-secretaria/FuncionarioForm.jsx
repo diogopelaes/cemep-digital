@@ -1,8 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Loading, FormActions } from '../components/ui'
+import { Card, Loading, FormActions } from '../../components/ui'
 
 // Hook
-import { useFuncionarioForm } from '../hooks'
+import { useFuncionarioForm } from '../../hooks'
 
 // Componentes de seção
 import {
@@ -10,7 +10,7 @@ import {
   EnderecoSectionFunc,
   DadosProfissionaisSection,
   CredenciaisFuncSection,
-} from '../components/funcionarios'
+} from '../../components/funcionarios'
 
 /**
  * Formulário de Funcionário (Criar/Editar)

@@ -4,7 +4,7 @@ import { coreAPI } from '../../services/api'
 import { HiPlus, HiCalendar, HiRefresh, HiCheckCircle } from 'react-icons/hi'
 import { Loading, Badge, Modal, Button, Card } from '../ui'
 import IniciarAnoModal from './IniciarAnoModal'
-import CalendarioDetalhes from '../../pages/CalendarioDetalhes'
+import CalendarioDetalhes from '../../pages/gestao-secretaria/CalendarioDetalhes'
 
 import { useReferences } from '../../contexts/ReferenceContext'
 

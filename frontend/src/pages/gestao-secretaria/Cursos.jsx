@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import {
   Card, Button, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading, Pagination, Select
-} from '../components/ui'
+} from '../../components/ui'
 import { HiPlus, HiBookOpen, HiCheckCircle, HiXCircle, HiUpload } from 'react-icons/hi'
-import BulkUploadModal from '../components/modals/BulkUploadModal'
-import { coreAPI } from '../services/api'
+import BulkUploadModal from '../../components/modals/BulkUploadModal'
+import { coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 
 export default function Cursos() {

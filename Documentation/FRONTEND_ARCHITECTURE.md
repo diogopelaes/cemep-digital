@@ -1,6 +1,6 @@
 # CEMEP Digital - Documentação do Frontend
 
-**Última atualização:** 05/01/2026  
+**Última atualização:** 10/01/2026  
 **Tecnologias:** React 18, Vite, TailwindCSS 3, React Router DOM 6, Axios, jsPDF
 
 ---
@@ -10,7 +10,7 @@
 ```
 frontend/
 ├── src/
-│   ├── App.jsx              # Configuração de rotas principais
+│   ├── App.jsx              # Configuração de rotas e DashboardRouter
 │   ├── main.jsx             # Entry point da aplicação
 │   ├── index.css            # Estilos globais e design system
 │   │
@@ -20,11 +20,31 @@ frontend/
 │   │   ├── modals/          # Modais reutilizáveis
 │   │   ├── turmas/          # Componentes específicos do domínio Turmas
 │   │   ├── estudantes/      # Componentes específicos do domínio Estudantes
-│   │   └── funcionarios/    # Componentes específicos do domínio Funcionários
+│   │   ├── funcionarios/    # Componentes específicos do domínio Funcionários
+│   │   └── configuracoes/   # Componentes de configuração (calendário, horários)
 │   │
-│   ├── pages/               # Páginas/Views da aplicação
+│   ├── pages/               # Páginas organizadas por perfil de usuário
+│   │   ├── gestao-secretaria/    # Páginas de gestão (24 arquivos)
+│   │   │   ├── DashboardGestao.jsx
+│   │   │   ├── Turmas.jsx, TurmaForm.jsx, TurmaDetalhes.jsx
+│   │   │   ├── Estudantes.jsx, EstudanteForm.jsx, EstudanteDetalhes.jsx
+│   │   │   ├── Funcionarios.jsx, FuncionarioForm.jsx, FuncionarioDetalhes.jsx
+│   │   │   ├── Cursos.jsx, CursoForm.jsx
+│   │   │   ├── Disciplinas.jsx, DisciplinaForm.jsx
+│   │   │   └── Configuracoes.jsx, CalendarioDetalhes.jsx, CalendarioForm.jsx
+│   │   ├── professor/            # Páginas do professor (8 arquivos)
+│   │   │   ├── DashboardProfessor.jsx
+│   │   │   ├── MinhasTurmas.jsx, MinhaTurmaDetalhes.jsx
+│   │   │   ├── PlanoAula.jsx, PlanoAulaForm.jsx
+│   │   │   └── AulaFaltas.jsx, AulaFaltasOptions.jsx, AulaFaltasForm.jsx
+│   │   ├── monitor/              # Páginas do monitor
+│   │   │   └── DashboardMonitor.jsx
+│   │   ├── estudante-responsavel/ # Páginas do estudante/responsável
+│   │   │   └── DashboardEstudante.jsx
+│   │   └── (páginas comuns)      # Login.jsx, Avisos.jsx, NotFound.jsx, etc.
+│   │
 │   ├── hooks/               # Custom hooks reutilizáveis
-│   ├── contexts/            # Context API (Auth, Theme)
+│   ├── contexts/            # Context API (Auth, Theme, Reference)
 │   ├── data/                # Constantes e dados estáticos
 │   ├── services/            # Serviços de API
 │   ├── utils/               # Funções utilitárias
@@ -288,39 +308,67 @@ const [estudante, prontuario] = await Promise.all([
 
 ---
 
-### `/src/pages/` - Páginas da Aplicação
+### `/src/pages/` - Páginas Organizadas por Perfil
+
+As páginas são organizadas em subdiretórios conforme o perfil de usuário que as utiliza.
+
+#### Páginas Comuns (raiz de `pages/`)
 
 | Página                       | Descrição                                         |
 |------------------------------|---------------------------------------------------|
-| `Dashboard.jsx`              | Dashboard principal com estatísticas              |
 | `Login.jsx`                  | Tela de login                                     |
 | `RecuperarSenha.jsx`         | Recuperação de senha                              |
+| `RedefinirSenha.jsx`         | Redefinição de senha via token                    |
+| `Avisos.jsx`                 | Página de avisos (acessível a todos)              |
 | `NotFound.jsx`               | Página 404                                        |
-| **Estudantes**               |                                                   |
+
+#### `pages/gestao-secretaria/` - Gestão e Secretaria
+
+| Página                       | Descrição                                         |
+|------------------------------|---------------------------------------------------|
+| `DashboardGestao.jsx`        | Dashboard com estatísticas e acesso rápido        |
 | `Estudantes.jsx`             | Listagem de estudantes                            |
 | `EstudanteForm.jsx`          | Formulário criar/editar (usa `useEstudanteForm`)  |
 | `EstudanteDetalhes.jsx`      | Detalhes + PDF do estudante                       |
-| **Funcionários**             |                                                   |
 | `Funcionarios.jsx`           | Listagem com cadastro em massa                    |
 | `FuncionarioForm.jsx`        | Formulário criar/editar (usa `useFuncionarioForm`)|
 | `FuncionarioDetalhes.jsx`    | Detalhes do funcionário                           |
 | `FuncionarioCredenciais.jsx` | Exibição de credenciais após criação              |
-| **Turmas**                   |                                                   |
 | `Turmas.jsx`                 | Listagem de turmas                                |
 | `TurmaForm.jsx`              | Formulário criar/editar turma                     |
 | `TurmaDetalhes.jsx`          | Detalhes da turma com importação de disciplinas   |
-| **Disciplinas**              |                                                   |
 | `Disciplinas.jsx`            | Listagem de disciplinas                           |
 | `DisciplinaForm.jsx`         | Formulário criar/editar com habilidades           |
-| **Cursos**                   |                                                   |
 | `Cursos.jsx`                 | Listagem de cursos                                |
 | `CursoForm.jsx`              | Formulário criar/editar curso                     |
-| **Configurações/Calendário** |                                                   |
 | `Configuracoes.jsx`          | Configurações gerais e calendário                 |
 | `CalendarioDetalhes.jsx`     | Detalhes do ano letivo com bimestres              |
 | `CalendarioForm.jsx`         | Formulário de ano letivo                          |
-| **Outros**                   |                                                   |
-| `Avisos.jsx`                 | Página de avisos                                  |
+
+#### `pages/professor/` - Professor
+
+| Página                       | Descrição                                         |
+|------------------------------|---------------------------------------------------|
+| `DashboardProfessor.jsx`     | Dashboard com avisos e acesso rápido              |
+| `MinhasTurmas.jsx`           | Listagem de turmas do professor                   |
+| `MinhaTurmaDetalhes.jsx`     | Detalhes da turma com estudantes                  |
+| `PlanoAula.jsx`              | Listagem de planos de aula                        |
+| `PlanoAulaForm.jsx`          | Formulário de plano de aula                       |
+| `AulaFaltas.jsx`             | Registro de aulas e faltas                        |
+| `AulaFaltasOptions.jsx`      | Seleção de turma para registro                    |
+| `AulaFaltasForm.jsx`         | Formulário de registro de aula                    |
+
+#### `pages/monitor/` - Monitor
+
+| Página                       | Descrição                                         |
+|------------------------------|---------------------------------------------------|
+| `DashboardMonitor.jsx`       | Dashboard com avisos e acesso a estudantes        |
+
+#### `pages/estudante-responsavel/` - Estudante/Responsável
+
+| Página                       | Descrição                                         |
+|------------------------------|---------------------------------------------------|
+| `DashboardEstudante.jsx`     | Dashboard com avisos e acesso ao boletim          |
 
 ---
 

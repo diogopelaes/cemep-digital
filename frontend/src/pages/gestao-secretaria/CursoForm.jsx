@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Input, Loading, Switch, FormActions } from '../components/ui'
-import { coreAPI } from '../services/api'
+import { Card, Input, Loading, Switch, FormActions } from '../../components/ui'
+import { coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 
 export default function CursoForm() {

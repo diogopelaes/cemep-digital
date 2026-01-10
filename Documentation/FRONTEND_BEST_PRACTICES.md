@@ -39,7 +39,23 @@ Dados que mudam raramente (Tabelas de Referência) devem ser buscados **UMA VEZ*
 *   **Padrão:** Usar `ReferenceContext` (ou React Query com staleTime infinito).
 *   **Nunca:** Fazer `useEffect` para buscar lista de Cursos dentro de um formulário que é aberto várias vezes.
 
----
+### 2.4. Organização de Páginas por Perfil
+As páginas são organizadas em subdiretórios conforme o perfil de usuário:
+*   `pages/gestao-secretaria/` - Dashboards e CRUD administrativo
+*   `pages/professor/` - Turmas, plano de aula, registro de aulas
+*   `pages/monitor/` - Dashboard do monitor
+*   `pages/estudante-responsavel/` - Dashboard do estudante/responsável
+*   `pages/` (raiz) - Páginas comuns (Login, Avisos, NotFound)
+
+**Imports devem refletir o caminho correto:**
+```javascript
+// Correto
+import DashboardGestao from './pages/gestao-secretaria/DashboardGestao'
+import Turmas from './pages/gestao-secretaria/Turmas'
+
+// Errado
+import Turmas from './pages/Turmas' // Arquivo foi movido!
+```
 
 ## 3. Padrões de UX e Componentes
 

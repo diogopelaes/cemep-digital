@@ -4,16 +4,16 @@ import {
   Card, Button, Select, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading, Pagination,
   DropdownMenu, DropdownItem
-} from '../components/ui'
+} from '../../components/ui'
 import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil, HiCheckCircle, HiXCircle, HiUpload, HiTable, HiPhotograph } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
-import BulkUploadModal from '../components/modals/BulkUploadModal'
-import BulkAssociateDisciplinasModal from '../components/modals/BulkAssociateDisciplinasModal'
-import { coreAPI, academicAPI } from '../services/api'
-import { getNomenclaturaLabel } from '../data'
+import BulkUploadModal from '../../components/modals/BulkUploadModal'
+import BulkAssociateDisciplinasModal from '../../components/modals/BulkAssociateDisciplinasModal'
+import { coreAPI, academicAPI } from '../../services/api'
+import { getNomenclaturaLabel } from '../../data'
 import toast from 'react-hot-toast'
-import { generateListaTurmaPDF } from '../utils/pdf'
-import { formatDateBR } from '../utils/date'
+import { generateListaTurmaPDF } from '../../utils/pdf'
+import { formatDateBR } from '../../utils/date'
 
 export default function Turmas() {
   const navigate = useNavigate()

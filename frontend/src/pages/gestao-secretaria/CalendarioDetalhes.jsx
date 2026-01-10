@@ -3,11 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom'
 import {
     Card, Button, Badge, Loading, Table, TableHead,
     TableBody, TableRow, TableHeader, TableCell
-} from '../components/ui'
-import { InfoItem } from '../components/common'
+} from '../../components/ui'
+import { InfoItem } from '../../components/common'
 import { HiPencil, HiCalendar, HiTrash } from 'react-icons/hi'
-import { coreAPI } from '../services/api'
-import { formatDateBR } from '../utils/date'
+import { coreAPI } from '../../services/api'
+import { formatDateBR } from '../../utils/date'
 import toast from 'react-hot-toast'
 
 const TIPOS_DIA_NAO_LETIVO = {

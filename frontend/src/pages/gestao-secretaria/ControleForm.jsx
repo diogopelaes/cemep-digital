@@ -1,4 +1,4 @@
-import { DateInput, Switch } from '../components/ui'
+import { DateInput, Switch } from '../../components/ui'
 
 /**
  * Formulário inline para um tipo de controle dentro do accordion.

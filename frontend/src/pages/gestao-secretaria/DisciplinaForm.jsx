@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Input, Select, Loading, Badge, PopConfirm, Switch, FormActions } from '../components/ui'
+import { Card, Button, Input, Select, Loading, Badge, PopConfirm, Switch, FormActions } from '../../components/ui'
 import { HiPlus, HiTrash, HiAcademicCap } from 'react-icons/hi'
-import { coreAPI } from '../services/api'
-import { AREAS_CONHECIMENTO } from '../data'
+import { coreAPI } from '../../services/api'
+import { AREAS_CONHECIMENTO } from '../../data'
 import toast from 'react-hot-toast'
 
 export default function DisciplinaForm() {

@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom'
 import {
   Card, Button, Select, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading, Pagination
-} from '../components/ui'
+} from '../../components/ui'
 import { HiPlus, HiTrash, HiBookOpen, HiX, HiCheck, HiAcademicCap, HiUpload, HiCheckCircle, HiXCircle } from 'react-icons/hi'
-import { coreAPI } from '../services/api'
+import { coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
-import BulkUploadModal from '../components/modals/BulkUploadModal'
+import BulkUploadModal from '../../components/modals/BulkUploadModal'
 
 export default function Disciplinas() {
   const navigate = useNavigate()

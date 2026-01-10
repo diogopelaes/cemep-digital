@@ -1,4 +1,4 @@
-import GradeHorariaDetalhes from '../../pages/GradeHorariaDetalhes'
+import GradeHorariaDetalhes from '../../pages/gestao-secretaria/GradeHorariaDetalhes'
 
 /**
  * Componente container da aba "Grade Horária" em TurmaDetalhes.

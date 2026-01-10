@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { academicAPI } from '../services/api'
-import { Button, Card } from '../components/ui'
+import { academicAPI } from '../../services/api'
+import { Button, Card } from '../../components/ui'
 import { HiUser, HiZoomIn, HiDownload } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
-import { generateCarometroPDF } from '../utils/pdf/index'
+import { generateCarometroPDF } from '../../utils/pdf/index'
 import toast from 'react-hot-toast'
 
 export default function Carometro() {

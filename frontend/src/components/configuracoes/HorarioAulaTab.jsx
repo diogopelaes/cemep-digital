@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { HiPlus, HiPencil, HiTrash, HiClock } from 'react-icons/hi'
 import { coreAPI } from '../../services/api'
 import { Button, Loading, Badge } from '../ui'
-import HorarioAulaForm from '../../pages/HorarioAulaForm'
-import HorarioAulaDetalhes from '../../pages/HorarioAulaDetalhes'
+import HorarioAulaForm from '../../pages/gestao-secretaria/HorarioAulaForm'
+import HorarioAulaDetalhes from '../../pages/gestao-secretaria/HorarioAulaDetalhes'
 import toast from 'react-hot-toast'
 
 export default function HorarioAulaTab() {

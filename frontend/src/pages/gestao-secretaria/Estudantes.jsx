@@ -3,18 +3,18 @@ import { useNavigate } from 'react-router-dom'
 import {
   Card, Button, Input, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Badge, Loading, Pagination, Avatar
-} from '../components/ui'
+} from '../../components/ui'
 import { HiPlus, HiSearch, HiUpload, HiUserGroup, HiDuplicate } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
-import BulkUploadModal from '../components/modals/BulkUploadModal'
-import { useAuth } from '../contexts/AuthContext'
-import { academicAPI } from '../services/api'
-import { formatDateBR, calcularIdade } from '../utils/date'
+import BulkUploadModal from '../../components/modals/BulkUploadModal'
+import { useAuth } from '../../contexts/AuthContext'
+import { academicAPI } from '../../services/api'
+import { formatDateBR, calcularIdade } from '../../utils/date'
 import {
   createPDF, addHeader, addFooter, addSectionTitle, addField,
   addPhoto, addTable, checkNewPage, imageToBase64, downloadPDF,
   CONFIG
-} from '../utils/pdf/index'
+} from '../../utils/pdf/index'
 import toast from 'react-hot-toast'
 
 /**
