@@ -45,6 +45,7 @@ def import_tudo():
         # 2. Cadastros de Infraestrutura Acadêmica
         "import_cursos.py",
         "import_disciplinas.py",
+        "import_habilidades.py",
         
         # 3. Recursos Humanos (Cria Usuários e Funcionários)
         "import_professores.py",
@@ -59,6 +60,7 @@ def import_tudo():
         "import_disciplinas_turmas.py",
         "import_estudantes_turmas.py",
         "import_professor_disciplina_turma.py",
+        "import_habilidades_disciplinas.py",
     ]
 
     print("Iniciando Importação Global do Sistema CEMEP-Digital...")

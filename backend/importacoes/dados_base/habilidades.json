@@ -1,0 +1,718 @@
+[
+    {
+        "SIGLA_HABILIDADE": "EM13LGG101",
+        "DESCRICAO_HABILIDADE": "Compreender e analisar processos de produção e circulação de discursos, nas diferentes linguagens, para fazer escolhas fundamentadas em função de interesses pessoais e coletivos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG102",
+        "DESCRICAO_HABILIDADE": "Analisar visões de mundo, conflitos de interesse, preconceitos e ideologias presentes nos discursos veiculados nas diferentes mídias como forma de ampliar suas as possibilidades de explicação e interpretação crítica da realidade."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG103",
+        "DESCRICAO_HABILIDADE": "Analisar, de maneira cada vez mais aprofundada, o funcionamento das linguagens, para interpretar e produzir criticamente discursos em textos de diversas semioses."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG104",
+        "DESCRICAO_HABILIDADE": "Utilizar as diferentes linguagens, levando em conta seus funcionamentos, para a compreensão e produção de textos e discursos em diversos campos de atuação social."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG105",
+        "DESCRICAO_HABILIDADE": "Analisar e experimentar diversos processos de remidiação de produções multissemióticas, multimídia e transmídia, como forma de fomentar diferentes modos de participação e intervenção social."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG201",
+        "DESCRICAO_HABILIDADE": "Utilizar adequadamente as diversas linguagens (artísticas, corporais e verbais) em diferentes contextos, valorizando-as como fenômeno social, cultural, histórico, variável, heterogêneo e sensível aos contextos de uso."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG202",
+        "DESCRICAO_HABILIDADE": "Analisar interesses, relações de poder e perspectivas de mundo nos discursos das diversas práticas de linguagem (artísticas, corporais e verbais), para compreender o modo como circulam, constituem-se e (re)produzem significação e ideologias."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG203",
+        "DESCRICAO_HABILIDADE": "Analisar os diálogos e conflitos entre diversidades e os processos de disputa por legitimidade nas práticas de linguagem e suas produções (artísticas, corporais e verbais), presentes na cultura local e em outras culturas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG204",
+        "DESCRICAO_HABILIDADE": "Negociar sentidos e produzir entendimento mútuo, nas diversas linguagens (artísticas, corporais e verbais), com vistas ao interesse comum pautado em princípios e valores de equidade assentados na democracia e nos Direitos Humanos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG301",
+        "DESCRICAO_HABILIDADE": "Participar de processos de produção individual e colaborativa em diferentes linguagens (artísticas, corporais e verbais), levando em conta seus funcionamentos, para produzir sentidos em diferentes contextos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG302",
+        "DESCRICAO_HABILIDADE": "Compreender e posicionar-se criticamente diante de diversas visões de mundo presentes nos discursos em diferentes linguagens, levando em conta seus contextos de produção e de circulação."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG303",
+        "DESCRICAO_HABILIDADE": "Debater questões polêmicas de relevância social, analisando diferentes argumentos e opiniões manifestados, para negociar e sustentar posições, formular propostas, e intervir e tomar decisões democraticamente sustentadas, que levem em conta o bem comum e os Direitos Humanos, a consciência socioambiental e o consumo responsável em âmbito local, regional e global."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG304",
+        "DESCRICAO_HABILIDADE": "Mapear e criar, por meio de práticas de linguagem, possibilidades de atuação social, política, artística e cultural para enfrentar desafios contemporâneos, discutindo seus princípios e objetivos de maneira crítica, criativa, solidária e ética."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG401",
+        "DESCRICAO_HABILIDADE": "Analisar textos de modo a caracterizar as línguas como fenômeno (geo)político, histórico, social, variável, heterogêneo e sensível aos contextos de uso."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG402",
+        "DESCRICAO_HABILIDADE": "Empregar, nas interações sociais, a variedade e o estilo de língua adequados à situação comunicativa, ao(s) interlocutor(es) e ao gênero do discurso, respeitando os usos das línguas por esse(s) interlocutor(es) e combatendo situações de preconceito linguístico."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG403",
+        "DESCRICAO_HABILIDADE": "Fazer uso do inglês como língua do mundo global, levando em conta a multiplicidade e variedade de usos, usuários e funções dessa língua no mundo contemporâneo."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG501",
+        "DESCRICAO_HABILIDADE": "Selecionar e utilizar movimentos corporais de forma consciente e intencional para interagir socialmente em práticas da cultura corporal, de modo a estabelecer relações construtivas, éticas e de respeito às diferenças."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG502",
+        "DESCRICAO_HABILIDADE": "Analisar criticamente preconceitos, estereótipos e relações de poder subjacentes às práticas e discursos verbais e imagéticos na apreciação e produção das práticas da cultura corporal de movimento."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG503",
+        "DESCRICAO_HABILIDADE": "Praticar, significar e valorizar a cultura corporal de movimento como forma de autoconhecimento, autocuidado e construção de laços sociais em seus projetos de vida."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG601",
+        "DESCRICAO_HABILIDADE": "Apropriar-se do patrimônio artístico e da cultura corporal de movimento de diferentes tempos e lugares, compreendendo a sua diversidade, bem como os processos de disputa por legitimidade."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG602",
+        "DESCRICAO_HABILIDADE": "Fruir e apreciar esteticamente diversas manifestações artísticas e culturais, das locais às mundiais, assim como delas participar, de modo a aguçar continuamente a sensibilidade, a imaginação e a criatividade."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG603",
+        "DESCRICAO_HABILIDADE": "Expressar-se e atuar em processos criativos que integrem diferentes linguagens artísticas e referências estéticas e culturais, recorrendo a conhecimentos de naturezas diversas (artísticos, históricos, sociais e políticos) e experiências individuais e coletivas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG604",
+        "DESCRICAO_HABILIDADE": "Relacionar as práticas artísticas e da cultura corporal do movimento às diferentes dimensões da vida social, cultural, política, histórica e econômica."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG701",
+        "DESCRICAO_HABILIDADE": "Explorar tecnologias digitais da informação e comunicação (TDIC), compreendendo seus princípios e funcionalidades, e mobilizá-las de modo ético, responsável e adequado a práticas de linguagem em diferentes contextos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG702",
+        "DESCRICAO_HABILIDADE": "Avaliar o impacto das tecnologias digitais da informação e comunicação (TDIC) na formação do sujeito e em suas práticas sociais, para fazer uso crítico dessa mídia em práticas de seleção, compreensão e produção de discursos em ambiente digital."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG703",
+        "DESCRICAO_HABILIDADE": "Utilizar diferentes linguagens, mídias e ferramentas digitais em processos de produção coletiva, colaborativa e projetos autorais em ambientes digitais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LGG704",
+        "DESCRICAO_HABILIDADE": "Apropriar-se criticamente de processos de pesquisa e busca de informação, por meio de ferramentas e dos novos formatos de produção e distribuição do conhecimento na cultura de rede."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP01",
+        "DESCRICAO_HABILIDADE": "Relacionar o texto, tanto na produção como na recepção, com suas condições de produção e seu contexto sócio-histórico de circulação (leitor previsto, objetivos, pontos de vista e perspectivas, papel social do autor, época, gênero do discurso etc.)."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP02",
+        "DESCRICAO_HABILIDADE": "Estabelecer relações entre as partes do texto, tanto na produção como na recepção, considerando a construção composicional e o estilo do gênero, usando/reconhecendo adequadamente elementos e recursos coesivos diversos que contribuam para a coerência, a continuidade do texto e sua progressão temática, e organizando informações, tendo em vista as condições de produção e as relações lógico-discursivas envolvidas (causa/efeito ou consequência; tese/argumentos; problema/solução; definição/exemplos etc.)."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP03",
+        "DESCRICAO_HABILIDADE": "Analisar relações de intertextualidade e interdiscursividade que permitam a explicitação de relações dialógicas, a identificação de posicionamentos ou de perspectivas, a compreensão de paródias e estilizações, entre outras possibilidades."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP04",
+        "DESCRICAO_HABILIDADE": "Estabelecer relações de interdiscursividade e intertextualidade para explicitar, sustentar e qualificar posicionamentos e para construir e referendar explicações e relatos, fazendo uso de citações e paráfrases devidamente marcadas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP05",
+        "DESCRICAO_HABILIDADE": "Analisar, em textos argumentativos, os posicionamentos assumidos, os movimentos argumentativos e os argumentos utilizados para sustentá-los, para avaliar sua força e eficácia, e posicionar-se diante da questão discutida e/ou dos argumentos utilizados, recorrendo aos mecanismos linguísticos necessários."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP06",
+        "DESCRICAO_HABILIDADE": "Analisar efeitos de sentido decorrentes de usos expressivos da linguagem, da escolha de determinadas palavras ou expressões e da ordenação, combinação e contraposição de palavras, dentre outros, para ampliar as possibilidades de construção de sentidos e de uso crítico da língua."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP07",
+        "DESCRICAO_HABILIDADE": "Analisar, em textos de diferentes gêneros, marcas que expressam a posição do enunciador frente àquilo que é dito: uso de diferentes modalidades (epistêmica, deôntica e apreciativa) e de diferentes recursos gramaticais que operam como modalizadores (verbos modais, tempos e modos verbais, expressões modais, adjetivos, locuções ou orações adjetivas, advérbios, locuções ou orações adverbiais, entonação etc.), uso de estratégias de impessoalização (uso de terceira pessoa e de voz passiva etc.), com vistas ao incremento da compreensão e da criticidade e ao manejo adequado desses elementos nos textos produzidos, considerando os contextos de produção."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP08",
+        "DESCRICAO_HABILIDADE": "Analisar elementos e aspectos da sintaxe do Português, como a ordem dos constituintes da sentença (e os efeito que causam sua inversão), a estrutura dos sintagmas, as categorias sintáticas, os processos de coordenação e subordinação (e os efeitos de seus usos) e a sintaxe de concordância e de regência, de modo a potencializar os processos de compreensão e produção de textos e a possibilitar escolhas adequadas à situação comunicativa."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP09",
+        "DESCRICAO_HABILIDADE": "Fazer curadoria de informações, tendo em vista diferentes propósitos e projetos discursivos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP10",
+        "DESCRICAO_HABILIDADE": "Selecionar informações, dados e argumentos em fontes confiáveis, impressas e digitais, e utilizá-los de forma referenciada, para que o texto a ser produzido tenha um nível de aprofundamento adequado (para além do senso comum) e contemple a sustentação das posições defendidas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP11",
+        "DESCRICAO_HABILIDADE": "Analisar efeitos de sentido decorrentes de escolhas de elementos sonoros (volume, timbre, intensidade, pausas, ritmo, efeitos sonoros, sincronização etc.) e de suas relações com o verbal, levando em conta esses efeitos na produção de áudios, para ampliar as possibilidades de construção de sentidos e de apreciação."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP12",
+        "DESCRICAO_HABILIDADE": "Analisar efeitos de sentido decorrentes de escolhas e formatação das imagens (enquadramento, ângulo/vetor, cor, brilho, contraste) e de sua sequenciação (disposição e transição, movimentos de câmera, remix), das performances (movimentos do corpo, gestos, ocupação do espaço cênico), dos elementos sonoros (entonação, trilha sonora, sampleamento etc.) e das relações desses elementos com o verbal, levando em conta esses efeitos nas produções de imagens e vídeos, para ampliar as possibilidades de construção de sentidos e de apreciação."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP13",
+        "DESCRICAO_HABILIDADE": "Planejar, produzir, revisar, editar, reescrever e avaliar textos escritos e multissemióticos, considerando sua adequação às condições de produção do texto, no que diz respeito ao lugar social a ser assumido e à imagem que se pretende passar a respeito de si mesmo, ao leitor pretendido, ao veículo e mídia em que o texto ou produção cultural vai circular, ao contexto imediato e sócio-histórico mais geral, ao gênero textual em questão e suas regularidades, à variedade linguística apropriada a esse contexto e ao uso do conhecimento dos aspectos notacionais (ortografia padrão, pontuação adequada, mecanismos de concordância nominal e verbal, regência verbal etc.), sempre que o contexto o exigir."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP14",
+        "DESCRICAO_HABILIDADE": "Produzir e analisar textos orais, considerando sua adequação aos contextos de produção, à forma composicional e ao estilo do gênero em questão, à clareza, à progressão temática e à variedade linguística empregada, como também aos elementos relacionados à fala (modulação de voz, entonação, ritmo, altura e intensidade, respiração etc.) e à cinestesia (postura corporal, movimentos e gestualidade significativa, expressão facial, contato de olho com plateia etc.)."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP15",
+        "DESCRICAO_HABILIDADE": "Elaborar roteiros para a produção de vídeos variados (vlog, videoclipe, videominuto, documentário etc.), apresentações teatrais, narrativas multimídia e transmídia, podcasts, playlists comentadas etc., para ampliar as possibilidades de produção de sentidos e engajar-se de forma reflexiva em práticas autorais e coletivas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP16",
+        "DESCRICAO_HABILIDADE": "Utilizar softwares de edição de textos, fotos, vídeos e áudio, além de ferramentas e ambientes colaborativos para criar textos e produções multissemióticas com finalidades diversas, explorando os recursos e efeitos disponíveis e apropriando-se de práticas colaborativas de escrita, de construção coletiva do conhecimento e de desenvolvimento de projetos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP17",
+        "DESCRICAO_HABILIDADE": "Analisar o fenômeno da variação linguística, em seus diferentes níveis (variação fonético-fonológica, lexical, sintática, semântica e estilístico-pragmática) e em suas diferentes dimensões (regional, histórica, social, situacional, ocupacional, etária etc.), de forma a ampliar a compreensão sobre a natureza viva e dinâmica da língua e sobre o fenômeno da constituição de variedades linguísticas de prestígio e estigmatizadas, e a fundamentar o respeito às variedades linguísticas e o combate a preconceitos linguísticos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP18",
+        "DESCRICAO_HABILIDADE": "Apresentar-se por meio de textos multimodais diversos (perfis variados, gifs biográficos, biodata, currículo web, videocurrículo etc.) e de ferramentas digitais (ferramenta de gif, wiki, site etc.), para falar de si de formas variadas, considerando diferentes situações e objetivos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP19",
+        "DESCRICAO_HABILIDADE": "Compartilhar gostos, interesses, práticas culturais, temas/problemas/questões que despertam maior interesse ou preocupação, respeitando e valorizando diferenças, como forma de identificar afinidades e interesses comuns, como também de organizar e/ou participar de grupos, clubes, oficinas e afins."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP20",
+        "DESCRICAO_HABILIDADE": "Produzir, de forma colaborativa, e socializar playlists comentadas de preferências culturais e de entretenimento, revistas culturais, fanzines, e-zines ou publicações afins que divulguem, comentem e avaliem músicas, games, séries, filmes, quadrinhos, livros, peças, exposições, espetáculos de dança etc., de forma a compartilhar gostos, identificar afinidades, fomentar comunidades etc."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP21",
+        "DESCRICAO_HABILIDADE": "Construir e/ou atualizar, de forma colaborativa, registros dinâmicos (mapas, wiki etc.) de profissões e ocupações de seu interesse (áreas de atuação, dados sobre formação, fazeres, produções, depoimentos de profissionais etc.) que possibilitem vislumbrar trajetórias pessoais e profissionais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP22",
+        "DESCRICAO_HABILIDADE": "Analisar o histórico e o discurso político de candidatos e de partidos, como também propagandas políticas e programas e propostas de governo, de forma a participar do debate político e tomar decisões fundamentadas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP23",
+        "DESCRICAO_HABILIDADE": "Analisar formas não institucionalizadas de participação social, sobretudo as vinculadas a manifestações artísticas, produções culturais, intervenções urbanas e formas de expressão típica das culturas juvenis que pretendam expor uma problemática ou promover uma reflexão/ação, posicionando-se em relação a essas produções e manifestações."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP24",
+        "DESCRICAO_HABILIDADE": "Participar de reuniões na escola (conselho de escola e de classe, grêmio livre etc.), agremiações, coletivos ou movimentos, entre outros, em debates, assembleias, fóruns de discussão etc., exercitando a escuta atenta, respeitando seu turno e tempo de fala, posicionando-se de forma fundamentada, respeitosa e ética diante da apresentação de propostas e defesas de opiniões, usando estratégias linguísticas típicas de negociação e de apoio e/ou de consideração do discurso do outro (como solicitar esclarecimento, detalhamento, fazer referência direta ou retomar a fala do outro, parafraseando-a para endossá-la, enfatizá-la, complementá-la ou enfraquecê-la), considerando propostas alternativas e reformulando seu posicionamento, quando for caso, com vistas ao entendimento e ao bem comum."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP25",
+        "DESCRICAO_HABILIDADE": "Relacionar textos e documentos legais e normativos de âmbito universal, nacional, local ou escolar que envolvam a definição de direitos e deveres – em especial, os voltados a adolescentes e jovens – aos seus contextos de produção, identificando ou inferindo possíveis motivações e finalidades, como forma de ampliar a compreensão desses direitos e deveres."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP26",
+        "DESCRICAO_HABILIDADE": "Engajar-se na busca de solução de problemas que envolvam a coletividade, denunciando o desrespeito a direitos, organizando e/ou participando de discussões, campanhas e debates, produzindo textos reivindicatórios, normativos, dentre outras possibilidades, como forma de fomentar os princípios democráticos e uma atuação pautada pela ética da responsabilidade."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP27",
+        "DESCRICAO_HABILIDADE": "Organizar situações de estudo e utilizar procedimentos e estratégias de leitura adequados aos objetivos e à natureza do conhecimento em questão."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP28",
+        "DESCRICAO_HABILIDADE": "Resumir e resenhar textos, com o manejo adequado das vozes envolvidas (do autor da obra e do resenhador), por meio do uso de paráfrases, marcas do discurso reportado e citações, para uso em textos de divulgação de estudos e pesquisas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP29",
+        "DESCRICAO_HABILIDADE": "Realizar pesquisas de diferentes tipos (bibliográfica, de campo, experimento científico, levantamento de dados etc.), usando fontes abertas e confiáveis, registrando o processo e comunicando os resultados, tendo em vista os objetivos colocados e demais elementos do contexto de produção, como forma de compreender como o conhecimento científico é produzido e apropriar-se dos procedimentos e dos gêneros textuais envolvidos na realização de pesquisas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP30",
+        "DESCRICAO_HABILIDADE": "Compreender criticamente textos de divulgação científica orais, escritos e multissemióticos de diferentes áreas do conhecimento, identificando sua organização tópica e a hierarquização das informações, questionando fontes não confiáveis e problematizando enfoques tendenciosos ou superficiais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP31",
+        "DESCRICAO_HABILIDADE": "Selecionar informações e dados necessários para uma dada pesquisa (sem excedê-los) em diferentes fontes (orais, impressas, digitais etc.) e comparar autonomamente esses conteúdos, levando em conta seus contextos de produção, referências e índices de confiabilidade, e percebendo coincidências, complementaridades, contradições, erros ou imprecisões conceituais e de dados, de forma a compreender e posicionar-se criticamente sobre esses conteúdos e estabelecer recortes precisos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP32",
+        "DESCRICAO_HABILIDADE": "Selecionar, elaborar e utilizar instrumentos simples de coleta de dados e informações (questionários, enquetes, mapeamentos, opinários) e de tratamento e análise dos conteúdos obtidos, que atendam adequadamente a diferentes objetivos de pesquisa."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP33",
+        "DESCRICAO_HABILIDADE": "Produzir textos para a divulgação do conhecimento e de resultados de levantamentos e pesquisas – texto monográfico, ensaio, artigo de divulgação científica, verbete de enciclopédia (colaborativa ou não), infográfico (estático ou animado), relato de experimento, relatório, relatório multimidiático de campo, reportagem científica, podcast ou vlog científico, apresentações orais, seminários, comunicações em mesas redondas, mapas dinâmicos etc. –, considerando o contexto de produção e utilizando os conhecimentos sobre os gêneros de divulgação científica, de forma a engajar-se em processos significativos de socialização e divulgação do conhecimento."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP34",
+        "DESCRICAO_HABILIDADE": "Utilizar adequadamente ferramentas de apoio a apresentações orais, escolhendo e usando tipos e tamanhos de fontes que permitam boa visualização, topicalizando e/ou organizando o conteúdo em itens, inserindo de forma adequada imagens, gráficos, tabelas, formas e elementos gráficos, dimensionando a quantidade de texto e imagem por slide e usando, de forma harmônica, recursos (efeitos de transição, slides mestres, layouts personalizados, gravação de áudios em slides etc.)."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP35",
+        "DESCRICAO_HABILIDADE": "Analisar os interesses que movem o campo jornalístico, os impactos das novas tecnologias no campo e as condições que fazem da informação uma mercadoria e da checagem de informação uma prática (e um serviço) essencial, adotando atitude analítica e crítica diante dos textos jornalísticos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP36",
+        "DESCRICAO_HABILIDADE": "Conhecer e analisar diferentes projetos editorias – institucionais, privados, públicos, financiados, independentes etc. –, de forma a ampliar o repertório de escolhas possíveis de fontes de informação e opinião, reconhecendo o papel da mídia plural para a consolidação da democracia."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP37",
+        "DESCRICAO_HABILIDADE": "Analisar os diferentes graus de parcialidade/imparcialidade (no limite, a não neutralidade) em textos noticiosos, comparando relatos de diferentes fontes e analisando o recorte feito de fatos/dados e os efeitos de sentido provocados pelas escolhas realizadas pelo autor do texto, de forma a manter uma atitude crítica diante dos textos jornalísticos e tornar-se consciente das escolhas feitas como produtor."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP38",
+        "DESCRICAO_HABILIDADE": "Usar procedimentos de checagem de fatos noticiados e fotos publicadas (verificar/avaliar veículo, fonte, data e local da publicação, autoria, URL, formatação; comparar diferentes fontes; consultar ferramentas e sites checadores etc.), de forma a combater a proliferação de notícias falsas (fake news)."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP39",
+        "DESCRICAO_HABILIDADE": "Analisar o fenômeno da pós-verdade – discutindo as condições e os mecanismos de disseminação de fake news e também exemplos, causas e consequências desse fenômeno e da prevalência de crenças e opiniões sobre fatos –, de forma a adotar atitude crítica em relação ao fenômeno e desenvolver uma postura flexível que permita rever crenças e opiniões quando fatos apurados as contradisserem."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP40",
+        "DESCRICAO_HABILIDADE": "Analisar os processos humanos e automáticos de curadoria que operam nas redes sociais e outros domínios da internet, comparando os feeds de diferentes páginas de redes sociais e discutindo os efeitos desses modelos de curadoria, de forma a ampliar as possibilidades de trato com o diferente e minimizar o efeito bolha e a manipulação de terceiros."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP41",
+        "DESCRICAO_HABILIDADE": "Acompanhar, analisar e discutir a cobertura da mídia diante de acontecimentos e questões de relevância social, local e global, comparando diferentes enfoques e perspectivas, por meio do uso de ferramentas de curadoria de informação (como agregadores de conteúdo) e da consulta a serviços e fontes de checagem e curadoria de informação, de forma a aprofundar o entendimento sobre um determinado fato ou questão, identificar o enfoque preponderante da mídia e manter-se implicado, de forma crítica, com os fatos e as questões que afetam a coletividade."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP42",
+        "DESCRICAO_HABILIDADE": "Atuar de forma fundamentada, ética e crítica na produção e no compartilhamento de comentários, textos noticiosos e de opinião, memes, gifs, remixes variados etc. em redes sociais ou outros ambientes digitais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP43",
+        "DESCRICAO_HABILIDADE": "Analisar formas contemporâneas de publicidade em contexto digital e peças de campanhas publicitárias e políticas (cartazes, folhetos, anúncios, propagandas em diferentes mídias, spots, jingles etc.), explicando os mecanismos de persuasão utilizados e os efeitos de sentido provocados pelas escolhas feitas em termos de elementos e recursos linguístico-discursivos, imagéticos, sonoros, gestuais e espaciais, entre outros, e destacando valores e representações de situações, grupos e configurações sociais veiculadas, a fim de desconstruir eventuais estereótipos e proceder a uma avaliação crítica da publicidade e das práticas de consumo."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP44",
+        "DESCRICAO_HABILIDADE": "Analisar, discutir, produzir e socializar, tendo em vista temas e acontecimentos de interesse local ou global, notícias, fotodenúncias, fotorreportagens, reportagens multimidiáticas, documentários, infográficos, podcasts noticiosos, artigos de opinião, críticas da mídia, vlogs de opinião, textos de apresentação e apreciação de produções culturais (resenhas, ensaios etc.) e outros gêneros próprios das formas de expressão das culturas juvenis (vlogs e podcasts culturais, gameplay etc.), em várias mídias, vivenciando de forma significativa o papel de repórter, analista, crítico, editorialista ou articulista, leitor, vlogueiro e booktuber, entre outros."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP45",
+        "DESCRICAO_HABILIDADE": "Compartilhar sentidos construídos na leitura/escuta de textos literários, percebendo diferenças e eventuais tensões entre as formas pessoais e as coletivas de apreensão desses textos, para exercitar o diálogo cultural e aguçar a perspectiva crítica."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP46",
+        "DESCRICAO_HABILIDADE": "Participar de eventos (saraus, competições orais, audições, mostras, festivais, feiras culturais e literárias, rodas e clubes de leitura, cooperativas culturais, jograis, repentes, slams etc.), inclusive para socializar obras da própria autoria (poemas, contos e suas variedades, roteiros e microrroteiros, videominutos, playlists comentadas de música etc.) e/ou interpretar obras de outros, inserindo-se nas diferentes práticas culturais de seu tempo."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP47",
+        "DESCRICAO_HABILIDADE": "Analisar assimilações e rupturas no processo de constituição da literatura brasileira e ao longo de sua trajetória, por meio da leitura e análise de obras fundamentais do cânone ocidental, em especial da literatura portuguesa, para perceber a historicidade de matrizes e procedimentos estéticos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP48",
+        "DESCRICAO_HABILIDADE": "Perceber as peculiaridades estruturais e estilísticas de diferentes gêneros literários (a apreensão pessoal do cotidiano nas crônicas, a manifestação livre e subjetiva do eu lírico diante do mundo nos poemas, a múltipla perspectiva da vida humana e social dos romances, a dimensão política e social de textos da literatura marginal e da periferia etc.) para experimentar os diferentes ângulos de apreensão do indivíduo e do mundo pela literatura."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP49",
+        "DESCRICAO_HABILIDADE": "Analisar relações intertextuais e interdiscursivas entre obras de diferentes autores e gêneros literários de um mesmo momento histórico e de momentos históricos diversos, explorando os modos como a literatura e as artes em geral se constituem, dialogam e se retroalimentam."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP50",
+        "DESCRICAO_HABILIDADE": "Selecionar obras do repertório artístico-literário contemporâneo à disposição segundo suas predileções, de modo a constituir um acervo pessoal e dele se apropriar para se inserir e intervir com autonomia e criticidade no meio cultural."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP51",
+        "DESCRICAO_HABILIDADE": "Analisar obras significativas da literatura brasileira e da literatura de outros países e povos, em especial a portuguesa, a indígena, a africana e a latino-americana, com base em ferramentas da crítica literária (estrutura da composição, estilo, aspectos discursivos), considerando o contexto de produção (visões de mundo, diálogos com outros textos, inserções em movimentos estéticos e culturais etc.) e o modo como elas dialogam com o presente."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP52",
+        "DESCRICAO_HABILIDADE": "Produzir apresentações e comentários apreciativos e críticos sobre livros, filmes, discos, canções, espetáculos de teatro e dança, exposições etc. (resenhas, vlogs e podcasts literários e artísticos, playlists comentadas, fanzines, e-zines etc.)."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13LP53",
+        "DESCRICAO_HABILIDADE": "Criar obras autorais, em diferentes gêneros e mídias – mediante seleção e apropriação de recursos textuais e expressivos do repertório artístico –, e/ou produções derivadas (paródias, estilizações, fanfics, fanclipes etc.), como forma de dialogar crítica e/ou subjetivamente com o texto literário."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT101",
+        "DESCRICAO_HABILIDADE": "Interpretar situações econômicas, sociais e das Ciências da Natureza que envolvem a variação de duas grandezas, pela análise dos gráficos das funções representadas e das taxas de variação com ou sem apoio de tecnologias digitais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT102",
+        "DESCRICAO_HABILIDADE": "Analisar gráficos e métodos de amostragem de pesquisas estatísticas apresentadas em relatórios divulgados por diferentes meios de comunicação, identificando, quando for o caso, inadequações que possam induzir a erros de interpretação, como escalas e amostras não apropriadas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT103",
+        "DESCRICAO_HABILIDADE": "Interpretar e compreender o emprego de unidades de medida de diferentes grandezas, inclusive de novas unidades, como as de armazenamento de dados e de distâncias astronômicas e microscópicas, ligadas aos avanços tecnológicos, amplamente divulgadas na sociedade."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT104",
+        "DESCRICAO_HABILIDADE": "Interpretar taxas e índices de natureza socioeconômica, tais como índice de desenvolvimento humano, taxas de inflação, entre outros, investigando os processos de cálculo desses números."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT105",
+        "DESCRICAO_HABILIDADE": "Utilizar as noções de transformações isométricas (translação, reflexão, rotação e composições destas) e transformações homotéticas para analisar diferentes produções humanas como construções civis, obras de arte, entre outras."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT201",
+        "DESCRICAO_HABILIDADE": "Propor ações comunitárias, como as voltadas aos locais de moradia dos estudantes dentre outras, envolvendo cálculos das medidas de área, de volume, de capacidade ou de massa, adequados às demandas da região."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT202",
+        "DESCRICAO_HABILIDADE": "Planejar e executar pesquisa amostral usando dados coletados ou de diferentes fontes sobre questões relevantes atuais, incluindo ou não, apoio de recursos tecnológicos, e comunicar os resultados por meio de relatório contendo gráficos e interpretação das medidas de tendência central e das de dispersão."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT203",
+        "DESCRICAO_HABILIDADE": "Planejar e executar ações envolvendo a criação e a utilização de aplicativos, jogos (digitais ou não), planilhas para o controle de orçamento familiar, simuladores de cálculos de juros compostos, dentre outros, para aplicar conceitos matemáticos e tomar decisões."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT301",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas do cotidiano, da Matemática e de outras áreas do conhecimento, que envolvem equações lineares simultâneas, usando técnicas algébricas e gráficas, incluindo ou não tecnologias digitais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT302",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas cujos modelos são as funções polinomiais de 1º e 2º graus, em contextos diversos, incluindo ou não tecnologias digitais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT303",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas envolvendo porcentagens em diversos contextos e sobre juros compostos, destacando o crescimento exponencial."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT304",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas com funções exponenciais nos quais é necessário compreender e interpretar a variação das grandezas envolvidas, em contextos como o da Matemática Financeira e o do crescimento de seres vivos microscópicos, entre outros."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT305",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas com funções logarítmicas nos quais é necessário compreender e interpretar a variação das grandezas envolvidas, em contextos como os de abalos sísmicos, pH, radioatividade, Matemática Financeira, entre outros."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT306",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas em contextos que envolvem fenômenos periódicos reais, como ondas sonoras, ciclos menstruais, movimentos cíclicos, entre outros, e comparar suas representações com as funções seno e cosseno, no plano cartesiano, com ou sem apoio de aplicativos de álgebra e geometria."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT307",
+        "DESCRICAO_HABILIDADE": "Empregar diferentes métodos para a obtenção da medida da área de uma superfície (reconfigurações, aproximação por cortes etc.) e deduzir expressões de cálculo para aplicá-las em situações reais, como o remanejamento e a distribuição de plantações, com ou sem apoio de tecnologias digitais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT308",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas em variados contextos, envolvendo triângulos nos quais se aplicam as relações métricas ou as noções de congruência e semelhança."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT309",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas que envolvem o cálculo de áreas totais e de volumes de prismas, pirâmides e corpos redondos (cilindro e cone) em situações reais, como o cálculo do gasto de material para forrações ou pinturas de objetos cujos formatos sejam composições dos sólidos estudados."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT310",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas de contagem envolvendo diferentes tipos de agrupamento de elementos, por meio dos princípios multiplicativo e aditivo, recorrendo a estratégias diversas como o diagrama de árvore."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT311",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas que envolvem o cálculo da probabilidade de eventos aleatórios, identificando e descrevendo o espaço amostral e realizando contagem das possibilidades."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT312",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas que envolvem o cálculo de probabilidade de eventos em experimentos aleatórios sucessivos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT313",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas que envolvem medições em que se discuta o emprego de algarismos significativos e algarismos duvidosos, utilizando, quando necessário, a notação científica."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT314",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas que envolvem grandezas compostas, determinadas pela razão ou pelo produto de duas outras, como velocidade, densidade demográfica, energia elétrica etc."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT315",
+        "DESCRICAO_HABILIDADE": "Reconhecer um problema algorítmico, enunciá-lo, procurar uma solução e expressá-la por meio de um algoritmo, com o respectivo fluxograma."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT316",
+        "DESCRICAO_HABILIDADE": "Resolver e elaborar problemas, em diferentes contextos, que envolvem cálculo e interpretação das medidas de tendência central (média, moda, mediana) e das de dispersão (amplitude, variância e desvio padrão)."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT401",
+        "DESCRICAO_HABILIDADE": "Converter representações algébricas de funções polinomiais de 1º grau para representações geométricas no plano cartesiano, distinguindo os casos nos quais o comportamento é proporcional, recorrendo ou não a softwares ou aplicativos de álgebra e geometria dinâmica."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT402",
+        "DESCRICAO_HABILIDADE": "Converter representações algébricas de funções polinomiais de 2º grau para representações geométricas no plano cartesiano, distinguindo os casos nos quais uma variável for diretamente proporcional ao quadrado da outra, recorrendo ou não a softwares ou aplicativos de álgebra e geometria dinâmica."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT403",
+        "DESCRICAO_HABILIDADE": "Comparar e analisar as representações, em plano cartesiano, das funções exponencial e logarítmica para identificar as características fundamentais (domínio, imagem, crescimento) de cada uma, com ou sem apoio de tecnologias digitais, estabelecendo relações entre elas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT404",
+        "DESCRICAO_HABILIDADE": "Identificar as características fundamentais das funções seno e cosseno (periodicidade, domínio, imagem), por meio da comparação das representações em ciclos trigonométricos e em planos cartesianos, com ou sem apoio de tecnologias digitais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT405",
+        "DESCRICAO_HABILIDADE": "Reconhecer funções definidas por uma ou mais sentenças (como a tabela do Imposto de Renda, contas de luz, água, gás etc.), em suas representações algébrica e gráfica, convertendo essas representações de uma para outra e identificando domínios de validade, imagem, crescimento e decrescimento."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT406",
+        "DESCRICAO_HABILIDADE": "Utilizar os conceitos básicos de uma linguagem de programação na implementação de algoritmos escritos em linguagem corrente e/ou matemática."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT407",
+        "DESCRICAO_HABILIDADE": "Interpretar e construir vistas ortogonais de uma figura espacial para representar formas tridimensionais por meio de figuras planas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT408",
+        "DESCRICAO_HABILIDADE": "Construir e interpretar tabelas e gráficos de frequências, com base em dados obtidos em pesquisas por amostras estatísticas, incluindo ou não o uso de softwares que inter-relacionem estatística, geometria e álgebra."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT409",
+        "DESCRICAO_HABILIDADE": "Interpretar e comparar conjuntos de dados estatísticos por meio de diferentes diagramas e gráficos, como o histograma, o de caixa (box-plot), o de ramos e folhas, reconhecendo os mais eficientes para sua análise."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT501",
+        "DESCRICAO_HABILIDADE": "Investigar relações entre números expressos em tabelas para representá-los no plano cartesiano, identificando padrões e criando conjecturas para generalizar e expressar algebricamente essa generalização, reconhecendo quando essa representação é de função polinomial de 1º grau."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT502",
+        "DESCRICAO_HABILIDADE": "Investigar relações entre números expressos em tabelas para representá-los no plano cartesiano, identificando padrões e criando conjecturas para generalizar e expressar algebricamente essa generalização, reconhecendo quando essa representação é de função polinomial de 2º grau do tipo y = ax²."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT503",
+        "DESCRICAO_HABILIDADE": "Investigar pontos de máximo ou de mínimo de funções quadráticas em contextos da Matemática Financeira ou da Cinemática, entre outros."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT504",
+        "DESCRICAO_HABILIDADE": "Investigar processos de obtenção da medida do volume de prismas, pirâmides, cilindros e cones, incluindo o princípio de Cavalieri, para a obtenção das fórmulas de cálculo da medida do volume dessas figuras."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT505",
+        "DESCRICAO_HABILIDADE": "Resolver problemas sobre ladrilhamentos do plano, com ou sem apoio de aplicativos de geometria dinâmica, para conjecturar a respeito dos tipos ou composição de polígonos que podem ser utilizados, generalizando padrões observados."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT506",
+        "DESCRICAO_HABILIDADE": "Representar graficamente a variação da área e do perímetro de um polígono regular quando os comprimentos de seus lados variam, analisando e classificando as funções envolvidas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT507",
+        "DESCRICAO_HABILIDADE": "Identificar e associar sequências numéricas (PA) a funções afins de domínios discretos para análise de propriedades, incluindo dedução de algumas fórmulas e resolução de problemas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT508",
+        "DESCRICAO_HABILIDADE": "Identificar e associar sequências numéricas (PG) a funções exponenciais de domínios discretos para análise de propriedades, incluindo dedução de algumas fórmulas e resolução de problemas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT509",
+        "DESCRICAO_HABILIDADE": "Investigar a deformação de ângulos e áreas provocada pelas diferentes projeções usadas em cartografia, como a cilíndrica e a cônica."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT510",
+        "DESCRICAO_HABILIDADE": "Investigar conjuntos de dados relativos ao comportamento de duas variáveis numéricas, usando tecnologias da informação, e, se apropriado, levar em conta a variação e utilizar uma reta para descrever a relação observada."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT511",
+        "DESCRICAO_HABILIDADE": "Reconhecer a existência de diferentes tipos de espaços amostrais, discretos ou não, de eventos equiprováveis ou não, e investigar as implicações no cálculo de probabilidades."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13MAT512",
+        "DESCRICAO_HABILIDADE": "Investigar propriedades de figuras geométricas, questionando suas conjecturas por meio da busca de contraexemplos, para refutá-las ou reconhecer a necessidade de sua demonstração para validação, como os teoremas relativos aos quadriláteros e triângulos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT101",
+        "DESCRICAO_HABILIDADE": "Analisar e representar as transformações e conservações em sistemas que envolvam quantidade de matéria, de energia e de movimento para realizar previsões em situações cotidianas e processos produtivos que priorizem o uso racional dos recursos naturais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT102",
+        "DESCRICAO_HABILIDADE": "Realizar previsões, avaliar intervenções e/ou construir protótipos de sistemas térmicos que visem à sustentabilidade, com base na análise dos efeitos das variáveis termodinâmicas e da composição dos sistemas naturais e tecnológicos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT103",
+        "DESCRICAO_HABILIDADE": "Utilizar o conhecimento sobre as radiações e suas origens para avaliar as potencialidades e os riscos de sua aplicação em equipamentos de uso cotidiano, na saúde, na indústria e na geração de energia elétrica."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT104",
+        "DESCRICAO_HABILIDADE": "Avaliar potenciais prejuízos de diferentes materiais e produtos à saúde e ao ambiente, considerando sua composição, toxicidade e reatividade, como também o nível de exposição a eles, posicionando-se criticamente e propondo soluções individuais e/ou coletivas para o uso adequado desses materiais e produtos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT105",
+        "DESCRICAO_HABILIDADE": "Analisar a ciclagem de elementos químicos no solo, na água, na atmosfera e nos seres vivos e interpretar os efeitos de fenômenos naturais e da interferência humana sobre esses ciclos, para promover ações individuais e/ou coletivas que minimizem consequências nocivas à vida."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT106",
+        "DESCRICAO_HABILIDADE": "Avaliar tecnologias e possíveis soluções para as demandas que envolvem a geração, o transporte, a distribuição e o consumo de energia elétrica, considerando a disponibilidade de recursos, a eficiência energética, a relação custo/benefício, as características geográficas e ambientais, a produção de resíduos e os impactos socioambientais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT201",
+        "DESCRICAO_HABILIDADE": "Analisar e utilizar modelos científicos, propostos em diferentes épocas e culturas para avaliar distintas explicações sobre o surgimento e a evolução da Vida, da Terra e do Universo."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT202",
+        "DESCRICAO_HABILIDADE": "Interpretar formas de manifestação da vida, considerando seus diferentes níveis de organização (da composição molecular à biosfera), bem como as condições ambientais favoráveis e os fatores limitantes a elas, tanto na Terra quanto em outros planetas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT203",
+        "DESCRICAO_HABILIDADE": "Avaliar e prever efeitos de intervenções nos ecossistemas, nos seres vivos e no corpo humano, interpretando os mecanismos de manutenção da vida com base nos ciclos da matéria e nas transformações e transferências de energia."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT204",
+        "DESCRICAO_HABILIDADE": "Elaborar explicações e previsões a respeito dos movimentos de objetos na Terra, no Sistema Solar e no Universo com base na análise das interações gravitacionais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT205",
+        "DESCRICAO_HABILIDADE": "Utilizar noções de probabilidade e incerteza para interpretar previsões sobre atividades experimentais, fenômenos naturais e processos tecnológicos, reconhecendo os limites explicativos das ciências."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT206",
+        "DESCRICAO_HABILIDADE": "Justificar a importância da preservação e conservação da biodiversidade, considerando parâmetros qualitativos e quantitativos, e avaliar os efeitos da ação humana e das políticas ambientais para a garantia da sustentabilidade do planeta."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT207",
+        "DESCRICAO_HABILIDADE": "Identificar e analisar vulnerabilidades vinculadas aos desafios contemporâneos aos quais as juventudes estão expostas, considerando as dimensões física, psicoemocional e social, a fim de desenvolver e divulgar ações de prevenção e de promoção da saúde e do bem-estar."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT301",
+        "DESCRICAO_HABILIDADE": "Construir questões, elaborar hipóteses, previsões e estimativas, empregar instrumentos de medição e representar e interpretar modelos explicativos, dados e/ou resultados experimentais para construir, avaliar e justificar conclusões no enfrentamento de situações-problema sob uma perspectiva científica."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT302",
+        "DESCRICAO_HABILIDADE": "Comunicar, para públicos variados, em diversos contextos, resultados de análises, pesquisas e/ou experimentos – interpretando gráficos, tabelas, símbolos, códigos, sistemas de classificação e equações, elaborando textos e utilizando diferentes mídias e tecnologias digitais de informação e comunicação (TDIC) –, de modo a promover debates em torno de temas científicos e/ou tecnológicos de relevância sociocultural."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT303",
+        "DESCRICAO_HABILIDADE": "Interpretar textos de divulgação científica que tratem de temáticas das Ciências da Natureza, disponíveis em diferentes mídias, considerando a apresentação dos dados, a consistência dos argumentos e a coerência das conclusões, visando construir estratégias de seleção de fontes confiáveis de informações."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT304",
+        "DESCRICAO_HABILIDADE": "Analisar e debater situações controversas sobre a aplicação de conhecimentos da área de Ciências da Natureza (tais como tecnologias do DNA, tratamentos com células-tronco, produção de armamentos, formas de controle de pragas, entre outros), com base em argumentos consistentes, éticos e responsáveis, distinguindo diferentes pontos de vista."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT305",
+        "DESCRICAO_HABILIDADE": "Investigar e discutir o uso indevido de conhecimentos das Ciências da Natureza na justificativa de processos de discriminação, segregação e privação de direitos individuais e coletivos para promover a equidade e o respeito à diversidade."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT306",
+        "DESCRICAO_HABILIDADE": "Avaliar os riscos envolvidos em atividades cotidianas, aplicando conhecimentos das Ciências da Natureza, para justificar o uso de equipamentos e comportamentos de segurança, visando à integridade física, individual e coletiva, e socioambiental."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT307",
+        "DESCRICAO_HABILIDADE": "Analisar as propriedades específicas dos materiais para avaliar a adequação de seu uso em diferentes aplicações (industriais, cotidianas, arquitetônicas ou tecnológicas) e/ou propor soluções seguras e sustentáveis."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT308",
+        "DESCRICAO_HABILIDADE": "Analisar o funcionamento de equipamentos elétricos e/ou eletrônicos, redes de informática e sistemas de automação para compreender as tecnologias contemporâneas e avaliar seus impactos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT309",
+        "DESCRICAO_HABILIDADE": "Analisar questões socioambientais, políticas e econômicas relativas à dependência do mundo atual com relação aos recursos fósseis e discutir a necessidade de introdução de alternativas e novas tecnologias energéticas e de materiais, comparando diferentes tipos de motores e processos de produção de novos materiais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CNT310",
+        "DESCRICAO_HABILIDADE": "Investigar e analisar os efeitos de programas de infraestrutura e demais serviços básicos (saneamento, energia elétrica, transporte, telecomunicações, cobertura vacinal, atendimento primário à saúde e produção de alimentos, entre outros) e identificar necessidades locais e/ou regionais em relação a esses serviços, a fim de promover ações que contribuam para a melhoria na qualidade de vida e nas condições de saúde da população."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS101",
+        "DESCRICAO_HABILIDADE": "Analisar e comparar diferentes fontes e narrativas expressas em diversas linguagens, com vistas à compreensão e à crítica de ideias filosóficas e processos e eventos históricos, geográficos, políticos, econômicos, sociais, ambientais e culturais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS102",
+        "DESCRICAO_HABILIDADE": "Identificar, analisar e discutir as circunstâncias históricas, geográficas, políticas, econômicas, sociais, ambientais e culturais da emergência de matrizes conceituais hegemônicas (etnocentrismo, evolução, modernidade etc.), comparando-as a narrativas que contemplem outros agentes e discursos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS103",
+        "DESCRICAO_HABILIDADE": "Elaborar hipóteses, selecionar evidências e compor argumentos relativos a processos políticos, econômicos, sociais, ambientais, culturais e epistemológicos, com base na sistematização de dados e informações de natureza qualitativa e quantitativa (expressões artísticas, textos filosóficos e sociológicos, documentos históricos, gráficos, mapas, tabelas etc.)."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS104",
+        "DESCRICAO_HABILIDADE": "Analisar objetos da cultura material e imaterial como suporte de conhecimentos, valores, crenças e práticas que singularizam diferentes sociedades inseridas no tempo e no espaço."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS105",
+        "DESCRICAO_HABILIDADE": "Identificar, contextualizar e criticar as tipologias evolutivas (como populações nômades e sedentárias, entre outras) e as oposições dicotômicas (cidade/campo, cultura/natureza, civilizados/bárbaros, razão/sensibilidade, material/virtual etc.), explicitando as ambiguidades e a complexidade dos conceitos e dos sujeitos envolvidos em diferentes circunstâncias e processos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS106",
+        "DESCRICAO_HABILIDADE": "Utilizar as linguagens cartográfica, gráfica e iconográfica e de diferentes gêneros textuais e as tecnologias digitais de informação e comunicação de forma crítica, significativa, reflexiva e ética nas diversas práticas sociais (incluindo as escolares) para se comunicar, acessar e disseminar informações, produzir conhecimentos, resolver problemas e exercer protagonismo e autoria na vida pessoal e coletiva."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS201",
+        "DESCRICAO_HABILIDADE": "Analisar e caracterizar as dinâmicas das populações, das mercadorias e do capital nos diversos continentes, com destaque para a mobilidade e a fixação de pessoas, grupos humanos e povos, em função de eventos naturais, políticos, econômicos, sociais e culturais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS202",
+        "DESCRICAO_HABILIDADE": "Analisar e avaliar os impactos das tecnologias na estruturação e nas dinâmicas das sociedades contemporâneas (fluxos populacionais, financeiros, de mercadorias, de informações, de valores éticos e culturais etc.), bem como suas interferências nas decisões políticas, sociais, ambientais, econômicas e culturais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS203",
+        "DESCRICAO_HABILIDADE": "Contrapor os diversos significados de território, fronteiras e vazio (espacial, temporal e cultural) em diferentes sociedades, contextualizando e relativizando visões dualistas como civilização/barbárie, nomadismo/sedentarismo e cidade/campo, entre outras."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS204",
+        "DESCRICAO_HABILIDADE": "Comparar e avaliar os processos de ocupação do espaço e a formação de territórios, territorialidades e fronteiras, identificando o papel de diferentes agentes (como grupos sociais e culturais, impérios, Estados Nacionais e organismos internacionais) e considerando os conflitos populacionais (internos e externos), a diversidade étnico-cultural e as características socioeconômicas, políticas e tecnológicas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS205",
+        "DESCRICAO_HABILIDADE": "Analisar a produção de diferentes territorialidades em suas dimensões culturais, econômicas, ambientais, políticas e sociais, no Brasil e no mundo contemporâneo, com destaque para as culturas juvenis."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS206",
+        "DESCRICAO_HABILIDADE": "Compreender e aplicar os princípios de localização, distribuição, ordem, extensão, conexão, entre outros, relacionados com o raciocínio geográfico, na análise da ocupação humana e da produção do espaço em diferentes tempos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS301",
+        "DESCRICAO_HABILIDADE": "Problematizar hábitos e práticas individuais e coletivos de produção e descarte (reuso e reciclagem) de resíduos na contemporaneidade e elaborar e/ou selecionar propostas de ação que promovam a sustentabilidade socioambiental e o consumo responsável."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS302",
+        "DESCRICAO_HABILIDADE": "Analisar e avaliar os impactos econômicos e socioambientais de cadeias produtivas ligadas à exploração de recursos naturais e às atividades agropecuárias em diferentes ambientes e escalas de análise, considerando o modo de vida das populações locais e o compromisso com a sustentabilidade."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS303",
+        "DESCRICAO_HABILIDADE": "Debater e avaliar o papel da indústria cultural e das culturas de massa no estímulo ao consumismo, seus impactos econômicos e socioambientais, com vistas a uma percepção crítica das necessidades criadas pelo consumo."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS304",
+        "DESCRICAO_HABILIDADE": "Analisar os impactos socioambientais decorrentes de práticas de instituições governamentais, de empresas e de indivíduos, discutindo as origens dessas práticas, e selecionar aquelas que respeitem e promovam a consciência e a ética socioambiental e o consumo responsável."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS305",
+        "DESCRICAO_HABILIDADE": "Analisar e discutir o papel dos organismos nacionais de regulação, controle e fiscalização ambiental e dos acordos internacionais para a promoção e a garantia de práticas ambientais sustentáveis."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS306",
+        "DESCRICAO_HABILIDADE": "Contextualizar, comparar e avaliar os impactos de diferentes modelos econômicos no uso dos recursos naturais e na promoção da sustentabilidade econômica e socioambiental do planeta."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS401",
+        "DESCRICAO_HABILIDADE": "Identificar e analisar as relações entre sujeitos, grupos e classes sociais diante das transformações técnicas, tecnológicas e informacionais e das novas formas de trabalho ao longo do tempo, em diferentes espaços e contextos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS402",
+        "DESCRICAO_HABILIDADE": "Analisar e comparar indicadores de emprego, trabalho e renda em diferentes espaços, escalas e tempos, associando-os a processos de estratificação e desigualdade socioeconômica."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS403",
+        "DESCRICAO_HABILIDADE": "Caracterizar e analisar processos próprios da contemporaneidade, com ênfase nas transformações tecnológicas e das relações sociais e de trabalho, para propor ações que visem à superação de situações de opressão e violação dos Direitos Humanos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS404",
+        "DESCRICAO_HABILIDADE": "Identificar e discutir os múltiplos aspectos do trabalho em diferentes circunstâncias e contextos históricos e/ou geográficos e seus efeitos sobre as gerações, em especial, os jovens e as gerações futuras, levando em consideração, na atualidade, as transformações técnicas, tecnológicas e informacionais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS501",
+        "DESCRICAO_HABILIDADE": "Compreender e analisar os fundamentos da ética em diferentes culturas, identificando processos que contribuem para a formação de sujeitos éticos que valorizem a liberdade, a autonomia e o poder de decisão (vontade)."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS502",
+        "DESCRICAO_HABILIDADE": "Analisar situações da vida cotidiana (estilos de vida, valores, condutas etc.), desnaturalizando e problematizando formas de desigualdade e preconceito, e propor ações que promovam os Direitos Humanos, a solidariedade e o respeito às diferenças e às escolhas individuais."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS503",
+        "DESCRICAO_HABILIDADE": "Identificar diversas formas de violência (física, simbólica, psicológica etc.), suas causas, significados e usos políticos, sociais e culturais, avaliando e propondo mecanismos para combatê-las, com base em argumentos éticos."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS504",
+        "DESCRICAO_HABILIDADE": "Analisar e avaliar os impasses ético-políticos decorrentes das transformações científicas e tecnológicas no mundo contemporâneo e seus desdobramentos nas atitudes e nos valores de indivíduos, grupos sociais, sociedades e culturas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS601",
+        "DESCRICAO_HABILIDADE": "Relacionar as demandas políticas, sociais e culturais de indígenas e afrodescendentes no Brasil contemporâneo aos processos históricos das Américas e ao contexto de exclusão e inclusão precária desses grupos na ordem social e econômica atual."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS602",
+        "DESCRICAO_HABILIDADE": "Identificar, caracterizar e relacionar a presença do paternalismo, do autoritarismo e do populismo na política, na sociedade e nas culturas brasileira e latino-americana, em períodos ditatoriais e democráticos, com as formas de organização e de articulação das sociedades em defesa da autonomia, da liberdade, do diálogo e da promoção da cidadania."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS603",
+        "DESCRICAO_HABILIDADE": "Compreender e aplicar conceitos políticos básicos (Estado, poder, formas, sistemas e regimes de governo, soberania etc.) na análise da formação de diferentes países, povos e nações e de suas experiências políticas."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS604",
+        "DESCRICAO_HABILIDADE": "Conhecer e discutir o papel dos organismos internacionais no contexto mundial, com vistas à elaboração de uma visão crítica sobre seus limites e suas formas de atuação."
+    },
+    {
+        "SIGLA_HABILIDADE": "EM13CHS605",
+        "DESCRICAO_HABILIDADE": "Analisar os princípios da declaração dos Direitos Humanos, recorrendo às noções de justiça, igualdade e fraternidade, para fundamentar a crítica à desigualdade entre indivíduos, grupos e sociedades e propor ações concretas diante da desigualdade e das violações desses direitos em diferentes espaços de vivência dos jovens."
+    }
+]

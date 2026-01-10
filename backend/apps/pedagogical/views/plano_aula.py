@@ -173,15 +173,15 @@ class PlanoAulaViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet
         disciplinas_list = sorted(list(disciplinas_map.values()), key=lambda d: d.nome)
         disciplinas_data = DisciplinaSerializer(disciplinas_list, many=True).data
         
-        # Busca habilidades das disciplinas encontradas
-        habilidades = Habilidade.objects.filter(
-            disciplina__in=list(disciplinas_map.values()),
-            is_active=True
-        ).select_related('disciplina')
-        habilidades_data = HabilidadeSerializer(habilidades, many=True).data
+        # Busca habilidades das disciplinas encontradas (agora via M2M reverso)
+        # Estrutura: { disciplina_id: [habilidades] }
+        habilidades_por_disciplina = {}
+        for disc in disciplinas_list:
+            habilidades_disc = disc.habilidades.filter(is_active=True)
+            habilidades_por_disciplina[str(disc.id)] = HabilidadeSerializer(habilidades_disc, many=True).data
 
         return Response({
             'disciplinas': disciplinas_data,
             'turmas_por_disciplina': turmas_por_disciplina,
-            'habilidades': habilidades_data
+            'habilidades_por_disciplina': habilidades_por_disciplina
         })

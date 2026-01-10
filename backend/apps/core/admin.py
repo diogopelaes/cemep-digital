@@ -40,6 +40,7 @@ class DisciplinaAdmin(admin.ModelAdmin):
     list_display = ['nome', 'sigla', 'is_active']
     list_filter = ['is_active']
     search_fields = ['nome', 'sigla']
+    filter_horizontal = ['habilidades']
 
 
 @admin.register(Curso)
@@ -74,8 +75,8 @@ class ProfessorDisciplinaTurmaAdmin(admin.ModelAdmin):
 
 @admin.register(Habilidade)
 class HabilidadeAdmin(admin.ModelAdmin):
-    list_display = ['codigo', 'disciplina', 'descricao', 'is_active']
-    list_filter = ['disciplina']
+    list_display = ['codigo', 'descricao', 'is_active']
+    list_filter = ['is_active']
     search_fields = ['codigo', 'descricao']
 
 

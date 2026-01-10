@@ -164,6 +164,12 @@ class Disciplina(UUIDModel):
         blank=True,
         verbose_name='Área de Conhecimento'
     )
+    habilidades = models.ManyToManyField(
+        'Habilidade',
+        related_name='disciplinas',
+        blank=True,
+        verbose_name='Habilidades BNCC'
+    )
     is_active = models.BooleanField(default=True, verbose_name='Ativa')
     
     class Meta:
@@ -325,25 +331,16 @@ class ProfessorDisciplinaTurma(UUIDModel):
 
 
 class Habilidade(UUIDModel):
-
-    """Habilidades BNCC ou internas por disciplina."""
+    """Habilidade BNCC."""
     
-    codigo = models.CharField(max_length=20, verbose_name='Código')
+    codigo = models.CharField(max_length=20, verbose_name='Código', unique=True)
     descricao = RichTextField(verbose_name='Descrição')
-    disciplina = models.ForeignKey(
-        Disciplina,
-        on_delete=models.CASCADE,
-        related_name='habilidades',
-        null=True,
-        blank=True
-    )
     is_active = models.BooleanField(default=True, verbose_name='Ativa')
     
     class Meta:
         verbose_name = 'Habilidade'
         verbose_name_plural = 'Habilidades'
-        ordering = ['disciplina', 'codigo']
-        unique_together = ['codigo', 'disciplina']
+        ordering = ['codigo']
     
     def __str__(self):
         return f"{self.codigo} - {self.descricao[:50]}..."

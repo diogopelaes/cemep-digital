@@ -1,0 +1,1486 @@
+[
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG101"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG101"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG101"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG101"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG102"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG102"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG102"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG102"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG103"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG103"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG103"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG103"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG104"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG104"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG104"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG104"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG105"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG105"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG105"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG105"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG201"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG201"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG201"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG201"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG202"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG202"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG202"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG202"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG203"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG203"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG203"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG203"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG204"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG204"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG204"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG204"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG301"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG301"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG301"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG301"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG302"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG302"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG302"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG302"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG303"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG303"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG303"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG303"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG304"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG304"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG304"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG304"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG401"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG401"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG402"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG402"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG403"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG501"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG502"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG503"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG601"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG602"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG603"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG604"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG701"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG701"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG701"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG701"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG702"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG702"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG702"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG702"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG703"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG703"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG703"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG703"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LGG704"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ART",
+        "SIGLA_HABILIDADE": "EM13LGG704"
+    },
+    {
+        "SIGLA_DISCIPLINA": "ING",
+        "SIGLA_HABILIDADE": "EM13LGG704"
+    },
+    {
+        "SIGLA_DISCIPLINA": "EF",
+        "SIGLA_HABILIDADE": "EM13LGG704"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP01"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP02"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP03"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP04"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP05"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP06"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP07"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP08"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP09"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP10"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP11"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP12"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP13"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP14"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP15"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP16"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP17"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP18"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP19"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP20"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP21"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP22"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP23"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP24"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP25"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP26"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP27"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP28"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP29"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP30"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP31"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP32"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP33"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP34"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP35"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP36"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP37"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP38"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP39"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP40"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP41"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP42"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP43"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP44"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP45"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP46"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP47"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP48"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP49"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP50"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP51"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP52"
+    },
+    {
+        "SIGLA_DISCIPLINA": "PORT",
+        "SIGLA_HABILIDADE": "EM13LP53"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT101"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT102"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT103"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT104"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT105"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT201"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT202"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT203"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT301"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT302"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT303"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT304"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT305"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT306"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT307"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT308"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT309"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT310"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT311"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT312"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT313"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT314"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT315"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT316"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT401"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT402"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT403"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT404"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT405"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT406"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT407"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT408"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT409"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT501"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT502"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT503"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT504"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT505"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT506"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT507"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT508"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT509"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT510"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT511"
+    },
+    {
+        "SIGLA_DISCIPLINA": "MAT",
+        "SIGLA_HABILIDADE": "EM13MAT512"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT101"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT101"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT101"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT102"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT102"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT102"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT103"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT103"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT103"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT104"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT104"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT104"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT105"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT105"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT105"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT106"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT106"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT106"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT201"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT201"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT201"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT202"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT202"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT202"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT203"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT203"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT203"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT204"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT204"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT204"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT205"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT205"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT205"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT206"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT206"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT206"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT207"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT207"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT207"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT301"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT301"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT301"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT302"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT302"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT302"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT303"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT303"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT303"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT304"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT304"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT304"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT305"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT305"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT305"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT306"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT306"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT306"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT307"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT307"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT307"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT308"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT308"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT308"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT309"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT309"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT309"
+    },
+    {
+        "SIGLA_DISCIPLINA": "BIO",
+        "SIGLA_HABILIDADE": "EM13CNT310"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FIS",
+        "SIGLA_HABILIDADE": "EM13CNT310"
+    },
+    {
+        "SIGLA_DISCIPLINA": "QUI",
+        "SIGLA_HABILIDADE": "EM13CNT310"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS101"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS101"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS101"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS101"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS102"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS102"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS102"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS102"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS103"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS103"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS103"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS103"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS104"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS104"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS104"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS104"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS105"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS105"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS105"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS105"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS106"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS106"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS106"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS106"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS201"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS201"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS201"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS201"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS202"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS202"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS202"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS202"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS203"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS203"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS203"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS203"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS204"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS204"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS204"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS204"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS205"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS205"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS205"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS205"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS206"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS206"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS206"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS206"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS301"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS301"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS301"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS301"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS302"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS302"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS302"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS302"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS303"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS303"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS303"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS303"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS304"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS304"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS304"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS304"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS305"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS305"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS305"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS305"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS306"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS306"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS306"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS306"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS401"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS401"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS401"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS401"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS402"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS402"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS402"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS402"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS403"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS403"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS403"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS403"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS404"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS404"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS404"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS404"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS501"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS501"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS501"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS501"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS502"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS502"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS502"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS502"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS503"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS503"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS503"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS503"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS504"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS504"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS504"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS504"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS601"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS601"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS601"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS601"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS602"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS602"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS602"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS602"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS603"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS603"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS603"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS603"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS604"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS604"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS604"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS604"
+    },
+    {
+        "SIGLA_DISCIPLINA": "HIST",
+        "SIGLA_HABILIDADE": "EM13CHS605"
+    },
+    {
+        "SIGLA_DISCIPLINA": "GEO",
+        "SIGLA_HABILIDADE": "EM13CHS605"
+    },
+    {
+        "SIGLA_DISCIPLINA": "FILO",
+        "SIGLA_HABILIDADE": "EM13CHS605"
+    },
+    {
+        "SIGLA_DISCIPLINA": "SOC",
+        "SIGLA_HABILIDADE": "EM13CHS605"
+    }
+]

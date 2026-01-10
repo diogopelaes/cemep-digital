@@ -2,7 +2,7 @@
 View para Habilidade
 """
 from rest_framework import viewsets
-from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 
 from apps.core.models import Habilidade
 from apps.core.serializers import HabilidadeSerializer
@@ -12,10 +12,11 @@ from apps.users.permissions import GestaoSecretariaWritePublicReadMixin
 class HabilidadeViewSet(GestaoSecretariaWritePublicReadMixin, viewsets.ModelViewSet):
     """
     ViewSet para Habilidade.
-    Leitura: Gestão, Secretaria, Professor, Monitor | Escrita: Gestão
+    Leitura: Qualquer autenticado | Escrita: Gestão e Secretaria
     """
-    queryset = Habilidade.objects.select_related('disciplina').all()
+    queryset = Habilidade.objects.all()
     serializer_class = HabilidadeSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['disciplina', 'is_active']
+    filter_backends = [SearchFilter]
     search_fields = ['codigo', 'descricao']
+    filterset_fields = ['is_active']
+

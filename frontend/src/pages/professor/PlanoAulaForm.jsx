@@ -18,7 +18,7 @@ export default function PlanoAulaForm() {
     const [disciplinas, setDisciplinas] = useState([])
     const [turmasDisponiveis, setTurmasDisponiveis] = useState([]) // Turmas exibidas no seletor
     const [turmasMap, setTurmasMap] = useState({}) // Mapa completo { disciplinaId: [turmas] }
-    const [allHabilidades, setAllHabilidades] = useState([]) // Todas as habilidades pré-carregadas
+    const [habilidadesMap, setHabilidadesMap] = useState({}) // Mapa { disciplinaId: [habilidades] }
     const [habilidades, setHabilidades] = useState([]) // Habilidades filtradas por disciplina
 
     const [formData, setFormData] = useState({
@@ -44,19 +44,14 @@ export default function PlanoAulaForm() {
             const turmasDisc = turmasMap[formData.disciplina] || []
             setTurmasDisponiveis(turmasDisc)
 
-            // Filtra habilidades localmente
-            if (allHabilidades.length > 0) {
-                const filtered = allHabilidades.filter(h =>
-                    h.disciplina?.id === formData.disciplina ||
-                    h.disciplina === formData.disciplina
-                )
-                setHabilidades(filtered)
-            }
+            // Busca habilidades do mapa por disciplina
+            const habsDisc = habilidadesMap[formData.disciplina] || []
+            setHabilidades(habsDisc)
         } else {
             setTurmasDisponiveis([])
             setHabilidades([])
         }
-    }, [formData.disciplina, turmasMap, allHabilidades])
+    }, [formData.disciplina, turmasMap, habilidadesMap])
 
     const loadInitialData = async () => {
         try {
@@ -66,7 +61,7 @@ export default function PlanoAulaForm() {
             const loadedDisciplinas = res.data.disciplinas || []
             setDisciplinas(loadedDisciplinas)
             setTurmasMap(res.data.turmas_por_disciplina || {})
-            setAllHabilidades(res.data.habilidades || [])
+            setHabilidadesMap(res.data.habilidades_por_disciplina || {})
 
             // Se houver apenas uma disciplina, seleciona automaticamente se não estiver editando
             if (loadedDisciplinas.length === 1 && !isEditing) {

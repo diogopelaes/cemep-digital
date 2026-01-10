@@ -35,6 +35,14 @@ class IsGestaoOrSecretaria(BasePermission):
         return request.user.is_authenticated and request.user.tipo_usuario in ['GESTAO', 'SECRETARIA']
 
 
+class IsGestaoSecretariaOrProfessor(BasePermission):
+    """
+    PERFIS: GESTAO, SECRETARIA e PROFESSOR.
+    """
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.tipo_usuario in ['GESTAO', 'SECRETARIA', 'PROFESSOR']
+
+
 class IsFuncionario(BasePermission):
     """
     PERFIS: GESTAO, SECRETARIA, PROFESSOR e MONITOR.
@@ -230,6 +238,18 @@ class GestaoSecretariaWritePublicReadMixin:
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsGestaoOrSecretaria()]
+        return [IsAuthenticated()]
+
+
+class GestaoSecretariaProfessorWritePublicReadMixin:
+    """
+    Permissões:
+    - GESTAO/SECRETARIA/PROFESSOR: CRUD
+    - QUALQUER AUTENTICADO: R (Apenas leitura)
+    """
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsGestaoSecretariaOrProfessor()]
         return [IsAuthenticated()]
 
 

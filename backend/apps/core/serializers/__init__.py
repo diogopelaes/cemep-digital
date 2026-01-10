@@ -49,3 +49,5 @@ __all__ = [
     'AnoLetivoSelecionadoSerializer',
     'ControleRegistrosVisualizacaoSerializer',
 ]
+
+
