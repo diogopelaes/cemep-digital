@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { HiSave, HiX } from 'react-icons/hi'
-import { Button, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, DateInput } from '../../components/ui'
+import { Button, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, DateInput, MiniCombobox } from '../../components/ui'
 import { useGradeHoraria } from '../../hooks/useGradeHoraria'
 import toast from 'react-hot-toast'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -206,18 +206,16 @@ export default function GradeHorariaForm() {
 
                                             return (
                                                 <TableCell key={day.value} className={`p-2 text-center ${colBg}`}>
-                                                    <select
+                                                    <MiniCombobox
                                                         value={selectedDisciplina}
-                                                        onChange={(e) => handleSelectChange(horario.id, e.target.value)}
-                                                        className="max-w-[120px] px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                                                    >
-                                                        <option value="">— Vazio —</option>
-                                                        {disciplinas.map(d => (
-                                                            <option key={`${d.id}-${d.turma_id}`} value={d.id}>
-                                                                {d.sigla}{temMultiplasTurmas ? ` - ${d.curso_sigla}` : ''}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                                        onChange={(value) => handleSelectChange(horario.id, value)}
+                                                        options={disciplinas.map(d => ({
+                                                            value: d.id,
+                                                            label: d.sigla
+                                                        }))}
+                                                        placeholder="—"
+                                                        className="w-full min-w-[100px]"
+                                                    />
                                                 </TableCell>
                                             )
                                         })}

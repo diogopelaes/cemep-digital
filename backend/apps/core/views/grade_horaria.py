@@ -226,14 +226,30 @@ class GradeHorariaViewSet(AnoLetivoFilterMixin, GestaoWritePublicReadMixin, view
             if validade_id:
                 try:
                     ref_validade = GradeHorariaValidade.objects.get(id=validade_id)
-                    # Busca validades irmãs (mesmas datas, turmas relacionadas)
+                    
+                    # Busca validades irmãs (mesmas datas originais, turmas relacionadas)
                     validades_existentes = GradeHorariaValidade.objects.filter(
                         turma__in=turmas_ids,
                         data_inicio=ref_validade.data_inicio,
                         data_fim=ref_validade.data_fim
                     )
-                    for v in validades_existentes:
-                        validades_map[v.turma_id] = v
+                    
+                    # Se o usuário alterou as datas, atualiza todas as validades irmãs
+                    if data_inicio and data_fim:
+                        from datetime import datetime
+                        # Converte strings para date
+                        nova_data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d').date() if isinstance(data_inicio, str) else data_inicio
+                        nova_data_fim = datetime.strptime(data_fim, '%Y-%m-%d').date() if isinstance(data_fim, str) else data_fim
+                        
+                        for v in validades_existentes:
+                            if v.data_inicio != nova_data_inicio or v.data_fim != nova_data_fim:
+                                v.data_inicio = nova_data_inicio
+                                v.data_fim = nova_data_fim
+                                v.save()
+                            validades_map[v.turma_id] = v
+                    else:
+                        for v in validades_existentes:
+                            validades_map[v.turma_id] = v
                         
                 except GradeHorariaValidade.DoesNotExist:
                      return Response({'error': 'Validade informada não encontrada'}, status=status.HTTP_404_NOT_FOUND)
@@ -309,6 +325,26 @@ class GradeHorariaViewSet(AnoLetivoFilterMixin, GestaoWritePublicReadMixin, view
                 ))
             
             GradeHoraria.objects.bulk_create(novas_grades)
+            
+            # Rebuild manual de grade_horaria (bulk_create não dispara signals)
+            # Coleta todas as turmas e disciplinas afetadas
+            turmas_afetadas = set(validades_map.keys())
+            disciplinas_afetadas = set(item.get('disciplina') for item in grades_data if item.get('disciplina'))
+            
+            # Rebuild das turmas
+            for turma_afetada in turmas_relacionadas.filter(id__in=turmas_afetadas):
+                turma_afetada.build_grade_horaria(save=True)
+            
+            # Rebuild dos professores que lecionam as disciplinas afetadas
+            professores_afetados = set()
+            for pdt in ProfessorDisciplinaTurma.objects.filter(
+                disciplina_turma__turma__in=turmas_afetadas,
+                disciplina_turma__disciplina__in=disciplinas_afetadas
+            ).select_related('professor'):
+                professores_afetados.add(pdt.professor)
+            
+            for professor in professores_afetados:
+                professor.build_grade_horaria(save=True)
 
         # Retorna o ID da validade principal (da turma solicitada) para redirecionamento
         validade_principal = validades_map.get(turma.id)

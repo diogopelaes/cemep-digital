@@ -9,7 +9,7 @@ from .views import (
     ProfessorDisciplinaTurmaViewSet, HabilidadeViewSet,
     AnoLetivoViewSet, HorarioAulaViewSet, GradeHorariaViewSet,
     AnoLetivoSelecionadoViewSet, MinhasTurmasViewSet,
-    ControleRegistrosVisualizacaoViewSet
+    ControleRegistrosVisualizacaoViewSet, grade_turma_view
 )
 
 router = DefaultRouter()
@@ -30,6 +30,8 @@ router.register('controle-registros', ControleRegistrosVisualizacaoViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    # Grade horária por turma (ano/numero/letra)
+    path('grade-turma/<int:ano>/<int:numero>/<str:letra>/', grade_turma_view, name='grade-turma'),
 ]
 
 

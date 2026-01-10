@@ -6,3 +6,6 @@ class CoreConfig(AppConfig):
     name = 'apps.core'
     verbose_name = 'Cadastros Base'
 
+    def ready(self):
+        # Registra os signals para auto-rebuild de grade_horaria
+        import apps.core.signals  # noqa: F401

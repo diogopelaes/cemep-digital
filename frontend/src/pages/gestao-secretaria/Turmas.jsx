@@ -233,7 +233,7 @@ export default function Turmas() {
                           className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors disabled:opacity-50"
                           title="Lista de Estudantes (PDF)"
                         >
-                          {generatingPDF === turma.id ? <Loading size="sm" /> : <FaFilePdf className="h-5 w-5" />}
+                          {generatingPDF === turma.id ? <Loading size="sm" /> : <FaFilePdf className="h-4 w-4" />}
                         </button>
                       </TableCell>
                       <TableCell className="td-center">

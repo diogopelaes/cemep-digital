@@ -11,6 +11,7 @@ import RecuperarSenha from './pages/RecuperarSenha'
 import RedefinirSenha from './pages/RedefinirSenha'
 import Avisos from './pages/Avisos'
 import NotFound from './pages/NotFound'
+import GradeTurma from './pages/GradeTurma'
 
 // Dashboards por perfil
 import DashboardGestao from './pages/gestao-secretaria/DashboardGestao'
@@ -85,6 +86,9 @@ function App() {
       }>
         <Route path="/dashboard" element={<DashboardRouter />} />
         <Route path="/avisos" element={<Avisos />} />
+
+        {/* Grade Horária pública (todos autenticados) */}
+        <Route path="/grade-turma/:ano/:numero/:letra" element={<GradeTurma />} />
 
         {/* Rotas de Gestão/Secretaria */}
         <Route path="/turmas" element={

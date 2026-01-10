@@ -378,7 +378,7 @@ export default function Funcionarios() {
                       {generatingPDF === func.id ? (
                         <Loading size="sm" />
                       ) : (
-                        <FaFilePdf className="h-5 w-5" />
+                        <FaFilePdf className="h-4 w-4" />
                       )}
                     </button>
                     <button

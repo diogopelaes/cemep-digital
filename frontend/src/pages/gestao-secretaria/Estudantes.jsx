@@ -314,7 +314,7 @@ export default function Estudantes() {
             <button
               onClick={(e) => handleGeneratePDF(estudante.id, e)}
               disabled={generatingPDF === estudante.id}
-              className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-danger-600 dark:hover:text-danger-400 transition-colors disabled:opacity-50"
+              className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors disabled:opacity-50"
               title="Gerar PDF"
             >
               {generatingPDF === estudante.id ? (
@@ -483,7 +483,7 @@ export default function Estudantes() {
                         {generatingPDF === estudante.id ? (
                           <Loading size="sm" />
                         ) : (
-                          <FaFilePdf className="h-5 w-5" />
+                          <FaFilePdf className="h-4 w-4" />
                         )}
                       </button>
                     </TableCell>
