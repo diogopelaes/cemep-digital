@@ -52,6 +52,18 @@ $FRONTEND_COMMAND = "npm run dev"
 # CARREGAR VARIÁVEIS DE AMBIENTE (.env)
 # ============================================================
 $DOTENV_PATH = Join-Path $BACKEND_PATH ".env"
+
+if (-not (Test-Path $DOTENV_PATH)) {
+    Write-Host "Arquivo .env não encontrado. Executando setup-env-dev.ps1..." -ForegroundColor Yellow
+    $SETUP_SCRIPT = Join-Path $PROJECT_ROOT "setup-env-dev.ps1"
+    if (Test-Path $SETUP_SCRIPT) {
+        & $SETUP_SCRIPT
+    }
+    else {
+        Write-Host "ERRO: Script de setup não encontrado em $SETUP_SCRIPT. O backend pode falhar ao iniciar." -ForegroundColor Red
+    }
+}
+
 if (Test-Path $DOTENV_PATH) {
     Get-Content $DOTENV_PATH | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object {
         $name, $value = $_.Split('=', 2)
