@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Card, Button, Input, Select, Table, TableHead, TableBody, TableRow,
-  TableHeader, TableCell, TableEmpty, Loading, Badge, Modal, ModalFooter, DateInput, Pagination, Avatar
+  TableHeader, TableCell, TableEmpty, Loading, Badge, Modal, ModalFooter, DateInput, Pagination, Avatar, ActionSelect
 } from '../../components/ui'
 import {
   HiPlus, HiPencil, HiCalendar, HiCheck, HiX, HiRefresh,
-  HiCheckCircle, HiXCircle, HiSearch, HiUpload
+  HiCheckCircle, HiXCircle, HiSearch, HiUpload, HiTable
 } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
 import { coreAPI } from '../../services/api'
@@ -368,27 +368,38 @@ export default function Funcionarios() {
                   </button>
                 </TableCell>
                 <TableCell className="td-center">
-                  <div className="inline-flex items-center gap-2">
-                    <button
-                      onClick={() => handleGeneratePDF(func.id)}
-                      disabled={generatingPDF === func.id}
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors disabled:opacity-50"
-                      title="Gerar PDF"
-                    >
-                      {generatingPDF === func.id ? (
-                        <Loading size="sm" />
-                      ) : (
-                        <FaFilePdf className="h-4 w-4" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => handleOpenPeriodosModal(func)}
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
-                      title="Períodos de Trabalho"
-                    >
-                      <HiCalendar className="h-5 w-5" />
-                    </button>
-                  </div>
+                  <ActionSelect
+                    size="sm"
+                    actions={[
+                      {
+                        label: 'Editar Funcionário',
+                        icon: HiPencil,
+                        onClick: () => navigate(`/funcionarios/${func.id}`)
+                      },
+                      {
+                        label: 'Gerar Ficha (PDF)',
+                        icon: FaFilePdf,
+                        disabled: generatingPDF === func.id,
+                        onClick: () => handleGeneratePDF(func.id)
+                      },
+                      {
+                        label: 'Períodos de Trabalho',
+                        icon: HiCalendar,
+                        onClick: () => handleOpenPeriodosModal(func)
+                      },
+                      ...(func.usuario?.tipo_usuario === 'PROFESSOR' ? [{
+                        label: 'Grade',
+                        icon: HiTable,
+                        onClick: () => navigate(`/minha-grade?professor_id=${func.id}`)
+                      }] : []),
+                      {
+                        label: func.usuario?.is_active ? 'Desativar Usuário' : 'Ativar Usuário',
+                        icon: func.usuario?.is_active ? HiXCircle : HiCheckCircle,
+                        variant: func.usuario?.is_active ? 'danger' : 'default',
+                        onClick: () => handleToggleAtivo(func)
+                      }
+                    ]}
+                  />
                 </TableCell>
               </TableRow>
             ))

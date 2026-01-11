@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import {
   Card, Button, Select, Table, TableHead, TableBody, TableRow,
   TableHeader, TableCell, TableEmpty, Loading, Pagination,
-  DropdownMenu, DropdownItem
+  DropdownMenu, DropdownItem, ActionSelect
 } from '../../components/ui'
 import { HiPlus, HiUserGroup, HiTrash, HiCheck, HiX, HiBookOpen, HiPencil, HiCheckCircle, HiXCircle, HiUpload, HiTable, HiPhotograph } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
@@ -153,12 +153,8 @@ export default function Turmas() {
                 <TableRow>
                   <TableHeader>Turma</TableHeader>
                   <TableHeader>Curso</TableHeader>
-                  <TableHeader className="th-center">Estudantes</TableHeader>
-                  <TableHeader className="th-center">Disciplinas</TableHeader>
-                  <TableHeader className="th-center">Grade</TableHeader>
-                  <TableHeader className="th-center">Lista</TableHeader>
-                  <TableHeader className="th-center">Carômetro</TableHeader>
                   <TableHeader className="th-center">Status</TableHeader>
+                  <TableHeader className="th-center font-bold text-primary-600 dark:text-primary-400">Ações</TableHeader>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -197,55 +193,6 @@ export default function Turmas() {
                         </span>
                       </TableCell>
                       <TableCell className="td-center">
-                        <Link
-                          to={`/turmas/${turma.id}`}
-                          state={{ tab: 'estudantes' }}
-                          className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                        >
-                          <HiUserGroup className="h-4 w-4" />
-                          <span>{turma.estudantes_count || 0}</span>
-                        </Link>
-                      </TableCell>
-                      <TableCell className="td-center">
-                        <Link
-                          to={`/turmas/${turma.id}`}
-                          state={{ tab: 'disciplinas' }}
-                          className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                        >
-                          <HiBookOpen className="h-4 w-4" />
-                          <span>{turma.disciplinas_count || 0}</span>
-                        </Link>
-                      </TableCell>
-                      <TableCell className="td-center">
-                        <Link
-                          to={`/turmas/${turma.id}`}
-                          state={{ tab: 'gradeHoraria' }}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
-                          title="Grade Horária"
-                        >
-                          <HiTable className="h-5 w-5" />
-                        </Link>
-                      </TableCell>
-                      <TableCell className="td-center">
-                        <button
-                          onClick={(e) => handleGerarLista(turma, e)}
-                          disabled={generatingPDF === turma.id}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors disabled:opacity-50"
-                          title="Lista de Estudantes (PDF)"
-                        >
-                          {generatingPDF === turma.id ? <Loading size="sm" /> : <FaFilePdf className="h-4 w-4" />}
-                        </button>
-                      </TableCell>
-                      <TableCell className="td-center">
-                        <Link
-                          to={`/turmas/${turma.id}/carometro`}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
-                          title="Visualizar Carômetro"
-                        >
-                          <HiPhotograph className="h-5 w-5" />
-                        </Link>
-                      </TableCell>
-                      <TableCell className="td-center">
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
@@ -270,6 +217,45 @@ export default function Turmas() {
                           )}
                         </button>
                       </TableCell>
+                      <TableCell className="td-center">
+                        <ActionSelect
+                          size="sm"
+                          actions={[
+                            {
+                              label: `Estudantes (${turma.estudantes_count || 0})`,
+                              icon: HiUserGroup,
+                              onClick: () => navigate(`/turmas/${turma.id}`, { state: { tab: 'estudantes' } })
+                            },
+                            {
+                              label: `Disciplinas (${turma.disciplinas_count || 0})`,
+                              icon: HiBookOpen,
+                              onClick: () => navigate(`/turmas/${turma.id}`, { state: { tab: 'disciplinas' } })
+                            },
+                            {
+                              label: 'Grade Horária',
+                              icon: HiTable,
+                              onClick: () => navigate(`/turmas/${turma.id}`, { state: { tab: 'gradeHoraria' } })
+                            },
+                            {
+                              label: 'Lista PDF',
+                              icon: FaFilePdf,
+                              disabled: generatingPDF === turma.id,
+                              onClick: (e) => handleGerarLista(turma, e)
+                            },
+                            {
+                              label: 'Visualizar Carômetro',
+                              icon: HiPhotograph,
+                              onClick: () => navigate(`/turmas/${turma.id}/carometro`)
+                            },
+                            {
+                              label: turma.is_active ? 'Desativar Turma' : 'Ativar Turma',
+                              icon: turma.is_active ? HiXCircle : HiCheckCircle,
+                              variant: turma.is_active ? 'danger' : 'default',
+                              onClick: () => handleToggleAtivo(turma)
+                            }
+                          ]}
+                        />
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
@@ -282,7 +268,7 @@ export default function Turmas() {
             </Table>
 
             {/* Paginação */}
-            <Pagination
+            < Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               totalItems={totalCount}

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
     Card, Table, TableHead, TableBody, TableRow,
-    TableHeader, TableCell, TableEmpty, Loading, Badge
+    TableHeader, TableCell, TableEmpty, Loading, Badge, ActionSelect
 } from '../../components/ui'
 import { HiUserGroup, HiTable, HiPhotograph } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
@@ -81,79 +81,114 @@ export default function MinhasTurmas() {
     }
 
     // Componente de Card para Mobile
-    const TurmaCard = ({ turma }) => (
-        <Card
-            padding={false}
-            className="p-3 overflow-hidden"
-        >
-            <div className="flex items-start gap-3">
-                {/* Avatar da Turma - clicável */}
-                <div
-                    className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-md cursor-pointer hover:scale-105 transition-transform"
-                    onClick={() => navigate(`/minhas-turmas/${turma.id}`)}
-                >
-                    <span className="text-white font-bold text-sm">
-                        {turma.numero}{turma.letra}
-                    </span>
+    const TurmaCard = ({ turma }) => {
+        const [showActions, setShowActions] = useState(false);
+
+        return (
+            <Card
+                padding={false}
+                className="overflow-hidden border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all duration-300"
+            >
+                <div className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                        <div className="flex gap-3">
+                            {/* Avatar da Turma - clicável */}
+                            <div
+                                className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-md cursor-pointer hover:scale-105 transition-transform"
+                                onClick={() => navigate(`/minhas-turmas/${turma.id}`)}
+                            >
+                                <span className="text-white font-bold text-sm">
+                                    {turma.numero}{turma.letra}
+                                </span>
+                            </div>
+
+                            {/* Informações */}
+                            <div className="min-w-0">
+                                <h3
+                                    className="font-bold text-slate-800 dark:text-white text-sm cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors truncate"
+                                    onClick={() => navigate(`/minhas-turmas/${turma.id}`)}
+                                >
+                                    {formatTurmaNome(turma)}
+                                </h3>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-medium">
+                                    {turma.curso?.nome || 'Curso não definido'}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* BOTÃO BADGE PARA EXPANDIR AÇÕES */}
+                        <button
+                            onClick={() => setShowActions(!showActions)}
+                            className={`
+                                text-[10px] font-bold px-3 py-1 rounded-full transition-all duration-200
+                                ${showActions
+                                    ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/20'
+                                    : 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 border border-primary-100 dark:border-primary-800/50'
+                                }
+                            `}
+                        >
+                            {showActions ? 'Fechar' : 'Ações'}
+                        </button>
+                    </div>
+
+                    {/* Rodapé do Card: Disciplinas e Alunos */}
+                    <div className="mt-4 flex items-center justify-between gap-2">
+                        <div className="flex flex-wrap gap-1">
+                            {turma.disciplinas_lecionadas?.map((disc, idx) => (
+                                <Badge key={idx} variant="outline" className="text-[10px] px-1.5 py-0 border-slate-200 dark:border-slate-700">
+                                    {disc.sigla}
+                                </Badge>
+                            ))}
+                        </div>
+
+                        <div className="flex items-center gap-1 text-[11px] font-bold text-slate-400 bg-slate-50 dark:bg-slate-800/50 px-2 py-0.5 rounded-lg">
+                            <HiUserGroup className="h-3 w-3" />
+                            <span>{turma.estudantes_count || 0}</span>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Informações */}
-                <div className="flex-1 min-w-0">
-                    {/* Nome - clicável */}
-                    <h3
-                        className="font-semibold text-slate-800 dark:text-white text-sm cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors truncate"
-                        onClick={() => navigate(`/minhas-turmas/${turma.id}`)}
-                    >
-                        {formatTurmaNome(turma)}
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                        {turma.curso?.nome || 'Curso não definido'}
-                    </p>
-
-                    {/* Disciplinas e Ações */}
-                    <div className="flex items-center flex-wrap gap-1 mt-2">
-                        {turma.disciplinas_lecionadas?.map((disc, idx) => (
-                            <Badge key={idx} variant="outline" className="text-[10px] px-1.5 py-0">
-                                {disc.sigla}
-                            </Badge>
-                        ))}
-
-                        {/* Contador de estudantes */}
-                        <span className="text-[10px] text-slate-400 flex items-center gap-0.5">
-                            <HiUserGroup className="h-3 w-3" />
-                            {turma.estudantes_count || 0}
-                        </span>
-
-                        {/* Ações */}
-                        <Link
-                            to={`/turmas/${turma.id}/carometro`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                            title="Carômetro"
-                        >
-                            <HiPhotograph className="h-3.5 w-3.5" />
-                        </Link>
+                {/* BARRA DE AÇÕES EXPANSÍVEL (MODO GIGANTE AO CLICAR) */}
+                <div className={`
+                    grid transition-all duration-300 ease-in-out border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30
+                    ${showActions ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}
+                `}>
+                    <div className="overflow-hidden flex">
                         <button
                             onClick={(e) => handleGerarLista(turma, e)}
                             disabled={generatingPDF === turma.id}
-                            className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors disabled:opacity-50"
-                            title="Lista de Estudantes (PDF)"
+                            className="flex-1 py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all border-r border-slate-100 dark:border-slate-800 active:scale-95 disabled:opacity-50"
                         >
-                            {generatingPDF === turma.id ? <Loading size="sm" /> : <FaFilePdf className="h-3.5 w-3.5" />}
+                            {generatingPDF === turma.id ? (
+                                <Loading size="sm" />
+                            ) : (
+                                <>
+                                    <FaFilePdf className="h-5 w-5" />
+                                    <span>PDF</span>
+                                </>
+                            )}
                         </button>
-                        <Link
-                            to={`/grade-turma/${turma.ano_letivo}/${turma.numero}/${turma.letra}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                            title="Grade Horária"
+
+                        <button
+                            onClick={() => navigate(`/turmas/${turma.id}/carometro`)}
+                            className="flex-1 py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all border-r border-slate-100 dark:border-slate-800 active:scale-95"
                         >
-                            <HiTable className="h-3.5 w-3.5" />
-                        </Link>
+                            <HiPhotograph className="h-6 w-6" />
+                            <span>Carômetro</span>
+                        </button>
+
+                        <button
+                            onClick={() => navigate(`/grade-turma/${turma.ano_letivo}/${turma.numero}/${turma.letra}`)}
+                            className="flex-1 py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all active:scale-95"
+                        >
+                            <HiTable className="h-6 w-6" />
+                            <span>Grade</span>
+                        </button>
                     </div>
                 </div>
-            </div>
-        </Card>
-    )
+            </Card>
+        )
+    }
 
     // Estado vazio
     const EmptyState = () => (
@@ -209,9 +244,7 @@ export default function MinhasTurmas() {
                                     <TableHeader>Curso</TableHeader>
                                     <TableHeader>Disciplinas</TableHeader>
                                     <TableHeader className="th-center">Estudantes</TableHeader>
-                                    <TableHeader className="th-center">Lista</TableHeader>
-                                    <TableHeader className="th-center">Carômetro</TableHeader>
-                                    <TableHeader className="th-center">Grade</TableHeader>
+                                    <TableHeader className="th-center font-bold text-primary-600 dark:text-primary-400">Ações</TableHeader>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -251,39 +284,34 @@ export default function MinhasTurmas() {
                                         <TableCell className="td-center">
                                             <Link
                                                 to={`/minhas-turmas/${turma.id}`}
-                                                className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                                className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium"
                                             >
                                                 <HiUserGroup className="h-4 w-4" />
                                                 <span>{turma.estudantes_count || 0}</span>
                                             </Link>
                                         </TableCell>
                                         <TableCell className="td-center">
-                                            <button
-                                                onClick={(e) => handleGerarLista(turma, e)}
-                                                disabled={generatingPDF === turma.id}
-                                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors disabled:opacity-50"
-                                                title="Lista de Estudantes (PDF)"
-                                            >
-                                                {generatingPDF === turma.id ? <Loading size="sm" /> : <FaFilePdf className="h-4 w-4" />}
-                                            </button>
-                                        </TableCell>
-                                        <TableCell className="td-center">
-                                            <Link
-                                                to={`/turmas/${turma.id}/carometro`}
-                                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                                                title="Visualizar Carômetro"
-                                            >
-                                                <HiPhotograph className="h-5 w-5" />
-                                            </Link>
-                                        </TableCell>
-                                        <TableCell className="td-center">
-                                            <Link
-                                                to={`/grade-turma/${turma.ano_letivo}/${turma.numero}/${turma.letra}`}
-                                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                                                title="Ver Grade Horária"
-                                            >
-                                                <HiTable className="h-5 w-5" />
-                                            </Link>
+                                            <ActionSelect
+                                                size="sm"
+                                                actions={[
+                                                    {
+                                                        label: 'Lista em PDF',
+                                                        icon: FaFilePdf,
+                                                        disabled: generatingPDF === turma.id,
+                                                        onClick: (e) => handleGerarLista(turma, e)
+                                                    },
+                                                    {
+                                                        label: 'Visualizar Carômetro',
+                                                        icon: HiPhotograph,
+                                                        onClick: () => navigate(`/turmas/${turma.id}/carometro`)
+                                                    },
+                                                    {
+                                                        label: 'Grade da Turma',
+                                                        icon: HiTable,
+                                                        onClick: () => navigate(`/grade-turma/${turma.ano_letivo}/${turma.numero}/${turma.letra}`)
+                                                    }
+                                                ]}
+                                            />
                                         </TableCell>
                                     </TableRow>
                                 ))}

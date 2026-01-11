@@ -249,7 +249,7 @@ export default function GradeProfessor() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-2">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">
-                        Minha Grade Horária
+                        Grade Horária
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium italic text-sm md:text-base">
                         {professor_nome} - {ano_letivo}

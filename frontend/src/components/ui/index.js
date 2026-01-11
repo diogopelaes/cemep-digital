@@ -24,4 +24,5 @@ export { default as TurmaSelector } from './TurmaSelector'
 export { default as Toaster } from './Toaster'
 export { default as FormActions } from './FormActions'
 export { default as FormActionsProfessor } from './FormActionsProfessor'
+export { default as ActionSelect } from './ActionSelect'
 

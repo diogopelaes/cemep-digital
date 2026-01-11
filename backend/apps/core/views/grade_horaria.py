@@ -16,15 +16,22 @@ from apps.core.serializers.grade_horaria import (
     HorarioAulaSerializer, GradeHorariaValidadeSerializer
 )
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from apps.users.permissions import GestaoSecretariaWritePublicReadMixin, IsGestaoOrSecretaria
 
-class GradeHorariaViewSet(viewsets.ModelViewSet):
+class GradeHorariaViewSet(GestaoSecretariaWritePublicReadMixin, viewsets.ModelViewSet):
     """
     ViewSet para gerenciamento da Grade Horária.
     Focado nas operações de edição administrativa (Gestão/Secretaria).
     """
     queryset = GradeHoraria.objects.all()
     serializer_class = GradeHorariaSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        # Protege especificamente a ação customizada que o Mixin não conhece
+        if self.action == 'salvar_lote':
+            return [IsGestaoOrSecretaria()]
+        # Segue as regras do sistema para o restante (CRUD e Leitura)
+        return super().get_permissions()
 
     @action(detail=False, methods=['get'])
     def dados_edicao(self, request):
