@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Card, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, PageLoading } from '../../components/ui'
+import { Card, Button, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, PageLoading } from '../../components/ui'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { HiAcademicCap, HiClock } from 'react-icons/hi'
+import { FaFilePdf } from 'react-icons/fa'
+import { generateGradeProfessorPDF } from '../../utils/pdf'
 
 const DAYS = [
     { value: 0, label: 'Segunda', short: 'Seg' },
@@ -27,6 +29,7 @@ export default function GradeProfessor() {
     const [dados, setDados] = useState(null)
     const [error, setError] = useState(null)
     const [selectedDay, setSelectedDay] = useState(getTodayIndex)
+    const [generatingPDF, setGeneratingPDF] = useState(false)
 
     useEffect(() => {
         carregarGrade()
@@ -52,6 +55,15 @@ export default function GradeProfessor() {
             }
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleGerarPDF = async () => {
+        setGeneratingPDF(true)
+        try {
+            await generateGradeProfessorPDF(dados)
+        } finally {
+            setGeneratingPDF(false)
         }
     }
 
@@ -242,6 +254,17 @@ export default function GradeProfessor() {
                     <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium italic text-sm md:text-base">
                         {professor_nome} - {ano_letivo}
                     </p>
+                </div>
+                <div className="flex shrink-0">
+                    <Button
+                        variant="secondary"
+                        icon={FaFilePdf}
+                        onClick={handleGerarPDF}
+                        loading={generatingPDF}
+                        className="w-full md:w-auto"
+                    >
+                        Visualizar PDF
+                    </Button>
                 </div>
             </div>
 
