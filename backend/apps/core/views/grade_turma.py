@@ -137,6 +137,17 @@ def grade_turma_view(request, ano, numero, letra):
                 'hora_fim': g.horario_aula.hora_fim.strftime('%H:%M')
             }
     
+    # Busca disciplinas do professor logado (se for professor)
+    minhas_disciplinas = []
+    if request.user.tipo_usuario == 'PROFESSOR' and hasattr(request.user, 'funcionario'):
+        atribuicoes = ProfessorDisciplinaTurma.objects.filter(
+            professor=request.user.funcionario,
+            disciplina_turma__turma__in=turmas
+        ).filter(
+            models.Q(data_fim__isnull=True) | models.Q(data_fim__gte=hoje)
+        ).values_list('disciplina_turma__disciplina_id', flat=True)
+        minhas_disciplinas = [str(d) for d in atribuicoes]
+    
     return Response({
         'ano_letivo': ano,
         'numero': numero,
@@ -149,5 +160,6 @@ def grade_turma_view(request, ano, numero, letra):
         },
         'matriz': matriz,
         'horarios': horarios,
+        'minhas_disciplinas': minhas_disciplinas,
         'gerado_em': timezone.now().isoformat()
     })

@@ -54,6 +54,7 @@ class Funcionario(UUIDModel):
         null=True,
         blank=True,
         default=None,
+        unique=True,
         verbose_name='Apelido'
     )
     cpf = models.CharField(

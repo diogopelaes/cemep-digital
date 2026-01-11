@@ -32,6 +32,7 @@ const menuItems = {
   PROFESSOR: [
     { path: '/aula-faltas', label: 'Aula e Faltas', icon: HiClipboardList },
     { path: '/dashboard', label: 'Dashboard', icon: HiHome },
+    { path: '/minha-grade', label: 'Minha Grade', icon: HiAcademicCap },
     { path: '/minhas-turmas', label: 'Minhas Turmas', icon: HiUsers },
     { path: '/estudantes', label: 'Estudantes', icon: HiAcademicCap },
     { path: '/plano-aula', label: 'Plano de Aula', icon: HiDocumentText },

@@ -256,12 +256,30 @@ class GradeHorariaViewSet(AnoLetivoFilterMixin, GestaoWritePublicReadMixin, view
             
             # Caso 2: Nova Validade ou criando irmãs faltantes
             if not validade_id and data_inicio and data_fim:
-                # Vamos iterar sobre todas as turmas relacionadas e garantir que existe validade
+                from datetime import datetime as dt
+                # Converte strings para date se necessário
+                nova_data_inicio = dt.strptime(data_inicio, '%Y-%m-%d').date() if isinstance(data_inicio, str) else data_inicio
+                nova_data_fim = dt.strptime(data_fim, '%Y-%m-%d').date() if isinstance(data_fim, str) else data_fim
+                
+                # Verifica sobreposição para todas as turmas antes de criar
+                for t in turmas_relacionadas:
+                    sobreposicao = GradeHorariaValidade.objects.filter(
+                        turma=t,
+                        data_inicio__lte=nova_data_fim,
+                        data_fim__gte=nova_data_inicio
+                    ).exists()
+                    
+                    if sobreposicao:
+                        return Response({
+                            'error': f'Já existe uma vigência de grade para a turma {t.nome_completo} que sobrepõe o período informado.'
+                        }, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Cria validades para todas as turmas
                 for t in turmas_relacionadas:
                     v, created = GradeHorariaValidade.objects.get_or_create(
                         turma=t,
-                        data_inicio=data_inicio,
-                        data_fim=data_fim
+                        data_inicio=nova_data_inicio,
+                        data_fim=nova_data_fim
                     )
                     validades_map[t.id] = v
             

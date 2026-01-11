@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import { Card, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, Badge, PageLoading } from '../components/ui'
-import api from '../services/api'
+import { useSearchParams } from 'react-router-dom'
+import { Card, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, PageLoading } from '../../components/ui'
+import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { HiAcademicCap, HiClock } from 'react-icons/hi'
 
@@ -19,8 +19,10 @@ const getTodayIndex = () => {
     return today >= 1 && today <= 5 ? today - 1 : 0
 }
 
-export default function GradeTurma() {
-    const { ano, numero, letra } = useParams()
+export default function GradeProfessor() {
+    const [searchParams] = useSearchParams()
+    const professorId = searchParams.get('professor_id')
+
     const [loading, setLoading] = useState(true)
     const [dados, setDados] = useState(null)
     const [error, setError] = useState(null)
@@ -28,17 +30,22 @@ export default function GradeTurma() {
 
     useEffect(() => {
         carregarGrade()
-    }, [ano, numero, letra])
+    }, [professorId])
 
     const carregarGrade = async () => {
         setLoading(true)
         setError(null)
         try {
-            const response = await api.get(`/core/grade-turma/${ano}/${numero}/${letra.toUpperCase()}/`)
+            const url = professorId
+                ? `/core/grade-professor/?professor_id=${professorId}`
+                : '/core/grade-professor/'
+            const response = await api.get(url)
             setDados(response.data)
         } catch (err) {
-            if (err.response?.status === 404) {
-                setError('Turma não encontrada.')
+            if (err.response?.status === 403) {
+                setError('Sem permissão para visualizar esta grade.')
+            } else if (err.response?.status === 404) {
+                setError('Professor não encontrado.')
             } else {
                 setError('Erro ao carregar grade horária.')
                 toast.error('Erro ao carregar grade horária.')
@@ -65,7 +72,7 @@ export default function GradeTurma() {
 
     if (!dados) return null
 
-    const { turma_nome, cursos, matriz, horarios, mensagem, ano_letivo, minhas_disciplinas = [] } = dados
+    const { professor_nome, matriz, horarios, mensagem, ano_letivo, mostrar_disciplina } = dados
 
     // Ordena os números de aula
     const numerosAula = Object.keys(matriz || {}).map(Number).sort((a, b) => a - b)
@@ -107,67 +114,16 @@ export default function GradeTurma() {
         )
     }
 
-    // Função para converter hora "HH:MM" em minutos desde meia-noite
-    const timeToMinutes = (timeStr) => {
-        if (!timeStr) return 0
-        const [hours, minutes] = timeStr.split(':').map(Number)
-        return hours * 60 + minutes
-    }
-
-    // Verifica se estamos no dia de hoje (dia útil) e retorna info da aula atual/próxima
-    const getAulaStatus = () => {
-        const now = new Date()
-        const dayOfWeek = now.getDay() // 0=Dom, 1=Seg, ..., 6=Sab
-        const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5
-        const todayIdx = isWeekday ? dayOfWeek - 1 : -1
-
-        // Só mostra status se for dia útil E estiver visualizando o dia de hoje
-        if (!isWeekday || selectedDay !== todayIdx) {
-            return { currentAula: null, nextAula: null }
-        }
-
-        const currentMinutes = now.getHours() * 60 + now.getMinutes()
-        const dayValue = DAYS[selectedDay].value
-
-        let currentAula = null
-        let nextAula = null
-
-        for (const num of numerosAula) {
-            const horario = horarios?.[String(num)]
-            const linhaMatriz = matriz?.[String(num)] || {}
-            const celula = linhaMatriz[String(dayValue)]
-
-            if (!horario || !celula) continue
-
-            const inicio = timeToMinutes(horario.hora_inicio)
-            const fim = timeToMinutes(horario.hora_fim)
-
-            // Aula atual: estamos dentro do horário
-            if (currentMinutes >= inicio && currentMinutes < fim) {
-                currentAula = num
-            }
-            // Próxima aula: ainda não começou
-            else if (currentMinutes < inicio && !nextAula) {
-                nextAula = num
-            }
-        }
-
-        return { currentAula, nextAula }
-    }
-
     // Componente: Card de Aula para Mobile
     const MobileAulaCard = ({ numeroAula, celula, horario, isCurrent, isNext }) => {
         const isEmpty = !celula
-        const isMinhaDisciplina = celula && minhas_disciplinas.includes(celula.disciplina_id)
 
-        // Classes de destaque para aula atual, próxima ou minha disciplina
+        // Classes de destaque para aula atual ou próxima
         const highlightClasses = isCurrent
             ? 'ring-2 ring-emerald-500 dark:ring-emerald-400 bg-emerald-50/50 dark:bg-emerald-900/20'
             : isNext
                 ? 'ring-2 ring-amber-500 dark:ring-amber-400 bg-amber-50/50 dark:bg-amber-900/20'
-                : isMinhaDisciplina
-                    ? 'ring-2 ring-primary-500 dark:ring-primary-400 bg-primary-50/50 dark:bg-primary-900/20'
-                    : ''
+                : ''
 
         return (
             <div className={`
@@ -187,21 +143,19 @@ export default function GradeTurma() {
                                 ? 'bg-gradient-to-br from-emerald-500 to-emerald-600'
                                 : isNext
                                     ? 'bg-gradient-to-br from-amber-500 to-amber-600'
-                                    : isMinhaDisciplina
-                                        ? 'bg-gradient-to-br from-primary-500 to-primary-600'
-                                        : 'bg-gradient-to-br from-slate-400 to-slate-500'
+                                    : 'bg-gradient-to-br from-primary-500 to-primary-600'
                         }
                     `}>
                         <span className={`text-lg font-bold ${isEmpty ? 'text-slate-400' : 'text-white'}`}>
-                            {numeroAula}ª
+                            {numeroAula}
                         </span>
                     </div>
 
                     {/* Conteúdo */}
                     <div className="flex-1 min-w-0">
                         {isEmpty ? (
-                            <div className="py-2">
-                                <span className="text-slate-400 dark:text-slate-500 text-sm">
+                            <div className="flex items-center h-12">
+                                <span className="text-sm text-slate-400 dark:text-slate-500 italic">
                                     Sem aula
                                 </span>
                             </div>
@@ -209,7 +163,7 @@ export default function GradeTurma() {
                             <>
                                 <div className="flex items-center gap-2">
                                     <h3 className="font-bold text-slate-800 dark:text-white text-base">
-                                        {celula.disciplina_sigla}
+                                        {celula.turma_label}
                                     </h3>
                                     {isCurrent && (
                                         <span className="px-1.5 py-0.5 rounded bg-emerald-500 text-white text-[10px] font-bold animate-pulse">
@@ -222,12 +176,11 @@ export default function GradeTurma() {
                                         </span>
                                     )}
                                 </div>
-                                {celula.professor_apelido && (
+                                {mostrar_disciplina && celula.disciplina_sigla && (
                                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                                        {celula.professor_apelido}
+                                        {celula.disciplina_sigla}
                                     </p>
                                 )}
-
                             </>
                         )}
                     </div>
@@ -249,31 +202,33 @@ export default function GradeTurma() {
         )
     }
 
-    // Componente: Lista de Aulas Mobile para o dia selecionado
-    const MobileAulasList = () => {
-        const dayValue = DAYS[selectedDay].value
-        const { currentAula, nextAula } = getAulaStatus()
+    // Função para obter status de aula (atual, próxima, etc)
+    const getAulaStatus = (dia) => {
+        const today = new Date()
+        const currentDay = today.getDay() - 1 // 0=Seg, 4=Sex
 
-        return (
-            <div className="space-y-3">
-                {numerosAula.map(num => {
-                    const horario = horarios?.[String(num)]
-                    const linhaMatriz = matriz?.[String(num)] || {}
-                    const celula = linhaMatriz[String(dayValue)]
+        if (dia !== currentDay) return { currentAula: null, nextAula: null }
 
-                    return (
-                        <MobileAulaCard
-                            key={num}
-                            numeroAula={num}
-                            celula={celula}
-                            horario={horario}
-                            isCurrent={num === currentAula}
-                            isNext={num === nextAula}
-                        />
-                    )
-                })}
-            </div>
-        )
+        const now = today.getHours() * 60 + today.getMinutes()
+
+        let currentAula = null
+        let nextAula = null
+
+        for (const numStr of Object.keys(horarios)) {
+            const horario = horarios[numStr]
+            const [startH, startM] = horario.hora_inicio.split(':').map(Number)
+            const [endH, endM] = horario.hora_fim.split(':').map(Number)
+            const start = startH * 60 + startM
+            const end = endH * 60 + endM
+
+            if (now >= start && now < end) {
+                currentAula = parseInt(numStr)
+            } else if (now < start && !nextAula) {
+                nextAula = parseInt(numStr)
+            }
+        }
+
+        return { currentAula, nextAula }
     }
 
     return (
@@ -282,33 +237,51 @@ export default function GradeTurma() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-2">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">
-                        Grade Horária
+                        Minha Grade Horária
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium italic text-sm md:text-base">
-                        {turma_nome} - {ano_letivo}
+                        {professor_nome} - {ano_letivo}
                     </p>
                 </div>
-
-
             </div>
 
             {/* Mensagem se não houver grade */}
             {mensagem && (
-                <div className="glass rounded-2xl p-4 md:p-6 text-center border-amber-200/50 dark:border-amber-800/50 bg-amber-50/30 dark:bg-amber-900/10">
-                    <p className="text-amber-700 dark:text-amber-300 font-medium text-sm md:text-base">{mensagem}</p>
-                </div>
+                <Card className="!p-8 text-center">
+                    <HiAcademicCap className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+                    <p className="text-slate-500 dark:text-slate-400">{mensagem}</p>
+                </Card>
             )}
 
             {/* Grade */}
-            {numerosAula.length > 0 && (
+            {!mensagem && numerosAula.length > 0 && (
                 <>
-                    {/* Mobile: Vista por dia com cards */}
+                    {/* Mobile View */}
                     <div className="md:hidden">
                         <MobileDaySelector />
-                        <MobileAulasList />
+                        <div className="space-y-2">
+                            {numerosAula.map(num => {
+                                const numStr = String(num)
+                                const diaKey = String(selectedDay)
+                                const celula = matriz[numStr]?.[diaKey]
+                                const horario = horarios[numStr]
+                                const { currentAula, nextAula } = getAulaStatus(selectedDay)
+
+                                return (
+                                    <MobileAulaCard
+                                        key={num}
+                                        numeroAula={num}
+                                        celula={celula}
+                                        horario={horario}
+                                        isCurrent={num === currentAula}
+                                        isNext={num === nextAula}
+                                    />
+                                )
+                            })}
+                        </div>
                     </div>
 
-                    {/* Desktop: Tabela completa */}
+                    {/* Desktop View */}
                     <div className="hidden md:block max-w-6xl">
                         <Card padding={false} hover={false} className="overflow-hidden shadow-premium">
                             <div className="overflow-x-auto">
@@ -332,20 +305,21 @@ export default function GradeTurma() {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {numerosAula.map(numero => {
-                                            const horario = horarios?.[String(numero)]
-                                            const linhaMatriz = matriz?.[String(numero)] || {}
+                                        {numerosAula.map(num => {
+                                            const numStr = String(num)
+                                            const horario = horarios[numStr]
+                                            const linhaMatriz = matriz[numStr] || {}
 
                                             return (
                                                 <TableRow
-                                                    key={numero}
+                                                    key={num}
                                                     className="group/row transition-colors [&:has(.col-aula:hover)_td]:!bg-slate-100/80 dark:[&:has(.col-aula:hover)_td]:!bg-slate-800/60"
                                                 >
                                                     <TableCell className="col-aula text-center bg-slate-50/30 dark:bg-slate-800/30 border-r border-b border-slate-100 dark:border-slate-700/50 cursor-default transition-colors">
                                                         <div className="font-bold text-slate-700 dark:text-slate-200">
-                                                            {numero}ª
+                                                            {num}ª
                                                         </div>
-                                                        <div className="text-[10px] text-slate-400 font-medium">
+                                                        <div className="text-[10px] text-slate-400 font-medium whitespace-nowrap">
                                                             {horario?.hora_inicio} - {horario?.hora_fim}
                                                         </div>
                                                     </TableCell>
@@ -371,18 +345,14 @@ export default function GradeTurma() {
                                                                     <span className="opacity-20">—</span>
                                                                 ) : (
                                                                     <div className="space-y-1 py-2">
-                                                                        <div className={`font-bold text-sm ${minhas_disciplinas.includes(celula.disciplina_id)
-                                                                            ? 'text-primary-600 dark:text-primary-400'
-                                                                            : 'text-slate-800 dark:text-slate-100'
-                                                                            }`}>
-                                                                            {celula.disciplina_sigla}
+                                                                        <div className="font-bold text-slate-800 dark:text-slate-100 text-sm">
+                                                                            {celula.turma_label}
                                                                         </div>
-                                                                        {celula.professor_apelido && (
+                                                                        {mostrar_disciplina && celula.disciplina_sigla && (
                                                                             <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                                                                                {celula.professor_apelido}
+                                                                                {celula.disciplina_sigla}
                                                                             </div>
                                                                         )}
-
                                                                     </div>
                                                                 )}
                                                             </TableCell>

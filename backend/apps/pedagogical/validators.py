@@ -8,6 +8,40 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 
 
+def _obter_datas_com_grade_valida(ano_letivo):
+    """
+    Retorna um set de datas (ISO strings) que possuem grade horária válida.
+    
+    Uma data é considerada válida se existe pelo menos uma GradeHorariaValidade
+    onde data_inicio <= data <= data_fim.
+    
+    Args:
+        ano_letivo: Instância de AnoLetivo
+        
+    Returns:
+        set: Conjunto de datas ISO que têm grade válida, ou None se não filtrar
+    """
+    from apps.core.models import GradeHorariaValidade
+    
+    # Busca todas as validades do ano letivo
+    validades = GradeHorariaValidade.objects.filter(
+        turma__ano_letivo=ano_letivo.ano
+    ).values_list('data_inicio', 'data_fim')
+    
+    if not validades:
+        return None  # Sem validades = não filtrar por grade
+    
+    datas_validas = set()
+    for data_inicio, data_fim in validades:
+        if data_inicio and data_fim:
+            curr = data_inicio
+            while curr <= data_fim:
+                datas_validas.add(curr.isoformat())
+                curr += timedelta(days=1)
+    
+    return datas_validas if datas_validas else None
+
+
 def obter_datas_liberadas_cached(ano_letivo):
     """
     Retorna datas liberadas usando cache com validade diária.
@@ -60,6 +94,7 @@ def _calcular_datas_liberadas(ano_letivo):
     - Se data_liberada_inicio <= hoje <= data_liberada_fim:
         - Se digitacao_futura=True: todos os dias_letivos
         - Se digitacao_futura=False: apenas dias_letivos <= hoje
+    - Filtra apenas datas que possuem grade horária válida (GradeHorariaValidade)
     
     Returns:
         set: Conjunto de datas ISO liberadas
@@ -100,6 +135,11 @@ def _calcular_datas_liberadas(ano_letivo):
             for dia in dias_letivos:
                 if dia <= hoje_iso:
                     datas_liberadas.add(dia)
+    
+    # Filtra apenas datas que têm grade horária válida
+    datas_com_grade = _obter_datas_com_grade_valida(ano_letivo)
+    if datas_com_grade:
+        datas_liberadas = datas_liberadas.intersection(datas_com_grade)
     
     return datas_liberadas
 

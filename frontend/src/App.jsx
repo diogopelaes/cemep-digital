@@ -48,6 +48,7 @@ import PlanoAulaForm from './pages/professor/PlanoAulaForm'
 import AulaFaltas from './pages/professor/AulaFaltas'
 import AulaFaltasOptions from './pages/professor/AulaFaltasOptions'
 import AulaFaltasForm from './pages/professor/AulaFaltasForm'
+import GradeProfessor from './pages/professor/GradeProfessor'
 
 // Constantes de perfis para evitar repetição
 const GESTAO_ONLY = ['GESTAO']
@@ -177,6 +178,9 @@ function App() {
           <ProtectedRoute allowedRoles={GESTAO_ONLY}><CalendarioForm /></ProtectedRoute>
         } />
         {/* Rotas exclusivas do Professor */}
+        <Route path="/minha-grade" element={
+          <ProtectedRoute allowedRoles={[...PROFESSOR_ONLY, ...GESTAO_SECRETARIA]}><GradeProfessor /></ProtectedRoute>
+        } />
         <Route path="/minhas-turmas" element={
           <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><MinhasTurmas /></ProtectedRoute>
         } />

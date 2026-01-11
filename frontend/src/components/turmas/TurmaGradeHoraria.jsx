@@ -245,25 +245,44 @@ export default function TurmaGradeHoraria() {
                                 onChange={handleChangeValidade}
                                 className="min-w-[200px]"
                                 placeholder={validades.length === 0 ? 'Nenhuma grade cadastrada' : 'Selecione...'}
-                                options={validades.map(v => ({
-                                    value: v.id,
-                                    label: `${formatDate(v.data_inicio)} - ${formatDate(v.data_fim)} ${v.is_active ? '(Atual)' : ''}`
-                                }))}
+                                options={[...validades]
+                                    .sort((a, b) => b.data_inicio.localeCompare(a.data_inicio))
+                                    .map(v => {
+                                        const hoje = new Date().toISOString().split('T')[0]
+                                        const isVigente = v.data_inicio <= hoje && v.data_fim >= hoje
+                                        return {
+                                            value: v.id,
+                                            label: `${formatDate(v.data_inicio)} - ${formatDate(v.data_fim)} ${isVigente ? '(Atual)' : ''}`
+                                        }
+                                    })}
                             />
 
-                            {validadeSelecionada && (
-                                <div className={`px-2 py-1 rounded text-xs font-semibold border ${validadeSelecionada.data_inicio <= new Date().toISOString().split('T')[0] &&
-                                        validadeSelecionada.data_fim >= new Date().toISOString().split('T')[0]
-                                        ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
-                                        : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-700 dark:text-slate-400 dark:border-slate-600'
-                                    }`}>
-                                    {validadeSelecionada.data_inicio <= new Date().toISOString().split('T')[0] &&
-                                        validadeSelecionada.data_fim >= new Date().toISOString().split('T')[0]
-                                        ? 'Vigente'
-                                        : 'Histórico/Futuro'
-                                    }
-                                </div>
-                            )}
+                            {validadeSelecionada && (() => {
+                                const hoje = new Date().toISOString().split('T')[0]
+                                const isNaoIniciada = validadeSelecionada.data_inicio > hoje
+                                const isFinalizada = validadeSelecionada.data_fim < hoje
+                                const isVigente = !isNaoIniciada && !isFinalizada
+
+                                let badgeClass = ''
+                                let badgeText = ''
+
+                                if (isVigente) {
+                                    badgeClass = 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
+                                    badgeText = 'Vigente'
+                                } else if (isNaoIniciada) {
+                                    badgeClass = 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800'
+                                    badgeText = 'Não iniciada'
+                                } else {
+                                    badgeClass = 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-700 dark:text-slate-400 dark:border-slate-600'
+                                    badgeText = 'Finalizada'
+                                }
+
+                                return (
+                                    <div className={`px-2 py-1 rounded text-xs font-semibold border whitespace-nowrap ${badgeClass}`}>
+                                        {badgeText}
+                                    </div>
+                                )
+                            })()}
                         </div>
                     </div>
                 )}

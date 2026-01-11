@@ -15,7 +15,7 @@ from .habilidade import HabilidadeViewSet
 from .horario_aula import HorarioAulaViewSet
 from .grade_horaria import GradeHorariaViewSet
 from .ano_letivo_selecionado import AnoLetivoSelecionadoViewSet
-from .professor import MinhasTurmasViewSet
+from .professor import MinhasTurmasViewSet, grade_professor_view
 from .media import ProtectedMediaView
 from .controle import ControleRegistrosVisualizacaoViewSet
 from .grade_turma import grade_turma_view
@@ -38,6 +38,7 @@ __all__ = [
     'ProtectedMediaView',
     'ControleRegistrosVisualizacaoViewSet',
     'grade_turma_view',
+    'grade_professor_view',
 ]
 
 
