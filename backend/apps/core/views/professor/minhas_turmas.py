@@ -77,8 +77,6 @@ class MinhasTurmasViewSet(viewsets.ViewSet):
             id__in=turma_ids
         ).select_related(
             'curso'
-        ).prefetch_related(
-            'validades_grade'
         ).order_by('numero', 'letra')
         
         serializer = TurmaSerializer(turmas, many=True)
@@ -122,8 +120,6 @@ class MinhasTurmasViewSet(viewsets.ViewSet):
         try:
             turma = Turma.objects.select_related(
                 'curso'
-            ).prefetch_related(
-                'validades_grade'
             ).get(id=pk)
         except Turma.DoesNotExist:
             return Response(

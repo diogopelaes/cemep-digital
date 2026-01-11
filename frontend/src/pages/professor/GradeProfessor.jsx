@@ -261,9 +261,9 @@ export default function GradeProfessor() {
                         icon={FaFilePdf}
                         onClick={handleGerarPDF}
                         loading={generatingPDF}
-                        className="w-full md:w-auto"
+                        className="w-auto"
                     >
-                        Visualizar PDF
+                        <span className="hidden md:inline">Visualizar PDF</span>
                     </Button>
                 </div>
             </div>

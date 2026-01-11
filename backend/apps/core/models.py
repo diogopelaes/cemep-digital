@@ -122,25 +122,6 @@ class Funcionario(UUIDModel):
             
         Returns:
             dict: A grade horária gerada, ou None se não houver ano letivo.
-            
-        Estrutura do JSON retornado:
-        {
-            "ano_letivo": 2026,
-            "matriz": {
-                "1": {  # número da aula (linha)
-                    "0": {...},  # Segunda (coluna)
-                    "1": {...},  # Terça
-                    ...
-                },
-                ...
-            },
-            "horarios": {
-                "1": {"hora_inicio": "07:30", "hora_fim": "08:20"},
-                ...
-            },
-            "aulas": [...],  # lista flat para outros usos
-            "gerado_em": "..."
-        }
         """
         from django.utils import timezone
         
@@ -157,19 +138,16 @@ class Funcionario(UUIDModel):
         
         ano_referencia = ano_letivo_obj.ano
         
-        # Busca atribuições ativas do professor
-        # (ativas = sem data_fim ou data_fim >= hoje)
+        # Busca atribuições ativas do professor para verificar disciplinas e turmas
         atribuicoes = ProfessorDisciplinaTurma.objects.filter(
             professor=self,
             disciplina_turma__turma__ano_letivo=ano_referencia
         ).filter(
             models.Q(data_fim__isnull=True) | models.Q(data_fim__gte=hoje)
-        ).select_related(
-            'disciplina_turma__turma__curso',
-            'disciplina_turma__disciplina'
-        )
-        
+        ).select_related('disciplina_turma', 'disciplina_turma__turma', 'disciplina_turma__disciplina')
+
         if not atribuicoes.exists():
+            # Estrutura vazia
             self.grade_horaria = {
                 'ano_letivo': ano_referencia,
                 'matriz': {},
@@ -178,105 +156,105 @@ class Funcionario(UUIDModel):
                 'gerado_em': timezone.now().isoformat()
             }
             if save:
-                self.save(update_fields=['grade_horaria'])
+                 self.save(update_fields=['grade_horaria'])
             return self.grade_horaria
+
+        matriz = {}
+        horarios = {}
+        aulas_list = []
+
+        # Para cada atribuição, buscamos 'onde' essa disciplina está na grade daquela turma
+        # Otimização: Agrupar turmas por (numero, letra) para buscar validade uma vez?
+        # Ou simplesmente iterar. Como não são muitas, iterar é ok.
         
-        # Mapeia turma_id + disciplina_id para buscar nas grades
-        turma_disciplina_map = {}
-        for attr in atribuicoes:
-            key = (attr.disciplina_turma.turma_id, attr.disciplina_turma.disciplina_id)
-            turma_disciplina_map[key] = attr.disciplina_turma
-        
-        turmas_ids = list(set(k[0] for k in turma_disciplina_map.keys()))
-        disciplinas_ids = list(set(k[1] for k in turma_disciplina_map.keys()))
-        
-        # Busca validades vigentes para essas turmas
-        validades_vigentes = GradeHorariaValidade.objects.filter(
-            turma_id__in=turmas_ids,
-            data_inicio__lte=hoje,
-            data_fim__gte=hoje
-        ).select_related('turma__curso')
-        
-        if not validades_vigentes.exists():
-            self.grade_horaria = {
-                'ano_letivo': ano_referencia,
-                'matriz': {},
-                'horarios': {},
-                'aulas': [],
-                'gerado_em': timezone.now().isoformat()
-            }
-            if save:
-                self.save(update_fields=['grade_horaria'])
-            return self.grade_horaria
-        
-        # Busca itens de grade dessas validades que tenham as disciplinas do professor
-        grades = GradeHoraria.objects.filter(
-            validade__in=validades_vigentes,
-            disciplina_id__in=disciplinas_ids
-        ).select_related(
-            'horario_aula',
-            'disciplina',
-            'validade__turma__curso'
-        ).order_by('horario_aula__dia_semana', 'horario_aula__hora_inicio')
-        
-        aulas = []
-        matriz = {}  # {numero_aula: {dia_semana: dados}}
-        horarios = {}  # {numero_aula: {hora_inicio, hora_fim}}
-        
-        for g in grades:
-            # Verifica se essa combinação turma+disciplina pertence ao professor
-            key = (g.validade.turma_id, g.disciplina_id)
-            if key not in turma_disciplina_map:
-                continue
-                
-            turma = g.validade.turma
-            numero = g.horario_aula.numero
-            dia = g.horario_aula.dia_semana
-            
-            aula_data = {
-                'horario_aula_id': str(g.horario_aula.id),
-                'dia_semana': dia,
-                'dia_semana_display': g.horario_aula.get_dia_semana_display(),
-                'numero': numero,
-                'hora_inicio': g.horario_aula.hora_inicio.strftime('%H:%M'),
-                'hora_fim': g.horario_aula.hora_fim.strftime('%H:%M'),
-                'turma_id': str(turma.id),
-                'turma_nome': f"{turma.numero}{turma.letra}",
-                'curso_sigla': turma.curso.sigla,
-                'disciplina_id': str(g.disciplina.id),
-                'disciplina_sigla': g.disciplina.sigla,
-                'validade': g.validade.data_fim.isoformat()
-            }
-            
-            aulas.append(aula_data)
-            
-            # Monta matriz para renderização de tabela
-            num_key = str(numero)
-            dia_key = str(dia)
-            
-            if num_key not in matriz:
-                matriz[num_key] = {}
-            
-            # Dados resumidos para a célula da matriz
-            matriz[num_key][dia_key] = {
-                'turma_nome': f"{turma.numero}{turma.letra}",
-                'curso_sigla': turma.curso.sigla,
-                'disciplina_sigla': g.disciplina.sigla,
-                'validade': g.validade.data_fim.isoformat()
-            }
-            
-            # Registra horários por número de aula (para legenda das linhas)
-            if num_key not in horarios:
-                horarios[num_key] = {
-                    'hora_inicio': g.horario_aula.hora_inicio.strftime('%H:%M'),
-                    'hora_fim': g.horario_aula.hora_fim.strftime('%H:%M')
+        # Precisamos dos horários de aula para montar a legenda
+        todos_horarios = HorarioAula.objects.filter(ano_letivo=ano_letivo_obj)
+        horarios_map = {h.id: h for h in todos_horarios}
+
+        for h in todos_horarios:
+            if str(h.numero) not in horarios:
+                horarios[str(h.numero)] = {
+                    'hora_inicio': h.hora_inicio.strftime('%H:%M'),
+                    'hora_fim': h.hora_fim.strftime('%H:%M')
                 }
-        
+
+        for atribuicao in atribuicoes:
+            turma = atribuicao.disciplina_turma.turma
+            disciplina = atribuicao.disciplina_turma.disciplina
+            
+            # Busca validade vigente para esta turma (agora por numero/letra)
+            validade = GradeHorariaValidade.objects.filter(
+                ano_letivo__ano=turma.ano_letivo,
+                turma_numero=turma.numero,
+                turma_letra=turma.letra,
+                data_inicio__lte=hoje,
+                data_fim__gte=hoje
+            ).first()
+
+            if not validade:
+                continue
+
+            # Busca itens da grade para esta DISCIPLINA nesta VALIDADE
+            itens_grade = GradeHoraria.objects.filter(
+                validade=validade,
+                disciplina=disciplina
+            )
+
+            for item in itens_grade:
+                # Recupera horário do map (evita query extra)
+                horario_aula = horarios_map.get(item.horario_aula_id)
+                if not horario_aula:
+                    continue
+
+                num_key = str(horario_aula.numero)
+                dia_key = str(horario_aula.dia_semana)
+
+                if num_key not in matriz:
+                    matriz[num_key] = {}
+                
+                # Se já tem algo nessa célula (conflito de professor dando aula em 2 turmas ao mesmo tempo?)
+                # O front deve lidar ou sobrescrevemos. Vamos append se for lista, mas a estrutura pedida é dict simples.
+                # Se o professor dá aula para 2 turmas no mesmo horario (ex: Junção), precisamos mostrar.
+                # A estrutura atual parece suportar apenas um item por célula no JSON exemplo?
+                # "0": {...}
+                # Vamos assumir que sobrescreve ou concatena info. 
+                # Concatenar texto da turma é melhor.
+                
+                celula_existente = matriz[num_key].get(dia_key)
+                
+                texto_turma = turma.sigla
+                
+                if celula_existente:
+                     # Já tem aula nesse horário (outra turma?)
+                     # Concatena turma
+                     if texto_turma not in celula_existente['turma_sigla']:
+                        celula_existente['turma_sigla'] += f", {texto_turma}"
+                        celula_existente['turma_id'] = None # Múltiplas ids, melhor anular ou virar lista
+                else:
+                    matriz[num_key][dia_key] = {
+                        'disciplina_nome': disciplina.nome,
+                        'disciplina_sigla': disciplina.sigla,
+                        'turma_sigla': texto_turma,
+                        'turma_label': f"{turma.numero}{turma.letra}", # Para frontend
+                        'curso_sigla': turma.curso.sigla, # Para frontend
+                        'turma_id': str(turma.id),
+                        'sala': '' # Futuro
+                    }
+                
+                aulas_list.append({
+                    'dia_semana': horario_aula.dia_semana,
+                    'numero_aula': horario_aula.numero,
+                    'hora_inicio': horario_aula.hora_inicio.strftime('%H:%M'),
+                    'hora_fim': horario_aula.hora_fim.strftime('%H:%M'),
+                    'disciplina': disciplina.nome,
+                    'turma': turma.nome_completo
+                })
+
         self.grade_horaria = {
             'ano_letivo': ano_referencia,
             'matriz': matriz,
             'horarios': horarios,
-            'aulas': aulas,
+            'aulas': aulas_list,
             'gerado_em': timezone.now().isoformat()
         }
         
@@ -284,6 +262,8 @@ class Funcionario(UUIDModel):
             self.save(update_fields=['grade_horaria'])
         
         return self.grade_horaria
+
+
 
 
 class PeriodoTrabalho(UUIDModel):
@@ -465,37 +445,16 @@ class Turma(UUIDModel):
             
         Returns:
             dict: A grade horária gerada, ou None se não houver validade vigente.
-            
-        Estrutura do JSON retornado:
-        {
-            "ano_letivo": 2026,
-            "validade": "2026-06-30",
-            "matriz": {
-                "1": {  # número da aula (linha)
-                    "0": {  # Segunda (coluna)
-                        "disciplina_id": "...",
-                        "disciplina_nome": "Matemática",
-                        "disciplina_sigla": "MAT",
-                        "professor_apelido": "João"
-                    },
-                    ...
-                },
-                ...
-            },
-            "horarios": {
-                "1": {"hora_inicio": "07:30", "hora_fim": "08:20"},
-                ...
-            },
-            "gerado_em": "..."
-        }
         """
         from django.utils import timezone
         
         hoje = timezone.now().date()
         
-        # Busca a validade vigente para esta turma
+        # Busca a validade vigente para esta turma (por numero/letra)
         validade = GradeHorariaValidade.objects.filter(
-            turma=self,
+            ano_letivo__ano=self.ano_letivo,
+            turma_numero=self.numero,
+            turma_letra=self.letra,
             data_inicio__lte=hoje,
             data_fim__gte=hoje
         ).first()
@@ -514,7 +473,15 @@ class Turma(UUIDModel):
             'disciplina'
         ).order_by('horario_aula__dia_semana', 'horario_aula__hora_inicio')
         
-        if not grades.exists():
+        # Busca disciplinas VINCLULADAS a esta turma específica
+        # Isso é crucial para filtrar quais grades se aplicam a esta turma (já que as turmas irmãs compartilham validade)
+        disciplinas_turma_ids = set(
+            DisciplinaTurma.objects.filter(turma=self).values_list('disciplina_id', flat=True)
+        )
+
+        grades_filtradas = [g for g in grades if g.disciplina_id in disciplinas_turma_ids]
+        
+        if not grades_filtradas:
             self.grade_horaria = {
                 'ano_letivo': self.ano_letivo,
                 'validade': validade.data_fim.isoformat(),
@@ -527,18 +494,15 @@ class Turma(UUIDModel):
             return self.grade_horaria
         
         # Busca os professores das disciplinas desta turma
-        # Mapeia disciplina_id -> professor ativo
         professores_map = {}
         disciplinas_turma = DisciplinaTurma.objects.filter(
             turma=self
         ).prefetch_related('professores__professor')
         
         for dt in disciplinas_turma:
-            # Busca professor ativo (sem data_fim ou data_fim >= hoje)
             professor_ativo = dt.professores.filter(
                 models.Q(data_fim__isnull=True) | models.Q(data_fim__gte=hoje)
             ).order_by(
-                # Prioriza: Titular > Substituto > Auxiliar
                 models.Case(
                     models.When(tipo='TITULAR', then=0),
                     models.When(tipo='SUBSTITUTO', then=1),
@@ -556,7 +520,7 @@ class Turma(UUIDModel):
         matriz = {}
         horarios = {}
         
-        for g in grades:
+        for g in grades_filtradas:
             numero = g.horario_aula.numero
             dia = g.horario_aula.dia_semana
             num_key = str(numero)
@@ -565,15 +529,14 @@ class Turma(UUIDModel):
             if num_key not in matriz:
                 matriz[num_key] = {}
             
-            # Dados da célula
             matriz[num_key][dia_key] = {
                 'disciplina_id': str(g.disciplina.id),
                 'disciplina_nome': g.disciplina.nome,
                 'disciplina_sigla': g.disciplina.sigla,
+                'curso_sigla': g.curso.sigla if g.curso else '', # Adicionado curso
                 'professor_apelido': professores_map.get(g.disciplina_id)
             }
             
-            # Horários para legenda das linhas
             if num_key not in horarios:
                 horarios[num_key] = {
                     'hora_inicio': g.horario_aula.hora_inicio.strftime('%H:%M'),
@@ -585,6 +548,15 @@ class Turma(UUIDModel):
             'validade': validade.data_fim.isoformat(),
             'matriz': matriz,
             'horarios': horarios,
+            'cursos_turmas': { 
+                # Meta info das turmas irmãs p/ frontend saber quem é quem na mesclagem
+                 str(t.id): {'curso_sigla': t.curso.sigla, 'turma_nome': t.nome} 
+                 for t in Turma.objects.filter(
+                    ano_letivo=self.ano_letivo,
+                    numero=self.numero,
+                    letra=self.letra
+                 ).select_related('curso')
+            },
             'gerado_em': timezone.now().isoformat()
         }
         
@@ -592,6 +564,7 @@ class Turma(UUIDModel):
             self.save(update_fields=['grade_horaria'])
         
         return self.grade_horaria
+
 
 
 class DisciplinaTurma(UUIDModel):
@@ -616,6 +589,17 @@ class DisciplinaTurma(UUIDModel):
     
     def __str__(self):
         return f"{self.disciplina.sigla} - {self.turma} ({self.aulas_semanais} aulas/sem)"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Rebuild da turma
+        self.turma.build_grade_horaria(save=True)
+
+    def delete(self, *args, **kwargs):
+        turma = self.turma
+        super().delete(*args, **kwargs)
+        # Rebuild da turma
+        turma.build_grade_horaria(save=True)
 
 
 class ProfessorDisciplinaTurma(UUIDModel):
@@ -666,6 +650,20 @@ class ProfessorDisciplinaTurma(UUIDModel):
     def __str__(self):
         tipo = self.get_tipo_display()
         return f"{self.professor.usuario.get_full_name()} ({tipo}) - {self.disciplina_turma}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Rebuild do funcionário e da turma
+        self.professor.build_grade_horaria(save=True)
+        self.disciplina_turma.turma.build_grade_horaria(save=True)
+
+    def delete(self, *args, **kwargs):
+        professor = self.professor
+        turma = self.disciplina_turma.turma
+        super().delete(*args, **kwargs)
+        # Rebuild
+        professor.build_grade_horaria(save=True)
+        turma.build_grade_horaria(save=True)
 
 
 class Habilidade(UUIDModel):
@@ -998,55 +996,109 @@ class HorarioAula(UUIDModel):
             if horario.numero != index:
                 # Usa update para evitar recursão infinita ao chamar save()
                 HorarioAula.objects.filter(pk=horario.pk).update(numero=index)
+        
+        # Trigger rebuild de cache se mudou horarios (apenas se nao for new/loaddata)
+        self._rebuild_all_caches()
 
     def __str__(self):
         return f"{self.get_dia_semana_display()} - {self.numero}ª Aula ({self.hora_inicio.strftime('%H:%M')} - {self.hora_fim.strftime('%H:%M')})"
+        
+    def delete(self, *args, **kwargs):
+        # Ao deletar horário, precisa rebuildar grades que usavam ele?
+        # Cascatas deletarão grades, que triggerão seus proprios deletes.
+        super().delete(*args, **kwargs)
+        self._rebuild_all_caches()
+
+    def _rebuild_all_caches(self):
+        """
+        Reconstrói caches de TODAS as turmas e funcionários do ano letivo.
+        Operação pesada, mas necessária para manter consistência ao alterar horários base.
+        """
+        from apps.core.models import Turma, Funcionario
+        
+        # Turmas do ano
+        Turma.objects.filter(ano_letivo=self.ano_letivo.ano).earliest('ano_letivo') # Trigger dummy? No, iterate.
+        for t in Turma.objects.filter(ano_letivo=self.ano_letivo.ano):
+            t.build_grade_horaria(save=True)
+            
+        # Funcionários (que tem atribuição neste ano)
+        # Mais complexo filtrar, vamos pegar quem tem atribuição em turma desse ano
+        professores_ids = ProfessorDisciplinaTurma.objects.filter(
+            disciplina_turma__turma__ano_letivo=self.ano_letivo.ano
+        ).values_list('professor_id', flat=True).distinct()
+        
+        for p in Funcionario.objects.filter(id__in=professores_ids):
+            p.build_grade_horaria(save=True)
 
 
 class GradeHorariaValidade(UUIDModel):
     """
-    Grade horária com validade (Agrupador de grades por período).
-    Define um período de vigência para uma grade de aulas de uma turma.
+    Grade horária com validade (Agrupador de grades por período e turmas irmãs).
+    Vincula-se a um AnoLetivo + Número + Letra (ex: 1º Ano A).
     """
-    turma = models.ForeignKey(
-        Turma, 
-        on_delete=models.CASCADE, 
-        related_name='validades_grade', 
-        verbose_name='Turma'
+    ano_letivo = models.ForeignKey(
+        AnoLetivo,
+        on_delete=models.CASCADE,
+        related_name='validades_grade',
+        verbose_name='Ano Letivo'
     )
+    turma_numero = models.PositiveSmallIntegerField(verbose_name='Número da Turma')
+    turma_letra = models.CharField(max_length=1, verbose_name='Letra da Turma')
+    
     data_inicio = models.DateField(verbose_name='Data de início')
     data_fim = models.DateField(verbose_name='Data de fim')
 
     class Meta:
         verbose_name = 'Vigência de Grade Horária'
         verbose_name_plural = 'Vigências de Grade Horária'
-        ordering = ['turma', '-data_inicio']
+        ordering = ['ano_letivo', 'turma_numero', 'turma_letra', '-data_inicio']
 
     def clean(self):
         """Validações de datas e sobreposição."""
         if self.data_inicio and self.data_fim:
-            if self.data_inicio >= self.data_fim:
-                raise ValidationError('A data de início deve ser estritamente menor que a data de fim.')
+            if self.data_inicio > self.data_fim:
+                raise ValidationError('A data de início deve ser menor ou igual à data de fim.')
             
-            if self.turma_id:
-                # Valida ano letivo
-                if self.data_inicio.year != self.turma.ano_letivo or self.data_fim.year != self.turma.ano_letivo:
-                    raise ValidationError(f'As datas devem pertencer ao ano letivo da turma ({self.turma.ano_letivo}).')
+            # Valida ano letivo (datas devem estar dentro do ano? Ou apenas pertencer ao ano em lógica de negócios?)
+            # O ideal é que as datas "façam sentido" para o ano letivo, mas o ano letivo pode ter datas de inicio/fim variaveis.
+            # Vamos manter simples.
 
-                # Verifica sobreposição com outras vigências da mesma turma
-                sobreposicoes = GradeHorariaValidade.objects.filter(
-                    turma=self.turma,
-                    data_inicio__lte=self.data_fim,
-                    data_fim__gte=self.data_inicio
-                )
-                if self.pk:
-                    sobreposicoes = sobreposicoes.exclude(pk=self.pk)
-                
-                if sobreposicoes.exists():
-                    raise ValidationError('Já existe uma vigência de grade horária para este período.')
+            # Verifica sobreposição com outras vigências do mesmo grupo de turmas (irmãs)
+            sobreposicoes = GradeHorariaValidade.objects.filter(
+                ano_letivo=self.ano_letivo,
+                turma_numero=self.turma_numero,
+                turma_letra=self.turma_letra,
+                data_inicio__lte=self.data_fim,
+                data_fim__gte=self.data_inicio
+            )
+            if self.pk:
+                sobreposicoes = sobreposicoes.exclude(pk=self.pk)
+            
+            if sobreposicoes.exists():
+                raise ValidationError('Já existe uma vigência de grade horária para este período e grupo de turmas.')
 
     def __str__(self):
-        return f"{self.turma} ({self.data_inicio.strftime('%d/%m')} a {self.data_fim.strftime('%d/%m')})"
+        return f"{self.turma_numero}{self.turma_letra} ({self.data_inicio.strftime('%d/%m')} a {self.data_fim.strftime('%d/%m')})"
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+        self._rebuild_turmas()
+
+    def delete(self, *args, **kwargs):
+        # Guarda info para rebuild antes de deletar (embora o objeto ja esteja memory only apos delete no DB, os dados estao aqui)
+        super().delete(*args, **kwargs)
+        self._rebuild_turmas()
+        
+    def _rebuild_turmas(self):
+        """Rebuild grades de todas as turmas afetadas (mesmo numero/letra/ano)."""
+        turmas = Turma.objects.filter(
+            ano_letivo=self.ano_letivo.ano,
+            numero=self.turma_numero,
+            letra=self.turma_letra
+        )
+        for t in turmas:
+            t.build_grade_horaria(save=True)
 
 
 class GradeHoraria(UUIDModel):
@@ -1075,62 +1127,108 @@ class GradeHoraria(UUIDModel):
         verbose_name='Disciplina'
     )
 
+    curso = models.ForeignKey(
+        Curso, 
+        on_delete=models.CASCADE, 
+        related_name='grades_horarias', 
+        verbose_name='Curso'
+    )
+
     class Meta:
         verbose_name = 'Item de Grade Horária'
         verbose_name_plural = 'Itens de Grade Horária'
+        # Uma única grade por validade/horário (turmas irmãs compartilham o slot)
         unique_together = ['validade', 'horario_aula']
         ordering = ['horario_aula__dia_semana', 'horario_aula__hora_inicio']
 
     def clean(self):
         """
         Validações:
-        1. Horário pertence ao mesmo ano da turma
-        2. Não há conflito de horário entre turmas relacionadas (mesmo numero/letra/ano)
+        1. Horário pertence ao mesmo ano da validade
+        2. Disciplina deve estar vinculada a alguma turma do grupo via DisciplinaTurma
         """
         if self.validade_id and self.horario_aula_id:
-            turma = self.validade.turma
-            
             # Validação 1: Ano letivo
-            ano_turma = turma.ano_letivo
+            ano_validade = self.validade.ano_letivo.ano
             ano_horario = self.horario_aula.ano_letivo.ano
             
-            if ano_turma != ano_horario:
-                raise ValidationError(f'O horário de aula ({ano_horario}) deve ser do mesmo ano letivo da turma ({ano_turma}).')
+            if ano_validade != ano_horario:
+                raise ValidationError(f'O horário de aula ({ano_horario}) deve ser do mesmo ano letivo da validade ({ano_validade}).')
             
-            # Validação 2: Conflito entre turmas relacionadas
-            # Turmas relacionadas = mesmo numero + letra + ano_letivo (cursos diferentes)
-            turmas_relacionadas = Turma.objects.filter(
-                numero=turma.numero,
-                letra=turma.letra,
-                ano_letivo=turma.ano_letivo
-            ).exclude(id=turma.id)
-            
-            if turmas_relacionadas.exists():
-                # Busca validades irmãs (mesmas datas, turmas relacionadas)
-                validades_irmas = GradeHorariaValidade.objects.filter(
-                    turma__in=turmas_relacionadas,
-                    data_inicio=self.validade.data_inicio,
-                    data_fim=self.validade.data_fim
-                )
+            if self.disciplina_id:
+                # Tenta encontrar a turma relacionada (para definir o curso)
+                turma = Turma.objects.filter(
+                    ano_letivo=ano_validade,
+                    numero=self.validade.turma_numero,
+                    letra=self.validade.turma_letra,
+                    disciplinas_vinculadas__disciplina=self.disciplina
+                ).first()
                 
-                # Verifica se já existe grade para esse horário em turmas irmãs
-                conflito = GradeHoraria.objects.filter(
-                    validade__in=validades_irmas,
-                    horario_aula=self.horario_aula
-                )
-                
-                if self.pk:
-                    conflito = conflito.exclude(pk=self.pk)
-                
-                if conflito.exists():
-                    grade_conflito = conflito.first()
-                    raise ValidationError(
-                        f'Conflito de horário: {self.horario_aula} já está ocupado por '
-                        f'{grade_conflito.disciplina.sigla} na turma {grade_conflito.validade.turma}.'
+                if not turma:
+                     raise ValidationError(
+                        f'A disciplina {self.disciplina.sigla} não está vinculada a nenhuma turma '
+                        f'do grupo {self.validade.turma_numero}{self.validade.turma_letra} no ano {ano_validade}.'
                     )
 
+    def save(self, *args, **kwargs):
+        # Auto-detecta curso antes de validar/salvar
+        if self.validade_id and self.disciplina_id:
+            # Busca a turma que tem essa disciplina nesse grupo
+            # Nota: Assume que uma disciplina só está vinculada a UM curso nesse grupo de irmãs.
+            # Se 1A Info e 1A Enf tem Matemática, qual curso pega? O primeiro que achar.
+            # Isso é uma limitação da modelagem "Turmas Irmãs", assumimos que se ambas tem, tanto faz qual curso grava,
+            # POIS elas compartilham o espaço fisico. 
+            # Mas o usuario pediu pra gravar o curso.
+            turma = Turma.objects.filter(
+                ano_letivo=self.validade.ano_letivo.ano,
+                numero=self.validade.turma_numero,
+                letra=self.validade.turma_letra,
+                disciplinas_vinculadas__disciplina=self.disciplina
+            ).select_related('curso').first()
+            
+            if turma:
+                self.curso = turma.curso
+            else:
+                # Se não achou turma, vai falhar no clean ou DB constraint se curso for not null.
+                # Mas vamos deixar o clean pegar.
+                pass
+
+        self.clean()
+        super().save(*args, **kwargs)
+        self._rebuild_afetados()
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        self._rebuild_afetados()
+
+    def _rebuild_afetados(self):
+        """Rebuild turmas e professores afetados."""
+        if not self.validade:
+            return
+            
+        # Rebuild turmas do grupo
+        turmas = Turma.objects.filter(
+            ano_letivo=self.validade.ano_letivo.ano,
+            numero=self.validade.turma_numero,
+            letra=self.validade.turma_letra
+        )
+        for t in turmas:
+            t.build_grade_horaria(save=True)
+            
+        # Rebuild professores
+        # Busca professores vinculados a essa disciplina nessas turmas
+        from apps.core.models import ProfessorDisciplinaTurma
+        pdts = ProfessorDisciplinaTurma.objects.filter(
+            disciplina_turma__turma__in=turmas,
+            disciplina_turma__disciplina=self.disciplina
+        ).select_related('professor')
+        
+        professores = set(pdt.professor for pdt in pdts)
+        for p in professores:
+            p.build_grade_horaria(save=True)
+
     def __str__(self):
-        return f"{self.validade.turma} - {self.horario_aula} - {self.disciplina.sigla}"
+        return f"{self.validade} - {self.horario_aula} - {self.disciplina.sigla}"
 
 
 class AnoLetivoSelecionado(UUIDModel):
@@ -1154,6 +1252,18 @@ class AnoLetivoSelecionado(UUIDModel):
 
     def __str__(self):
         return f"{self.usuario} - {self.ano_letivo.ano}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Rebuild grade do funcionário vinculado (se houver)
+        if hasattr(self.usuario, 'funcionario'):
+            self.usuario.funcionario.build_grade_horaria(save=True)
+
+    def delete(self, *args, **kwargs):
+        usuario = self.usuario
+        super().delete(*args, **kwargs)
+        if hasattr(usuario, 'funcionario'):
+            usuario.funcionario.build_grade_horaria(save=True)
 
 
 class ControleRegistrosVisualizacao(UUIDModel):

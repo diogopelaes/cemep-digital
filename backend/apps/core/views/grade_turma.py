@@ -46,11 +46,14 @@ def grade_turma_view(request, ano, numero, letra):
     turma_ref = turmas.first()
     
     # Busca validades vigentes de qualquer uma das turmas relacionadas
+    # Busca validades vigentes para esta turma (grupo)
     validades = GradeHorariaValidade.objects.filter(
-        turma__in=turmas,
+        ano_letivo__ano=ano,
+        turma_numero=numero,
+        turma_letra=letra,
         data_inicio__lte=hoje,
         data_fim__gte=hoje
-    ).select_related('turma__curso')
+    )
     
     if not validades.exists():
         return Response({
@@ -73,7 +76,6 @@ def grade_turma_view(request, ano, numero, letra):
     ).select_related(
         'horario_aula',
         'disciplina',
-        'validade__turma__curso'
     ).order_by('horario_aula__dia_semana', 'horario_aula__numero')
     
     # Mapa de professores: disciplina_turma -> professor ativo
@@ -117,7 +119,19 @@ def grade_turma_view(request, ano, numero, letra):
             matriz[num_key] = {}
         
         # Pega professor para essa disciplina/turma
-        turma_da_grade = g.validade.turma
+        # Tenta encontrar a turma relacionada que corresponde ao curso_sigla esperado ou pega a primeira
+        validade = g.validade
+        turma_da_grade = None
+        for t in turmas:
+             if t.numero == validade.turma_numero and t.letra == validade.turma_letra:
+                  if g.curso and t.curso_id == g.curso_id:
+                       turma_da_grade = t
+                       break
+        
+        # Fallback: pega qualquer turma que combine (para caso de curso generico ou erro)
+        if not turma_da_grade:
+             turma_da_grade = turmas.first() # Simplificacao segura pois todas as turmas sao "irmas"
+
         prof_key = (turma_da_grade.id, g.disciplina_id)
         professor_apelido = professores_map.get(prof_key)
         
@@ -126,7 +140,7 @@ def grade_turma_view(request, ano, numero, letra):
             'disciplina_id': str(g.disciplina.id),
             'disciplina_nome': g.disciplina.nome,
             'disciplina_sigla': g.disciplina.sigla,
-            'curso_sigla': turma_da_grade.curso.sigla,
+            'curso_sigla': g.curso.sigla if g.curso else '',
             'professor_apelido': professor_apelido
         }
         

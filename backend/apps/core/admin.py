@@ -134,16 +134,16 @@ class HorarioAulaAdmin(admin.ModelAdmin):
 
 @admin.register(GradeHorariaValidade)
 class GradeHorariaValidadeAdmin(admin.ModelAdmin):
-    list_display = ['turma', 'data_inicio', 'data_fim']
-    list_filter = ['turma__ano_letivo', 'turma__curso']
-    search_fields = ['turma__numero', 'turma__letra']
+    list_display = ['ano_letivo', 'turma_numero', 'turma_letra', 'data_inicio', 'data_fim']
+    list_filter = ['ano_letivo', 'turma_numero', 'turma_letra']
+    search_fields = ['turma_numero', 'turma_letra']
 
 
 @admin.register(GradeHoraria)
 class GradeHorariaAdmin(admin.ModelAdmin):
-    list_display = ['validade', 'horario_aula', 'disciplina']
-    list_filter = ['validade__turma__ano_letivo', 'validade__turma__curso', 'horario_aula__dia_semana']
-    search_fields = ['validade__turma__numero', 'validade__turma__letra', 'disciplina__nome']
+    list_display = ['validade', 'horario_aula', 'disciplina', 'curso']
+    list_filter = ['validade__ano_letivo', 'curso', 'horario_aula__dia_semana']
+    search_fields = ['validade__turma_numero', 'validade__turma_letra', 'disciplina__nome']
 
 
 @admin.register(AnoLetivoSelecionado)

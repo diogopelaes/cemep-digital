@@ -101,11 +101,18 @@ def grade_professor_view(request):
     mostrar_disciplina = len(disciplinas) > 1
     
     # Busca validades vigentes das turmas do professor
+    # Como GradeHorariaValidade não tem FK para turma, usamos numero/letra.
+    # Montamos query com Q objects para cada par (numero, letra) das turmas do professor
+    q_turmas = models.Q()
+    for t in turmas:
+        q_turmas |= models.Q(turma_numero=t.numero, turma_letra=t.letra)
+    
     validades = GradeHorariaValidade.objects.filter(
-        turma__in=turmas,
+        q_turmas,
+        ano_letivo__ano=ano_letivo.ano,
         data_inicio__lte=hoje,
         data_fim__gte=hoje
-    ).select_related('turma__curso')
+    )
     
     if not validades.exists():
         return Response({
@@ -126,7 +133,7 @@ def grade_professor_view(request):
     ).select_related(
         'horario_aula',
         'disciplina',
-        'validade__turma__curso'
+        # 'validade__turma__curso' # Validade nao tem FK turma
     ).order_by('horario_aula__dia_semana', 'horario_aula__numero')
     
     # Monta matriz com apenas as aulas do professor
@@ -134,7 +141,17 @@ def grade_professor_view(request):
     horarios = {}
     
     for g in grades:
-        turma = g.validade.turma
+        # Encontra a turma correta dessa validade
+        # g.validade tem numero/letra. Precisamos achar a 'turma' objeto correspondente 
+        # que está no set 'turmas' (que filtramos do professor).
+        turma = next((
+            t for t in turmas 
+            if t.numero == g.validade.turma_numero and t.letra == g.validade.turma_letra
+        ), None)
+
+        if not turma:
+            continue
+
         disciplina = g.disciplina
         
         # Verifica se essa aula é do professor
@@ -158,7 +175,7 @@ def grade_professor_view(request):
             'turma_label': turma_label,
             'disciplina_id': str(disciplina.id),
             'disciplina_sigla': disciplina.sigla if mostrar_disciplina else None,
-            'curso_sigla': turma.curso.sigla
+            'curso_sigla': g.curso.sigla if g.curso else turma.curso.sigla
         }
         
         # Horários para legenda

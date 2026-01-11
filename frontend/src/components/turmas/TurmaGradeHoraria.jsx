@@ -381,7 +381,7 @@ export default function TurmaGradeHoraria() {
                                                                 onChange={(value) => handleSelectChange(horario.id, value)}
                                                                 options={disciplinas.map(d => ({
                                                                     value: d.id,
-                                                                    label: d.sigla
+                                                                    label: d.curso_sigla ? `${d.sigla} (${d.curso_sigla})` : d.sigla
                                                                 }))}
                                                                 placeholder="—"
                                                                 className="w-full min-w-[100px]"

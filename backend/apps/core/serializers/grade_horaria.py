@@ -1,79 +1,76 @@
 from rest_framework import serializers
-from apps.core.models import GradeHoraria, Turma, HorarioAula, GradeHorariaValidade
-
+from apps.core.models import (
+    GradeHoraria, GradeHorariaValidade, Turma, 
+    HorarioAula, Disciplina
+)
 
 class GradeHorariaSerializer(serializers.ModelSerializer):
-    """
-    Serializer para GradeHoraria.
-    
-    Campos aninhados (read-only):
-    - horario_aula_details: dados do horário (dia_semana, hora_inicio, etc.)
-    - disciplina_details: dados da disciplina (nome, sigla)
-    """
-    horario_aula_details = serializers.SerializerMethodField(read_only=True)
-    disciplina_details = serializers.SerializerMethodField(read_only=True)
-
-    # Turma agora é derivada da validade (read-only para compatibilidade frontend)
-    turma = serializers.UUIDField(source='validade.turma.id', read_only=True)
-    
-    # Campo obrigatório para vincular à vigência correta
-    validade = serializers.PrimaryKeyRelatedField(
-        queryset=GradeHorariaValidade.objects.all(),
-        required=True
-    )
-    
-    horario_aula = serializers.PrimaryKeyRelatedField(queryset=HorarioAula.objects.all())
-
+    """Serializer para visualização simples de itens de grade."""
     class Meta:
         model = GradeHoraria
-        fields = [
-            'id',
-            'turma',
-            'validade',
-            'horario_aula',
-            'disciplina',
-            'horario_aula_details',
-            'disciplina_details',
-        ]
-        read_only_fields = ['id', 'turma']
+        fields = ['id', 'horario_aula', 'disciplina', 'curso']
 
-    def get_horario_aula_details(self, obj):
-        if obj.horario_aula:
-            return {
-                'id': str(obj.horario_aula.id),
-                'numero': obj.horario_aula.numero,
-                'dia_semana': obj.horario_aula.dia_semana,
-                'dia_semana_display': obj.horario_aula.get_dia_semana_display(),
-                'hora_inicio': obj.horario_aula.hora_inicio.strftime('%H:%M') if obj.horario_aula.hora_inicio else None,
-                'hora_fim': obj.horario_aula.hora_fim.strftime('%H:%M') if obj.horario_aula.hora_fim else None,
-            }
-        return None
 
-    def get_disciplina_details(self, obj):
-        if obj.disciplina:
-            return {
-                'id': str(obj.disciplina.id),
-                'nome': obj.disciplina.nome,
-                'sigla': obj.disciplina.sigla,
-            }
-        return None
+class GradeHorariaEdicaoSerializer(serializers.Serializer):
+    """
+    Serializer para o payload de cadastro/edição em lote.
+    Recebe:
+    - turma_id (para identificar o grupo de turmas)
+    - validade_id (opcional, se for edição de validade existente)
+    - data_inicio / data_fim
+    - grades: Lista de itens { horario_aula, disciplina }
+    """
+    turma_id = serializers.UUIDField()
+    validade_id = serializers.UUIDField(required=False, allow_null=True)
+    data_inicio = serializers.DateField()
+    data_fim = serializers.DateField()
+    grades = serializers.ListField(
+        child=serializers.DictField(
+            child=serializers.UUIDField() # horario_aula: uuid, disciplina: uuid
+        )
+    )
 
     def validate(self, data):
-        """
-        Validação customizada para garantir consistência.
-        """
-        validade = data.get('validade')
-        horario_aula = data.get('horario_aula')
-
-        if validade and horario_aula:
-            # Ano letivo da turma deve coincidir com o do horário
-            ano_turma = validade.turma.ano_letivo
-            ano_horario = horario_aula.ano_letivo.ano
-            
-            if ano_turma != ano_horario:
-                raise serializers.ValidationError({
-                    'horario_aula': f'O ano letivo da turma ({ano_turma}) '
-                                    f'não coincide com o do horário ({ano_horario}).'
-                })
-
+        """Valida se as datas são coerentes e se turma existe."""
+        if data['data_inicio'] > data['data_fim']:
+             raise serializers.ValidationError("A data de início deve ser menor ou igual à data de fim.")
         return data
+
+
+class TurmaSimplificadaSerializer(serializers.ModelSerializer):
+    """Serializer leve de Turma para contexto de edição."""
+    curso_sigla = serializers.CharField(source='curso.sigla')
+    
+    class Meta:
+        model = Turma
+        fields = ['id', 'numero', 'letra', 'curso_sigla', 'nome']
+
+
+class DisciplinaSimplificadaSerializer(serializers.ModelSerializer):
+    """Serializer leve de Disciplina."""
+    class Meta:
+        model = Disciplina
+        fields = ['id', 'nome', 'sigla']
+
+
+class HorarioAulaSerializer(serializers.ModelSerializer):
+    """Serializer de horário para montagem da grade."""
+    hora_inicio = serializers.SerializerMethodField()
+    hora_fim = serializers.SerializerMethodField()
+
+    class Meta:
+        model = HorarioAula
+        fields = ['id', 'numero', 'dia_semana', 'hora_inicio', 'hora_fim']
+
+    def get_hora_inicio(self, obj):
+        return obj.hora_inicio.strftime('%H:%M')
+
+    def get_hora_fim(self, obj):
+        return obj.hora_fim.strftime('%H:%M')
+
+
+class GradeHorariaValidadeSerializer(serializers.ModelSerializer):
+    """Serializer para listar validades existentes."""
+    class Meta:
+        model = GradeHorariaValidade
+        fields = ['id', 'data_inicio', 'data_fim', 'turma_numero', 'turma_letra']

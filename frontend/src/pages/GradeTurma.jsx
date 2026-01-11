@@ -306,9 +306,9 @@ export default function GradeTurma() {
                         icon={FaFilePdf}
                         onClick={handleGerarPDF}
                         loading={generatingPDF}
-                        className="w-full md:w-auto"
+                        className="w-auto"
                     >
-                        Visualizar PDF
+                        <span className="hidden md:inline">Visualizar PDF</span>
                     </Button>
                 </div>
             </div>
@@ -392,10 +392,7 @@ export default function GradeTurma() {
                                                                     <span className="opacity-20">—</span>
                                                                 ) : (
                                                                     <div className="space-y-1 py-2">
-                                                                        <div className={`font-bold text-sm ${minhas_disciplinas.includes(celula.disciplina_id)
-                                                                            ? 'text-primary-600 dark:text-primary-400'
-                                                                            : 'text-slate-800 dark:text-slate-100'
-                                                                            }`}>
+                                                                        <div className="font-bold text-sm text-slate-800 dark:text-slate-100">
                                                                             {celula.disciplina_sigla}
                                                                         </div>
                                                                         {celula.professor_apelido && (
