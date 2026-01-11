@@ -5,6 +5,9 @@ import {
     Table, TableHead, TableBody, TableRow, TableHeader, TableCell,
     Modal, Button, DateInput, Select, MiniCombobox
 } from '../ui'
+import { FaFilePdf } from 'react-icons/fa'
+import { generateGradeTurmaPDF } from '../../utils/pdf'
+import api from '../../services/api'
 import { useGradeHoraria } from '../../hooks/useGradeHoraria'
 import toast from 'react-hot-toast'
 
@@ -42,6 +45,7 @@ export default function TurmaGradeHoraria() {
     const [novaDataInicio, setNovaDataInicio] = useState('')
     const [novaDataFim, setNovaDataFim] = useState('')
     const [criandoGrade, setCriandoGrade] = useState(false)
+    const [generatingPDF, setGeneratingPDF] = useState(false)
 
     useEffect(() => {
         carregarDados()
@@ -166,6 +170,23 @@ export default function TurmaGradeHoraria() {
             // Tratado no hook
         } finally {
             setSaving(false)
+        }
+    }
+
+    const handleGerarPDF = async () => {
+        if (!validadeSelecionada || !turmas.length) return
+
+        setGeneratingPDF(true)
+        try {
+            const ref = turmas[0]
+            const ano = dados.ano_letivo
+            const response = await api.get(`/core/grade-turma/${ano}/${ref.numero}/${ref.letra.toUpperCase()}/`)
+            await generateGradeTurmaPDF(response.data)
+        } catch (err) {
+            console.error('Erro ao gerar PDF:', err)
+            toast.error('Erro ao gerar PDF da grade horária.')
+        } finally {
+            setGeneratingPDF(false)
         }
     }
 
@@ -305,6 +326,16 @@ export default function TurmaGradeHoraria() {
                             {validadeSelecionada && (
                                 <Button variant="primary" onClick={handleEditar} icon={HiPencil}>
                                     Editar Grade
+                                </Button>
+                            )}
+                            {validadeSelecionada && (
+                                <Button
+                                    variant="secondary"
+                                    icon={FaFilePdf}
+                                    onClick={handleGerarPDF}
+                                    loading={generatingPDF}
+                                >
+                                    PDF
                                 </Button>
                             )}
                         </>

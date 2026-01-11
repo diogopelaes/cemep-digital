@@ -116,6 +116,7 @@ class GradeHorariaViewSet(viewsets.ModelViewSet):
                 validade_selecionada = GradeHorariaValidadeSerializer(vigente).data
 
         return Response({
+            'ano_letivo': turma_ref.ano_letivo,
             'turmas': TurmaSimplificadaSerializer(turmas_irmas, many=True).data,
             'disciplinas': disciplinas_data,
             'horarios_aula': HorarioAulaSerializer(horarios, many=True).data,

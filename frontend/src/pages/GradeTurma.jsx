@@ -372,6 +372,7 @@ export default function GradeTurma() {
                                                     </TableCell>
                                                     {DAYS.map((day, idx) => {
                                                         const celula = linhaMatriz[String(day.value)]
+                                                        const isMinhaDisciplina = celula && minhas_disciplinas.includes(celula.disciplina_id)
                                                         const colBg = idx % 2 === 0
                                                             ? ''
                                                             : 'bg-primary-500/[0.02] dark:bg-primary-400/[0.02]'
@@ -392,15 +393,14 @@ export default function GradeTurma() {
                                                                     <span className="opacity-20">—</span>
                                                                 ) : (
                                                                     <div className="space-y-1 py-2">
-                                                                        <div className="font-bold text-sm text-slate-800 dark:text-slate-100">
+                                                                        <div className={`font-bold text-sm ${isMinhaDisciplina ? 'text-primary-600 dark:text-primary-400' : 'text-slate-800 dark:text-slate-100'}`}>
                                                                             {celula.disciplina_sigla}
                                                                         </div>
                                                                         {celula.professor_apelido && (
-                                                                            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                                                            <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
                                                                                 {celula.professor_apelido}
                                                                             </div>
                                                                         )}
-
                                                                     </div>
                                                                 )}
                                                             </TableCell>

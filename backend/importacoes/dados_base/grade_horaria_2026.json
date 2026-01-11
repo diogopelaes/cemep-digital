@@ -1,0 +1,575 @@
+[
+    {
+        "model": "core.gradehorariavalidade",
+        "fields": {
+            "ano_letivo": 2026,
+            "turma_numero": 1,
+            "turma_letra": "W",
+            "data_inicio": "2026-01-01",
+            "data_fim": "2026-12-31"
+        },
+        "itens": [
+            {
+                "dia_semana": 0,
+                "horario_numero": 1,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 2,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 3,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 4,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 5,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 6,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 7,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 8,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 9,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 10,
+                "disciplina_sigla": "HIST"
+            }
+        ]
+    },
+    {
+        "model": "core.gradehorariavalidade",
+        "fields": {
+            "ano_letivo": 2026,
+            "turma_numero": 1,
+            "turma_letra": "X",
+            "data_inicio": "2026-01-01",
+            "data_fim": "2026-12-31"
+        },
+        "itens": [
+            {
+                "dia_semana": 0,
+                "horario_numero": 5,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 6,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 7,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 8,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 1,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 2,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 3,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 4,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 11,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 1,
+                "disciplina_sigla": "HIST"
+            }
+        ]
+    },
+    {
+        "model": "core.gradehorariavalidade",
+        "fields": {
+            "ano_letivo": 2026,
+            "turma_numero": 1,
+            "turma_letra": "Y",
+            "data_inicio": "2026-01-01",
+            "data_fim": "2026-12-31"
+        },
+        "itens": [
+            {
+                "dia_semana": 0,
+                "horario_numero": 9,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 10,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 11,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 1,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 4,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 8,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 2,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 1,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 2,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 3,
+                "disciplina_sigla": "HIST"
+            }
+        ]
+    },
+    {
+        "model": "core.gradehorariavalidade",
+        "fields": {
+            "ano_letivo": 2026,
+            "turma_numero": 2,
+            "turma_letra": "W",
+            "data_inicio": "2026-01-01",
+            "data_fim": "2026-12-31"
+        },
+        "itens": [
+            {
+                "dia_semana": 1,
+                "horario_numero": 2,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 3,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 4,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 5,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 6,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 9,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 10,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 11,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 5,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 6,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 0,
+                "horario_numero": 7,
+                "disciplina_sigla": "HIST"
+            }
+        ]
+    },
+    {
+        "model": "core.gradehorariavalidade",
+        "fields": {
+            "ano_letivo": 2026,
+            "turma_numero": 2,
+            "turma_letra": "X",
+            "data_inicio": "2026-01-01",
+            "data_fim": "2026-12-31"
+        },
+        "itens": [
+            {
+                "dia_semana": 1,
+                "horario_numero": 7,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 8,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 9,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 10,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 11,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 1,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 3,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 4,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 2,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 5,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 6,
+                "disciplina_sigla": "HIST"
+            }
+        ]
+    },
+    {
+        "model": "core.gradehorariavalidade",
+        "fields": {
+            "ano_letivo": 2026,
+            "turma_numero": 2,
+            "turma_letra": "Y",
+            "data_inicio": "2026-01-01",
+            "data_fim": "2026-12-31"
+        },
+        "itens": [
+            {
+                "dia_semana": 2,
+                "horario_numero": 1,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 2,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 3,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 4,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 5,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 5,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 6,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 7,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 3,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 4,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 8,
+                "disciplina_sigla": "HIST"
+            }
+        ]
+    },
+    {
+        "model": "core.gradehorariavalidade",
+        "fields": {
+            "ano_letivo": 2026,
+            "turma_numero": 3,
+            "turma_letra": "W",
+            "data_inicio": "2026-01-01",
+            "data_fim": "2026-12-31"
+        },
+        "itens": [
+            {
+                "dia_semana": 2,
+                "horario_numero": 6,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 7,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 8,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 9,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 8,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 9,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 10,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 7,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 11,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 1,
+                "disciplina_sigla": "HIST"
+            }
+        ]
+    },
+    {
+        "model": "core.gradehorariavalidade",
+        "fields": {
+            "ano_letivo": 2026,
+            "turma_numero": 3,
+            "turma_letra": "X",
+            "data_inicio": "2026-01-01",
+            "data_fim": "2026-12-31"
+        },
+        "itens": [
+            {
+                "dia_semana": 2,
+                "horario_numero": 10,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 11,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 3,
+                "horario_numero": 1,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 3,
+                "horario_numero": 2,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 11,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 1,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 2,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 9,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 1,
+                "horario_numero": 10,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 3,
+                "disciplina_sigla": "HIST"
+            }
+        ]
+    },
+    {
+        "model": "core.gradehorariavalidade",
+        "fields": {
+            "ano_letivo": 2026,
+            "turma_numero": 3,
+            "turma_letra": "Y",
+            "data_inicio": "2026-01-01",
+            "data_fim": "2026-12-31"
+        },
+        "itens": [
+            {
+                "dia_semana": 3,
+                "horario_numero": 3,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 3,
+                "horario_numero": 4,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 3,
+                "horario_numero": 5,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 3,
+                "horario_numero": 6,
+                "disciplina_sigla": "MAT"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 3,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 4,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 5,
+                "disciplina_sigla": "GEO"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 2,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 6,
+                "disciplina_sigla": "HIST"
+            },
+            {
+                "dia_semana": 2,
+                "horario_numero": 7,
+                "disciplina_sigla": "HIST"
+            }
+        ]
+    }
+]
