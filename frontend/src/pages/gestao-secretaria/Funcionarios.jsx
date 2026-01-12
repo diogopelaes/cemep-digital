@@ -35,8 +35,6 @@ export default function Funcionarios() {
   const [loadingPeriodos, setLoadingPeriodos] = useState(false)
   const [novoPeriodo, setNovoPeriodo] = useState({ data_entrada: '', data_saida: '' })
 
-
-
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -92,8 +90,6 @@ export default function Funcionarios() {
       toast.error('Erro ao alterar status')
     }
   }
-
-
 
   // === Lógica de Períodos ===
   const handleOpenPeriodosModal = async (funcionario) => {
@@ -234,6 +230,117 @@ export default function Funcionarios() {
     setGeneratingPDF(null)
   }
 
+  // Componente de Card para Mobile
+  const FuncionarioCard = ({ func }) => {
+    const [showActions, setShowActions] = useState(false);
+
+    return (
+      <Card
+        padding={false}
+        className="overflow-hidden border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all duration-300"
+      >
+        <div className="p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div
+              className="flex-1 min-w-0 flex gap-3 cursor-pointer group"
+              onClick={() => navigate(`/funcionarios/${func.id}`)}
+            >
+              <Avatar
+                name={func.nome_completo || func.usuario?.first_name}
+                size="md"
+                className="shrink-0"
+              />
+              <div className="min-w-0">
+                <h3 className="font-bold text-slate-800 dark:text-white text-sm group-hover:text-primary-600 transition-colors truncate" title={func.nome_completo || func.usuario?.first_name}>
+                  {(func.nome_completo || func.usuario?.first_name)?.length > 25
+                    ? (func.nome_completo || func.usuario?.first_name).substring(0, 25) + '...'
+                    : (func.nome_completo || func.usuario?.first_name)}
+                </h3>
+                <p className="text-[11px] text-slate-500 font-medium">
+                  Mat. {func.matricula}
+                </p>
+                <div className="mt-1 flex flex-wrap gap-1">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase transition-colors shrink-0 ${TIPOS_USUARIO_COLORS[func.usuario?.tipo_usuario] || 'bg-slate-100 text-slate-600'}`}>
+                    {func.usuario?.tipo_usuario}
+                  </span>
+                  {func.area_atuacao && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 max-w-[100px] truncate">
+                      {func.area_atuacao}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-end gap-2">
+              <button
+                onClick={() => setShowActions(!showActions)}
+                className={`
+                                text-[10px] font-bold px-3 py-1 rounded-full transition-all duration-200
+                                ${showActions
+                    ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/30'
+                    : 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 border border-primary-100 dark:border-primary-800/50'
+                  }
+                            `}
+              >
+                {showActions ? 'Fechar' : 'Ações'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* BARRA DE AÇÕES EXPANSÍVEL */}
+        <div className={`
+                    grid transition-all duration-300 ease-in-out border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30
+                    ${showActions ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}
+                `}>
+          <div className="overflow-hidden grid grid-cols-4">
+            <button
+              onClick={() => navigate(`/funcionarios/${func.id}`)}
+              className="py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 transition-all border-r border-slate-100 dark:border-slate-800"
+            >
+              <HiPencil className="h-5 w-5" />
+              <span>Editar</span>
+            </button>
+
+            <button
+              onClick={() => handleGeneratePDF(func.id)}
+              disabled={generatingPDF === func.id}
+              className="py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 transition-all border-r border-slate-100 dark:border-slate-800 disabled:opacity-50"
+            >
+              {generatingPDF === func.id ? <Loading size="sm" /> : <FaFilePdf className="h-5 w-5" />}
+              <span>Ficha</span>
+            </button>
+
+            <button
+              onClick={() => handleOpenPeriodosModal(func)}
+              className="py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 transition-all border-r border-slate-100 dark:border-slate-800"
+            >
+              <HiCalendar className="h-5 w-5" />
+              <span>Períodos</span>
+            </button>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                handleToggleAtivo(func)
+              }}
+              className={`
+                                py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider transition-all
+                                ${func.usuario?.is_active
+                  ? 'text-success-600 hover:bg-success-50 dark:text-success-400 dark:hover:bg-success-900/10'
+                  : 'text-slate-400 hover:bg-slate-100 dark:text-slate-500 dark:hover:bg-slate-800'
+                }
+                            `}
+            >
+              {func.usuario?.is_active ? <HiCheckCircle className="h-5 w-5" /> : <HiXCircle className="h-5 w-5" />}
+              <span>{func.usuario?.is_active ? 'Ativo' : 'Inativo'}</span>
+            </button>
+          </div>
+        </div>
+      </Card>
+    )
+  }
 
   if (loading) {
     return (
@@ -257,10 +364,10 @@ export default function Funcionarios() {
         </div>
         <div className="flex items-center gap-4">
           <Button variant="secondary" icon={HiUpload} onClick={() => setShowUploadModal(true)}>
-            Cadastro em massa
+            <span className="hidden sm:inline">Cadastro em massa</span>
           </Button>
           <Button icon={HiPlus} onClick={() => navigate('/funcionarios/novo')}>
-            Novo Funcionário
+            <span className="hidden sm:inline">Novo Funcionário</span>
           </Button>
         </div>
       </div>
@@ -300,114 +407,129 @@ export default function Funcionarios() {
         </div>
       </Card>
 
-      {/* Tabela de Funcionários */}
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableHeader>Funcionário</TableHeader>
-            <TableHeader>Cargo</TableHeader>
-            <TableHeader>Área</TableHeader>
-            <TableHeader className="th-center">Status</TableHeader>
-            <TableHeader className="th-center">Ações</TableHeader>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {funcionarios.length > 0 ? (
-            funcionarios.map((func) => (
-              <TableRow key={func.id}>
-                <TableCell>
-                  <div
-                    className="flex items-center gap-3 cursor-pointer group"
-                    onClick={() => navigate(`/funcionarios/${func.id}`)}
-                  >
-                    <Avatar
-                      name={func.nome_completo || func.usuario?.first_name}
-                      size="md"
-                    />
-                    <div>
-                      <p className="font-medium text-slate-800 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                        {func.nome_completo || func.usuario?.first_name}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        Mat. {func.matricula}
-                      </p>
+      {/* Mobile: Cards */}
+      <div className="md:hidden space-y-3">
+        {funcionarios.length > 0 ? (
+          funcionarios.map((func) => (
+            <FuncionarioCard key={func.id} func={func} />
+          ))
+        ) : (
+          <Card className="p-8 text-center text-slate-500">
+            Nenhum funcionário encontrado
+          </Card>
+        )}
+      </div>
+
+      {/* Desktop: Tabela de Funcionários */}
+      <div className="hidden md:block">
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableHeader>Funcionário</TableHeader>
+              <TableHeader>Cargo</TableHeader>
+              <TableHeader>Área</TableHeader>
+              <TableHeader className="th-center">Status</TableHeader>
+              <TableHeader className="th-center font-bold text-primary-600 dark:text-primary-400">Ações</TableHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {funcionarios.length > 0 ? (
+              funcionarios.map((func) => (
+                <TableRow key={func.id}>
+                  <TableCell>
+                    <div
+                      className="flex items-center gap-3 cursor-pointer group"
+                      onClick={() => navigate(`/funcionarios/${func.id}`)}
+                    >
+                      <Avatar
+                        name={func.nome_completo || func.usuario?.first_name}
+                        size="md"
+                      />
+                      <div>
+                        <p className="font-medium text-slate-800 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                          {func.nome_completo || func.usuario?.first_name}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Mat. {func.matricula}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${TIPOS_USUARIO_COLORS[func.usuario?.tipo_usuario] || 'bg-slate-100 text-slate-600'}`}>
-                    {func.usuario?.tipo_usuario}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {func.area_atuacao || '-'}
-                </TableCell>
-                <TableCell className="td-center">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleToggleAtivo(func)
-                    }}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${func.usuario?.is_active
-                      ? 'bg-success-500/10 text-success-600 hover:bg-success-500/20 dark:text-success-400'
-                      : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400'
-                      }`}
-                    title="Alterar Status"
-                  >
-                    {func.usuario?.is_active ? (
-                      <>
-                        <HiCheckCircle className="w-4 h-4" />
-                        Ativo
-                      </>
-                    ) : (
-                      <>
-                        <HiXCircle className="w-4 h-4" />
-                        Inativo
-                      </>
-                    )}
-                  </button>
-                </TableCell>
-                <TableCell className="td-center">
-                  <ActionSelect
-                    size="sm"
-                    actions={[
-                      {
-                        label: 'Editar Funcionário',
-                        icon: HiPencil,
-                        onClick: () => navigate(`/funcionarios/${func.id}`)
-                      },
-                      {
-                        label: 'Gerar Ficha (PDF)',
-                        icon: FaFilePdf,
-                        disabled: generatingPDF === func.id,
-                        onClick: () => handleGeneratePDF(func.id)
-                      },
-                      {
-                        label: 'Períodos de Trabalho',
-                        icon: HiCalendar,
-                        onClick: () => handleOpenPeriodosModal(func)
-                      },
-                      ...(func.usuario?.tipo_usuario === 'PROFESSOR' ? [{
-                        label: 'Grade',
-                        icon: HiTable,
-                        onClick: () => navigate(`/minha-grade?professor_id=${func.id}`)
-                      }] : []),
-                      {
-                        label: func.usuario?.is_active ? 'Desativar Usuário' : 'Ativar Usuário',
-                        icon: func.usuario?.is_active ? HiXCircle : HiCheckCircle,
-                        variant: func.usuario?.is_active ? 'danger' : 'default',
-                        onClick: () => handleToggleAtivo(func)
-                      }
-                    ]}
-                  />
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableEmpty colSpan={5} message="Nenhum funcionário encontrado" />
-          )}
-        </TableBody>
-      </Table>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${TIPOS_USUARIO_COLORS[func.usuario?.tipo_usuario] || 'bg-slate-100 text-slate-600'}`}>
+                      {func.usuario?.tipo_usuario}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    {func.area_atuacao || '-'}
+                  </TableCell>
+                  <TableCell className="td-center">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleToggleAtivo(func)
+                      }}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${func.usuario?.is_active
+                        ? 'bg-success-500/10 text-success-600 hover:bg-success-500/20 dark:text-success-400'
+                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400'
+                        }`}
+                      title="Alterar Status"
+                    >
+                      {func.usuario?.is_active ? (
+                        <>
+                          <HiCheckCircle className="w-4 h-4" />
+                          Ativo
+                        </>
+                      ) : (
+                        <>
+                          <HiXCircle className="w-4 h-4" />
+                          Inativo
+                        </>
+                      )}
+                    </button>
+                  </TableCell>
+                  <TableCell className="td-center">
+                    <ActionSelect
+                      size="sm"
+                      actions={[
+                        {
+                          label: 'Editar Funcionário',
+                          icon: HiPencil,
+                          onClick: () => navigate(`/funcionarios/${func.id}`)
+                        },
+                        {
+                          label: 'Gerar Ficha (PDF)',
+                          icon: FaFilePdf,
+                          disabled: generatingPDF === func.id,
+                          onClick: () => handleGeneratePDF(func.id)
+                        },
+                        {
+                          label: 'Períodos de Trabalho',
+                          icon: HiCalendar,
+                          onClick: () => handleOpenPeriodosModal(func)
+                        },
+                        ...(func.usuario?.tipo_usuario === 'PROFESSOR' ? [{
+                          label: 'Grade',
+                          icon: HiTable,
+                          onClick: () => navigate(`/minha-grade?professor_id=${func.id}`)
+                        }] : []),
+                        {
+                          label: func.usuario?.is_active ? 'Desativar Usuário' : 'Ativar Usuário',
+                          icon: func.usuario?.is_active ? HiXCircle : HiCheckCircle,
+                          variant: func.usuario?.is_active ? 'danger' : 'default',
+                          onClick: () => handleToggleAtivo(func)
+                        }
+                      ]}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableEmpty colSpan={5} message="Nenhum funcionário encontrado" />
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       {/* Paginação */}
       <Pagination
@@ -495,8 +617,6 @@ export default function Funcionarios() {
           </Button>
         </ModalFooter>
       </Modal>
-
-
 
       <BulkUploadModal
         isOpen={showUploadModal}

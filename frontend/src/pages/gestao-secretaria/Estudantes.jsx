@@ -368,11 +368,9 @@ export default function Estudantes() {
           <div className="flex items-center gap-2 sm:gap-4">
             <Button variant="secondary" icon={HiUpload} onClick={() => setShowUploadModal(true)} className="text-sm sm:text-base">
               <span className="hidden sm:inline">Cadastro em massa</span>
-              <span className="sm:hidden">Importar</span>
             </Button>
             <Button icon={HiPlus} onClick={() => navigate('/estudantes/novo')} className="text-sm sm:text-base">
               <span className="hidden sm:inline">Novo Estudante</span>
-              <span className="sm:hidden">Novo</span>
             </Button>
           </div>
         )}
