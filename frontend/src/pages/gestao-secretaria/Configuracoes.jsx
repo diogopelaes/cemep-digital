@@ -9,6 +9,7 @@ import AvaliacaoTab from '../../components/configuracoes/AvaliacaoTab'
 import { useReferences } from '../../contexts/ReferenceContext'
 
 
+
 export default function Configuracoes() {
     const [searchParams] = useSearchParams()
     const [activeTab, setActiveTab] = useState(() => {
@@ -56,7 +57,7 @@ export default function Configuracoes() {
             </div>
 
             {/* Tab Content */}
-            <div className="glass p-6 rounded-2xl min-h-[400px]">
+            <div className="min-h-[400px]">
                 {activeTab === 'calendario' && <CalendarioTab />}
                 {activeTab === 'horarios' && hasActiveCalendar && <HorarioAulaTab />}
                 {activeTab === 'controle' && hasActiveCalendar && <ControleTab />}

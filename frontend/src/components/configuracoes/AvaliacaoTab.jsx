@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { HiCheck, HiX, HiInformationCircle } from 'react-icons/hi'
+import { HiInformationCircle } from 'react-icons/hi'
 import { evaluationAPI } from '../../services/api'
-import { Loading, FormActions, Badge } from '../ui'
+import { Loading, FormActions, Card, CardHeader, CardTitle, CardDescription, CardContent, Select, Switch } from '../ui'
 import toast from 'react-hot-toast'
 import { useReferences } from '../../contexts/ReferenceContext'
 
@@ -105,128 +105,107 @@ export default function AvaliacaoTab() {
     }
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div>
-                <h2 className="text-xl font-semibold text-slate-800 dark:text-white">
+        <Card className="w-full">
+            <CardHeader>
+                <CardTitle>
                     Configuração de Avaliação - {anoLetivoAtual?.ano}
-                </h2>
-                <p className="text-slate-500 text-sm mt-1">
+                </CardTitle>
+                <CardDescription>
                     Configure as regras gerais de avaliação para o ano letivo.
-                </p>
-            </div>
+                </CardDescription>
+            </CardHeader>
 
-            {/* Info Box - Valores Fixos */}
-            <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                <HiInformationCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-blue-700 dark:text-blue-300">
-                    <p className="font-medium mb-1">Valores fixos do sistema:</p>
-                    <ul className="list-disc list-inside space-y-0.5 text-blue-600 dark:text-blue-400">
-                        <li><strong>Valor máximo por bimestre:</strong> {config?.valor_maximo || '10.00'} pontos</li>
-                        <li><strong>Média de aprovação:</strong> {config?.media_aprovacao || '6.00'} pontos</li>
-                    </ul>
+            <CardContent className="space-y-6">
+
+                {/* Info Box - Valores Fixos */}
+                <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                    <HiInformationCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-blue-700 dark:text-blue-300">
+                        <p className="font-medium mb-1">Valores fixos do sistema:</p>
+                        <ul className="list-disc list-inside space-y-0.5 text-blue-600 dark:text-blue-400">
+                            <li><strong>Valor máximo por bimestre:</strong> {config?.valor_maximo?.toString().replace('.', ',') || '10,0'} pontos</li>
+                            <li><strong>Média de aprovação:</strong> {config?.media_aprovacao?.toString().replace('.', ',') || '6,0'} pontos</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
 
-            {/* Form */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Livre Escolha Professor */}
-                <div className="col-span-full">
-                    <label className="flex items-center gap-3 cursor-pointer">
-                        <div
-                            className={`relative w-12 h-6 rounded-full transition-colors ${config?.livre_escolha_professor
-                                ? 'bg-primary-500'
-                                : 'bg-slate-300 dark:bg-slate-600'
-                                }`}
-                            onClick={() => handleChange('livre_escolha_professor', !config?.livre_escolha_professor)}
-                        >
-                            <div
-                                className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${config?.livre_escolha_professor ? 'left-7' : 'left-1'
-                                    }`}
+                {/* Form */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Livre Escolha Professor */}
+                    <div className="col-span-full p-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
+                        <div className="flex items-center justify-between gap-4">
+                            <div>
+                                <span className="font-medium text-slate-700 dark:text-slate-200 block">
+                                    Livre escolha do professor
+                                </span>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">
+                                    Se ativado, cada professor pode escolher a forma de cálculo (Soma ou Média Ponderada) para cada bimestre.
+                                </p>
+                            </div>
+                            <Switch
+                                checked={config?.livre_escolha_professor}
+                                onChange={(e) => handleChange('livre_escolha_professor', e.target.checked)}
                             />
                         </div>
-                        <div>
-                            <span className="font-medium text-slate-700 dark:text-slate-200">
-                                Livre escolha do professor
-                            </span>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">
-                                Se ativado, cada professor pode escolher a forma de cálculo (Soma ou Média Ponderada) para cada bimestre.
-                            </p>
-                        </div>
-                    </label>
-                </div>
+                    </div>
 
-                {/* Casas Decimais - Bimestral */}
-                <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                        Casas decimais (Nota Bimestral)
-                    </label>
-                    <select
-                        value={config?.numero_casas_decimais_bimestral || 1}
-                        onChange={(e) => handleChange('numero_casas_decimais_bimestral', parseInt(e.target.value))}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 
-                                 bg-white dark:bg-slate-800 text-slate-900 dark:text-white
-                                 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    >
-                        {[0, 1, 2, 3, 4].map(n => (
-                            <option key={n} value={n}>{n} casa{n !== 1 ? 's' : ''} decimal{n !== 1 ? 'is' : ''}</option>
-                        ))}
-                    </select>
-                    <p className="text-xs text-slate-500 mt-1">
-                        Arredondamento aplicado na nota final do bimestre.
-                    </p>
-                </div>
+                    {/* Casas Decimais - Bimestral */}
+                    <div className="space-y-1">
+                        <Select
+                            label="Casas decimais (Nota Bimestral)"
+                            value={config?.numero_casas_decimais_bimestral ?? 1}
+                            onChange={(e) => handleChange('numero_casas_decimais_bimestral', parseInt(e.target.value))}
+                            options={[0, 1, 2, 3, 4].map(n => ({
+                                value: n,
+                                label: `${n} casa${n !== 1 ? 's' : ''} decimal${n !== 1 ? 'is' : ''}`
+                            }))}
+                            placeholder=""
+                        />
+                        <p className="text-xs text-slate-500">
+                            Arredondamento aplicado na nota final do bimestre.
+                        </p>
+                    </div>
 
-                {/* Casas Decimais - Avaliação */}
-                <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                        Casas decimais (Avaliação)
-                    </label>
-                    <select
-                        value={config?.numero_casas_decimais_avaliacao || 2}
-                        onChange={(e) => handleChange('numero_casas_decimais_avaliacao', parseInt(e.target.value))}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 
-                                 bg-white dark:bg-slate-800 text-slate-900 dark:text-white
-                                 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    >
-                        {[0, 1, 2, 3, 4].map(n => (
-                            <option key={n} value={n}>{n} casa{n !== 1 ? 's' : ''} decimal{n !== 1 ? 'is' : ''}</option>
-                        ))}
-                    </select>
-                    <p className="text-xs text-slate-500 mt-1">
-                        Arredondamento aplicado em cada nota de avaliação individual.
-                    </p>
-                </div>
+                    {/* Casas Decimais - Avaliação */}
+                    <div className="space-y-1">
+                        <Select
+                            label="Casas decimais (Avaliação)"
+                            value={config?.numero_casas_decimais_avaliacao ?? 2}
+                            onChange={(e) => handleChange('numero_casas_decimais_avaliacao', parseInt(e.target.value))}
+                            options={[0, 1, 2, 3, 4].map(n => ({
+                                value: n,
+                                label: `${n} casa${n !== 1 ? 's' : ''} decimal${n !== 1 ? 'is' : ''}`
+                            }))}
+                            placeholder=""
+                        />
+                        <p className="text-xs text-slate-500">
+                            Arredondamento aplicado em cada nota de avaliação individual.
+                        </p>
+                    </div>
 
-                {/* Regra de Arredondamento */}
-                <div className="col-span-full">
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                        Regra de Arredondamento
-                    </label>
-                    <select
-                        value={config?.regra_arredondamento || 'MATEMATICO_CLASSICO'}
-                        onChange={(e) => handleChange('regra_arredondamento', e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 
-                                 bg-white dark:bg-slate-800 text-slate-900 dark:text-white
-                                 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    >
-                        {choices.regra_arredondamento?.map(opt => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                        ))}
-                    </select>
+                    {/* Regra de Arredondamento */}
+                    <div className="col-span-full">
+                        <Select
+                            label="Regra de Arredondamento"
+                            value={config?.regra_arredondamento || 'MATEMATICO_CLASSICO'}
+                            onChange={(e) => handleChange('regra_arredondamento', e.target.value)}
+                            options={choices.regra_arredondamento}
+                            placeholder=""
+                        />
+                    </div>
                 </div>
+            </CardContent>
+
+            <div className="p-6 pt-0">
+                <FormActions
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                    saving={saving}
+                    isEditing={true}
+                    saveLabel={isNew ? 'Criar Configuração' : 'Salvar Configuração'}
+                    disabled={!hasChanges}
+                />
             </div>
-
-            {/* Actions */}
-            <FormActions
-                onSave={handleSave}
-                onCancel={handleCancel}
-                saving={saving}
-                isEditing={true}
-                saveLabel={isNew ? 'Criar Configuração' : 'Salvar Configuração'}
-                disabled={!hasChanges}
-                className="mt-6"
-            />
-        </div>
+        </Card>
     )
 }

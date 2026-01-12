@@ -401,7 +401,7 @@ export default function Estudantes() {
           </div>
 
           {/* Desktop: Tabela */}
-          <Card hover={false} className="hidden md:block">
+          <div className="hidden md:block">
             <Table>
               <TableHead>
                 <TableRow>
@@ -491,7 +491,7 @@ export default function Estudantes() {
                 ))}
               </TableBody>
             </Table>
-          </Card>
+          </div>
         </>
       )}
 

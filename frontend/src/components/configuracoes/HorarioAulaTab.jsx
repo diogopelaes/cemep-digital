@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { HiPlus, HiPencil, HiTrash, HiClock } from 'react-icons/hi'
 import { coreAPI } from '../../services/api'
-import { Button, Loading, Badge } from '../ui'
+import { Button, Loading, Badge, Card } from '../ui'
 import HorarioAulaForm from '../../pages/gestao-secretaria/HorarioAulaForm'
 import HorarioAulaDetalhes from '../../pages/gestao-secretaria/HorarioAulaDetalhes'
 import toast from 'react-hot-toast'
@@ -56,40 +56,42 @@ export default function HorarioAulaTab() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-xl font-semibold text-slate-800 dark:text-white flex items-center gap-2">
-                        <HiClock className="text-primary-600" />
-                        Horários de Aula - {activeAno.ano}
-                    </h2>
-                    <p className="text-slate-500 text-sm">
-                        Defina a grade de horários para o ano letivo.
-                    </p>
+        <Card className="w-full">
+            <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h2 className="text-xl font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                            <HiClock className="text-primary-600" />
+                            Horários de Aula - {activeAno.ano}
+                        </h2>
+                        <p className="text-slate-500 text-sm">
+                            Defina a grade de horários para o ano letivo.
+                        </p>
+                    </div>
+                    {view === 'list' && (
+                        <Button
+                            onClick={() => setView('form')}
+                            icon={horarios.length > 0 ? HiPencil : HiPlus}
+                        >
+                            {horarios.length > 0 ? 'Editar Horários' : 'Criar Horários'}
+                        </Button>
+                    )}
                 </div>
-                {view === 'list' && (
-                    <Button
-                        onClick={() => setView('form')}
-                        icon={horarios.length > 0 ? HiPencil : HiPlus}
-                    >
-                        {horarios.length > 0 ? 'Editar Horários' : 'Criar Horários'}
-                    </Button>
+
+                {view === 'list' ? (
+                    <HorarioAulaDetalhes horarios={horarios} />
+                ) : (
+                    <HorarioAulaForm
+                        anoLetivo={activeAno}
+                        existingHorarios={horarios}
+                        onCancel={() => setView('list')}
+                        onSuccess={() => {
+                            setView('list')
+                            loadData()
+                        }}
+                    />
                 )}
             </div>
-
-            {view === 'list' ? (
-                <HorarioAulaDetalhes horarios={horarios} />
-            ) : (
-                <HorarioAulaForm
-                    anoLetivo={activeAno}
-                    existingHorarios={horarios}
-                    onCancel={() => setView('list')}
-                    onSuccess={() => {
-                        setView('list')
-                        loadData()
-                    }}
-                />
-            )}
-        </div>
+        </Card>
     )
 }

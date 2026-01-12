@@ -236,7 +236,7 @@ export default function MinhasTurmas() {
                     </div>
 
                     {/* Desktop: Tabela */}
-                    <Card hover={false} className="hidden md:block">
+                    <div className="hidden md:block">
                         <Table>
                             <TableHead>
                                 <TableRow>
@@ -317,7 +317,7 @@ export default function MinhasTurmas() {
                                 ))}
                             </TableBody>
                         </Table>
-                    </Card>
+                    </div>
                 </>
             )}
         </div>

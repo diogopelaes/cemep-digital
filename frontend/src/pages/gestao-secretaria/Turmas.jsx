@@ -147,135 +147,133 @@ export default function Turmas() {
 
 
           {/* Tabela de Turmas */}
-          <Card key="tabela-turmas" hover={false}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeader>Turma</TableHeader>
-                  <TableHeader>Curso</TableHeader>
-                  <TableHeader className="th-center">Status</TableHeader>
-                  <TableHeader className="th-center font-bold text-primary-600 dark:text-primary-400">Ações</TableHeader>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {turmas.length > 0 ? (
-                  turmas.map((turma) => (
-                    <TableRow key={turma.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeader>Turma</TableHeader>
+                <TableHeader>Curso</TableHeader>
+                <TableHeader className="th-center">Status</TableHeader>
+                <TableHeader className="th-center font-bold text-primary-600 dark:text-primary-400">Ações</TableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {turmas.length > 0 ? (
+                turmas.map((turma) => (
+                  <TableRow key={turma.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => navigate(`/turmas/${turma.id}`)}
+                          className={`w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center hover:scale-105 hover:shadow-lg transition-all ${turma.is_active
+                            ? 'from-primary-500 to-accent-500'
+                            : 'from-slate-400 to-slate-500 grayscale'
+                            }`}
+                        >
+                          <span className="text-white font-bold text-sm">
+                            {turma.numero}{turma.letra}
+                          </span>
+                        </button>
+                        <div>
                           <button
                             onClick={() => navigate(`/turmas/${turma.id}`)}
-                            className={`w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center hover:scale-105 hover:shadow-lg transition-all ${turma.is_active
-                              ? 'from-primary-500 to-accent-500'
-                              : 'from-slate-400 to-slate-500 grayscale'
-                              }`}
+                            className={`font-medium text-left ${!turma.is_active ? 'text-slate-400 line-through' : 'text-link-subtle'}`}
                           >
-                            <span className="text-white font-bold text-sm">
-                              {turma.numero}{turma.letra}
-                            </span>
+                            {formatTurmaNome(turma)}
                           </button>
-                          <div>
-                            <button
-                              onClick={() => navigate(`/turmas/${turma.id}`)}
-                              className={`font-medium text-left ${!turma.is_active ? 'text-slate-400 line-through' : 'text-link-subtle'}`}
-                            >
-                              {formatTurmaNome(turma)}
-                            </button>
-                            {!turma.is_active && (
-                              <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">Inativa</p>
-                            )}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-slate-600 dark:text-slate-400">
-                          {turma.curso?.nome || 'Curso não definido'}
-                        </span>
-                      </TableCell>
-                      <TableCell className="td-center">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleToggleAtivo(turma)
-                          }}
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${turma.is_active
-                            ? 'bg-success-500/10 text-success-600 hover:bg-success-500/20 dark:text-success-400'
-                            : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400'
-                            }`}
-                          title="Alterar Status"
-                        >
-                          {turma.is_active ? (
-                            <>
-                              <HiCheckCircle className="w-4 h-4" />
-                              Ativa
-                            </>
-                          ) : (
-                            <>
-                              <HiXCircle className="w-4 h-4" />
-                              Inativa
-                            </>
+                          {!turma.is_active && (
+                            <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">Inativa</p>
                           )}
-                        </button>
-                      </TableCell>
-                      <TableCell className="td-center">
-                        <ActionSelect
-                          size="sm"
-                          actions={[
-                            {
-                              label: `Estudantes (${turma.estudantes_count || 0})`,
-                              icon: HiUserGroup,
-                              onClick: () => navigate(`/turmas/${turma.id}`, { state: { tab: 'estudantes' } })
-                            },
-                            {
-                              label: `Disciplinas (${turma.disciplinas_count || 0})`,
-                              icon: HiBookOpen,
-                              onClick: () => navigate(`/turmas/${turma.id}`, { state: { tab: 'disciplinas' } })
-                            },
-                            {
-                              label: 'Grade Horária',
-                              icon: HiTable,
-                              onClick: () => navigate(`/turmas/${turma.id}`, { state: { tab: 'gradeHoraria' } })
-                            },
-                            {
-                              label: 'Lista PDF',
-                              icon: FaFilePdf,
-                              disabled: generatingPDF === turma.id,
-                              onClick: (e) => handleGerarLista(turma, e)
-                            },
-                            {
-                              label: 'Visualizar Carômetro',
-                              icon: HiPhotograph,
-                              onClick: () => navigate(`/turmas/${turma.id}/carometro`)
-                            },
-                            {
-                              label: turma.is_active ? 'Desativar Turma' : 'Ativar Turma',
-                              icon: turma.is_active ? HiXCircle : HiCheckCircle,
-                              variant: turma.is_active ? 'danger' : 'default',
-                              onClick: () => handleToggleAtivo(turma)
-                            }
-                          ]}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableEmpty
-                    colSpan={4}
-                    message="Nenhuma turma encontrada"
-                  />
-                )}
-              </TableBody>
-            </Table>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-slate-600 dark:text-slate-400">
+                        {turma.curso?.nome || 'Curso não definido'}
+                      </span>
+                    </TableCell>
+                    <TableCell className="td-center">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleToggleAtivo(turma)
+                        }}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${turma.is_active
+                          ? 'bg-success-500/10 text-success-600 hover:bg-success-500/20 dark:text-success-400'
+                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400'
+                          }`}
+                        title="Alterar Status"
+                      >
+                        {turma.is_active ? (
+                          <>
+                            <HiCheckCircle className="w-4 h-4" />
+                            Ativa
+                          </>
+                        ) : (
+                          <>
+                            <HiXCircle className="w-4 h-4" />
+                            Inativa
+                          </>
+                        )}
+                      </button>
+                    </TableCell>
+                    <TableCell className="td-center">
+                      <ActionSelect
+                        size="sm"
+                        actions={[
+                          {
+                            label: `Estudantes (${turma.estudantes_count || 0})`,
+                            icon: HiUserGroup,
+                            onClick: () => navigate(`/turmas/${turma.id}`, { state: { tab: 'estudantes' } })
+                          },
+                          {
+                            label: `Disciplinas (${turma.disciplinas_count || 0})`,
+                            icon: HiBookOpen,
+                            onClick: () => navigate(`/turmas/${turma.id}`, { state: { tab: 'disciplinas' } })
+                          },
+                          {
+                            label: 'Grade Horária',
+                            icon: HiTable,
+                            onClick: () => navigate(`/turmas/${turma.id}`, { state: { tab: 'gradeHoraria' } })
+                          },
+                          {
+                            label: 'Lista PDF',
+                            icon: FaFilePdf,
+                            disabled: generatingPDF === turma.id,
+                            onClick: (e) => handleGerarLista(turma, e)
+                          },
+                          {
+                            label: 'Visualizar Carômetro',
+                            icon: HiPhotograph,
+                            onClick: () => navigate(`/turmas/${turma.id}/carometro`)
+                          },
+                          {
+                            label: turma.is_active ? 'Desativar Turma' : 'Ativar Turma',
+                            icon: turma.is_active ? HiXCircle : HiCheckCircle,
+                            variant: turma.is_active ? 'danger' : 'default',
+                            onClick: () => handleToggleAtivo(turma)
+                          }
+                        ]}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableEmpty
+                  colSpan={4}
+                  message="Nenhuma turma encontrada"
+                />
+              )}
+            </TableBody>
+          </Table>
 
-            {/* Paginação */}
-            < Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalCount}
-              pageSize={pageSize}
-              onPageChange={handlePageChange}
-            />
-          </Card>
+          {/* Paginação */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalCount}
+            pageSize={pageSize}
+            onPageChange={handlePageChange}
+          />
         </div>
       )}
 

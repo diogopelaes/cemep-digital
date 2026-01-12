@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { HiChevronDown, HiChevronRight, HiInformationCircle } from 'react-icons/hi'
 import { coreAPI } from '../../services/api'
-import { Loading, Badge, FormActions } from '../ui'
+import { Loading, Badge, FormActions, Card } from '../ui'
 import ControleForm from '../../pages/gestao-secretaria/ControleForm'
 import toast from 'react-hot-toast'
 import { useReferences } from '../../contexts/ReferenceContext'
@@ -149,116 +149,120 @@ export default function ControleTab() {
 
     if (!activeAno) {
         return (
-            <div className="text-center py-12 text-slate-500 dark:text-slate-400">
-                Não há um ano letivo ativo para configurar controles.
-            </div>
+            <Card hover={false} className="w-full">
+                <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+                    Não há um ano letivo ativo para configurar controles.
+                </div>
+            </Card>
         )
     }
 
     return (
-        <div className="space-y-4">
-            {/* Header */}
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-xl font-semibold text-slate-800 dark:text-white">
-                        Controle de Registros - {activeAno.ano}
-                    </h2>
-                    <p className="text-slate-500 text-sm">
-                        Defina os períodos para registro de aulas, notas e visualização de boletins.
-                    </p>
+        <Card className="w-full">
+            <div className="space-y-4">
+                {/* Header */}
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h2 className="text-xl font-semibold text-slate-800 dark:text-white">
+                            Controle de Registros - {activeAno.ano}
+                        </h2>
+                        <p className="text-slate-500 text-sm">
+                            Defina os períodos para registro de aulas, notas e visualização de boletins.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                    </div>
                 </div>
-                <div className="flex items-center gap-2">
+
+                {/* Info Box */}
+                <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                    <HiInformationCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-blue-700 dark:text-blue-300">
+                        <p className="font-medium mb-1">Como funciona a liberação:</p>
+                        <ul className="list-disc list-inside space-y-0.5 text-blue-600 dark:text-blue-400">
+                            <li><strong>Com data início e fim:</strong> Liberado no período definido</li>
+                            <li><strong>Só data início:</strong> Liberado dessa data em diante</li>
+                            <li><strong>Só data fim:</strong> Liberado até essa data</li>
+                            <li><strong>Sem datas:</strong> Não liberado</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
 
-            {/* Info Box */}
-            <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                <HiInformationCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-blue-700 dark:text-blue-300">
-                    <p className="font-medium mb-1">Como funciona a liberação:</p>
-                    <ul className="list-disc list-inside space-y-0.5 text-blue-600 dark:text-blue-400">
-                        <li><strong>Com data início e fim:</strong> Liberado no período definido</li>
-                        <li><strong>Só data início:</strong> Liberado dessa data em diante</li>
-                        <li><strong>Só data fim:</strong> Liberado até essa data</li>
-                        <li><strong>Sem datas:</strong> Não liberado</li>
-                    </ul>
-                </div>
-            </div>
+                {/* Accordions por Bimestre */}
+                <div className="space-y-3">
+                    {BIMESTRES.map(bim => {
+                        const isExpanded = expandedBimestres.includes(bim.value)
+                        const tiposDisponiveis = TIPOS.filter(t => t.bimestres.includes(bim.value))
 
-            {/* Accordions por Bimestre */}
-            <div className="space-y-3">
-                {BIMESTRES.map(bim => {
-                    const isExpanded = expandedBimestres.includes(bim.value)
-                    const tiposDisponiveis = TIPOS.filter(t => t.bimestres.includes(bim.value))
-
-                    return (
-                        <div
-                            key={bim.value}
-                            className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-800"
-                        >
-                            {/* Accordion Header */}
-                            <button
-                                onClick={() => toggleBimestre(bim.value)}
-                                className="w-full flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                        return (
+                            <div
+                                key={bim.value}
+                                className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-800"
                             >
-                                <div className="flex items-center gap-3">
-                                    {isExpanded ? (
-                                        <HiChevronDown className="w-5 h-5 text-slate-400" />
-                                    ) : (
-                                        <HiChevronRight className="w-5 h-5 text-slate-400" />
-                                    )}
-                                    <span className="font-semibold text-slate-800 dark:text-white">
-                                        {bim.label}
-                                    </span>
-                                </div>
-                                <div className="flex gap-2">
-                                    {tiposDisponiveis.map(tipo => {
-                                        const controle = getControle(bim.value, tipo.value)
-                                        const status = controle?.status_liberacao || 'Não configurado'
-                                        return (
-                                            <Badge
-                                                key={tipo.value}
-                                                variant={getStatusBadge(status)}
-                                                className="text-xs"
-                                            >
-                                                {tipo.value === 'AULA' ? 'Aula' : tipo.value === 'NOTA' ? 'Nota' : 'Boletim'}
-                                            </Badge>
-                                        )
-                                    })}
-                                </div>
-                            </button>
+                                {/* Accordion Header */}
+                                <button
+                                    onClick={() => toggleBimestre(bim.value)}
+                                    className="w-full flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        {isExpanded ? (
+                                            <HiChevronDown className="w-5 h-5 text-slate-400" />
+                                        ) : (
+                                            <HiChevronRight className="w-5 h-5 text-slate-400" />
+                                        )}
+                                        <span className="font-semibold text-slate-800 dark:text-white">
+                                            {bim.label}
+                                        </span>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        {tiposDisponiveis.map(tipo => {
+                                            const controle = getControle(bim.value, tipo.value)
+                                            const status = controle?.status_liberacao || 'Não configurado'
+                                            return (
+                                                <Badge
+                                                    key={tipo.value}
+                                                    variant={getStatusBadge(status)}
+                                                    className="text-xs"
+                                                >
+                                                    {tipo.value === 'AULA' ? 'Aula' : tipo.value === 'NOTA' ? 'Nota' : 'Boletim'}
+                                                </Badge>
+                                            )
+                                        })}
+                                    </div>
+                                </button>
 
-                            {/* Accordion Content */}
-                            {isExpanded && (
-                                <div className="border-t border-slate-200 dark:border-slate-700 p-4 space-y-4">
-                                    {tiposDisponiveis.map(tipo => {
-                                        const controle = getControle(bim.value, tipo.value)
+                                {/* Accordion Content */}
+                                {isExpanded && (
+                                    <div className="border-t border-slate-200 dark:border-slate-700 p-4 space-y-4">
+                                        {tiposDisponiveis.map(tipo => {
+                                            const controle = getControle(bim.value, tipo.value)
 
-                                        return (
-                                            <ControleForm
-                                                key={tipo.value}
-                                                tipo={tipo}
-                                                controle={controle}
-                                                onChange={(field, value) => handleChange(bim.value, tipo.value, field, value)}
-                                            />
-                                        )
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    )
-                })}
+                                            return (
+                                                <ControleForm
+                                                    key={tipo.value}
+                                                    tipo={tipo}
+                                                    controle={controle}
+                                                    onChange={(field, value) => handleChange(bim.value, tipo.value, field, value)}
+                                                />
+                                            )
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        )
+                    })}
+                </div>
+
+                <FormActions
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                    saving={saving}
+                    isEditing={true}
+                    saveLabel="Salvar Configurações"
+                    disabled={!hasChanges}
+                    className="mt-6"
+                />
             </div>
-
-            <FormActions
-                onSave={handleSave}
-                onCancel={handleCancel}
-                saving={saving}
-                isEditing={true}
-                saveLabel="Salvar Configurações"
-                disabled={!hasChanges}
-                className="mt-6"
-            />
-        </div>
+        </Card>
     )
 }

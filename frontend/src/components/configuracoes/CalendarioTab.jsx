@@ -91,27 +91,30 @@ export default function CalendarioTab() {
     }
 
     return (
-        <div className="space-y-6">
-            {/* Header com Novo Ano */}
-            <div className="flex justify-end items-center gap-2">
-                <Button
-                    size="sm"
-                    icon={HiPlus}
-                    onClick={() => setShowIniciarModal(true)}
-                >
-                    Novo Ano Letivo
-                </Button>
-            </div>
-
-            {/* Embedded Details */}
-            {selectedAno && (
-                <div key={selectedAno.ano} className="animate-fade-in">
-                    <CalendarioDetalhes
-                        ano={selectedAno.ano}
-                        showBackButton={false}
-                    />
+        <>
+            <Card hover={false} className="w-full">
+                <div className="space-y-6">
+                    {/* Embedded Details */}
+                    {selectedAno && (
+                        <div key={selectedAno.ano} className="animate-fade-in">
+                            <CalendarioDetalhes
+                                ano={selectedAno.ano}
+                                showBackButton={false}
+                                actions={
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        icon={HiPlus}
+                                        onClick={() => setShowIniciarModal(true)}
+                                    >
+                                        Novo Ano Letivo
+                                    </Button>
+                                }
+                            />
+                        </div>
+                    )}
                 </div>
-            )}
+            </Card>
 
             {createPortal(
                 <IniciarAnoModal
@@ -121,7 +124,7 @@ export default function CalendarioTab() {
                 />,
                 document.body
             )}
-        </div>
+        </>
     )
 }
 

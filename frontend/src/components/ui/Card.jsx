@@ -1,12 +1,12 @@
-export default function Card({ 
-  children, 
-  className = '', 
-  hover = true,
+export default function Card({
+  children,
+  className = '',
+  hover = false,
   padding = true,
-  ...props 
+  ...props
 }) {
   return (
-    <div 
+    <div
       className={`
         glass rounded-2xl 
         ${padding ? 'p-6' : ''} 
@@ -59,4 +59,3 @@ export function CardFooter({ children, className = '' }) {
     </div>
   )
 }
-

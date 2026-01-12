@@ -20,7 +20,7 @@ const TIPOS_DIA_NAO_LETIVO = {
     'OUTROS': 'Outros',
 }
 
-export default function CalendarioDetalhes({ className, ano: anoProp, showBackButton = true }) {
+export default function CalendarioDetalhes({ className, ano: anoProp, showBackButton = true, actions }) {
     const navigate = useNavigate()
     const params = useParams()
     const ano = anoProp || params.ano
@@ -75,7 +75,7 @@ export default function CalendarioDetalhes({ className, ano: anoProp, showBackBu
     }
 
     return (
-        <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
+        <div className="w-full space-y-6 animate-fade-in">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -96,6 +96,7 @@ export default function CalendarioDetalhes({ className, ano: anoProp, showBackBu
                 </div>
 
                 <div className="flex gap-3">
+                    {actions}
                     <Button
                         icon={HiPencil}
                         onClick={() => navigate(`/configuracoes/calendario/${ano}/editar`)}
