@@ -244,7 +244,7 @@ export default function GradeProfessor() {
     }
 
     return (
-        <div className="space-y-4 md:space-y-6 animate-fade-in pb-12">
+        <div className="space-y-4 md:space-y-6 animate-fade-in p-4 lg:p-8 pb-12">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-2">
                 <div>
@@ -305,7 +305,7 @@ export default function GradeProfessor() {
                     </div>
 
                     {/* Desktop View */}
-                    <div className="hidden md:block max-w-6xl">
+                    <div className="hidden md:block">
                         <Card padding={false} hover={false} className="overflow-hidden shadow-premium">
                             <div className="overflow-x-auto">
                                 <Table className="border-separate border-spacing-0 [&_tr:hover_td]:!bg-transparent">
@@ -314,17 +314,29 @@ export default function GradeProfessor() {
                                             <TableHeader className="w-32 text-center bg-slate-50/50 dark:bg-slate-800/50 border-b border-r border-slate-100 dark:border-slate-700/50 text-[11px] uppercase tracking-wider font-bold">
                                                 Aula
                                             </TableHeader>
-                                            {DAYS.map((day, idx) => (
-                                                <TableHeader
-                                                    key={day.value}
-                                                    className={`text-center border-b border-slate-100 dark:border-slate-700/50 text-[11px] uppercase tracking-wider font-bold ${idx % 2 === 0
-                                                        ? 'bg-slate-50/30 dark:bg-slate-800/30'
-                                                        : 'bg-primary-500/5 dark:bg-primary-400/5'
-                                                        }`}
-                                                >
-                                                    {day.label}
-                                                </TableHeader>
-                                            ))}
+                                            {DAYS.map((day, idx) => {
+                                                const isToday = idx === (new Date().getDay() - 1)
+                                                return (
+                                                    <TableHeader
+                                                        key={day.value}
+                                                        className={`text-center border-b border-slate-100 dark:border-slate-700/50 text-[11px] uppercase tracking-wider font-bold transition-colors ${isToday
+                                                            ? '!bg-primary-500/10 !text-primary-600 dark:!text-primary-400'
+                                                            : idx % 2 === 0
+                                                                ? 'bg-slate-50/30 dark:bg-slate-800/30 text-slate-500 dark:text-slate-400'
+                                                                : 'bg-primary-500/5 dark:bg-primary-400/5 text-slate-500 dark:text-slate-400'
+                                                            }`}
+                                                    >
+                                                        <div className="flex flex-col items-center py-1">
+                                                            {day.label}
+                                                            {isToday && (
+                                                                <span className="text-[9px] font-black mt-0.5 px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30">
+                                                                    Hoje
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </TableHeader>
+                                                )
+                                            })}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -348,9 +360,20 @@ export default function GradeProfessor() {
                                                     </TableCell>
                                                     {DAYS.map((day, idx) => {
                                                         const celula = linhaMatriz[String(day.value)]
-                                                        const colBg = idx % 2 === 0
-                                                            ? ''
-                                                            : 'bg-primary-500/[0.02] dark:bg-primary-400/[0.02]'
+                                                        const isToday = idx === (new Date().getDay() - 1)
+                                                        const { currentAula, nextAula } = getAulaStatus(idx)
+                                                        const isCurrent = num === currentAula
+                                                        const isNext = num === nextAula
+
+                                                        const colBg = isToday
+                                                            ? isCurrent
+                                                                ? 'bg-emerald-500/10'
+                                                                : isNext
+                                                                    ? 'bg-amber-500/10'
+                                                                    : 'bg-primary-500/[0.08] dark:bg-primary-400/[0.08]'
+                                                            : idx % 2 === 0
+                                                                ? ''
+                                                                : 'bg-primary-500/[0.02] dark:bg-primary-400/[0.02]'
 
                                                         return (
                                                             <TableCell
@@ -359,7 +382,7 @@ export default function GradeProfessor() {
                                                                     text-center border-b border-slate-100 dark:border-slate-700/50 transition-all duration-200
                                                                     ${colBg}
                                                                     ${celula
-                                                                        ? 'hover:!bg-white dark:hover:!bg-slate-700 hover:shadow-xl hover:scale-[1.05] relative z-20 cursor-default'
+                                                                        ? `hover:!bg-white dark:hover:!bg-slate-700 hover:shadow-xl hover:scale-[1.05] relative z-20 cursor-default ${isCurrent ? 'ring-2 ring-inset ring-emerald-500/50' : isNext ? 'ring-2 ring-inset ring-amber-500/30' : ''}`
                                                                         : 'hover:!bg-slate-50 dark:hover:!bg-slate-800/50 cursor-default'
                                                                     }
                                                                 `}
@@ -368,11 +391,15 @@ export default function GradeProfessor() {
                                                                     <span className="opacity-20">—</span>
                                                                 ) : (
                                                                     <div className="space-y-1 py-2">
-                                                                        <div className="font-bold text-slate-800 dark:text-slate-100 text-sm">
-                                                                            {celula.turma_label}
+                                                                        <div className="flex flex-col items-center">
+                                                                            <div className={`font-bold text-sm ${isCurrent ? 'text-emerald-600 dark:text-emerald-400' : isNext ? 'text-amber-600 dark:text-amber-400' : 'text-slate-800 dark:text-slate-100'}`}>
+                                                                                {celula.turma_label}
+                                                                            </div>
+                                                                            {isCurrent && <span className="text-[9px] font-black uppercase text-emerald-500 animate-pulse">Agora</span>}
+                                                                            {isNext && <span className="text-[9px] font-black uppercase text-amber-500">Próxima</span>}
                                                                         </div>
                                                                         {mostrar_disciplina && celula.disciplina_sigla && (
-                                                                            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                                                            <div className={`text-xs font-medium ${isCurrent ? 'text-emerald-500/70' : 'text-slate-500 dark:text-slate-400'}`}>
                                                                                 {celula.disciplina_sigla}
                                                                             </div>
                                                                         )}

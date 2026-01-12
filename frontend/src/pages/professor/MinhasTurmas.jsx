@@ -4,7 +4,6 @@ import {
     Card, Table, TableHead, TableBody, TableRow,
     TableHeader, TableCell, TableEmpty, Loading, Badge, ActionSelect
 } from '../../components/ui'
-import ActionSelectTemp from '../../components/ui/ActionSelectTemp'
 import { HiUserGroup, HiTable, HiPhotograph } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
 import { coreAPI, academicAPI } from '../../services/api'
@@ -292,7 +291,7 @@ export default function MinhasTurmas() {
                                             </Link>
                                         </TableCell>
                                         <TableCell className="td-center">
-                                            <ActionSelectTemp
+                                            <ActionSelect
                                                 size="sm"
                                                 actions={[
                                                     {

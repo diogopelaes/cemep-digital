@@ -127,19 +127,19 @@ export default function GradeTurma() {
     }
 
     // Verifica se estamos no dia de hoje (dia útil) e retorna info da aula atual/próxima
-    const getAulaStatus = () => {
+    const getAulaStatus = (dayIndex = selectedDay) => {
         const now = new Date()
         const dayOfWeek = now.getDay() // 0=Dom, 1=Seg, ..., 6=Sab
         const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5
         const todayIdx = isWeekday ? dayOfWeek - 1 : -1
 
         // Só mostra status se for dia útil E estiver visualizando o dia de hoje
-        if (!isWeekday || selectedDay !== todayIdx) {
+        if (!isWeekday || dayIndex !== todayIdx) {
             return { currentAula: null, nextAula: null }
         }
 
         const currentMinutes = now.getHours() * 60 + now.getMinutes()
-        const dayValue = DAYS[selectedDay].value
+        const dayValue = DAYS[dayIndex].value
 
         let currentAula = null
         let nextAula = null
@@ -289,7 +289,7 @@ export default function GradeTurma() {
     }
 
     return (
-        <div className="space-y-4 md:space-y-6 animate-fade-in pb-12">
+        <div className="space-y-4 md:space-y-6 animate-fade-in p-4 lg:p-8 pb-12">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-2">
                 <div>
@@ -330,7 +330,7 @@ export default function GradeTurma() {
                     </div>
 
                     {/* Desktop: Tabela completa */}
-                    <div className="hidden md:block max-w-6xl">
+                    <div className="hidden md:block">
                         <Card padding={false} hover={false} className="overflow-hidden shadow-premium">
                             <div className="overflow-x-auto">
                                 <Table className="border-separate border-spacing-0 [&_tr:hover_td]:!bg-transparent">
@@ -339,17 +339,29 @@ export default function GradeTurma() {
                                             <TableHeader className="w-32 text-center bg-slate-50/50 dark:bg-slate-800/50 border-b border-r border-slate-100 dark:border-slate-700/50 text-[11px] uppercase tracking-wider font-bold">
                                                 Aula
                                             </TableHeader>
-                                            {DAYS.map((day, idx) => (
-                                                <TableHeader
-                                                    key={day.value}
-                                                    className={`text-center border-b border-slate-100 dark:border-slate-700/50 text-[11px] uppercase tracking-wider font-bold ${idx % 2 === 0
-                                                        ? 'bg-slate-50/30 dark:bg-slate-800/30'
-                                                        : 'bg-primary-500/5 dark:bg-primary-400/5'
-                                                        }`}
-                                                >
-                                                    {day.label}
-                                                </TableHeader>
-                                            ))}
+                                            {DAYS.map((day, idx) => {
+                                                const isToday = idx === (new Date().getDay() - 1)
+                                                return (
+                                                    <TableHeader
+                                                        key={day.value}
+                                                        className={`text-center border-b border-slate-100 dark:border-slate-700/50 text-[11px] uppercase tracking-wider font-bold transition-colors ${isToday
+                                                            ? '!bg-primary-500/10 !text-primary-600 dark:!text-primary-400'
+                                                            : idx % 2 === 0
+                                                                ? 'bg-slate-50/30 dark:bg-slate-800/30 text-slate-500 dark:text-slate-400'
+                                                                : 'bg-primary-500/5 dark:bg-primary-400/5 text-slate-500 dark:text-slate-400'
+                                                            }`}
+                                                    >
+                                                        <div className="flex flex-col items-center py-1">
+                                                            {day.label}
+                                                            {isToday && (
+                                                                <span className="text-[9px] font-black mt-0.5 px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30">
+                                                                    Hoje
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </TableHeader>
+                                                )
+                                            })}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -373,9 +385,20 @@ export default function GradeTurma() {
                                                     {DAYS.map((day, idx) => {
                                                         const celula = linhaMatriz[String(day.value)]
                                                         const isMinhaDisciplina = celula && minhas_disciplinas.includes(celula.disciplina_id)
-                                                        const colBg = idx % 2 === 0
-                                                            ? ''
-                                                            : 'bg-primary-500/[0.02] dark:bg-primary-400/[0.02]'
+                                                        const isToday = idx === (new Date().getDay() - 1)
+                                                        const { currentAula, nextAula } = getAulaStatus(idx)
+                                                        const isCurrent = numero === currentAula
+                                                        const isNext = numero === nextAula
+
+                                                        const colBg = isToday
+                                                            ? isCurrent
+                                                                ? 'bg-emerald-500/10'
+                                                                : isNext
+                                                                    ? 'bg-amber-500/10'
+                                                                    : 'bg-primary-500/[0.08] dark:bg-primary-400/[0.08]'
+                                                            : idx % 2 === 0
+                                                                ? ''
+                                                                : 'bg-primary-500/[0.02] dark:bg-primary-400/[0.02]'
 
                                                         return (
                                                             <TableCell
@@ -384,7 +407,7 @@ export default function GradeTurma() {
                                                                     text-center border-b border-slate-100 dark:border-slate-700/50 transition-all duration-200
                                                                     ${colBg}
                                                                     ${celula
-                                                                        ? 'hover:!bg-white dark:hover:!bg-slate-700 hover:shadow-xl hover:scale-[1.05] relative z-20 cursor-default'
+                                                                        ? `hover:!bg-white dark:hover:!bg-slate-700 hover:shadow-xl hover:scale-[1.05] relative z-20 cursor-default ${isCurrent ? 'ring-2 ring-inset ring-emerald-500/50' : isNext ? 'ring-2 ring-inset ring-amber-500/30' : ''}`
                                                                         : 'hover:!bg-slate-50 dark:hover:!bg-slate-800/50 cursor-default'
                                                                     }
                                                                 `}
@@ -393,11 +416,15 @@ export default function GradeTurma() {
                                                                     <span className="opacity-20">—</span>
                                                                 ) : (
                                                                     <div className="space-y-1 py-2">
-                                                                        <div className={`font-bold text-sm ${isMinhaDisciplina ? 'text-primary-600 dark:text-primary-400' : 'text-slate-800 dark:text-slate-100'}`}>
-                                                                            {celula.disciplina_sigla}
+                                                                        <div className="flex flex-col items-center">
+                                                                            <div className={`font-bold text-sm ${isCurrent ? 'text-emerald-600 dark:text-emerald-400' : isNext ? 'text-amber-600 dark:text-amber-400' : isMinhaDisciplina ? 'text-primary-600 dark:text-primary-400' : 'text-slate-800 dark:text-slate-100'}`}>
+                                                                                {celula.disciplina_sigla}
+                                                                            </div>
+                                                                            {isCurrent && <span className="text-[9px] font-black uppercase text-emerald-500 animate-pulse">Agora</span>}
+                                                                            {isNext && <span className="text-[9px] font-black uppercase text-amber-500">Próxima</span>}
                                                                         </div>
                                                                         {celula.professor_apelido && (
-                                                                            <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                                                                            <div className={`text-xs font-medium ${isCurrent ? 'text-emerald-500/70' : 'text-slate-500 dark:text-slate-400'}`}>
                                                                                 {celula.professor_apelido}
                                                                             </div>
                                                                         )}
