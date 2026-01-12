@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'apps.core',
     'apps.academic',
     'apps.pedagogical',
+    'apps.evaluation',
     'apps.management',
     'apps.permanent',
     'ckeditor',

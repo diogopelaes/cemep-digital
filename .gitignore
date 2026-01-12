@@ -43,4 +43,4 @@ backend/db.sqlite3
 # env.production.json
 
 # Migrations
-backend/apps/*/migrations/
+# backend/apps/*/migrations/

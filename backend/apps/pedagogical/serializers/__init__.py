@@ -15,7 +15,6 @@ from .ocorrencia import (
     OcorrenciaPedagogicaSerializer,
     OcorrenciaResponsavelCienteSerializer
 )
-from .nota import NotaBimestralSerializer, NotificacaoRecuperacaoSerializer
 
 
 __all__ = [
@@ -27,6 +26,4 @@ __all__ = [
     'DescritorOcorrenciaPedagogicaSerializer',
     'OcorrenciaPedagogicaSerializer',
     'OcorrenciaResponsavelCienteSerializer',
-    'NotaBimestralSerializer',
-    'NotificacaoRecuperacaoSerializer',
 ]

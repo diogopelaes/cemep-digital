@@ -351,3 +351,44 @@ export const managementAPI = {
   },
 }
 
+export const evaluationAPI = {
+  // Configuração Geral de Avaliação
+  configGeral: {
+    list: (params) => api.get('/evaluation/config-geral/', { params }),
+    get: (id) => api.get(`/evaluation/config-geral/${id}/`),
+    create: (data) => api.post('/evaluation/config-geral/', data),
+    update: (id, data) => api.patch(`/evaluation/config-geral/${id}/`, data),
+    delete: (id) => api.delete(`/evaluation/config-geral/${id}/`),
+    choices: () => api.get('/evaluation/config-geral/choices/'),
+    atual: () => api.get('/evaluation/config-geral/atual/'),
+  },
+  // Configuração do Professor
+  configProfessor: {
+    list: (params) => api.get('/evaluation/config-professor/', { params }),
+    get: (id) => api.get(`/evaluation/config-professor/${id}/`),
+    create: (data) => api.post('/evaluation/config-professor/', data),
+    update: (id, data) => api.patch(`/evaluation/config-professor/${id}/`, data),
+    delete: (id) => api.delete(`/evaluation/config-professor/${id}/`),
+    choices: () => api.get('/evaluation/config-professor/choices/'),
+    minha: () => api.get('/evaluation/config-professor/minha/'),
+  },
+  // Avaliações
+  avaliacoes: {
+    list: (params) => api.get('/evaluation/avaliacoes/', { params }),
+    get: (id) => api.get(`/evaluation/avaliacoes/${id}/`),
+    create: (data) => api.post('/evaluation/avaliacoes/', data),
+    update: (id, data) => api.patch(`/evaluation/avaliacoes/${id}/`, data),
+    delete: (id) => api.delete(`/evaluation/avaliacoes/${id}/`),
+    choices: () => api.get('/evaluation/avaliacoes/choices/'),
+    notas: (id) => api.get(`/evaluation/avaliacoes/${id}/notas/`),
+    salvarNotas: (id, data) => api.post(`/evaluation/avaliacoes/${id}/notas/`, data),
+  },
+  // Notas Bimestrais
+  notasBimestrais: {
+    list: (params) => api.get('/evaluation/notas-bimestrais/', { params }),
+    get: (id) => api.get(`/evaluation/notas-bimestrais/${id}/`),
+    porTurma: (pdt, bimestre) => api.get('/evaluation/notas-bimestrais/por_turma/', { params: { pdt, bimestre } }),
+    salvar: (pdt, bimestre, data) => api.post('/evaluation/notas-bimestrais/por_turma/', data, { params: { pdt, bimestre } }),
+  },
+}
+

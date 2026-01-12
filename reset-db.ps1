@@ -56,14 +56,9 @@ Write-Host "4. Acessando ambiente virtual e executando migrações..." -Foregrou
 Write-Host "5. Diretório do backend..." -ForegroundColor Cyan
 Set-Location C:\Projects\cemep-digital\backend
 
-Write-Host "6. Criando migrações e migrando..." -ForegroundColor Cyan
-# Primeiro cria as migrações do app users (necessário para custom User model)
-python manage.py makemigrations users
-if ($LASTEXITCODE -ne 0) { Write-Error "Falha em makemigrations users"; exit }
-
-# Cria as migrações dos demais apps
-python manage.py makemigrations core academic pedagogical management permanent
-if ($LASTEXITCODE -ne 0) { Write-Error "Falha em makemigrations apps"; exit }
+# Cria as migrações globais
+python manage.py makemigrations
+if ($LASTEXITCODE -ne 0) { Write-Error "Falha em makemigrations"; exit }
 
 python manage.py migrate
 if ($LASTEXITCODE -ne 0) { Write-Error "Falha em migrate"; exit }

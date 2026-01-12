@@ -27,6 +27,7 @@ urlpatterns = [
         path('pedagogical/', include('apps.pedagogical.urls')),
         path('management/', include('apps.management.urls')),
         path('permanent/', include('apps.permanent.urls')),
+        path('evaluation/', include('apps.evaluation.urls')),
     ])),
 ]
 

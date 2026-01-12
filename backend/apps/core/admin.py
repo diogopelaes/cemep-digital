@@ -97,6 +97,7 @@ class DiaNaoLetivoAdmin(admin.ModelAdmin):
 class AnoLetivoAdmin(admin.ModelAdmin):
     list_display = ['ano', 'is_active']
     list_filter = ['is_active']
+    search_fields = ['ano']
     readonly_fields = ['controles']
     fieldsets = (
         (None, {

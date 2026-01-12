@@ -10,8 +10,6 @@ from .ocorrencia import (
     OcorrenciaPedagogicaViewSet,
     OcorrenciaResponsavelCienteViewSet
 )
-from .nota import NotaBimestralViewSet
-from .notificacao import NotificacaoRecuperacaoViewSet
 
 
 __all__ = [
@@ -20,6 +18,4 @@ __all__ = [
     'DescritorOcorrenciaPedagogicaViewSet',
     'OcorrenciaPedagogicaViewSet',
     'OcorrenciaResponsavelCienteViewSet',
-    'NotaBimestralViewSet',
-    'NotificacaoRecuperacaoViewSet',
 ]

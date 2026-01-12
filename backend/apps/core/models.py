@@ -566,7 +566,6 @@ class Turma(UUIDModel):
         return self.grade_horaria
 
 
-
 class DisciplinaTurma(UUIDModel):
     """Vínculo entre Disciplina e Turma com carga horária."""
     
@@ -652,10 +651,34 @@ class ProfessorDisciplinaTurma(UUIDModel):
         return f"{self.professor.usuario.get_full_name()} ({tipo}) - {self.disciplina_turma}"
 
     def save(self, *args, **kwargs):
+        is_new = self._state.adding
         super().save(*args, **kwargs)
         # Rebuild do funcionário e da turma
         self.professor.build_grade_horaria(save=True)
         self.disciplina_turma.turma.build_grade_horaria(save=True)
+        
+        # Cria configuração de avaliação do professor caso não exista
+        if is_new:
+            self._criar_configuracao_avaliacao_professor()
+
+    def _criar_configuracao_avaliacao_professor(self):
+        """Cria a configuração de avaliação para o professor no ano da turma."""
+        try:
+            from apps.evaluation.models import ConfiguracaoAvaliacaoProfessor, FormaCalculo
+            from apps.core.models import AnoLetivo
+            
+            # Busca o objeto AnoLetivo correspondente ao ano da turma
+            ano_int = self.disciplina_turma.turma.ano_letivo
+            ano_letivo_obj = AnoLetivo.objects.filter(ano=ano_int).first()
+            
+            if ano_letivo_obj:
+                ConfiguracaoAvaliacaoProfessor.objects.get_or_create(
+                    ano_letivo=ano_letivo_obj,
+                    professor=self.professor,
+                    defaults={'forma_calculo': FormaCalculo.SOMA}
+                )
+        except Exception:
+            pass # Evita travar a atribuição por erro na config secundária
 
     def delete(self, *args, **kwargs):
         professor = self.professor
@@ -806,19 +829,36 @@ class AnoLetivo(UUIDModel):
     def save(self, *args, **kwargs):
         """
         Ao criar um novo AnoLetivo, cria automaticamente os registros de 
-        ControleRegistrosVisualizacao para todos os tipos e bimestres.
+        ControleRegistrosVisualizacao para todos os tipos e bimestres,
+        e a configuração geral de avaliação.
         """
         # Verifica se é criação (novo registro)
         is_new = self._state.adding
         
         super().save(*args, **kwargs)
         
-        # Só cria controles se for um novo registro
+        # Só cria se for um novo registro
         if is_new:
             self._criar_controles_iniciais()
+            self._criar_configuracao_avaliacao_geral()
             
         # Atualiza o JSON de controles sempre que salvar o AnoLetivo
         self.atualizar_controles_json()
+    
+    def _criar_configuracao_avaliacao_geral(self):
+        """Cria a configuração geral de avaliação para o ano."""
+        try:
+            from apps.evaluation.models import ConfiguracaoAvaliacaoGeral
+            ConfiguracaoAvaliacaoGeral.objects.get_or_create(
+                ano_letivo=self,
+                defaults={
+                    'livre_escolha_professor': True,
+                    'numero_casas_decimais_bimestral': 1,
+                    'numero_casas_decimais_avaliacao': 2,
+                }
+            )
+        except Exception:
+            pass
     
     def _criar_controles_iniciais(self):
         """Cria os registros de controle para todos os tipos e bimestres."""
@@ -1017,7 +1057,7 @@ class HorarioAula(UUIDModel):
         from apps.core.models import Turma, Funcionario
         
         # Turmas do ano
-        Turma.objects.filter(ano_letivo=self.ano_letivo.ano).earliest('ano_letivo') # Trigger dummy? No, iterate.
+        # Código retirado, mas não sei o motivo exato do pq dá defeito: Turma.objects.filter(ano_letivo=self.ano_letivo.ano).earliest('ano_letivo') # Trigger dummy? No, iterate.
         for t in Turma.objects.filter(ano_letivo=self.ano_letivo.ano):
             t.build_grade_horaria(save=True)
             
