@@ -25,7 +25,7 @@ def _obter_datas_com_grade_valida(ano_letivo):
     
     # Busca todas as validades do ano letivo
     validades = GradeHorariaValidade.objects.filter(
-        turma__ano_letivo=ano_letivo.ano
+        ano_letivo__ano=ano_letivo.ano
     ).values_list('data_inicio', 'data_fim')
     
     if not validades:
