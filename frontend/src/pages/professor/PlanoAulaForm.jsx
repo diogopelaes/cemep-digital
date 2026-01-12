@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
     Card, Loading, Select, Input,
@@ -12,6 +12,7 @@ export default function PlanoAulaForm() {
     const navigate = useNavigate()
     const { id } = useParams()
     const isEditing = !!id
+    const conteudoRef = useRef(null)
 
     const [loading, setLoading] = useState(isEditing)
     const [submitting, setSubmitting] = useState(false)
@@ -63,8 +64,8 @@ export default function PlanoAulaForm() {
             setTurmasMap(res.data.turmas_por_disciplina || {})
             setHabilidadesMap(res.data.habilidades_por_disciplina || {})
 
-            // Se houver apenas uma disciplina, seleciona automaticamente se não estiver editando
-            if (loadedDisciplinas.length === 1 && !isEditing) {
+            // Se houver apenas uma disciplina, seleciona automaticamente
+            if (loadedDisciplinas.length === 1) {
                 setFormData(prev => ({ ...prev, disciplina: loadedDisciplinas[0].id }))
             }
 
@@ -144,8 +145,13 @@ export default function PlanoAulaForm() {
         <div className="max-w-4xl mx-auto space-y-6 p-4 lg:p-8">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white">
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
                         {isEditing ? 'Editar Plano de Aula' : 'Novo Plano de Aula'}
+                        {disciplinas.length === 1 && (
+                            <span className="text-primary-600 dark:text-primary-400 font-medium opacity-80 border-l-2 border-slate-300 dark:border-slate-600 pl-3 ml-1">
+                                {disciplinas[0].nome}
+                            </span>
+                        )}
                     </h1>
                     <p className="text-slate-500 text-sm">
                         {isEditing ? 'Atualize o planejamento pedagógico' : 'Crie um novo planejamento para suas turmas'}
@@ -166,16 +172,26 @@ export default function PlanoAulaForm() {
                             />
                         </div>
 
-                        <div className="md:col-span-2">
-                            <Select
-                                label="Disciplina"
-                                value={formData.disciplina}
-                                options={disciplinas.map(d => ({ value: d.id, label: d.nome }))}
-                                onChange={(e) => setFormData({ ...formData, disciplina: e.target.value })}
-                                required
-                                placeholder="Selecione a disciplina..."
-                            />
-                        </div>
+                        {disciplinas.length > 1 && (
+                            <div className="md:col-span-2">
+                                <Select
+                                    label="Disciplina"
+                                    value={formData.disciplina}
+                                    options={disciplinas.map(d => ({ value: d.id, label: d.nome }))}
+                                    onChange={(e) => {
+                                        const val = e.target.value
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            disciplina: val,
+                                            turmas: [],
+                                            habilidades: []
+                                        }))
+                                    }}
+                                    required
+                                    placeholder="Selecione a disciplina..."
+                                />
+                            </div>
+                        )}
 
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
@@ -225,24 +241,10 @@ export default function PlanoAulaForm() {
                         </div>
                     )}
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            Conteúdo <span className="text-xs font-normal text-slate-500 ml-1">(Obrigatório se nenhuma habilidade for selecionada)</span>
-                        </label>
-                        <div className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-600">
-                            <textarea
-                                className="w-full h-40 p-4 resize-none focus:outline-none dark:bg-slate-800 dark:text-white"
-                                placeholder="Descreva o conteúdo do plano de aula..."
-                                value={formData.conteudo}
-                                onChange={(e) => setFormData({ ...formData, conteudo: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    {formData.disciplina && (
-                        <div className="mt-8">
+                    {formData.disciplina && habilidades.length > 0 && (
+                        <div className="mt-6">
                             <MultiCombobox
-                                label="Habilidades BNCC da Disciplina"
+                                label="Habilidades para a Disciplina"
                                 placeholder="Selecione as habilidades..."
                                 options={habilidades.map(h => ({
                                     value: h.id,
@@ -251,12 +253,27 @@ export default function PlanoAulaForm() {
                                 }))}
                                 value={formData.habilidades}
                                 onChange={(newValues) => setFormData({ ...formData, habilidades: newValues })}
+                                onEnter={() => conteudoRef.current?.focus()}
                             />
-                            {habilidades.length === 0 && (
-                                <p className="text-sm text-slate-500 mt-2">Nenhuma habilidade cadastrada para esta disciplina.</p>
-                            )}
                         </div>
                     )}
+
+                    <div className="pt-4 border-t border-slate-100 dark:border-slate-700/50 mt-8">
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                            Conteúdo <span className="text-xs font-normal text-slate-500 ml-1">
+                                ({habilidades.length > 0 ? 'Obrigatório se nenhuma habilidade for selecionada' : 'Obrigatório'})
+                            </span>
+                        </label>
+                        <div className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-600">
+                            <textarea
+                                ref={conteudoRef}
+                                className="w-full h-40 p-4 resize-none focus:outline-none dark:bg-slate-800 dark:text-white"
+                                placeholder="Descreva o conteúdo do plano de aula..."
+                                value={formData.conteudo}
+                                onChange={(e) => setFormData({ ...formData, conteudo: e.target.value })}
+                            />
+                        </div>
+                    </div>
 
                     <FormActionsProfessor
                         saving={submitting}
