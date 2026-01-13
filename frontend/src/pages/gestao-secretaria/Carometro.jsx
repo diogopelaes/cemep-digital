@@ -23,7 +23,7 @@ export default function Carometro() {
             setData(response.data)
         } catch (error) {
             console.error(error)
-            toast.error('Erro ao carregar carômetro.')
+            toast.error('Erro ao carregar fotos.')
         } finally {
             setLoading(false)
         }
@@ -49,7 +49,7 @@ export default function Carometro() {
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
-                        Carômetro
+                        Fotos
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-1">
                         {turma.nome}

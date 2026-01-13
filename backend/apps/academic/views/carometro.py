@@ -8,7 +8,7 @@ from django.db.models import F
 
 class CarometroView(APIView):
     """
-    API View para exibir o Carômetro (lista de fotos e nomes) de uma turma.
+    API View para exibir o Fotos (lista de fotos e nomes) de uma turma.
     """
 
     def get(self, request, turma_id):

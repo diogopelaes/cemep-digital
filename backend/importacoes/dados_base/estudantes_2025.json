@@ -22,7 +22,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "alopes.jpg"
     },
     {
         "NOME_COMPLETO": "Alexandre Servolo Mateus",
@@ -47,7 +48,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "a_servolo.jpg"
     },
     {
         "NOME_COMPLETO": "Amanda Marin Rodrigues",
@@ -72,7 +74,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "amanda_rodrigues.jpg"
     },
     {
         "NOME_COMPLETO": "Ana Beatriz Ferrreira Do Vale",
@@ -97,7 +100,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "avale.jpg"
     },
     {
         "NOME_COMPLETO": "Ana Beatriz Padilha Fontoura",
@@ -122,7 +126,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "beatriz_fontoura.jpg"
     },
     {
         "NOME_COMPLETO": "Ana Clara Amaral De Oliveira",
@@ -147,7 +152,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "aamaral.jpg"
     },
     {
         "NOME_COMPLETO": "Ana Clara De Brito",
@@ -172,7 +178,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "ana_clara_brito.jpg"
     },
     {
         "NOME_COMPLETO": "Ana Julia Carvalho Rodrigues",
@@ -197,7 +204,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "aj_rodrigues.jpg"
     },
     {
         "NOME_COMPLETO": "Ana Julia Zanardi",
@@ -222,7 +230,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "azanardi.jpg"
     },
     {
         "NOME_COMPLETO": "Ana Leticia Franciosi Dos Santos",
@@ -247,7 +256,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "ana_franciosi.jpg"
     },
     {
         "NOME_COMPLETO": "Ana Lívia Evaristo Piva",
@@ -272,7 +282,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "ana_piva.jpg"
     },
     {
         "NOME_COMPLETO": "Ana Luiza Cortello Dos Santos",
@@ -297,7 +308,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "alsantos.jpg"
     },
     {
         "NOME_COMPLETO": "Ana Maria Padilha Carneiro",
@@ -322,7 +334,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "acarneiro.jpg"
     },
     {
         "NOME_COMPLETO": "Ananda Gabrielly França Dos Santos",
@@ -347,7 +360,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "ananda_santos.jpg"
     },
     {
         "NOME_COMPLETO": "Apolo Almeida Fernades Nogueira",
@@ -372,7 +386,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "anogueira.jpg"
     },
     {
         "NOME_COMPLETO": "Arthur Alexandrino Fabri",
@@ -397,7 +412,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "arthur_fabri.jpg"
     },
     {
         "NOME_COMPLETO": "Arthur Eduardo Rosario Pereira",
@@ -422,7 +438,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "arthur_rosario.jpg"
     },
     {
         "NOME_COMPLETO": "Arthur Oliveira Leal",
@@ -447,7 +464,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "aleal.jpg"
     },
     {
         "NOME_COMPLETO": "Beatriz Marques De Lima",
@@ -472,7 +490,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "beatriz_marques_lima.jpg"
     },
     {
         "NOME_COMPLETO": "Beatriz Terto Soares",
@@ -497,7 +516,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "beatriz_terto.jpg"
     },
     {
         "NOME_COMPLETO": "Bianca Yasmim Ribeiro E Silva",
@@ -522,7 +542,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "bianca_yasmim.jpg"
     },
     {
         "NOME_COMPLETO": "Brenda Tayna Moreira",
@@ -547,7 +568,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "bmoreira.jpg"
     },
     {
         "NOME_COMPLETO": "Bruno Brayn Vedovello",
@@ -572,7 +594,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "b_vedovello.jpg"
     },
     {
         "NOME_COMPLETO": "Bruno José De Brito",
@@ -597,7 +620,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "bbrito.jpg"
     },
     {
         "NOME_COMPLETO": "Caio Henrique Malavasi",
@@ -622,7 +646,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "cmalavasi.jpg"
     },
     {
         "NOME_COMPLETO": "Cauã Logato Marmirolli",
@@ -647,7 +672,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "caua_marmirolli.jpg"
     },
     {
         "NOME_COMPLETO": "Claudio Camilo Rodrigues Moura",
@@ -672,7 +698,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "cmoura.jpg"
     },
     {
         "NOME_COMPLETO": "Daízi Cuchi Vilela",
@@ -697,7 +724,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "daizi_vilela.jpg"
     },
     {
         "NOME_COMPLETO": "Daniel Barbosa De Paula",
@@ -722,7 +750,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "dpaula.jpg"
     },
     {
         "NOME_COMPLETO": "Daniel Moreira Da Silva",
@@ -747,7 +776,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "daniel_moreira.jpg"
     },
     {
         "NOME_COMPLETO": "Danilo Correia Surian",
@@ -772,7 +802,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "dsurian.jpg"
     },
     {
         "NOME_COMPLETO": "Davi André Dias Da Silva",
@@ -797,7 +828,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "davi_dias_silva.jpg"
     },
     {
         "NOME_COMPLETO": "Davi Barbosa Maciel",
@@ -822,7 +854,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "dmaciel.jpg"
     },
     {
         "NOME_COMPLETO": "Davi De Miranda Motta",
@@ -847,7 +880,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "davi_motta.jpg"
     },
     {
         "NOME_COMPLETO": "Davi De Souza Bragança",
@@ -872,7 +906,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "davi_braganca.jpg"
     },
     {
         "NOME_COMPLETO": "Davi Oliveira Poletto",
@@ -897,7 +932,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "davi_poletto.jpg"
     },
     {
         "NOME_COMPLETO": "Edgar Bicalho Da Rocha",
@@ -922,7 +958,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "edgar_rocha.jpg"
     },
     {
         "NOME_COMPLETO": "Eduarda Castanho Da Silva",
@@ -947,7 +984,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "ecsilva.jpg"
     },
     {
         "NOME_COMPLETO": "Emanuel De Almeida Gadioli",
@@ -972,7 +1010,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "e_gadioli.jpg"
     },
     {
         "NOME_COMPLETO": "Emmanuel Vinicius Valdívia Martinez",
@@ -997,7 +1036,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "emmanuel_valdivia.jpg"
     },
     {
         "NOME_COMPLETO": "Enzo Enrico De Freitas Luchetti M. Godinho",
@@ -1022,7 +1062,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "enzo_luchetti.jpg"
     },
     {
         "NOME_COMPLETO": "Enzo Gabiatti Lins",
@@ -1047,7 +1088,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "e_lins.jpg"
     },
     {
         "NOME_COMPLETO": "Enzo Hisashi Yamamoto Cabral",
@@ -1072,7 +1114,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "enzo_cabral.jpg"
     },
     {
         "NOME_COMPLETO": "Enzo Seiichi Yamakawa",
@@ -1097,7 +1140,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "eyamakawa.jpg"
     },
     {
         "NOME_COMPLETO": "Erick Fulgencio De Oliveira",
@@ -1122,7 +1166,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "efoliveira.jpg"
     },
     {
         "NOME_COMPLETO": "Estevam Godoy Fernandes",
@@ -1147,7 +1192,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "estevan_fernandes.jpg"
     },
     {
         "NOME_COMPLETO": "Felipe De Oliveira Pereira",
@@ -1172,7 +1218,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "f_pereira.jpg"
     },
     {
         "NOME_COMPLETO": "Felipe Gusmão Andrade",
@@ -1197,7 +1244,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "fandrade.jpg"
     },
     {
         "NOME_COMPLETO": "Felipe Teodoro",
@@ -1222,7 +1270,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "fteodoro.jpg"
     },
     {
         "NOME_COMPLETO": "Fernanda Gabriely Tavares Toledo",
@@ -1247,7 +1296,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "fernanda_toledo.jpg"
     },
     {
         "NOME_COMPLETO": "Fernanda Montrezol Dos Santos",
@@ -1272,7 +1322,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "fernanda_santos.jpg"
     },
     {
         "NOME_COMPLETO": "Gabriel Alan Cunha Silva",
@@ -1297,7 +1348,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "gabriel_alan.jpg"
     },
     {
         "NOME_COMPLETO": "Gabriel Carlos Da Silva",
@@ -1322,7 +1374,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "gabriel_carlos.jpg"
     },
     {
         "NOME_COMPLETO": "Gabriel Isaac Silva Coelho",
@@ -1347,7 +1400,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "gabriel_i_coelho.jpg"
     },
     {
         "NOME_COMPLETO": "Gabriel Nascimento De Oliveira",
@@ -1372,7 +1426,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "goliveira.jpg"
     },
     {
         "NOME_COMPLETO": "Gabriela Correia Cunha Rodrigues",
@@ -1397,7 +1452,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "grodrigues.jpg"
     },
     {
         "NOME_COMPLETO": "Gabriela Salgado Nascimento",
@@ -1422,7 +1478,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "gnascimento.jpg"
     },
     {
         "NOME_COMPLETO": "Giovana Cristina Ferreira",
@@ -1447,7 +1504,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "gferreira.jpg"
     },
     {
         "NOME_COMPLETO": "Giovanne Santos Martins",
@@ -1472,7 +1530,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "gmartins.jpg"
     },
     {
         "NOME_COMPLETO": "Giovanny De Araujo Campos",
@@ -1497,7 +1556,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "giovanny_campos.jpg"
     },
     {
         "NOME_COMPLETO": "Girlany Karine Barros Da Silva",
@@ -1522,7 +1582,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "gkbsilva.jpg"
     },
     {
         "NOME_COMPLETO": "Giulia Forti Landucci",
@@ -1547,7 +1608,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "glanducci.jpg"
     },
     {
         "NOME_COMPLETO": "Grasiely Amaro De Carvalho",
@@ -1572,7 +1634,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "grasiely_carvalho.jpg"
     },
     {
         "NOME_COMPLETO": "Guilherme Adan Machado",
@@ -1597,7 +1660,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "guilherme_machado.jpg"
     },
     {
         "NOME_COMPLETO": "Guilherme Kauê Souza Da Silva",
@@ -1622,7 +1686,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "gksilva.jpg"
     },
     {
         "NOME_COMPLETO": "Heloísa Maria Carvalho",
@@ -1647,7 +1712,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "hcarvalho.jpg"
     },
     {
         "NOME_COMPLETO": "Henry Kaito Yamanaka Nakasone",
@@ -1672,7 +1738,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "hnakasone.jpg"
     },
     {
         "NOME_COMPLETO": "Igor Portal Alves",
@@ -1697,7 +1764,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "igor_alves.jpg"
     },
     {
         "NOME_COMPLETO": "Isabela Lourenço Dos Santos",
@@ -1722,7 +1790,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "isa_santos.jpg"
     },
     {
         "NOME_COMPLETO": "Isadora Nascimento Cassiano",
@@ -1747,7 +1816,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "icassiano.jpg"
     },
     {
         "NOME_COMPLETO": "Joanna Francisca Silva Brito",
@@ -1772,7 +1842,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "jbrito.jpg"
     },
     {
         "NOME_COMPLETO": "João Gabriel Carvalho Scaramal",
@@ -1797,7 +1868,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "jscaramal.jpg"
     },
     {
         "NOME_COMPLETO": "João Gabriel De Oliveira M. Da Silva",
@@ -1822,7 +1894,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "jgsilva.jpg"
     },
     {
         "NOME_COMPLETO": "João Victor Da Silva Charme",
@@ -1847,7 +1920,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "jcharme.jpg"
     },
     {
         "NOME_COMPLETO": "João Vitor Do Nascimento Nakano",
@@ -1872,7 +1946,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "joao_vitor_nakano.jpg"
     },
     {
         "NOME_COMPLETO": "João Vitor Silva De Souza",
@@ -1897,7 +1972,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "joao_souza.jpg"
     },
     {
         "NOME_COMPLETO": "José Eduardo Leite Da Silva",
@@ -1922,7 +1998,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "jose_leite.jpg"
     },
     {
         "NOME_COMPLETO": "José Francisco Ledesma",
@@ -1947,7 +2024,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "jose_ledesma.jpg"
     },
     {
         "NOME_COMPLETO": "Jucielly Aparecida Nepununcena De Lima",
@@ -1972,7 +2050,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "jlima.jpg"
     },
     {
         "NOME_COMPLETO": "Julia Cosmo Morais Ferreira",
@@ -1997,7 +2076,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "jferreira.jpg"
     },
     {
         "NOME_COMPLETO": "Júlia Domingues Araujo",
@@ -2022,7 +2102,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "jaraujo.jpg"
     },
     {
         "NOME_COMPLETO": "Julia Negri De Oliveira",
@@ -2047,7 +2128,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "j_negri.jpg"
     },
     {
         "NOME_COMPLETO": "Kaike Rafael Santos De Almeida",
@@ -2072,7 +2154,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "kaike_almeida.jpg"
     },
     {
         "NOME_COMPLETO": "Kauan Lopes Da Silva",
@@ -2097,7 +2180,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "ksilva.jpg"
     },
     {
         "NOME_COMPLETO": "Kemilly Manueli Torres Da Silva",
@@ -2122,7 +2206,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "kmsilva.jpg"
     },
     {
         "NOME_COMPLETO": "Kimberly Lara Rodrigues Camara",
@@ -2147,7 +2232,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "kimberly_camara.jpg"
     },
     {
         "NOME_COMPLETO": "Lavínia Lahr Alvarenga",
@@ -2172,7 +2258,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "lavinia_alvarenga.jpg"
     },
     {
         "NOME_COMPLETO": "Leonardo Araújo De Oliveira",
@@ -2197,7 +2284,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "leonardo_araujo.jpg"
     },
     {
         "NOME_COMPLETO": "Letícia Assis Camillo",
@@ -2222,7 +2310,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "leticia_camilo.jpg"
     },
     {
         "NOME_COMPLETO": "Letícia De Paula Vedovello",
@@ -2247,7 +2336,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "leticia_vedovello.jpg"
     },
     {
         "NOME_COMPLETO": "Leticia Jangue Gadioli",
@@ -2272,7 +2362,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "lgadioli.jpg"
     },
     {
         "NOME_COMPLETO": "Leticia Oksanicz Mano Bianco",
@@ -2297,7 +2388,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "lbianco.jpg"
     },
     {
         "NOME_COMPLETO": "Lívia Borges Ferro Lima",
@@ -2322,7 +2414,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "llima.jpg"
     },
     {
         "NOME_COMPLETO": "Lívia Ferreira Barbosa",
@@ -2347,7 +2440,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "lbarbosa.jpg"
     },
     {
         "NOME_COMPLETO": "Lorena Helmeister Furlan",
@@ -2372,7 +2466,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "lfurlan.jpg"
     },
     {
         "NOME_COMPLETO": "Luan Dias Marinho",
@@ -2397,7 +2492,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "lmarinho.jpg"
     },
     {
         "NOME_COMPLETO": "Lucas Batista Caldeira",
@@ -2422,7 +2518,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "lcaldeira.jpg"
     },
     {
         "NOME_COMPLETO": "Lucas Gabriel De Almeida",
@@ -2447,7 +2544,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "lucas_almeida1.jpg"
     },
     {
         "NOME_COMPLETO": "Luigi Michilin Ribeiro Da Silva",
@@ -2472,7 +2570,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "luigi_silva1.jpg"
     },
     {
         "NOME_COMPLETO": "Luiza Conde Alexandre Rocha",
@@ -2497,7 +2596,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "luiza_conde.jpg"
     },
     {
         "NOME_COMPLETO": "Marcelo Brugin Bodrini",
@@ -2522,7 +2622,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "marcelo_bodrini.jpg"
     },
     {
         "NOME_COMPLETO": "Marconi Feliciano Gomes Neto",
@@ -2547,7 +2648,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "marconi_neto.jpg"
     },
     {
         "NOME_COMPLETO": "Marcos Oliveira Batista",
@@ -2572,7 +2674,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mbatista.jpg"
     },
     {
         "NOME_COMPLETO": "Maria Clara De Camargo Calcagno",
@@ -2597,7 +2700,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mcalcagno.jpg"
     },
     {
         "NOME_COMPLETO": "Maria Eduarda Soriano",
@@ -2622,7 +2726,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "maria_soriano.jpg"
     },
     {
         "NOME_COMPLETO": "Maria Gabriela Fontes Cardoso",
@@ -2647,7 +2752,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mcardoso.jpg"
     },
     {
         "NOME_COMPLETO": "Mariana Ap. Dos Santos Silva",
@@ -2672,7 +2778,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mariana_silva1.jpg"
     },
     {
         "NOME_COMPLETO": "Mariana D'Elia Vinhal De Pádua",
@@ -2697,7 +2804,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mariana_padua.jpg"
     },
     {
         "NOME_COMPLETO": "Mateus Iório Chaim",
@@ -2722,7 +2830,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mateus_chaim.jpg"
     },
     {
         "NOME_COMPLETO": "Matheus Lanza De Queiroz",
@@ -2747,7 +2856,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "matheus_lanza.jpg"
     },
     {
         "NOME_COMPLETO": "Matheus Passos Miranda",
@@ -2772,7 +2882,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mmiranda.jpg"
     },
     {
         "NOME_COMPLETO": "Max Pierre Da Silva Rodrigues",
@@ -2797,7 +2908,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mrodrigues.jpg"
     },
     {
         "NOME_COMPLETO": "Melissa Eloise Silva De Souza",
@@ -2822,7 +2934,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "melissa_souza.jpg"
     },
     {
         "NOME_COMPLETO": "Miguel Luis Borçato",
@@ -2847,7 +2960,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mborcato.jpg"
     },
     {
         "NOME_COMPLETO": "Miguel Raboni Cordeiro",
@@ -2872,7 +2986,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mcordeiro.jpg"
     },
     {
         "NOME_COMPLETO": "Milena Von Zuben Bueno De Castro",
@@ -2897,7 +3012,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "milena_castro.jpg"
     },
     {
         "NOME_COMPLETO": "Mirela Harumi Kimura De Souza",
@@ -2922,7 +3038,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mirela_kimura.jpg"
     },
     {
         "NOME_COMPLETO": "Mirella Maria Rosa",
@@ -2947,7 +3064,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mrosa.jpg"
     },
     {
         "NOME_COMPLETO": "Murilo Di Blasio Souza",
@@ -2972,7 +3090,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "mbsouza.jpg"
     },
     {
         "NOME_COMPLETO": "Nicole Emanuella Oliveira Moreira",
@@ -2997,7 +3116,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "nmoreira.jpg"
     },
     {
         "NOME_COMPLETO": "Nina Chaves Vicente",
@@ -3022,7 +3142,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "nvicente.jpg"
     },
     {
         "NOME_COMPLETO": "Pedro Henrique Pires Fernandes",
@@ -3047,7 +3168,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "pedroh_fernandes.jpg"
     },
     {
         "NOME_COMPLETO": "Pedro Henrique Teixeira Bauman",
@@ -3072,7 +3194,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "pbauman.jpg"
     },
     {
         "NOME_COMPLETO": "Rafael Souza Castilho",
@@ -3097,7 +3220,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "rcastilho.jpg"
     },
     {
         "NOME_COMPLETO": "Rafaela Bacan Dos Anjos",
@@ -3122,7 +3246,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "rafaella_anjos.jpg"
     },
     {
         "NOME_COMPLETO": "Rafaela Oliveira Munsignatti",
@@ -3147,7 +3272,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "rafa_munsignatti.jpg"
     },
     {
         "NOME_COMPLETO": "Raul Barrella Sotero",
@@ -3172,7 +3298,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "raul_sotero.jpg"
     },
     {
         "NOME_COMPLETO": "Rayssa Gabrielle Macedo Rodrigues",
@@ -3197,7 +3324,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "rrodrigues.jpg"
     },
     {
         "NOME_COMPLETO": "Renan Dos Santos Ribeiro",
@@ -3222,7 +3350,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "renan_s_ribeiro.jpg"
     },
     {
         "NOME_COMPLETO": "Rodrigo Braz Chionha",
@@ -3247,7 +3376,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "rchionha.jpg"
     },
     {
         "NOME_COMPLETO": "Ryan Dias Muniz",
@@ -3272,7 +3402,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "rmuniz.jpg"
     },
     {
         "NOME_COMPLETO": "Ryan Guilherme Jacundina",
@@ -3297,7 +3428,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "ryan_jacundina.jpg"
     },
     {
         "NOME_COMPLETO": "Sara Dos Santos Silva",
@@ -3322,7 +3454,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "ssilva.jpg"
     },
     {
         "NOME_COMPLETO": "Sarah Rebeca Farias Sousa",
@@ -3347,7 +3480,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "ssousa.jpg"
     },
     {
         "NOME_COMPLETO": "Sarah Thaynara Gomes Subtil",
@@ -3372,7 +3506,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "sarah_gomes.jpg"
     },
     {
         "NOME_COMPLETO": "Sophia Novais Moraes",
@@ -3397,7 +3532,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "snmoraes.jpg"
     },
     {
         "NOME_COMPLETO": "Thiago Levi De Souza Oliveira",
@@ -3422,7 +3558,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "toliveira.jpg"
     },
     {
         "NOME_COMPLETO": "Thiago Moda Da Silva",
@@ -3447,7 +3584,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "tsilva.jpg"
     },
     {
         "NOME_COMPLETO": "Thiago Moreira Moretti",
@@ -3472,7 +3610,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "thiago_m_moretti.jpg"
     },
     {
         "NOME_COMPLETO": "Valentina Gonçalves Mascarenhas",
@@ -3497,7 +3636,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "valentina_mascarenhas.jpg"
     },
     {
         "NOME_COMPLETO": "Victor Hugo De Freitas Padovini",
@@ -3522,7 +3662,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "vpadovini.jpg"
     },
     {
         "NOME_COMPLETO": "Victor Hugo Pinheiro Gonçalves",
@@ -3547,7 +3688,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "vitorhugo_pinheiro.jpg"
     },
     {
         "NOME_COMPLETO": "Victor Hugo Thomaz",
@@ -3572,7 +3714,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "vthomaz.jpg"
     },
     {
         "NOME_COMPLETO": "Victor Yuuki Nakamura",
@@ -3597,7 +3740,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "nakamura.jpg"
     },
     {
         "NOME_COMPLETO": "Vinícios Dos Santos Martins",
@@ -3622,7 +3766,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "vmartins.jpg"
     },
     {
         "NOME_COMPLETO": "Vinicius Fernandes Gatti",
@@ -3647,7 +3792,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "vgatti.jpg"
     },
     {
         "NOME_COMPLETO": "Vinícius Gouvêa Farias",
@@ -3672,7 +3818,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "vfarias.jpg"
     },
     {
         "NOME_COMPLETO": "Vinícius Martins De Camargo",
@@ -3697,7 +3844,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "vinicius_m_camargo.jpg"
     },
     {
         "NOME_COMPLETO": "Vinicius Souza Marinho",
@@ -3722,7 +3870,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "vmarinho.jpg"
     },
     {
         "NOME_COMPLETO": "Vitor Pontes Breda",
@@ -3747,7 +3896,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "vbreda.jpg"
     },
     {
         "NOME_COMPLETO": "Vitória De Almeida Carvalho Correa",
@@ -3772,7 +3922,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "vcorrea.jpg"
     },
     {
         "NOME_COMPLETO": "Willian Leme Alves",
@@ -3797,7 +3948,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "walves.jpg"
     },
     {
         "NOME_COMPLETO": "Yago Fellipe Dos Santos Borges",
@@ -3822,7 +3974,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "yago_borges.jpg"
     },
     {
         "NOME_COMPLETO": "Yasmin Kaori Massuda",
@@ -3847,7 +4000,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2024-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "ymassuda.jpg"
     },
     {
         "NOME_COMPLETO": "Yuri Coêlho Purcino",
@@ -3872,7 +4026,8 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "yuri_purcino.jpg"
     },
     {
         "NOME_COMPLETO": "Zakeu Goveia De Sousa",
@@ -3897,6 +4052,7 @@
         "CURSO_SIGLA": "EM",
         "DATA_ENTRADA_CURSO": "2025-01-02",
         "DATA_SAIDA_CURSO": null,
-        "STATUS_MATRICULA": "MATRICULADO"
+        "STATUS_MATRICULA": "MATRICULADO",
+        "FOTO": "zakeu_sousa.jpg"
     }
 ]

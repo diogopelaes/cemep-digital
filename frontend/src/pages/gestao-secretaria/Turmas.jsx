@@ -403,7 +403,7 @@ export default function Turmas() {
                               onClick: (e) => handleGerarLista(turma, e)
                             },
                             {
-                              label: 'Visualizar Carômetro',
+                              label: 'Fotos',
                               icon: HiPhotograph,
                               onClick: () => navigate(`/turmas/${turma.id}/carometro`)
                             },

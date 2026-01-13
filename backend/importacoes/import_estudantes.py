@@ -22,6 +22,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core_project.settings')
 django.setup()
 
 from django.contrib.auth import get_user_model
+from django.core.files import File
 from apps.academic.models import Estudante, MatriculaCEMEP
 from apps.core.models import Curso
 
@@ -88,6 +89,20 @@ def import_estudantes(json_path):
 
             if u_created:
                 contador_user_criados += 1
+
+            # 1.1 Importar Foto
+            foto_nome = item.get('FOTO')
+            if foto_nome:
+                foto_path = IMPORT_DIR / 'dados_base' / 'fotos-estudantes' / foto_nome
+                if foto_path.exists():
+                    # Importa se o usuário foi criado agora ou se ainda não tem foto
+                    if u_created or not user.foto:
+                        with open(foto_path, 'rb') as f:
+                            user.foto.save(foto_nome, File(f), save=True)
+                else:
+                    # Opcional: print avisando que a foto não foi encontrada
+                    # print(f"Aviso: Foto {foto_nome} não encontrada.")
+                    pass
             
             total_processed = contador_user_criados + contador_user_atualizados
             if total_processed % 50 == 0:

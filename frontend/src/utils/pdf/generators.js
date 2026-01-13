@@ -4,7 +4,7 @@ import { addHeader, addFooter } from './header'
 import { COLORS, CONFIG } from './config'
 
 /**
- * Gera o PDF do Carômetro
+ * Gera o PDF das Fotos
  * @param {Object} turma - Dados da turma
  * @param {Array} estudantes - Lista de estudantes
  */
@@ -15,7 +15,7 @@ export async function generateCarometroPDF(turma, estudantes) {
 
     // === CABEÇALHO PADRONIZADO ===
     let y = await addHeader(doc, {
-        title: 'CARÔMETRO',
+        title: 'Fotos',
         subtitle1: turma.nome_completo + ' - ' + turma.ano_letivo,
         subtitle2: INSTITUTION_NAME,
         info1: `Total de Estudantes: ${estudantes.length}`,

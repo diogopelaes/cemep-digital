@@ -174,7 +174,7 @@ export default function MinhasTurmas() {
                             className="flex-1 py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all border-r border-slate-100 dark:border-slate-800 active:scale-95"
                         >
                             <HiPhotograph className="h-6 w-6" />
-                            <span>Carômetro</span>
+                            <span>Fotos</span>
                         </button>
 
                         <button
@@ -301,7 +301,7 @@ export default function MinhasTurmas() {
                                                         onClick: (e) => handleGerarLista(turma, e)
                                                     },
                                                     {
-                                                        label: 'Visualizar Carômetro',
+                                                        label: 'Fotos',
                                                         icon: HiPhotograph,
                                                         onClick: () => navigate(`/turmas/${turma.id}/carometro`)
                                                     },

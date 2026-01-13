@@ -45,7 +45,7 @@ export default function TurmaHeader({ turma, onBack, onEdit, onCarometro }) {
                     icon={HiPhotograph}
                     onClick={onCarometro}
                 >
-                    Carômetro
+                    Fotos
                 </Button>
             )}
         </div>

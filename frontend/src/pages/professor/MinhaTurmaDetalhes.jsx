@@ -230,9 +230,9 @@ export default function MinhaTurmaDetalhes() {
                         icon={HiPhotograph}
                         onClick={() => navigate(`/turmas/${id}/carometro`)}
                         className="shrink-0"
-                        title="Visualizar Carômetro"
+                        title="Fotos"
                     >
-                        <span className="hidden sm:inline">Carômetro</span>
+                        <span className="hidden sm:inline">Fotos</span>
                     </Button>
                 </div>
             </div>
