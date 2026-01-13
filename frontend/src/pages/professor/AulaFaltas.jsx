@@ -214,22 +214,29 @@ export default function AulaFaltas() {
 
     // Estado vazio
     const EmptyState = () => (
-        <div className="col-span-full py-12 text-center text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700">
-            <HiClipboardCheck className="mx-auto h-12 w-12 text-slate-300 mb-3" />
-            <p>Nenhuma aula registrada neste período.</p>
-        </div>
+        <Card className="p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                <HiClipboardCheck className="h-8 w-8 text-slate-300" />
+            </div>
+            <h3 className="text-lg font-medium text-slate-800 dark:text-white mb-2">
+                Nenhuma aula encontrada
+            </h3>
+            <p className="text-slate-500 dark:text-slate-400">
+                Nenhuma aula registrada neste período ou para os filtros selecionados.
+            </p>
+        </Card>
     )
 
     if (loading) return <Loading />
 
     return (
-        <div className="space-y-6 animate-fade-in p-4 lg:p-8">
+        <div className="space-y-6 animate-fade-in">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white">
+                    <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
                         Aula e Faltas
                     </h1>
-                    <p className="text-slate-500 text-sm">Registre aulas e controle a frequência</p>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1">Registre aulas e controle a frequência</p>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -304,31 +311,41 @@ export default function AulaFaltas() {
                     </div>
 
                     {/* Desktop: Tabela */}
-                    <Card hover={false} className="hidden md:block overflow-hidden p-0">
+                    <div className="hidden md:block">
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableHeader>Data</TableHeader>
                                     <TableHeader>Turma</TableHeader>
+                                    <TableHeader>Data</TableHeader>
                                     {showDisciplinaColumn && <TableHeader>Disciplina</TableHeader>}
                                     {bimestreSelecionado === '' && <TableHeader>Bimestre</TableHeader>}
                                     <TableHeader className="th-center">Faltas</TableHeader>
                                     <TableHeader className="th-center">Nº Aulas</TableHeader>
-                                    <TableHeader className="th-center">Ações</TableHeader>
+                                    <TableHeader className="th-center font-bold text-primary-600 dark:text-primary-400">Ações</TableHeader>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {aulasOrdenadas.map((aula) => (
-                                    <TableRow key={aula.id} className="group">
+                                    <TableRow key={aula.id}>
                                         <TableCell>
-                                            <span className="text-sm text-slate-500 whitespace-nowrap">
-                                                {formatDateShortBR(aula.data)}
-                                            </span>
+                                            <div
+                                                className="cursor-pointer group inline-block"
+                                                onClick={() => navigate(`/aula-faltas/${aula.id}/editar`)}
+                                            >
+                                                <p className="font-medium text-slate-800 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                                    {aula.turma_nome}
+                                                </p>
+                                            </div>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="font-medium text-slate-800 dark:text-white">
-                                                {aula.turma_sigla}
-                                            </span>
+                                            <div
+                                                className="cursor-pointer group inline-block"
+                                                onClick={() => navigate(`/aula-faltas/${aula.id}/editar`)}
+                                            >
+                                                <span className="text-sm text-slate-500 whitespace-nowrap font-medium group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                                    {formatDateShortBR(aula.data)}
+                                                </span>
+                                            </div>
                                         </TableCell>
                                         {showDisciplinaColumn && (
                                             <TableCell>
@@ -355,32 +372,24 @@ export default function AulaFaltas() {
                                             </span>
                                         </TableCell>
                                         <TableCell className="td-center">
-                                            <ActionSelect
-                                                size="sm"
-                                                actions={[
-                                                    {
-                                                        label: 'Editar Aula',
-                                                        icon: HiPencil,
-                                                        onClick: () => navigate(`/aula-faltas/${aula.id}/editar`)
-                                                    },
-                                                    {
-                                                        label: 'Excluir Aula',
-                                                        icon: HiTrash,
-                                                        variant: 'danger',
-                                                        confirm: {
-                                                            title: 'Excluir Registro de Aula?',
-                                                            message: 'Esta ação não poderá ser desfeita.'
-                                                        },
-                                                        onClick: () => handleDelete(aula.id)
-                                                    }
-                                                ]}
-                                            />
+                                            <PopConfirm
+                                                title="Excluir Registro de Aula?"
+                                                message="Esta ação não poderá ser desfeita."
+                                                onConfirm={() => handleDelete(aula.id)}
+                                            >
+                                                <button
+                                                    className="p-2 text-slate-400 hover:text-danger-600 dark:hover:text-danger-400 transition-colors rounded-lg hover:bg-danger-50 dark:hover:bg-danger-900/20"
+                                                    title="Excluir Aula"
+                                                >
+                                                    <HiTrash className="h-5 w-5" />
+                                                </button>
+                                            </PopConfirm>
                                         </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
-                    </Card>
+                    </div>
                 </>
             )}
         </div>
