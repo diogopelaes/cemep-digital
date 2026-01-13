@@ -4,7 +4,7 @@ App Evaluation - Configurações, Avaliações, Notas, Recuperação
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
-from apps.core.models import Funcionario, ProfessorDisciplinaTurma, UUIDModel
+from apps.core.models import Funcionario, ProfessorDisciplinaTurma, UUIDModel, Arquivo
 from apps.academic.models import Estudante, MatriculaTurma
 
 
@@ -236,6 +236,18 @@ class Avaliacao(UUIDModel):
     - AVALIACAO_EXTRA: Uma única por bimestre, valor <= VALOR_MAXIMO
     """
 
+    titulo = models.CharField(
+        max_length=255,
+        verbose_name='Título da Avaliação'
+
+    )
+
+    descricao = models.TextField(
+        verbose_name='Descrição da Avaliação',
+        null=True,
+        blank=True,
+    )
+
     professor_disciplina_turma = models.ForeignKey(
         ProfessorDisciplinaTurma,
         on_delete=models.CASCADE,
@@ -269,6 +281,12 @@ class Avaliacao(UUIDModel):
 
     data_inicio = models.DateField(verbose_name='Data de inicio da avaliação')
     data_fim = models.DateField(verbose_name='Data de fim da avaliação')
+    arquivos = models.ManyToManyField(
+        Arquivo,
+        blank=True,
+        related_name='avaliacoes',
+        verbose_name='Arquivos'
+    )
     
     class Meta:
         verbose_name = 'Avaliação'
@@ -354,6 +372,18 @@ class Avaliacao(UUIDModel):
 
 class ControleVisto(UUIDModel):
     """Registro de visto de um estudante."""
+
+    titulo = models.CharField(
+        max_length=255,
+        verbose_name='Título da Avaliação'
+
+    )
+
+    descricao = models.TextField(
+        verbose_name='Descrição da Avaliação',
+        null=True,
+        blank=True,
+    )
     
     matricula_turma = models.ForeignKey(
         MatriculaTurma,
@@ -379,6 +409,12 @@ class ControleVisto(UUIDModel):
         null=True,
         blank=True,
         verbose_name='Bimestre'
+    )
+    arquivos = models.ManyToManyField(
+        Arquivo,
+        blank=True,
+        related_name='vistos',
+        verbose_name='Arquivos'
     )
     
     class Meta:
