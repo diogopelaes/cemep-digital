@@ -425,7 +425,8 @@ export default function AulaFaltasForm() {
                                                         <img
                                                             src={studentData.foto}
                                                             alt={studentData.nome_social || studentData.usuario?.first_name}
-                                                            className="w-full h-full object-cover"
+                                                            className="w-full h-full"
+                                                            style={{ imageRendering: 'auto' }}
                                                         />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center">
