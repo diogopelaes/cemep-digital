@@ -93,15 +93,14 @@ export default function AulaFaltasForm() {
                 const res = await pedagogicalAPI.aulasFaltas.estudantesPorTurma(professorDisciplinaTurmaId)
                 setEstudantes(processFaltasMask(res.data.estudantes || [], stateData.numeroAulas))
 
-                // Tenta identificar o bimestre pela data
-                try {
-                    const checkRes = await pedagogicalAPI.aulasFaltas.verificarDataRegistro(stateData.data)
-                    if (checkRes.data && checkRes.data.valida) {
-                        setBimestre(checkRes.data.bimestre)
-                    }
-                } catch (e) {
-                    console.error("Erro ao verificar bimestre", e)
+                // Valida a data e identifica o bimestre (regras pedagógicas do backend)
+                const checkRes = await pedagogicalAPI.aulasFaltas.verificarDataRegistro(stateData.data)
+                if (checkRes.data && !checkRes.data.valida) {
+                    setError(checkRes.data.mensagem || 'Data não permitida para registro.')
+                    toast.error(checkRes.data.mensagem || 'Data não permitida para registro.')
+                    return
                 }
+                setBimestre(checkRes.data.bimestre)
             }
         } catch (error) {
             console.error(error)

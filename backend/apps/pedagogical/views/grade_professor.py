@@ -23,8 +23,10 @@ def grade_professor_view(request):
     Se professor_id não for informado, retorna a grade do professor logado.
     """
     from django.utils import timezone
+    from datetime import timedelta
     from django.db import models
     from apps.core.models import Funcionario
+    from apps.pedagogical.models import Aula
     
     user = request.user
     hoje = timezone.now().date()
@@ -137,10 +139,37 @@ def grade_professor_view(request):
         # 'validade__turma__curso' # Validade nao tem FK turma
     ).order_by('horario_aula__dia_semana', 'horario_aula__numero')
     
+    # Identifica o intervalo da semana atual (Segunda a Sexta) para checar registros de aula
+    hoje_hoje = timezone.localtime(timezone.now()).date()
+    dia_semana_hoje = hoje_hoje.weekday() # 0=Segunda, 6=Domingo
+    
+    # Início da semana (Segunda)
+    inicio_semana = hoje_hoje - timedelta(days=dia_semana_hoje)
+    # Fim da semana (Sexta) - Grade só mostra até sexta
+    fim_semana = inicio_semana + timedelta(days=4)
+    
+    # Busca todas as aulas registradas pelo professor para as turmas dele NESTA semana
+    aulas_registradas = Aula.objects.filter(
+        professor_disciplina_turma__in=atribuicoes,
+        data__range=[inicio_semana, fim_semana]
+    ).values('professor_disciplina_turma_id', 'data')
+    
+    # Map para busca rápida: (pdt_id, data_iso) -> True
+    map_registros = {
+        (str(a['professor_disciplina_turma_id']), a['data'].isoformat()): True 
+        for a in aulas_registradas
+    }
+
     # Monta matriz com apenas as aulas do professor
     matriz = {}
     horarios = {}
     
+    # Calcula as datas da semana para cada dia (0=Segunda, 4=Sexta)
+    datas_semana = {}
+    for i in range(5):
+        data_dia = inicio_semana + timedelta(days=i)
+        datas_semana[str(i)] = data_dia.isoformat()
+
     for g in grades:
         # Encontra a turma correta dessa validade
         # g.validade tem numero/letra. Precisamos achar a 'turma' objeto correspondente 
@@ -179,7 +208,11 @@ def grade_professor_view(request):
             'disciplina_nome': disciplina.nome,
             'disciplina_sigla': disciplina.sigla if mostrar_disciplina else None,
             'curso_sigla': g.curso.sigla if g.curso else turma.curso.sigla,
-            'professor_disciplina_turma_id': str(turma_disciplina_map[(turma.id, disciplina.id)]['pdt_id'])
+            'professor_disciplina_turma_id': str(turma_disciplina_map[(turma.id, disciplina.id)]['pdt_id']),
+            'registrada': map_registros.get(
+                (str(turma_disciplina_map[(turma.id, disciplina.id)]['pdt_id']), datas_semana.get(dia_key)), 
+                False
+            )
         }
         
         # Horários para legenda

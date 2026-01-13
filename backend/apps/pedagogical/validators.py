@@ -178,16 +178,54 @@ def verificar_data_registro_aula(ano_letivo, data_verificar):
         bimestre = _identificar_bimestre(ano_letivo.controles, data_iso)
         return {'valida': True, 'mensagem': 'Data válida.', 'bimestre': bimestre}
     
+    # Se chegou aqui, a data é inválida. Vamos descobrir o porquê para dar um feedback melhor.
+    hoje_iso = timezone.localdate().isoformat()
+    controles = ano_letivo.controles
+    
+    # 1. Verifica se a data existe em algum bimestre (é dia letivo?)
+    bimestre_idx = _identificar_bimestre(controles, data_iso)
+    if not bimestre_idx:
+        try:
+            dt = datetime.strptime(data_iso, '%Y-%m-%d').date()
+            if dt.weekday() >= 5: # 5=Sábado, 6=Domingo
+                return {'valida': False, 'mensagem': 'Não é permitido registrar aulas em finais de semana.', 'bimestre': None}
+        except: pass
+        return {'valida': False, 'mensagem': 'A data selecionada não é considerada um dia letivo ou é feriado.', 'bimestre': None}
+
+    # 2. Verifica se é dia futuro e se é permitido
+    if data_iso > hoje_iso:
+        aula_ctrl = controles.get(str(bimestre_idx), {}).get('AULA', {})
+        if not aula_ctrl.get('digitacao_futura', True):
+            return {'valida': False, 'mensagem': f'Não é permitido o registro antecipado de aulas para o {bimestre_idx}º bimestre.', 'bimestre': None}
+
+    # 3. Verifica se o período de registro do bimestre está aberto
+    aula_ctrl = controles.get(str(bimestre_idx), {}).get('AULA', {})
+    inicio_reg = aula_ctrl.get('data_liberada_inicio')
+    fim_reg = aula_ctrl.get('data_liberada_fim')
+    
+    if inicio_reg and hoje_iso < inicio_reg:
+        data_br = datetime.strptime(inicio_reg, '%Y-%m-%d').strftime('%d/%m/%Y')
+        return {'valida': False, 'mensagem': f'O período de registro para o {bimestre_idx}º bimestre só começa em {data_br}.', 'bimestre': None}
+    
+    if fim_reg and hoje_iso > fim_reg:
+        data_br = datetime.strptime(fim_reg, '%Y-%m-%d').strftime('%d/%m/%Y')
+        return {'valida': False, 'mensagem': f'O período de registro para o {bimestre_idx}º bimestre encerrou em {data_br}.', 'bimestre': None}
+
+    # 4. Verifica grade horária
+    datas_com_grade = _obter_datas_com_grade_valida(ano_letivo)
+    if datas_com_grade is not None and data_iso not in datas_com_grade:
+        return {'valida': False, 'mensagem': 'Não há grade horária válida (vigente) configurada para esta data.', 'bimestre': None}
+
     return {
         'valida': False, 
-        'mensagem': 'Data não permitida (feriado, fim de semana ou fora do período letivo).', 
+        'mensagem': 'Data não permitida para registro (critério pedagógico não atendido).', 
         'bimestre': None
     }
 
 
 def _identificar_bimestre(controles, data_iso):
     """Retorna o número do bimestre (1-4) para uma data, ou None."""
-    for bim_key in ('1', '2', '3', '4'):
+    for bim_key in ('1', '2', '3', '4', '5'):
         bimestre = controles.get(bim_key, {})
         aula = bimestre.get('AULA', {})
         if data_iso in aula.get('dias_letivos', []):

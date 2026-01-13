@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Card, Button, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, PageLoading } from '../../components/ui'
-import api from '../../services/api'
+import api, { pedagogicalAPI } from '../../services/api'
 import toast from 'react-hot-toast'
-import { HiAcademicCap, HiClock } from 'react-icons/hi'
+import { HiAcademicCap, HiClock, HiCheckCircle, HiExclamationCircle, HiQuestionMarkCircle } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
 import { generateGradeProfessorPDF } from '../../utils/pdf'
 import { formatDateShortBR } from '../../utils/date'
@@ -90,7 +90,7 @@ export default function GradeProfessor() {
         }
     }
 
-    const handleAulaClick = (celula, numeroAula, diaIndex, horario) => {
+    const handleAulaClick = async (celula, numeroAula, diaIndex, horario) => {
         if (!celula) return
 
         // Calcula a data dessa aula baseada no dia da semana
@@ -98,24 +98,58 @@ export default function GradeProfessor() {
         // Formata para YYYY-MM-DD para o input type="date"
         const dataFormatada = dataAula.toISOString().split('T')[0]
 
-        navigate(`/aula-faltas/nova/${celula.professor_disciplina_turma_id}`, {
-            state: {
-                data: dataFormatada,
-                numeroAulas: 2,
-                turmaId: celula.turma_id || celula.id, // Fallback
-                turmaNome: celula.turma_nome_completo || celula.turma_label, // Prefer full name
-                disciplinaId: celula.disciplina_id,
-                disciplinaNome: celula.disciplina_nome || celula.disciplina_label, // Prefer full name
-                disciplinaSigla: celula.disciplina_sigla,
-                horario: horario
+        try {
+            // Calcula quantas aulas esse professor tem dessa disciplina/turma nesse dia específico
+            const targetPdtId = celula.professor_disciplina_turma_id
+            const diaKey = String(diaIndex)
+            let countAulasNoDia = 0
+
+            Object.values(matriz).forEach(linha => {
+                if (linha[diaKey]?.professor_disciplina_turma_id === targetPdtId) {
+                    countAulasNoDia++
+                }
+            })
+
+            // 1. Verifica se a data é permitida para registro de aula (regras pedagógicas)
+            const checkDataRes = await pedagogicalAPI.aulasFaltas.verificarDataRegistro(dataFormatada)
+            if (!checkDataRes.data.valida) {
+                return toast.error(checkDataRes.data.mensagem || 'Data não permitida para registro.')
             }
-        })
+
+            // 2. Verifica se já existe registro para essa data/turma/disciplina
+            const res = await pedagogicalAPI.aulasFaltas.verificarExistente({
+                professor_disciplina_turma_id: targetPdtId,
+                data: dataFormatada
+            })
+
+            if (res.data.existe) {
+                // Aula já existe, redireciona para edição
+                navigate(`/aula-faltas/${res.data.aula_id}/editar`)
+            } else {
+                // Nova aula, passa dados via state
+                navigate(`/aula-faltas/nova/${targetPdtId}`, {
+                    state: {
+                        data: dataFormatada,
+                        numeroAulas: countAulasNoDia || 2, // Usa o calculado ou fallback 2
+                        turmaId: celula.turma_id || celula.id,
+                        turmaNome: celula.turma_nome_completo || celula.turma_label,
+                        disciplinaId: celula.disciplina_id,
+                        disciplinaNome: celula.disciplina_nome || celula.disciplina_label,
+                        disciplinaSigla: celula.disciplina_sigla,
+                        horario: horario,
+                        bimestre: checkDataRes.data.bimestre // Passa o bimestre identificado
+                    }
+                })
+            }
+        } catch (error) {
+            console.error('Erro ao verificar aula existente:', error)
+            toast.error('Erro ao verificar registro. Tente novamente.')
+        }
     }
 
-    // Helper para determinar status de registro (Simulado por enquanto)
-    const getRegistrationStatus = (diaIndex, horario) => {
-        // Como não temos a info real do backend se foi registrada,
-        // vamos assumir false.
+    // Helper para determinar status de registro
+    const getRegistrationStatus = (diaIndex, horario, isRegisteredFromBackend) => {
+        // Agora recebemos se foi registrada via backend
         // Se data < agora e !registrada => PENDENTE (Problema)
         // Se data > agora e !registrada => NÃO REGISTRADA (Normal)
 
@@ -127,8 +161,7 @@ export default function GradeProfessor() {
         aulaDate.setHours(horaFimH, horaFimM, 0)
 
         const isPast = aulaDate < now
-        // TODO: Obter status real do backend
-        const isRegistered = false
+        const isRegistered = !!isRegisteredFromBackend
 
         return {
             isRegistered,
@@ -198,7 +231,7 @@ export default function GradeProfessor() {
 
     const MobileAulaCard = ({ numeroAula, celula, horario, isCurrent, isNext }) => {
         const isEmpty = !celula
-        const { isPending, isFuture } = !isEmpty ? getRegistrationStatus(selectedDay, horario) : {}
+        const { isPending, isFuture, isRegistered } = !isEmpty ? getRegistrationStatus(selectedDay, horario, celula.registrada) : {}
 
         return (
             <div
@@ -225,17 +258,36 @@ export default function GradeProfessor() {
                     </div>
                 )}
 
-                {/* Status de Registro (Pendente/Futuro) */}
-                {!isEmpty && !isCurrent && !isNext && (
+                {/* Status de Registro (Sempre visível para classes ocupadas) */}
+                {!isEmpty && (
                     <div className="absolute top-3 right-3">
                         <span className={`
-                            text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded
-                            ${isPending
-                                ? 'bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400'
-                                : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+                            inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider px-2 py-1 rounded-lg
+                            ${(isCurrent || isNext)
+                                ? 'bg-white/20 text-white border border-white/20 backdrop-blur-sm'
+                                : isRegistered
+                                    ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300'
+                                    : isPending
+                                        ? 'bg-danger-100 text-danger-600 dark:bg-danger-900/40 dark:text-danger-300'
+                                        : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300'
                             }
                         `}>
-                            {isPending ? 'Pendente' : 'Não registrada'}
+                            {isRegistered ? (
+                                <>
+                                    <HiCheckCircle className="w-4 h-4" />
+                                    Registrada
+                                </>
+                            ) : (isCurrent || isNext || !isPending) ? (
+                                <>
+                                    <HiQuestionMarkCircle className="w-4 h-4" />
+                                    Não registrada
+                                </>
+                            ) : (
+                                <>
+                                    <HiExclamationCircle className="w-4 h-4" />
+                                    Pendente
+                                </>
+                            )}
                         </span>
                     </div>
                 )}
@@ -449,7 +501,7 @@ export default function GradeProfessor() {
                                             const { currentAula, nextAula } = getAulaStatus(idx)
                                             const isCurrent = num === currentAula
                                             const isNext = num === nextAula
-                                            const { isPending, isFuture } = celula ? getRegistrationStatus(idx, horario) : {}
+                                            const { isPending, isFuture, isRegistered } = celula ? getRegistrationStatus(idx, horario, celula.registrada) : {}
 
                                             if (!celula) {
                                                 return (
@@ -481,22 +533,39 @@ export default function GradeProfessor() {
                                                     {/* Status Badges */}
                                                     <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
                                                         {isCurrent && (
-                                                            <span className="flex h-2 w-2 relative">
+                                                            <span className="flex h-2 w-2 relative mb-1">
                                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                                                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                                                             </span>
                                                         )}
-                                                        {!isCurrent && !isNext && (
-                                                            <span className={`
-                                                                text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded
-                                                                ${isPending
-                                                                    ? 'bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400'
-                                                                    : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
-                                                                }
-                                                            `}>
-                                                                {isPending ? 'Pendente' : 'Não registrada'}
-                                                            </span>
-                                                        )}
+                                                        <span className={`
+                                                            inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md
+                                                            ${(isCurrent || isNext)
+                                                                ? 'bg-white/20 text-white border border-white/20 backdrop-blur-sm'
+                                                                : isRegistered
+                                                                    ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300'
+                                                                    : isPending
+                                                                        ? 'bg-danger-100 text-danger-600 dark:bg-danger-900/40 dark:text-danger-300'
+                                                                        : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300'
+                                                            }
+                                                        `}>
+                                                            {isRegistered ? (
+                                                                <>
+                                                                    <HiCheckCircle className="w-3.5 h-3.5" />
+                                                                    Registrada
+                                                                </>
+                                                            ) : (isCurrent || isNext || !isPending) ? (
+                                                                <>
+                                                                    <HiQuestionMarkCircle className="w-3.5 h-3.5" />
+                                                                    Não registrada
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <HiExclamationCircle className="w-3.5 h-3.5" />
+                                                                    Pendente
+                                                                </>
+                                                            )}
+                                                        </span>
                                                     </div>
 
                                                     <div className="space-y-2">
