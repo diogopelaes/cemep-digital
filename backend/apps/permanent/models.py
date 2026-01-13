@@ -3,7 +3,8 @@ App Permanent - Histórico e Registros Imutáveis
 Usa CPF como PK para garantir sobrevivência dos dados após expurgo.
 """
 from django.db import models
-from apps.core.models import Parentesco, UUIDModel
+from apps.core.models import UUIDModel
+from apps.academic.models import Parentesco
 from apps.core.validators import validate_cpf, clean_digits
 from ckeditor.fields import RichTextField
 

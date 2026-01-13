@@ -4,11 +4,22 @@ App Academic - Vida Escolar (Estudantes, Matrículas, Responsáveis)
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from apps.core.models import Parentesco, Curso, Turma, UUIDModel
+from apps.core.models import Curso, Turma, UUIDModel
 from apps.core.validators import validate_cpf, clean_digits
 from apps.academic.validators import validate_matricula_digits
 import re
 from django.db.models.functions import Collate
+
+
+class Parentesco(models.TextChoices):
+    """Opções de parentesco - compartilhado entre apps."""
+    PAI = 'PAI', 'Pai'
+    MAE = 'MAE', 'Mãe'
+    AVO_M = 'AVO_M', 'Avô(a) Materno'
+    AVO_P = 'AVO_P', 'Avô(a) Paterno'
+    TIO = 'TIO', 'Tio(a)'
+    IRMAO = 'IRMAO', 'Irmão(ã)'
+    OUTRO = 'OUTRO', 'Outro'
 
 
 class Estudante(UUIDModel):
