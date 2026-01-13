@@ -92,17 +92,19 @@ def import_tudo():
             print(f"  [ERRO] {f}")
         sys.exit(1)
     else:
-        # Alterar senha do usuário 123242 para 123 no final de tudo
+        # Alterar senhas de usuários para 123 no final de tudo
         print("\n" + "-"*60)
-        print("AJUSTANDO SENHA DO USUÁRIO 123242...")
+        print("AJUSTANDO SENHAS DE USUÁRIOS ESPECÍFICOS...")
         try:
-            cmd = [
-                PYTHON_EXE, "-c",
-                "import os, django; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core_project.settings'); django.setup(); from django.contrib.auth import get_user_model; User = get_user_model(); u = User.objects.get(username='123242'); u.set_password('123'); u.save(); print('Senha do usuário 123242 alterada com sucesso!')"
-            ]
-            subprocess.run(cmd, check=True, cwd=IMPORT_DIR.parent)
+            users = ['123242', 'jbrito@alu.paulinia.sp.gov.br']
+            for user in users:
+                cmd = [
+                    PYTHON_EXE, "-c",
+                    f"import os, django; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core_project.settings'); django.setup(); from django.contrib.auth import get_user_model; User = get_user_model(); u = User.objects.get(username='{user}'); u.set_password('123'); u.save(); print('Senha do usuário {user} alterada com sucesso!')"
+                ]
+                subprocess.run(cmd, check=True, cwd=IMPORT_DIR.parent)
         except Exception as e:
-            print(f"[AVISO] Não foi possível alterar a senha do usuário 123242: {e}")
+            print(f"[AVISO] Não foi possível alterar as senhas: {e}")
 
         print("\n[SUCESSO] Todos os dados foram importados corretamente!")
 

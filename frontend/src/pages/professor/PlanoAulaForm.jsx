@@ -131,7 +131,7 @@ export default function PlanoAulaForm() {
                 await pedagogicalAPI.planosAula.create(payload)
                 toast.success('Plano criado!')
             }
-            navigate('/plano-aula')
+            navigate(-1)
         } catch (error) {
             console.error(error)
             toast.error('Erro ao salvar plano')

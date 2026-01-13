@@ -282,7 +282,7 @@ export default function AulaFaltasForm() {
                 toast.success('Aula registrada com sucesso!')
             }
 
-            navigate('/aula-faltas')
+            navigate(-1)
         } catch (error) {
             console.error('Erro ao salvar:', error)
             toast.error('Erro ao salvar registro de aula.')
@@ -295,7 +295,7 @@ export default function AulaFaltasForm() {
     if (error) return (
         <div className="p-8 text-center">
             <p className="text-rose-500 mb-4">{error}</p>
-            <Button onClick={() => navigate('/aula-faltas')}>Voltar</Button>
+            <Button onClick={() => navigate(-1)}>Voltar</Button>
         </div>
     )
 

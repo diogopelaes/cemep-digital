@@ -4,7 +4,7 @@
         "controles": [
             {
                 "tipo": "AULA",
-                "data_inicio": "2026-02-02",
+                "data_inicio": "2026-01-02",
                 "data_fim": "2026-04-25",
                 "digitacao_futura": false
             },
