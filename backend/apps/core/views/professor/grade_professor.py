@@ -94,7 +94,8 @@ def grade_professor_view(request):
         disciplinas.add(disciplina.id)
         turma_disciplina_map[(turma.id, disciplina.id)] = {
             'turma': turma,
-            'disciplina': disciplina
+            'disciplina': disciplina,
+            'pdt_id': atrib.id
         }
     
     # Se professor tem mais de uma disciplina, mostra sigla
@@ -173,9 +174,12 @@ def grade_professor_view(request):
         matriz[num_key][dia_key] = {
             'turma_id': str(turma.id),
             'turma_label': turma_label,
+            'turma_nome_completo': turma.nome_completo,
             'disciplina_id': str(disciplina.id),
+            'disciplina_nome': disciplina.nome,
             'disciplina_sigla': disciplina.sigla if mostrar_disciplina else None,
-            'curso_sigla': g.curso.sigla if g.curso else turma.curso.sigla
+            'curso_sigla': g.curso.sigla if g.curso else turma.curso.sigla,
+            'professor_disciplina_turma_id': str(turma_disciplina_map[(turma.id, disciplina.id)]['pdt_id'])
         }
         
         # Horários para legenda

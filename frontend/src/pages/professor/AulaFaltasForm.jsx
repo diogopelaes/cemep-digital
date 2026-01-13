@@ -87,6 +87,16 @@ export default function AulaFaltasForm() {
                 // Carregar estudantes da turma
                 const res = await pedagogicalAPI.aulasFaltas.estudantesPorTurma(professorDisciplinaTurmaId)
                 setEstudantes(processFaltasMask(res.data.estudantes || [], stateData.numeroAulas))
+
+                // Tenta identificar o bimestre pela data
+                try {
+                    const checkRes = await pedagogicalAPI.aulasFaltas.verificarDataRegistro(stateData.data)
+                    if (checkRes.data && checkRes.data.valida) {
+                        setBimestre(checkRes.data.bimestre)
+                    }
+                } catch (e) {
+                    console.error("Erro ao verificar bimestre", e)
+                }
             }
         } catch (error) {
             console.error(error)
@@ -292,10 +302,12 @@ export default function AulaFaltasForm() {
                                     <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wider">
                                         {bimestre === 0 ? 'ANUAL' : `${bimestre}º BIMESTRE`}
                                     </span>
-                                    <span className="font-medium">{numeroAulas} aulas</span>
                                     <span className="text-slate-300 dark:text-slate-600">•</span>
                                     <span className={`font-medium ${estudantesComFalta > 0 ? 'text-warning-600 dark:text-warning-400' : 'text-success-600 dark:text-success-400'}`}>
-                                        {estudantesComFalta} {estudantesComFalta === 1 ? 'estudante com falta' : 'estudantes com falta'}
+                                        {estudantesComFalta > 0
+                                            ? `${estudantesComFalta} ${estudantesComFalta === 1 ? 'estudante com falta' : 'estudantes com falta'}`
+                                            : 'Sem faltas'
+                                        }
                                     </span>
                                 </>
                             )}
