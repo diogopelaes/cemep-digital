@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { Card, Button, Loading, Badge, FormActionsProfessor } from '../../components/ui'
-import { pedagogicalAPI } from '../../services/api'
+import { pedagogicalAPI, academicAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { formatDateBR } from '../../utils/date'
 
@@ -26,6 +26,11 @@ export default function AulaFaltasForm() {
     // Lista de estudantes com faltas (estado local)
     const [estudantes, setEstudantes] = useState([])
     const [planosAula, setPlanosAula] = useState([])
+
+    // Expandable Card State (tracks which student is expanded and their photo)
+    const [expandedStudentId, setExpandedStudentId] = useState(null)
+    const [expandedStudentData, setExpandedStudentData] = useState(null)
+    const [loadingExpanded, setLoadingExpanded] = useState(false)
 
     useEffect(() => {
         loadData()
@@ -223,6 +228,30 @@ export default function AulaFaltasForm() {
         }))
     }
 
+    const handleStudentClick = async (studentId) => {
+        // If clicking the same student, collapse
+        if (expandedStudentId === studentId) {
+            setExpandedStudentId(null)
+            setExpandedStudentData(null)
+            return
+        }
+
+        // Expand and fetch photo
+        setExpandedStudentId(studentId)
+        setExpandedStudentData(null)
+        setLoadingExpanded(true)
+
+        try {
+            const res = await academicAPI.estudantes.get(studentId)
+            setExpandedStudentData(res.data)
+        } catch (error) {
+            console.error("Erro ao carregar estudante", error)
+            toast.error("Erro ao carregar foto.")
+        } finally {
+            setLoadingExpanded(false)
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setSubmitting(true)
@@ -362,58 +391,112 @@ export default function AulaFaltasForm() {
                 {/* Lista de Chamada */}
                 <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-3">
-                        {estudantes.map((estudante, idx) => (
-                            <div
-                                key={estudante.id}
-                                className="bg-white dark:bg-slate-800 rounded-2xl p-3 sm:p-4 flex items-center justify-between border border-slate-200/60 dark:border-slate-700/50 hover:border-primary-200 dark:hover:border-primary-800/50 transition-colors duration-200 group"
-                            >
-                                <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                                    <span className="text-xs font-bold text-slate-300 dark:text-slate-600 w-6 tabular-nums">
-                                        {(estudante.numero_chamada && estudante.numero_chamada !== 0)
-                                            ? estudante.numero_chamada.toString().padStart(2, '0')
-                                            : (idx + 1).toString().padStart(2, '0')}
-                                    </span>
-                                    <div className="min-w-0">
-                                        <p className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                                            {estudante.nome}
-                                        </p>
-                                        <div className="flex items-center gap-2 mt-0.5">
-                                            {estudante.status && <StatusBadge status={estudante.status} />}
+                        {estudantes.map((estudante, idx) => {
+                            const isExpanded = expandedStudentId === estudante.id
+                            const studentData = isExpanded ? expandedStudentData : null
+
+                            return (
+                                <div
+                                    key={estudante.id}
+                                    className={`
+                                        bg-white dark:bg-slate-800 rounded-2xl p-3 sm:p-4 
+                                        border border-slate-200/60 dark:border-slate-700/50 
+                                        transition-colors duration-200 group
+                                        ${isExpanded ? 'ring-2 ring-primary-400' : 'hover:border-primary-200 dark:hover:border-primary-800/50'}
+                                    `}
+                                >
+                                    <div className={`flex ${isExpanded ? 'flex-col sm:flex-row sm:items-center gap-4' : 'items-center justify-between'}`}>
+
+                                        {/* Left Side: Number + Photo/Name Section */}
+                                        <div className={`flex ${isExpanded ? 'flex-col sm:flex-row items-center sm:text-left text-center gap-4 flex-1' : 'items-center gap-3 sm:gap-4 min-w-0 flex-1'}`}>
+                                            <span className="text-xs font-bold text-slate-300 dark:text-slate-600 w-6 tabular-nums">
+                                                {(estudante.numero_chamada && estudante.numero_chamada !== 0)
+                                                    ? estudante.numero_chamada.toString().padStart(2, '0')
+                                                    : (idx + 1).toString().padStart(2, '0')}
+                                            </span>
+
+                                            {isExpanded && (
+                                                <div className="w-24 h-32 sm:w-28 sm:h-36 rounded-xl overflow-hidden border-2 border-slate-200 dark:border-slate-600 shrink-0 bg-slate-100 dark:bg-slate-700">
+                                                    {loadingExpanded ? (
+                                                        <div className="w-full h-full flex items-center justify-center">
+                                                            <Loading size="sm" />
+                                                        </div>
+                                                    ) : studentData?.foto ? (
+                                                        <img
+                                                            src={studentData.foto}
+                                                            alt={studentData.nome_social || studentData.usuario?.first_name}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center">
+                                                            <span className="text-3xl text-slate-400 font-bold">
+                                                                {(estudante.nome || '?').charAt(0)}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            <div className="min-w-0 flex-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleStudentClick(estudante.id)}
+                                                    className={`focus:outline-none w-full ${isExpanded ? 'text-center sm:text-left' : 'text-left'}`}
+                                                >
+                                                    <p className={`
+                                                        font-bold text-slate-700 dark:text-slate-200 
+                                                        group-hover:text-primary-600 dark:group-hover:text-primary-400 
+                                                        transition-colors
+                                                        ${isExpanded ? 'text-lg sm:text-xl' : 'text-sm truncate'}
+                                                    `}>
+                                                        {isExpanded && studentData
+                                                            ? (studentData.nome_social || `${studentData.usuario?.first_name || ''} ${studentData.usuario?.last_name || ''}`.trim() || estudante.nome)
+                                                            : estudante.nome
+                                                        }
+                                                    </p>
+                                                </button>
+                                                {estudante.status && (
+                                                    <div className={`mt-1 ${isExpanded ? 'flex justify-center sm:justify-start' : ''}`}>
+                                                        <StatusBadge status={estudante.status} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Right Side: Absence buttons */}
+                                        <div className={`flex items-center gap-2 sm:gap-3 shrink-0 ${isExpanded ? 'justify-center ml-0' : 'ml-4'}`}>
+                                            {Array.from({ length: numeroAulas }, (_, aulaIdx) => {
+                                                const isFalta = estudante.faltas_mask
+                                                    ? estudante.faltas_mask[aulaIdx]
+                                                    : false
+
+                                                return (
+                                                    <div key={aulaIdx} className="relative pb-1">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => toggleAulaFalta(estudante.id, aulaIdx)}
+                                                            className={`
+                                                                relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl text-xs font-bold
+                                                                flex flex-col items-center justify-center gap-0.5
+                                                                transition-all duration-200 border-2
+                                                                ${isFalta
+                                                                    ? 'bg-rose-50 border-rose-200 text-rose-600 dark:bg-rose-950/20 dark:border-rose-900/50 dark:text-rose-400 shadow-sm'
+                                                                    : 'bg-emerald-50 border-emerald-200 text-emerald-600 dark:bg-emerald-950/20 dark:border-emerald-900/50 dark:text-emerald-400 shadow-sm'
+                                                                }
+                                                                hover:scale-105 active:scale-95
+                                                            `}
+                                                            title={`Aula ${aulaIdx + 1}: ${isFalta ? 'Falta' : 'Presença'}`}
+                                                        >
+                                                            <span className="text-sm leading-none">{isFalta ? 'F' : 'C'}</span>
+                                                        </button>
+                                                    </div>
+                                                )
+                                            })}
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-4">
-                                    {Array.from({ length: numeroAulas }, (_, aulaIdx) => {
-                                        const isFalta = estudante.faltas_mask
-                                            ? estudante.faltas_mask[aulaIdx]
-                                            : false
-
-                                        return (
-                                            <div key={aulaIdx} className="relative pb-1">
-                                                <button
-                                                    type="button" // Importante: type button para não submumeter o form
-                                                    onClick={() => toggleAulaFalta(estudante.id, aulaIdx)}
-                                                    className={`
-                                                            relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl text-xs font-bold
-                                                            flex flex-col items-center justify-center gap-0.5
-                                                            transition-all duration-200 border-2
-                                                            ${isFalta
-                                                            ? 'bg-rose-50 border-rose-200 text-rose-600 dark:bg-rose-950/20 dark:border-rose-900/50 dark:text-rose-400 shadow-sm'
-                                                            : 'bg-emerald-50 border-emerald-200 text-emerald-600 dark:bg-emerald-950/20 dark:border-emerald-900/50 dark:text-emerald-400 shadow-sm'
-                                                        }
-                                                            hover:scale-105 active:scale-95
-                                                        `}
-                                                    title={`Aula ${aulaIdx + 1}: ${isFalta ? 'Falta' : 'Presença'}`}
-                                                >
-                                                    <span className="text-sm leading-none">{isFalta ? 'F' : 'C'}</span>
-                                                </button>
-                                            </div>
-                                        )
-                                    })}
-                                </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 </div>
 
@@ -427,3 +510,4 @@ export default function AulaFaltasForm() {
         </div>
     )
 }
+
