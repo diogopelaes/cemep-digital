@@ -163,8 +163,8 @@ class AulaFaltasSerializer(serializers.ModelSerializer):
         return obj.professor_disciplina_turma.professor.usuario.get_full_name()
     
     def get_total_faltas(self, obj):
-        # Soma a contagem total de faltas (nova property qtd_faltas em Faltas retorna len(aulas_faltas))
-        return sum(f.qtd_faltas for f in obj.faltas.all())
+        # Retorna quantidade de alunos com falta (contagem de registros) ao invés do total de aulas perdidas
+        return obj.faltas.count()
     
     def get_total_estudantes(self, obj):
         return obj.faltas.count() # Na verdade conta registros de falta. Total da turma seria via Matricula.
@@ -264,7 +264,7 @@ class AulaFaltasListSerializer(serializers.ModelSerializer):
         return obj.professor_disciplina_turma.disciplina_turma.disciplina.sigla
     
     def get_total_faltas(self, obj):
-        return sum(f.qtd_faltas for f in obj.faltas.all())
+        return obj.faltas.count()
     
     def get_bimestre(self, obj):
         return obj.bimestre

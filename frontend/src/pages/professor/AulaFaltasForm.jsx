@@ -267,6 +267,8 @@ export default function AulaFaltasForm() {
         return null
     }
 
+    const estudantesComFalta = estudantes.filter(e => e.faltas_mask && e.faltas_mask.some(Boolean)).length
+
     return (
         <div className="max-w-4xl mx-auto space-y-6 p-4 lg:p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -291,6 +293,10 @@ export default function AulaFaltasForm() {
                                         {bimestre === 0 ? 'ANUAL' : `${bimestre}º BIMESTRE`}
                                     </span>
                                     <span className="font-medium">{numeroAulas} aulas</span>
+                                    <span className="text-slate-300 dark:text-slate-600">•</span>
+                                    <span className={`font-medium ${estudantesComFalta > 0 ? 'text-warning-600 dark:text-warning-400' : 'text-success-600 dark:text-success-400'}`}>
+                                        {estudantesComFalta} {estudantesComFalta === 1 ? 'estudante com falta' : 'estudantes com falta'}
+                                    </span>
                                 </>
                             )}
                         </p>

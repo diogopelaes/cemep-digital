@@ -172,7 +172,7 @@ export default function AulaFaltas() {
                                 {aula.numero_aulas} aula{aula.numero_aulas > 1 ? 's' : ''}
                             </Badge>
                             <Badge variant={aula.total_faltas > 0 ? 'warning' : 'success'} className="text-[10px] px-1.5 py-0">
-                                {aula.total_faltas} falta{aula.total_faltas !== 1 ? 's' : ''}
+                                {aula.total_faltas} {aula.total_faltas === 1 ? 'estudante' : 'estudantes'}
                             </Badge>
                         </div>
                         <span className="text-[10px] text-slate-400 font-medium">Bimestre: {aula.bimestre}º</span>
