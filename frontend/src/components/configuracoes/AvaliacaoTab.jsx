@@ -7,7 +7,10 @@ import { useReferences } from '../../contexts/ReferenceContext'
 
 export default function AvaliacaoTab() {
     const [config, setConfig] = useState(null)
-    const [choices, setChoices] = useState({ regra_arredondamento: [] })
+    const [choices, setChoices] = useState({
+        regra_arredondamento: [],
+        forma_calculo: []
+    })
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [hasChanges, setHasChanges] = useState(false)
@@ -39,6 +42,7 @@ export default function AvaliacaoTab() {
                     setConfig({
                         ano_letivo: anoLetivoAtual?.id,
                         livre_escolha_professor: true,
+                        forma_calculo: 'SOMA',
                         numero_casas_decimais_bimestral: 1,
                         numero_casas_decimais_avaliacao: 2,
                         regra_arredondamento: 'MATEMATICO_CLASSICO',
@@ -130,68 +134,85 @@ export default function AvaliacaoTab() {
                 </div>
 
                 {/* Form */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Livre Escolha Professor */}
-                    <div className="col-span-full p-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
-                        <div className="flex items-center justify-between gap-4">
-                            <div>
-                                <span className="font-medium text-slate-700 dark:text-slate-200 block">
-                                    Livre escolha do professor
-                                </span>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">
-                                    Se ativado, cada professor pode escolher a forma de cálculo (Soma ou Média Ponderada) para cada bimestre.
-                                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                    {/* Seção 1: Regras de Cálculo */}
+                    <div className="col-span-full">
+                        <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/40 shadow-sm transition-all hover:shadow-md">
+                            <div className="flex items-center justify-between gap-6">
+                                <div className="space-y-1">
+                                    <span className="font-semibold text-slate-800 dark:text-slate-100 block">
+                                        Livre escolha do professor
+                                    </span>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                                        Se ativado, cada professor define individualmente se usará Soma ou Média Ponderada em seus diários.
+                                    </p>
+                                </div>
+                                <Switch
+                                    checked={config?.livre_escolha_professor}
+                                    onChange={(e) => handleChange('livre_escolha_professor', e.target.checked)}
+                                />
                             </div>
-                            <Switch
-                                checked={config?.livre_escolha_professor}
-                                onChange={(e) => handleChange('livre_escolha_professor', e.target.checked)}
-                            />
                         </div>
                     </div>
 
-                    {/* Casas Decimais - Bimestral */}
                     <div className="space-y-1">
                         <Select
-                            label="Casas decimais (Nota Bimestral)"
+                            label="Forma de Cálculo Padrão"
+                            value={config?.forma_calculo || 'SOMA'}
+                            onChange={(e) => handleChange('forma_calculo', e.target.value)}
+                            options={choices.forma_calculo}
+                            placeholder="Selecione a forma de cálculo..."
+                        />
+                        <p className="text-xs text-slate-500 px-1">
+                            {config?.livre_escolha_professor
+                                ? "Sugestão inicial para novos diários (editável pelo professor)."
+                                : "Regra mandatória aplicada a todos os lançamentos do ano."}
+                        </p>
+                    </div>
+
+                    <div className="space-y-1">
+                        <Select
+                            label="Regra de Arredondamento"
+                            value={config?.regra_arredondamento || 'MATEMATICO_CLASSICO'}
+                            onChange={(e) => handleChange('regra_arredondamento', e.target.value)}
+                            options={choices.regra_arredondamento}
+                            placeholder="Selecione a regra..."
+                        />
+                        <p className="text-xs text-slate-500 px-1">
+                            Define como o sistema trata as dízimas e frações nas notas.
+                        </p>
+                    </div>
+
+                    <div className="space-y-1">
+                        <Select
+                            label="Nota do Bimestre"
                             value={config?.numero_casas_decimais_bimestral ?? 1}
                             onChange={(e) => handleChange('numero_casas_decimais_bimestral', parseInt(e.target.value))}
                             options={[0, 1, 2, 3, 4].map(n => ({
                                 value: n,
                                 label: `${n} casa${n !== 1 ? 's' : ''} decimal${n !== 1 ? 'is' : ''}`
                             }))}
-                            placeholder=""
+                            placeholder="Selecione..."
                         />
-                        <p className="text-xs text-slate-500">
-                            Arredondamento aplicado na nota final do bimestre.
+                        <p className="text-xs text-slate-500 px-1">
+                            Arredondamento aplicado ao resultado final consolidado do bimestre.
                         </p>
                     </div>
 
-                    {/* Casas Decimais - Avaliação */}
                     <div className="space-y-1">
                         <Select
-                            label="Casas decimais (Avaliação)"
+                            label="Notas de Avaliações"
                             value={config?.numero_casas_decimais_avaliacao ?? 2}
                             onChange={(e) => handleChange('numero_casas_decimais_avaliacao', parseInt(e.target.value))}
                             options={[0, 1, 2, 3, 4].map(n => ({
                                 value: n,
                                 label: `${n} casa${n !== 1 ? 's' : ''} decimal${n !== 1 ? 'is' : ''}`
                             }))}
-                            placeholder=""
+                            placeholder="Selecione..."
                         />
-                        <p className="text-xs text-slate-500">
-                            Arredondamento aplicado em cada nota de avaliação individual.
+                        <p className="text-xs text-slate-500 px-1">
+                            Arredondamento aplicado em cada atividade ou prova individual.
                         </p>
-                    </div>
-
-                    {/* Regra de Arredondamento */}
-                    <div className="col-span-full">
-                        <Select
-                            label="Regra de Arredondamento"
-                            value={config?.regra_arredondamento || 'MATEMATICO_CLASSICO'}
-                            onChange={(e) => handleChange('regra_arredondamento', e.target.value)}
-                            options={choices.regra_arredondamento}
-                            placeholder=""
-                        />
                     </div>
                 </div>
             </CardContent>

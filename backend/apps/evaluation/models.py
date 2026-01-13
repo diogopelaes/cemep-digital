@@ -2,10 +2,13 @@
 App Evaluation - Configurações, Avaliações, Notas, Recuperação
 """
 from django.db import models
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
-from apps.core.models import Funcionario, ProfessorDisciplinaTurma, UUIDModel, Arquivo
+from apps.core.models import Funcionario, ProfessorDisciplinaTurma, UUIDModel, Arquivo, AnoLetivo
 from apps.academic.models import Estudante, MatriculaTurma
+from django.db.models.signals import m2m_changed
+from django.dispatch import receiver
 
 
 # =============================================================================
@@ -21,33 +24,6 @@ BIMESTRE_CHOICES = [
     (3, '3º Bimestre'),
     (4, '4º Bimestre'),
 ]
-
-
-def soma_valores_avaliacoes_regulares(disciplina_turma, bimestre, excluir_pk=None):
-    """
-    Calcula a soma dos valores das avaliações regulares para uma disciplina/turma/bimestre.
-    
-    Args:
-        disciplina_turma: Instância de DisciplinaTurma
-        bimestre: Número do bimestre (1-4)
-        excluir_pk: PK de avaliação a excluir do cálculo (para edição)
-    
-    Returns:
-        Decimal com a soma dos valores
-    """
-    # Import local para evitar import circular
-    from apps.evaluation.models import Avaliacao
-    
-    qs = Avaliacao.objects.filter(
-        professor_disciplina_turma__disciplina_turma=disciplina_turma,
-        tipo='AVALIACAO_REGULAR',
-        bimestre=bimestre
-    )
-    if excluir_pk:
-        qs = qs.exclude(pk=excluir_pk)
-    
-    return qs.aggregate(total=models.Sum('valor'))['total'] or Decimal('0.00')
-
 
 
 # =============================================================================
@@ -93,6 +69,14 @@ class ConfiguracaoAvaliacaoGeral(UUIDModel):
         verbose_name='Livre Escolha do Professor',
         help_text='Se marcado, o professor pode escolher a forma de cálculo das avaliações'
     )
+
+    # Forma de cálculo para cada bimestre
+    forma_calculo = models.CharField(
+        max_length=20,
+        choices=FormaCalculo.choices,
+        default=FormaCalculo.SOMA,
+        verbose_name='Forma de Cálculo'
+    )
     
     # Casas decimais para arredondamento (Bimestral)
     numero_casas_decimais_bimestral = models.PositiveSmallIntegerField(
@@ -114,7 +98,7 @@ class ConfiguracaoAvaliacaoGeral(UUIDModel):
     regra_arredondamento = models.CharField(
         max_length=30,
         choices=RegraArredondamento.choices,
-        default=RegraArredondamento.MATEMATICO_CLASSICO,
+        default=RegraArredondamento.FAIXAS_MULTIPLOS_05,
         verbose_name='Regra de Arredondamento',
         help_text='Regra utilizada para arredondamento das notas'
     )
@@ -128,6 +112,28 @@ class ConfiguracaoAvaliacaoGeral(UUIDModel):
     
     def __str__(self):
         return f"Configuração de Avaliação - {self.ano_letivo.ano}"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        # Se existir algum registro de Avaliacao nesse mesmo ano_letivo então não pode mais mudar as configurações
+        if not self._state.adding:
+            if Avaliacao.objects.filter(ano_letivo=self.ano_letivo).exists():
+                raise ValidationError(
+                    "Não é possível alterar as configurações pois já existem avaliações registradas para este ano letivo."
+                )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Se livre_escolha_professor = False deve atualizar todos os ConfiguracaoAvaliacaoProfessor
+        if not self.livre_escolha_professor:
+            ConfiguracaoAvaliacaoProfessor.objects.filter(
+                ano_letivo=self.ano_letivo
+            ).update(
+                forma_calculo_1bim=self.forma_calculo,
+                forma_calculo_2bim=self.forma_calculo,
+                forma_calculo_3bim=self.forma_calculo,
+                forma_calculo_4bim=self.forma_calculo,
+            )
 
 
 class ConfiguracaoAvaliacaoProfessor(UUIDModel):
@@ -212,18 +218,50 @@ class ConfiguracaoAvaliacaoProfessor(UUIDModel):
                     'Não existe configuração geral de avaliação para este ano letivo.'
                 )
             
-            # Verifica se permite livre escolha do professor
+            # Se não é a criação (é edição)
+            if not self._state.adding:
+                old_instance = ConfiguracaoAvaliacaoProfessor.objects.get(pk=self.pk)
+                
+                # Identifica quais bimestres mudaram
+                changed_bimestres = []
+                if self.forma_calculo_1bim != old_instance.forma_calculo_1bim:
+                    changed_bimestres.append(1)
+                if self.forma_calculo_2bim != old_instance.forma_calculo_2bim:
+                    changed_bimestres.append(2)
+                if self.forma_calculo_3bim != old_instance.forma_calculo_3bim:
+                    changed_bimestres.append(3)
+                if self.forma_calculo_4bim != old_instance.forma_calculo_4bim:
+                    changed_bimestres.append(4)
+                
+                if changed_bimestres:
+                    # Verifica se tem avaliações do professor nesses bimestres
+                    if Avaliacao.objects.filter(
+                        ano_letivo=self.ano_letivo,
+                        bimestre__in=changed_bimestres,
+                        professores_disciplinas_turmas__professor=self.professor
+                    ).exists():
+                        raise ValidationError(
+                            "Não é possível alterar a forma de cálculo para bimestres que já possuem avaliações registradas para este professor."
+                        )
+
+    def save(self, *args, **kwargs):
+        # Caso livre_escolha_professor = False faça todas as formas de cálculo ficarem como de ConfiguracaoAvaliacaoGeral
+        try:
+            config_geral = ConfiguracaoAvaliacaoGeral.objects.get(ano_letivo=self.ano_letivo)
             if not config_geral.livre_escolha_professor:
-                raise ValidationError(
-                    'A configuração geral não permite livre escolha do professor. '
-                    'Não é necessário criar configuração individual.'
-                )
+                self.forma_calculo_1bim = config_geral.forma_calculo
+                self.forma_calculo_2bim = config_geral.forma_calculo
+                self.forma_calculo_3bim = config_geral.forma_calculo
+                self.forma_calculo_4bim = config_geral.forma_calculo
+        except ConfiguracaoAvaliacaoGeral.DoesNotExist:
+            pass
+            
+        super().save(*args, **kwargs)
 
 
 # =============================================================================
 # AVALIAÇÕES
 # =============================================================================
-
 
 
 class Avaliacao(UUIDModel):
@@ -235,6 +273,13 @@ class Avaliacao(UUIDModel):
     - AVALIACAO_RECUPERACAO: Uma única por bimestre, valor = VALOR_MAXIMO
     - AVALIACAO_EXTRA: Uma única por bimestre, valor <= VALOR_MAXIMO
     """
+
+    ano_letivo = models.ForeignKey(
+        AnoLetivo,
+        on_delete=models.CASCADE,
+        related_name='avaliacoes',
+        verbose_name='Ano Letivo'
+    )
 
     titulo = models.CharField(
         max_length=255,
@@ -248,10 +293,11 @@ class Avaliacao(UUIDModel):
         blank=True,
     )
 
-    professor_disciplina_turma = models.ForeignKey(
+    professores_disciplinas_turmas = models.ManyToManyField(
         ProfessorDisciplinaTurma,
-        on_delete=models.CASCADE,
-        related_name='avaliacoes'
+        related_name='avaliacoes',
+        blank=True,
+        verbose_name='Professores/Disciplinas/Turmas'
     )
 
     valor = models.DecimalField(
@@ -279,95 +325,31 @@ class Avaliacao(UUIDModel):
         verbose_name='Bimestre'
     )
 
-    data_inicio = models.DateField(verbose_name='Data de inicio da avaliação')
+    data_inicio = models.DateField(verbose_name='Data de início da avaliação')
     data_fim = models.DateField(verbose_name='Data de fim da avaliação')
     arquivos = models.ManyToManyField(
         Arquivo,
         blank=True,
-        related_name='avaliacoes',
+        related_name='avaliacoes_model',
         verbose_name='Arquivos'
     )
-    
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    criado_por = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='avaliacoes_criadas',
+        verbose_name='Criado por'
+    )
+      
     class Meta:
         verbose_name = 'Avaliação'
         verbose_name_plural = 'Avaliações'
         # Removido unique_together para permitir várias REGULAR por bimestre
     
     def __str__(self):
-        return f"{self.professor_disciplina_turma.disciplina_turma.disciplina} ({self.get_tipo_display()})"
-
-    def clean(self):
-        """Validações de regras de negócio."""
-        from django.core.exceptions import ValidationError
-
-        if self.data_inicio > self.data_fim:
-            raise ValidationError(
-                'A data de inicio da avaliação não pode ser maior que a data de fim.'
-            )
-        
-        if not self.professor_disciplina_turma_id:
-            return
-        
-        disciplina_turma = self.professor_disciplina_turma.disciplina_turma
-        
-        # Validação: valor não pode ultrapassar VALOR_MAXIMO
-        if self.valor and self.valor > VALOR_MAXIMO:
-            raise ValidationError(
-                f'O valor da avaliação ({self.valor}) não pode ser maior que {VALOR_MAXIMO}.'
-            )
-        
-        # Validação: soma dos valores das avaliações regulares <= VALOR_MAXIMO
-        if self.tipo == 'AVALIACAO_REGULAR' and self.bimestre:
-            soma_atual = soma_valores_avaliacoes_regulares(disciplina_turma, self.bimestre, self.pk)
-            
-            if soma_atual + self.valor > VALOR_MAXIMO:
-                raise ValidationError(
-                    f'A soma das avaliações regulares ({soma_atual} + {self.valor}) '
-                    f'ultrapassa {VALOR_MAXIMO} pontos para esta disciplina/turma/bimestre.'
-                )
-        
-        # Validação: só pode existir UMA avaliação de recuperação por disciplina/turma/bimestre
-        if self.tipo == 'AVALIACAO_RECUPERACAO' and self.bimestre:
-            qs = Avaliacao.objects.filter(
-                professor_disciplina_turma__disciplina_turma=disciplina_turma,
-                tipo='AVALIACAO_RECUPERACAO',
-                bimestre=self.bimestre
-            )
-            if self.pk:
-                qs = qs.exclude(pk=self.pk)
-            if qs.exists():
-                raise ValidationError(
-                    'Já existe uma avaliação de recuperação para esta disciplina/turma/bimestre.'
-                )
-            
-            # Valor da avaliação de recuperação é sempre VALOR_MAXIMO
-            if self.valor != VALOR_MAXIMO:
-                raise ValidationError(
-                    f'O valor da avaliação de recuperação deve ser sempre {VALOR_MAXIMO}.'
-                )
-            
-            # Para criar recuperação, soma das avaliações regulares deve ser = VALOR_MAXIMO
-            soma_regulares = soma_valores_avaliacoes_regulares(disciplina_turma, self.bimestre)
-            
-            if soma_regulares != VALOR_MAXIMO:
-                raise ValidationError(
-                    f'Para criar avaliação de recuperação, a soma das avaliações regulares '
-                    f'deve ser exatamente {VALOR_MAXIMO}. Soma atual: {soma_regulares}.'
-                )
-        
-        # Validação: só pode existir UMA avaliação extra por disciplina/turma/bimestre
-        if self.tipo == 'AVALIACAO_EXTRA' and self.bimestre:
-            qs = Avaliacao.objects.filter(
-                professor_disciplina_turma__disciplina_turma=disciplina_turma,
-                tipo='AVALIACAO_EXTRA',
-                bimestre=self.bimestre
-            )
-            if self.pk:
-                qs = qs.exclude(pk=self.pk)
-            if qs.exists():
-                raise ValidationError(
-                    'Já existe uma avaliação extra para esta disciplina/turma/bimestre.'
-                )
+        return f"{self.titulo} ({self.get_tipo_display()})"
 
 
 class ControleVisto(UUIDModel):
@@ -395,7 +377,6 @@ class ControleVisto(UUIDModel):
         on_delete=models.CASCADE,
         related_name='vistos'
     )
-    titulo = models.CharField(max_length=100, verbose_name='Título')
     data_visto = models.DateTimeField(auto_now_add=True)
     visto = models.BooleanField(
         null=True, 
@@ -465,17 +446,7 @@ class NotaAvaliacao(UUIDModel):
     def __str__(self):
         return f"{self.avaliacao} - {self.matricula_turma}"
 
-    def clean(self):
-        """Validações de regras de negócio."""
-        from django.core.exceptions import ValidationError
-        
-        # Nota não pode ultrapassar o valor máximo da avaliação
-        if self.nota is not None and self.avaliacao_id:
-            if self.nota > self.avaliacao.valor:
-                raise ValidationError(
-                    f'A nota ({self.nota}) não pode ser maior que o valor máximo '
-                    f'da avaliação ({self.avaliacao.valor}).'
-                )
+    
 
 
 class NotaBimestral(UUIDModel):
@@ -540,181 +511,4 @@ class NotaBimestral(UUIDModel):
     def __str__(self):
         return f"{self.matricula_turma} - {self.professor_disciplina_turma.disciplina_turma.disciplina}"
     
-    def get_config_geral(self):
-        """Retorna a ConfiguracaoAvaliacaoGeral do ano letivo da turma."""
-        ano_letivo = self.professor_disciplina_turma.disciplina_turma.turma.ano_letivo
-        try:
-            return ConfiguracaoAvaliacaoGeral.objects.get(ano_letivo__ano=ano_letivo)
-        except ConfiguracaoAvaliacaoGeral.DoesNotExist:
-            return None
     
-    def get_config_professor(self):
-        """Retorna a ConfiguracaoAvaliacaoProfessor do professor, se existir."""
-        professor = self.professor_disciplina_turma.professor
-        ano_letivo = self.professor_disciplina_turma.disciplina_turma.turma.ano_letivo
-        try:
-            return ConfiguracaoAvaliacaoProfessor.objects.get(
-                ano_letivo__ano=ano_letivo,
-                professor=professor
-            )
-        except ConfiguracaoAvaliacaoProfessor.DoesNotExist:
-            return None
-    
-    def get_forma_calculo(self) -> str:
-        """
-        Retorna a forma de cálculo para este bimestre.
-        Se livre_escolha_professor, usa config do professor. Caso contrário, SOMA padrão.
-        """
-        if not self.bimestre:
-            return FormaCalculo.SOMA
-        
-        config_geral = self.get_config_geral()
-        if not config_geral:
-            return FormaCalculo.SOMA
-        
-        if config_geral.livre_escolha_professor:
-            config_prof = self.get_config_professor()
-            if config_prof:
-                return config_prof.get_forma_calculo(self.bimestre)
-        
-        return FormaCalculo.SOMA
-    
-    def fez_recuperacao_status(self) -> tuple:
-        """
-        Retorna (fez_recuperacao, recuperou).
-        - fez_recuperacao: True se há nota de recuperação lançada
-        - recuperou: True se a nota de recuperação foi maior que a nota das avaliações
-        """
-        fez = self.nota_recuperacao is not None
-        recuperou = False
-        
-        if fez and self.nota_calculo_avaliacoes is not None:
-            recuperou = self.nota_recuperacao > self.nota_calculo_avaliacoes
-        
-        return (fez, recuperou)
-    
-    def calcular_nota_recuperacao(self) -> Decimal | None:
-        """Busca a nota da avaliação de recuperação para este bimestre."""
-        if not self.bimestre:
-            return None
-        
-        nota_rec = NotaAvaliacao.objects.filter(
-            avaliacao__professor_disciplina_turma=self.professor_disciplina_turma,
-            avaliacao__tipo='AVALIACAO_RECUPERACAO',
-            avaliacao__bimestre=self.bimestre,
-            matricula_turma=self.matricula_turma,
-            nota__isnull=False
-        ).first()
-        
-        return nota_rec.nota if nota_rec else None
-    
-    def calcular_nota_avaliacoes(self) -> Decimal | None:
-        """
-        Calcula nota das avaliações conforme forma de cálculo.
-        a) SOMA ou MEDIA_PONDERADA das REGULAR
-        b) + EXTRA
-        
-        Nota: A comparação com RECUPERACAO é feita em atualizar_notas().
-        Retorna None se não houver notas lançadas.
-        """
-        if not self.bimestre:
-            return None
-        
-        # Buscar notas de avaliações regulares
-        notas_regular = NotaAvaliacao.objects.filter(
-            avaliacao__professor_disciplina_turma=self.professor_disciplina_turma,
-            avaliacao__tipo='AVALIACAO_REGULAR',
-            avaliacao__bimestre=self.bimestre,
-            matricula_turma=self.matricula_turma,
-            nota__isnull=False
-        ).select_related('avaliacao')
-        
-        if not notas_regular.exists():
-            return None
-        
-        forma_calculo = self.get_forma_calculo()
-        
-        # (a) Cálculo de soma ou média ponderada das REGULAR
-        if forma_calculo == FormaCalculo.SOMA:
-            resultado = sum(n.nota for n in notas_regular)
-        else:  # MEDIA_PONDERADA
-            soma_ponderada = sum(n.avaliacao.valor * n.nota for n in notas_regular)
-            soma_pesos = sum(n.avaliacao.valor for n in notas_regular)
-            if soma_pesos > 0:
-                resultado = (soma_ponderada / soma_pesos)
-            else:
-                resultado = Decimal('0.00')
-        
-        # (b) Somar nota EXTRA se existir
-        nota_extra = NotaAvaliacao.objects.filter(
-            avaliacao__professor_disciplina_turma=self.professor_disciplina_turma,
-            avaliacao__tipo='AVALIACAO_EXTRA',
-            avaliacao__bimestre=self.bimestre,
-            matricula_turma=self.matricula_turma,
-            nota__isnull=False
-        ).first()
-        
-        if nota_extra:
-            resultado += nota_extra.nota
-        
-        # Limitar ao VALOR_MAXIMO
-        resultado = min(resultado, VALOR_MAXIMO)
-        
-        return resultado.quantize(Decimal('0.01'))
-    
-    def atualizar_notas(self):
-        """
-        Popula nota_calculo_avaliacoes, nota_recuperacao e fez_recuperacao
-        com base nas notas de avaliação lançadas.
-        """
-        # Calcular nota das avaliações
-        self.nota_calculo_avaliacoes = self.calcular_nota_avaliacoes()
-        
-        # Calcular nota de recuperação
-        self.nota_recuperacao = self.calcular_nota_recuperacao()
-        
-        # Atualizar flag fez_recuperacao
-        self.fez_recuperacao = self.nota_recuperacao is not None
-        
-        # Calcular nota final (maior entre calculada e recuperação)
-        if self.nota_calculo_avaliacoes is not None:
-            if self.nota_recuperacao is not None:
-                self.nota_final = max(self.nota_calculo_avaliacoes, self.nota_recuperacao)
-            else:
-                self.nota_final = self.nota_calculo_avaliacoes
-        elif self.nota_recuperacao is not None:
-            self.nota_final = self.nota_recuperacao
-        else:
-            self.nota_final = None
-    
-    def clean(self):
-        """
-        Validações de regras de negócio.
-        - Em SOMA: soma dos VALORES das avaliações regulares deve ser = VALOR_MAXIMO
-        - Notas não podem ultrapassar VALOR_MAXIMO
-        """
-        from django.core.exceptions import ValidationError
-        
-        if not self.professor_disciplina_turma_id or not self.bimestre:
-            return
-        
-        disciplina_turma = self.professor_disciplina_turma.disciplina_turma
-        forma_calculo = self.get_forma_calculo()
-        
-        # Em SOMA: validar que a soma dos VALORES das avaliações regulares = VALOR_MAXIMO
-        if forma_calculo == FormaCalculo.SOMA:
-            soma_valores = soma_valores_avaliacoes_regulares(disciplina_turma, self.bimestre)
-            
-            if soma_valores != VALOR_MAXIMO:
-                raise ValidationError(
-                    f'Para o cálculo por SOMA, a soma dos valores das avaliações regulares '
-                    f'deve ser exatamente {VALOR_MAXIMO}. Soma atual: {soma_valores}.'
-                )
-        
-        # Notas não podem ultrapassar VALOR_MAXIMO
-        if self.nota_final is not None and self.nota_final > VALOR_MAXIMO:
-            raise ValidationError(
-                f'A nota final ({self.nota_final}) não pode ser maior que {VALOR_MAXIMO}.'
-            )
-
-

@@ -90,6 +90,39 @@ class IsOwnerOrGestao(BasePermission):
         return obj == request.user
 
 
+class IsCreatorOrReadOnly(BasePermission):
+    """
+    Permissão para recursos como Avaliacao:
+    - Create: Apenas PROFESSOR
+    - Read: Qualquer usuário autenticado
+    - Update/Delete: Apenas o criador (criado_por)
+    """
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        
+        if view.action == 'create':
+            return request.user.tipo_usuario == 'PROFESSOR'
+        
+        # Read: qualquer autenticado
+        if view.action in ['list', 'retrieve'] or request.method == 'GET':
+            return True
+        
+        # Update/Delete: verificação em has_object_permission
+        return True
+    
+    def has_object_permission(self, request, view, obj):
+        # Read: qualquer autenticado
+        if view.action == 'retrieve' or request.method == 'GET':
+            return True
+        
+        # Update/Delete: apenas criador
+        if hasattr(obj, 'criado_por'):
+            return obj.criado_por == request.user
+        
+        return False
+
+
 class IsOwnerProfessorStrict(BasePermission):
     """
     Permissão RESTRITA para recursos de Professor (Aula, Faltas).

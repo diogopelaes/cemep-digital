@@ -14,11 +14,12 @@ class ConfiguracaoAvaliacaoGeralAdmin(admin.ModelAdmin):
     list_display = [
         'ano_letivo',
         'livre_escolha_professor',
+        'forma_calculo',
         'numero_casas_decimais_bimestral',
         'numero_casas_decimais_avaliacao',
         'regra_arredondamento',
     ]
-    list_filter = ['ano_letivo', 'livre_escolha_professor', 'regra_arredondamento']
+    list_filter = ['ano_letivo', 'livre_escolha_professor', 'forma_calculo', 'regra_arredondamento']
     search_fields = ['ano_letivo__ano']
 
 
@@ -40,19 +41,23 @@ class ConfiguracaoAvaliacaoProfessorAdmin(admin.ModelAdmin):
 @admin.register(Avaliacao)
 class AvaliacaoAdmin(admin.ModelAdmin):
     list_display = [
-        'professor_disciplina_turma',
+        'titulo',
         'tipo',
         'valor',
         'bimestre',
         'data_inicio',
         'data_fim',
+        'criado_por',
+        'criado_em',
     ]
+    readonly_fields = ['criado_em', 'criado_por']
     list_filter = ['tipo', 'bimestre']
     search_fields = [
-        'professor_disciplina_turma__disciplina_turma__disciplina__nome',
-        'professor_disciplina_turma__disciplina_turma__turma__numero',
+        'titulo',
+        'professores_disciplinas_turmas__disciplina_turma__disciplina__nome',
+        'professores_disciplinas_turmas__disciplina_turma__turma__numero',
     ]
-    autocomplete_fields = ['professor_disciplina_turma']
+    filter_horizontal = ['professores_disciplinas_turmas']
 
 
 @admin.register(ControleVisto)
@@ -81,7 +86,7 @@ class NotaAvaliacaoAdmin(admin.ModelAdmin):
     list_filter = ['is_active', 'avaliacao__tipo', 'avaliacao__bimestre']
     search_fields = [
         'matricula_turma__matricula_cemep__estudante__usuario__first_name',
-        'avaliacao__professor_disciplina_turma__disciplina_turma__disciplina__nome',
+        'avaliacao__titulo',
     ]
     autocomplete_fields = ['avaliacao', 'matricula_turma']
 

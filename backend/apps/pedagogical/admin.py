@@ -4,8 +4,18 @@ Admin para o App Pedagogical
 from django.contrib import admin
 from .models import (
     PlanoAula, Aula, Faltas, DescritorOcorrenciaPedagogica, OcorrenciaPedagogica,
-    OcorrenciaResponsavelCiente
+    OcorrenciaResponsavelCiente, Atividade
 )
+
+
+@admin.register(Atividade)
+class AtividadeAdmin(admin.ModelAdmin):
+    list_display = ['titulo', 'data_inicio', 'data_fim', 'com_visto', 'criado_por', 'criado_em']
+    list_filter = ['data_inicio', 'com_visto', 'turmas_professores__disciplina_turma__turma', 'turmas_professores__disciplina_turma__disciplina']
+    search_fields = ['titulo', 'descricao', 'criado_por__first_name', 'criado_por__last_name']
+    filter_horizontal = ['turmas_professores', 'arquivos']
+    raw_id_fields = ['criado_por']
+    date_hierarchy = 'data_inicio'
 
 
 @admin.register(PlanoAula)

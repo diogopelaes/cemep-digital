@@ -37,11 +37,15 @@ class ConfiguracaoAvaliacaoGeralViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def choices(self, request):
-        """Retorna as opções de regras de arredondamento."""
+        """Retorna as opções de regras de arredondamento e forma de cálculo."""
         return Response({
             'regra_arredondamento': [
                 {'value': choice[0], 'label': choice[1]}
                 for choice in RegraArredondamento.choices
+            ],
+            'forma_calculo': [
+                {'value': choice[0], 'label': choice[1]}
+                for choice in FormaCalculo.choices
             ]
         })
     

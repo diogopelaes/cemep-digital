@@ -17,6 +17,10 @@ class ConfiguracaoAvaliacaoGeralSerializer(serializers.ModelSerializer):
         source='get_regra_arredondamento_display', read_only=True
     )
     
+    forma_calculo_display = serializers.CharField(
+        source='get_forma_calculo_display', read_only=True
+    )
+    
     # Constantes globais (read-only para informação do frontend)
     valor_maximo = serializers.SerializerMethodField()
     media_aprovacao = serializers.SerializerMethodField()
@@ -28,6 +32,8 @@ class ConfiguracaoAvaliacaoGeralSerializer(serializers.ModelSerializer):
             'ano_letivo',
             'ano_letivo_ano',
             'livre_escolha_professor',
+            'forma_calculo',
+            'forma_calculo_display',
             'numero_casas_decimais_bimestral',
             'numero_casas_decimais_avaliacao',
             'regra_arredondamento',
@@ -44,6 +50,17 @@ class ConfiguracaoAvaliacaoGeralSerializer(serializers.ModelSerializer):
     
     def get_media_aprovacao(self, obj):
         return str(MEDIA_APROVACAO)
+
+    def validate(self, data):
+        # Cria uma instância temporária para rodar o clean do model
+        if self.instance:
+            for attr, value in data.items():
+                setattr(self.instance, attr, value)
+            try:
+                self.instance.clean()
+            except Exception as e:
+                raise serializers.ValidationError(e.message if hasattr(e, 'message') else str(e))
+        return data
 
 
 class ConfiguracaoAvaliacaoProfessorSerializer(serializers.ModelSerializer):
@@ -94,15 +111,23 @@ class ConfiguracaoAvaliacaoProfessorSerializer(serializers.ModelSerializer):
         if ano_letivo:
             try:
                 config_geral = ConfiguracaoAvaliacaoGeral.objects.get(ano_letivo=ano_letivo)
-                if not config_geral.livre_escolha_professor:
-                    raise serializers.ValidationError(
-                        'A configuração geral não permite livre escolha do professor.'
-                    )
             except ConfiguracaoAvaliacaoGeral.DoesNotExist:
                 raise serializers.ValidationError(
                     'Não existe configuração geral de avaliação para este ano letivo.'
                 )
         
+        # Chama o clean do model para validar se já existem avaliações
+        if self.instance:
+            for attr, value in data.items():
+                setattr(self.instance, attr, value)
+            try:
+                self.instance.clean()
+            except Exception as e:
+                # O clean do Django pode lançar ValidationError com message_dict ou message
+                if hasattr(e, 'message_dict'):
+                    raise serializers.ValidationError(e.message_dict)
+                raise serializers.ValidationError(e.message if hasattr(e, 'message') else str(e))
+
         return data
 
 

@@ -2,7 +2,8 @@
 App Pedagogical - Diário de Classe, Planos de Aula, Faltas, Ocorrências
 """
 from django.db import models
-from apps.core.models import Funcionario, Disciplina, Turma, Habilidade, ProfessorDisciplinaTurma, UUIDModel
+from django.contrib.auth import get_user_model
+from apps.core.models import Funcionario, Disciplina, Turma, Habilidade, ProfessorDisciplinaTurma, UUIDModel, Arquivo
 from apps.academic.models import Estudante, Responsavel
 from ckeditor.fields import RichTextField
 
@@ -267,4 +268,52 @@ class OcorrenciaResponsavelCiente(UUIDModel):
     def __str__(self):
         status = 'Ciente' if self.ciente else 'Pendente'
         return f"{self.responsavel} - {self.ocorrencia} ({status})"
+
+
+# =============================================================================
+# ATIVIDADES PEDAGÓGICAS
+# =============================================================================
+
+class Atividade(UUIDModel):
+    """
+    Atividade pedagógica cadastrada pelo professor para uma ou mais turmas.
+    """
+    
+    titulo = models.CharField(max_length=255, verbose_name='Título')
+    descricao = models.TextField(verbose_name='Descrição', null=True, blank=True)
+    
+    turmas_professores = models.ManyToManyField(
+        ProfessorDisciplinaTurma,
+        related_name='atividades',
+        verbose_name='Professores/Disciplinas/Turmas'
+    )
+    
+    arquivos = models.ManyToManyField(
+        Arquivo,
+        blank=True,
+        related_name='avaliacoes',
+        verbose_name='Arquivos'
+    )
+    
+    data_inicio = models.DateField(verbose_name='Data de início da avaliação')
+    data_fim = models.DateField(verbose_name='Data de fim da avaliação')
+    com_visto = models.BooleanField(default=False, verbose_name='Com Visto')
+    
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    
+    criado_por = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='atividades_criadas',
+        verbose_name='Criado por'
+    )
+    
+    class Meta:
+        verbose_name = 'Atividade'
+        verbose_name_plural = 'Atividades'
+        ordering = ['-data_inicio', 'titulo']
+
+    def __str__(self):
+        return self.titulo
 
