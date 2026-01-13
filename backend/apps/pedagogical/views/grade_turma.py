@@ -17,8 +17,8 @@ def grade_turma_view(request, ano, numero, letra):
     """
     Retorna a grade horária unificada de uma turma (e suas relacionadas).
     
-    URL: /api/core/grade-turma/<ano>/<numero>/<letra>/
-    Exemplo: /api/core/grade-turma/2026/1/A/
+    URL: /api/pedagogical/grade-turma/<ano>/<numero>/<letra>/
+    Exemplo: /api/pedagogical/grade-turma/2026/1/A/
     
     Retorna a grade vigente (baseada na data atual) com todas as disciplinas
     de todas as turmas relacionadas (mesmo numero/letra/ano).

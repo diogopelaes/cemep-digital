@@ -6,7 +6,7 @@ import {
 } from '../../components/ui'
 import { HiPhotograph, HiUserGroup, HiDuplicate } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
-import { coreAPI, academicAPI } from '../../services/api'
+import { pedagogicalAPI, academicAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { formatDateBR } from '../../utils/date'
 import { generateListaTurmaPDF } from '../../utils/pdf'
@@ -37,7 +37,7 @@ export default function MinhaTurmaDetalhes() {
         setLoading(true)
         try {
             const [turmaRes, estudantesRes] = await Promise.all([
-                coreAPI.minhasTurmas.get(id),
+                pedagogicalAPI.minhasTurmas.get(id),
                 academicAPI.matriculasTurma.list({ turma: id, page_size: 1000 })
             ])
 

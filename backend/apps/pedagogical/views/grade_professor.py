@@ -16,7 +16,7 @@ def grade_professor_view(request):
     """
     Retorna a grade horária de um professor.
     
-    URL: /api/core/grade-professor/
+    URL: /api/pedagogical/grade-professor/
     Query params:
         - professor_id (opcional): UUID do professor (apenas para GESTAO/SECRETARIA)
     

@@ -13,7 +13,7 @@ const DAYS = [
 
 /**
  * Gera o PDF da Grade Horária de uma Turma
- * @param {Object} dados - Dados retornados pela API /api/core/grade-turma/
+ * @param {Object} dados - Dados retornados pela API /api/pedagogical/grade-turma/
  */
 export async function generateGradeTurmaPDF(dados) {
     const { validade, matriz, horarios, ano_letivo, turma_nome, numero, letra, cursos } = dados
@@ -42,7 +42,7 @@ export async function generateGradeTurmaPDF(dados) {
 
 /**
  * Gera o PDF da Grade Horária do Professor
- * @param {Object} dados - Dados retornados pela API /api/core/grade-professor/
+ * @param {Object} dados - Dados retornados pela API /api/pedagogical/grade-professor/
  */
 export async function generateGradeProfessorPDF(dados) {
     const { professor_nome, validade, matriz, horarios, ano_letivo, mostrar_disciplina } = dados

@@ -63,8 +63,8 @@ export default function GradeProfessor() {
         setError(null)
         try {
             const url = professorId
-                ? `/core/grade-professor/?professor_id=${professorId}`
-                : '/core/grade-professor/'
+                ? `/pedagogical/grade-professor/?professor_id=${professorId}`
+                : '/pedagogical/grade-professor/'
             const response = await api.get(url)
             setDados(response.data)
         } catch (err) {

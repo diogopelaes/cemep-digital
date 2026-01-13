@@ -55,7 +55,7 @@ export default function GradeTurma() {
         setLoading(true)
         setError(null)
         try {
-            const response = await api.get(`/core/grade-turma/${ano}/${numero}/${letra.toUpperCase()}/`)
+            const response = await api.get(`/pedagogical/grade-turma/${ano}/${numero}/${letra.toUpperCase()}/`)
             setDados(response.data)
         } catch (err) {
             if (err.response?.status === 404) {

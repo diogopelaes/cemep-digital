@@ -6,7 +6,7 @@ import {
 } from '../../components/ui'
 import { HiUserGroup, HiTable, HiPhotograph } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
-import { coreAPI, academicAPI } from '../../services/api'
+import { pedagogicalAPI, academicAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { generateListaTurmaPDF } from '../../utils/pdf'
 import { formatDateBR } from '../../utils/date'
@@ -34,7 +34,7 @@ export default function MinhasTurmas() {
     const loadTurmas = async () => {
         setLoading(true)
         try {
-            const response = await coreAPI.minhasTurmas.list()
+            const response = await pedagogicalAPI.minhasTurmas.list()
             setTurmas(response.data.results || [])
         } catch (error) {
             if (error.response?.status !== 403) {

@@ -10,6 +10,9 @@ from .ocorrencia import (
     OcorrenciaPedagogicaViewSet,
     OcorrenciaResponsavelCienteViewSet
 )
+from .minhas_turmas import MinhasTurmasViewSet
+from .grade_professor import grade_professor_view
+from .grade_turma import grade_turma_view
 
 
 __all__ = [
@@ -18,4 +21,7 @@ __all__ = [
     'DescritorOcorrenciaPedagogicaViewSet',
     'OcorrenciaPedagogicaViewSet',
     'OcorrenciaResponsavelCienteViewSet',
+    'MinhasTurmasViewSet',
+    'grade_professor_view',
+    'grade_turma_view',
 ]

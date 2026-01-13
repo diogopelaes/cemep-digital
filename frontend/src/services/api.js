@@ -227,12 +227,6 @@ export const coreAPI = {
     update: (anoLetivoId) => api.post('/core/ano-letivo-selecionado/', { ano_letivo_id: anoLetivoId }),
   },
 
-  // Minhas Turmas (apenas turmas onde o professor leciona)
-  minhasTurmas: {
-    list: () => api.get('/core/minhas-turmas/'),
-    get: (id) => api.get(`/core/minhas-turmas/${id}/`),
-  },
-
   // Controle de Registros e Visualizações
   controleRegistros: {
     list: (params) => api.get('/core/controle-registros/', { params }),
@@ -321,6 +315,12 @@ export const pedagogicalAPI = {
     update: (id, data) => api.patch(`/pedagogical/planos-aula/${id}/`, data),
     delete: (id) => api.delete(`/pedagogical/planos-aula/${id}/`),
     getContextoFormulario: () => api.get('/pedagogical/planos-aula/contexto-formulario/'),
+  },
+
+  // Minhas Turmas (apenas turmas onde o professor leciona)
+  minhasTurmas: {
+    list: () => api.get('/pedagogical/minhas-turmas/'),
+    get: (id) => api.get(`/pedagogical/minhas-turmas/${id}/`),
   },
 }
 

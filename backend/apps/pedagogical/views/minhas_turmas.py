@@ -15,8 +15,8 @@ class MinhasTurmasViewSet(viewsets.ViewSet):
     
     Permissões: Qualquer usuário autenticado pode acessar (filtra automaticamente).
     
-    GET /core/minhas-turmas/ - Retorna as turmas do professor no ano letivo selecionado
-    GET /core/minhas-turmas/{id}/ - Retorna os detalhes de uma turma específica
+    GET /pedagogical/minhas-turmas/ - Retorna as turmas do professor no ano letivo selecionado
+    GET /pedagogical/minhas-turmas/{id}/ - Retorna os detalhes de uma turma específica
     """
     permission_classes = [IsAuthenticated]
 

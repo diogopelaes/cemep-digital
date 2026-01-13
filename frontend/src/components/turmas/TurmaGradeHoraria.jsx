@@ -180,7 +180,7 @@ export default function TurmaGradeHoraria() {
         try {
             const ref = turmas[0]
             const ano = dados.ano_letivo
-            const response = await api.get(`/core/grade-turma/${ano}/${ref.numero}/${ref.letra.toUpperCase()}/`)
+            const response = await api.get(`/pedagogical/grade-turma/${ano}/${ref.numero}/${ref.letra.toUpperCase()}/`)
             await generateGradeTurmaPDF(response.data)
         } catch (err) {
             console.error('Erro ao gerar PDF:', err)
