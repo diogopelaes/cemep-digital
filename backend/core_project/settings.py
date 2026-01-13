@@ -133,6 +133,36 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# =============================================================================
+# FILE STORAGE CONFIGURATION
+# =============================================================================
+# Em desenvolvimento (USE_GCS=false): armazena localmente em MEDIA_ROOT
+# Em produção (USE_GCS=true): armazena no Google Cloud Storage com Signed URLs
+#
+# SEGURANÇA: Quando usando GCS, todos os arquivos são PRIVADOS.
+# Ninguém acessa diretamente a URL do bucket - o Django gera URLs temporárias
+# assinadas após verificar as permissões do usuário em ProtectedMediaView.
+
+USE_GCS = os.getenv('USE_GCS', 'False').lower() == 'true'
+
+if USE_GCS:
+    # Adiciona django-storages aos apps (se não estiver)
+    if 'storages' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('storages')
+    
+    # Configurações do Google Cloud Storage
+    GS_BUCKET_NAME = os.getenv('GS_BUCKET_NAME')
+    GS_PROJECT_ID = os.getenv('GS_PROJECT_ID')
+    GS_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+    GS_DEFAULT_ACL = 'private'  # IMPORTANTE: Todos os arquivos são privados
+    GS_SIGNED_URL_EXPIRY = timedelta(minutes=15)  # URLs expiram em 15 min
+    
+    # Usa o storage customizado para mídia
+    DEFAULT_FILE_STORAGE = 'core_project.storage.CEMEPGoogleCloudStorage'
+    
+    # URL base do bucket (usada internamente, acesso real é via Signed URLs)
+    MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

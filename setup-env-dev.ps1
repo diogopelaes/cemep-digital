@@ -57,6 +57,9 @@ EMAIL_USE_TLS=$($config.email.use_tls.ToString().ToLower())
 EMAIL_HOST_USER=$($config.email.user)
 EMAIL_HOST_PASSWORD=$($config.email.password)
 DEFAULT_FROM_EMAIL=$($config.email.from)
+
+# Storage (Local em desenvolvimento)
+USE_GCS=$($config.storage.use_gcs.ToString().ToLower())
 "@
 
 # Salvar .env

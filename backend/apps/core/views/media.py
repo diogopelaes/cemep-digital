@@ -78,6 +78,7 @@ import os
 import mimetypes
 from django.conf import settings
 from django.http import FileResponse, Http404
+from django.shortcuts import redirect
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from apps.users.permissions import IsGestao, IsGestaoOrSecretaria, IsFuncionario
@@ -172,7 +173,36 @@ class ProtectedMediaView(APIView):
     def get(self, request, file_path):
         """
         Serve o arquivo após verificação de permissões.
+        
+        Em desenvolvimento (USE_GCS=False):
+            - Serve arquivo diretamente do disco local
+        
+        Em produção com GCS (USE_GCS=True):
+            - Gera Signed URL temporária (15 min)
+            - Redireciona o cliente para essa URL
+            - O arquivo nunca passa pelo servidor Django
         """
+        # =====================================================================
+        # GOOGLE CLOUD STORAGE: Redireciona para Signed URL
+        # =====================================================================
+        if getattr(settings, 'USE_GCS', False):
+            from django.core.files.storage import default_storage
+            
+            # Verifica se o arquivo existe no bucket
+            if not default_storage.exists(file_path):
+                raise Http404("Arquivo não encontrado")
+            
+            # Gera URL assinada temporária (definida em GS_SIGNED_URL_EXPIRY)
+            # Esta URL expira e não pode ser reutilizada após expiração
+            signed_url = default_storage.url(file_path)
+            
+            # Redireciona o cliente para a URL do GCS
+            # O arquivo é baixado diretamente do Google, não passa pelo Django
+            return redirect(signed_url)
+        
+        # =====================================================================
+        # ARMAZENAMENTO LOCAL: Serve do disco
+        # =====================================================================
         # Constrói o caminho absoluto do arquivo
         absolute_path = os.path.join(settings.MEDIA_ROOT, file_path)
         

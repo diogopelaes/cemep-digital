@@ -60,6 +60,12 @@ EMAIL_USER=$(jq -r '.email.user' "$CONFIG_FILE")
 EMAIL_PASSWORD=$(jq -r '.email.password' "$CONFIG_FILE")
 EMAIL_FROM=$(jq -r '.email.from' "$CONFIG_FILE")
 
+# Storage (Google Cloud Storage)
+USE_GCS=$(jq -r '.storage.use_gcs' "$CONFIG_FILE")
+GS_BUCKET_NAME=$(jq -r '.storage.gcs_bucket_name' "$CONFIG_FILE")
+GS_PROJECT_ID=$(jq -r '.storage.gcs_project_id' "$CONFIG_FILE")
+GCS_CREDENTIALS_PATH=$(jq -r '.storage.gcs_credentials_path' "$CONFIG_FILE")
+
 # Gerar arquivo .env
 ENV_FILE="$BACKEND_DIR/.env"
 echo "Gerando arquivo .env em: $ENV_FILE"
@@ -95,6 +101,12 @@ EMAIL_USE_TLS=$EMAIL_USE_TLS
 EMAIL_HOST_USER=$EMAIL_USER
 EMAIL_HOST_PASSWORD=$EMAIL_PASSWORD
 DEFAULT_FROM_EMAIL=$EMAIL_FROM
+
+# Google Cloud Storage
+USE_GCS=$USE_GCS
+GS_BUCKET_NAME=$GS_BUCKET_NAME
+GS_PROJECT_ID=$GS_PROJECT_ID
+GOOGLE_APPLICATION_CREDENTIALS=$GCS_CREDENTIALS_PATH
 EOF
 
 chmod 600 "$ENV_FILE"
