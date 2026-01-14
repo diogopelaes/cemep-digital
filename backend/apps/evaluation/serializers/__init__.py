@@ -1,13 +1,3 @@
-from .configuracao import (
-    ConfiguracaoAvaliacaoGeralSerializer,
-    ConfiguracaoAvaliacaoProfessorSerializer,
-    FormaCalculoChoicesSerializer,
-    RegraArredondamentoChoicesSerializer,
-)
+from .avaliacao import AvaliacaoSerializer, AvaliacaoListSerializer, AvaliacaoChoicesSerializer
 
-__all__ = [
-    'ConfiguracaoAvaliacaoGeralSerializer',
-    'ConfiguracaoAvaliacaoProfessorSerializer',
-    'FormaCalculoChoicesSerializer',
-    'RegraArredondamentoChoicesSerializer',
-]
+__all__ = ['AvaliacaoSerializer', 'AvaliacaoListSerializer', 'AvaliacaoChoicesSerializer']

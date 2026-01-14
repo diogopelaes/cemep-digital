@@ -1,268 +1,14 @@
-"""
-App Evaluation - Configurações, Avaliações, Notas, Recuperação
-"""
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from apps.core.models import Funcionario, ProfessorDisciplinaTurma, UUIDModel, Arquivo, AnoLetivo
 from apps.academic.models import Estudante, MatriculaTurma
-from django.db.models.signals import m2m_changed
-from django.dispatch import receiver
-
-
-# =============================================================================
-# CONSTANTES GLOBAIS
-# =============================================================================
-
-VALOR_MAXIMO = Decimal('10.00')
-MEDIA_APROVACAO = Decimal('6.00')
-
-BIMESTRE_CHOICES = [
-    (1, '1º Bimestre'),
-    (2, '2º Bimestre'),
-    (3, '3º Bimestre'),
-    (4, '4º Bimestre'),
-]
-
-
-# =============================================================================
-# CONFIGURAÇÕES DE AVALIAÇÃO
-# =============================================================================
-
-class FormaCalculo(models.TextChoices):
-    """Opções de forma de cálculo das avaliações."""
-    SOMA = 'SOMA', 'Soma'
-    MEDIA_PONDERADA = 'MEDIA_PONDERADA', 'Média Ponderada'
-
-
-class RegraArredondamento(models.TextChoices):
-    """
-    Regras de arredondamento disponíveis.
-    Extensível para novas regras no futuro.
-    Ver: Documentation/REGRAS_ARREDONDAMENTO.md
-    """
-    MATEMATICO_CLASSICO = 'MATEMATICO_CLASSICO', 'Arredondamento Matemático Clássico'
-    FAIXAS_MULTIPLOS_05 = 'FAIXAS_MULTIPLOS_05', 'Arredondamento por Faixas (Múltiplos de 0,5)'
-    SEMPRE_PARA_CIMA = 'SEMPRE_PARA_CIMA', 'Arredondamento Sempre para Cima (Base Decimal)'
-    SEMPRE_PARA_CIMA_05 = 'SEMPRE_PARA_CIMA_05', 'Arredondamento Sempre para Cima (Múltiplos de 0,5)'
-
-
-class ConfiguracaoAvaliacaoGeral(UUIDModel):
-    """
-    Configuração geral de avaliação definida pela gestão.
-    Única por AnoLetivo.
-    
-    Nota: VALOR_MAXIMO e MEDIA_APROVACAO são constantes globais do módulo.
-    """
-    
-    ano_letivo = models.OneToOneField(
-        'core.AnoLetivo',
-        on_delete=models.CASCADE,
-        related_name='configuracao_avaliacao',
-        verbose_name='Ano Letivo'
-    )
-    
-    # Se True, o professor pode escolher a forma de cálculo
-    livre_escolha_professor = models.BooleanField(
-        default=True,
-        verbose_name='Livre Escolha do Professor',
-        help_text='Se marcado, o professor pode escolher a forma de cálculo das avaliações'
-    )
-
-    # Forma de cálculo para cada bimestre
-    forma_calculo = models.CharField(
-        max_length=20,
-        choices=FormaCalculo.choices,
-        default=FormaCalculo.SOMA,
-        verbose_name='Forma de Cálculo'
-    )
-    
-    # Casas decimais para arredondamento (Bimestral)
-    numero_casas_decimais_bimestral = models.PositiveSmallIntegerField(
-        default=1,
-        validators=[MinValueValidator(0), MaxValueValidator(4)],
-        verbose_name='Casas Decimais (Bimestral)',
-        help_text='Quantidade de casas decimais para arredondamento da nota final do bimestre'
-    )
-    
-    # Casas decimais para arredondamento (Avaliação)
-    numero_casas_decimais_avaliacao = models.PositiveSmallIntegerField(
-        default=2,
-        validators=[MinValueValidator(0), MaxValueValidator(4)],
-        verbose_name='Casas Decimais (Avaliação)',
-        help_text='Quantidade de casas decimais para arredondamento de cada avaliação individualmente'
-    )
-    
-    # Regra de arredondamento
-    regra_arredondamento = models.CharField(
-        max_length=30,
-        choices=RegraArredondamento.choices,
-        default=RegraArredondamento.FAIXAS_MULTIPLOS_05,
-        verbose_name='Regra de Arredondamento',
-        help_text='Regra utilizada para arredondamento das notas'
-    )
-    
-    criado_em = models.DateTimeField(auto_now_add=True)
-    atualizado_em = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        verbose_name = 'Configuração Geral de Avaliação'
-        verbose_name_plural = 'Configurações Gerais de Avaliação'
-    
-    def __str__(self):
-        return f"Configuração de Avaliação - {self.ano_letivo.ano}"
-
-    def clean(self):
-        from django.core.exceptions import ValidationError
-        # Se existir algum registro de Avaliacao nesse mesmo ano_letivo então não pode mais mudar as configurações
-        if not self._state.adding:
-            if Avaliacao.objects.filter(ano_letivo=self.ano_letivo).exists():
-                raise ValidationError(
-                    "Não é possível alterar as configurações pois já existem avaliações registradas para este ano letivo."
-                )
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        # Se livre_escolha_professor = False deve atualizar todos os ConfiguracaoAvaliacaoProfessor
-        if not self.livre_escolha_professor:
-            ConfiguracaoAvaliacaoProfessor.objects.filter(
-                ano_letivo=self.ano_letivo
-            ).update(
-                forma_calculo_1bim=self.forma_calculo,
-                forma_calculo_2bim=self.forma_calculo,
-                forma_calculo_3bim=self.forma_calculo,
-                forma_calculo_4bim=self.forma_calculo,
-            )
-
-
-class ConfiguracaoAvaliacaoProfessor(UUIDModel):
-    """
-    Configuração de avaliação do professor.
-    Única por AnoLetivo e Professor.
-    Só existe se a configuração geral permitir livre escolha do professor.
-    """
-    
-    ano_letivo = models.ForeignKey(
-        'core.AnoLetivo',
-        on_delete=models.CASCADE,
-        related_name='configuracoes_avaliacao_professores',
-        verbose_name='Ano Letivo'
-    )
-    
-    professor = models.ForeignKey(
-        Funcionario,
-        on_delete=models.CASCADE,
-        related_name='configuracoes_avaliacao',
-        verbose_name='Professor'
-    )
-    
-    # Forma de cálculo para cada bimestre
-    forma_calculo_1bim = models.CharField(
-        max_length=20,
-        choices=FormaCalculo.choices,
-        default=FormaCalculo.SOMA,
-        verbose_name='Forma de Cálculo - 1º Bimestre'
-    )
-    forma_calculo_2bim = models.CharField(
-        max_length=20,
-        choices=FormaCalculo.choices,
-        default=FormaCalculo.SOMA,
-        verbose_name='Forma de Cálculo - 2º Bimestre'
-    )
-    forma_calculo_3bim = models.CharField(
-        max_length=20,
-        choices=FormaCalculo.choices,
-        default=FormaCalculo.SOMA,
-        verbose_name='Forma de Cálculo - 3º Bimestre'
-    )
-    forma_calculo_4bim = models.CharField(
-        max_length=20,
-        choices=FormaCalculo.choices,
-        default=FormaCalculo.SOMA,
-        verbose_name='Forma de Cálculo - 4º Bimestre'
-    )
-    
-    criado_em = models.DateTimeField(auto_now_add=True)
-    atualizado_em = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        verbose_name = 'Configuração de Avaliação do Professor'
-        verbose_name_plural = 'Configurações de Avaliação dos Professores'
-        unique_together = ['ano_letivo', 'professor']
-    
-    def __str__(self):
-        return f"Config. Avaliação - {self.professor} ({self.ano_letivo.ano})"
-    
-    def get_forma_calculo(self, bimestre: int) -> str:
-        """Retorna a forma de cálculo para um bimestre específico."""
-        mapa = {
-            1: self.forma_calculo_1bim,
-            2: self.forma_calculo_2bim,
-            3: self.forma_calculo_3bim,
-            4: self.forma_calculo_4bim,
-        }
-        return mapa.get(bimestre, FormaCalculo.SOMA)
-    
-    def clean(self):
-        from django.core.exceptions import ValidationError
-        
-        # Verifica se existe ConfiguracaoAvaliacaoGeral para o AnoLetivo
-        if self.ano_letivo_id:
-            try:
-                config_geral = ConfiguracaoAvaliacaoGeral.objects.get(
-                    ano_letivo=self.ano_letivo
-                )
-            except ConfiguracaoAvaliacaoGeral.DoesNotExist:
-                raise ValidationError(
-                    'Não existe configuração geral de avaliação para este ano letivo.'
-                )
-            
-            # Se não é a criação (é edição)
-            if not self._state.adding:
-                old_instance = ConfiguracaoAvaliacaoProfessor.objects.get(pk=self.pk)
-                
-                # Identifica quais bimestres mudaram
-                changed_bimestres = []
-                if self.forma_calculo_1bim != old_instance.forma_calculo_1bim:
-                    changed_bimestres.append(1)
-                if self.forma_calculo_2bim != old_instance.forma_calculo_2bim:
-                    changed_bimestres.append(2)
-                if self.forma_calculo_3bim != old_instance.forma_calculo_3bim:
-                    changed_bimestres.append(3)
-                if self.forma_calculo_4bim != old_instance.forma_calculo_4bim:
-                    changed_bimestres.append(4)
-                
-                if changed_bimestres:
-                    # Verifica se tem avaliações do professor nesses bimestres
-                    if Avaliacao.objects.filter(
-                        ano_letivo=self.ano_letivo,
-                        bimestre__in=changed_bimestres,
-                        professores_disciplinas_turmas__professor=self.professor
-                    ).exists():
-                        raise ValidationError(
-                            "Não é possível alterar a forma de cálculo para bimestres que já possuem avaliações registradas para este professor."
-                        )
-
-    def save(self, *args, **kwargs):
-        # Caso livre_escolha_professor = False faça todas as formas de cálculo ficarem como de ConfiguracaoAvaliacaoGeral
-        try:
-            config_geral = ConfiguracaoAvaliacaoGeral.objects.get(ano_letivo=self.ano_letivo)
-            if not config_geral.livre_escolha_professor:
-                self.forma_calculo_1bim = config_geral.forma_calculo
-                self.forma_calculo_2bim = config_geral.forma_calculo
-                self.forma_calculo_3bim = config_geral.forma_calculo
-                self.forma_calculo_4bim = config_geral.forma_calculo
-        except ConfiguracaoAvaliacaoGeral.DoesNotExist:
-            pass
-            
-        super().save(*args, **kwargs)
-
+from .config import *
 
 # =============================================================================
 # AVALIAÇÕES
 # =============================================================================
-
 
 class Avaliacao(UUIDModel):
     """
@@ -279,6 +25,11 @@ class Avaliacao(UUIDModel):
         on_delete=models.CASCADE,
         related_name='avaliacoes',
         verbose_name='Ano Letivo'
+    )
+
+    bimestre = models.PositiveSmallIntegerField(
+        choices=BIMESTRE_CHOICES,
+        verbose_name='Bimestre'
     )
 
     titulo = models.CharField(
@@ -301,9 +52,12 @@ class Avaliacao(UUIDModel):
     )
 
     valor = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        validators=[MinValueValidator(Decimal('0.01')), MaxValueValidator(VALOR_MAXIMO)],
+        max_digits=10,
+        decimal_places=5,
+        validators=[
+            MinValueValidator(Decimal('0.00')), 
+            MaxValueValidator(999.9)
+        ],
         verbose_name='Valor Máximo da Avaliação'
     )
 
@@ -316,13 +70,6 @@ class Avaliacao(UUIDModel):
         ],
         default='AVALIACAO_REGULAR',
         verbose_name='Tipo de Avaliação'
-    )
-
-    bimestre = models.PositiveSmallIntegerField(
-        choices=BIMESTRE_CHOICES,
-        null=True,
-        blank=True,
-        verbose_name='Bimestre'
     )
 
     data_inicio = models.DateField(verbose_name='Data de início da avaliação')
@@ -348,6 +95,28 @@ class Avaliacao(UUIDModel):
         verbose_name_plural = 'Avaliações'
         # Removido unique_together para permitir várias REGULAR por bimestre
     
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.data_inicio:
+            # 1. Valida a integridade do intervalo (Data de início deve ser anterior ou igual à de fim)
+            if self.data_fim and self.data_inicio > self.data_fim:
+                raise ValidationError("A data de início não pode ser posterior à data de fim.")
+            
+            # 2. Executa validações de regras de negócio do calendário escolar centralizadas no AnoLetivo:
+            # - Garante que exista um Ano Letivo cadastrado para o ano da avaliação.
+            # - Garante que a data de início pertença a um bimestre definido.
+            # - Garante que o intervalo escolhido possua ao menos um dia letivo (ignora feriados/recessos).
+            ano_letivo = AnoLetivo.obter_ano_letivo_da_data(self.data_inicio)
+            ano_letivo.validar_periodo_letivo(self.data_inicio, self.data_fim)
+
+    def save(self, *args, **kwargs):
+        if self.data_inicio:
+            # O clean() já garante que ele existe
+            self.ano_letivo = AnoLetivo.obter_ano_letivo_da_data(self.data_inicio)
+            self.bimestre = self.ano_letivo.bimestre(self.data_inicio)
+                
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.titulo} ({self.get_tipo_display()})"
 
@@ -426,16 +195,23 @@ class NotaAvaliacao(UUIDModel):
         on_delete=models.CASCADE,
         related_name='notas_avaliacoes'
     )
-    
-    is_active = models.BooleanField(default=True, verbose_name='Ativa')
 
     nota = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
+        max_digits=10,
+        decimal_places=5,
         null=True,
         blank=True,
-        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(VALOR_MAXIMO)],
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(999.9)],
         verbose_name='Nota'
+    )
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    criado_por = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='notas_avaliacoes_criadas',
+        verbose_name='Criado por'
     )
     
     class Meta:
@@ -445,12 +221,41 @@ class NotaAvaliacao(UUIDModel):
     
     def __str__(self):
         return f"{self.avaliacao} - {self.matricula_turma}"
-
     
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        
+        # 1. Nota não pode exceder o valor máximo da avaliação vinculada
+        if self.nota is not None and self.avaliacao_id:
+            if self.nota > self.avaliacao.valor:
+                raise ValidationError({
+                    'nota': f"A nota ({self.nota}) não pode exceder o valor máximo "
+                            f"da avaliação ({self.avaliacao.valor})."
+                })
+        
+        # 2. Matrícula deve pertencer a uma turma vinculada à avaliação
+        if self.matricula_turma_id and self.avaliacao_id:
+            turmas_avaliacao = set(
+                self.avaliacao.professores_disciplinas_turmas.values_list(
+                    'disciplina_turma__turma_id', flat=True
+                )
+            )
+            if self.matricula_turma.turma_id not in turmas_avaliacao:
+                raise ValidationError({
+                    'matricula_turma': "O estudante não pertence a uma turma "
+                                       "vinculada a esta avaliação."
+                })
 
 
 class NotaBimestral(UUIDModel):
     """Nota bimestral de um estudante em uma disciplina."""
+
+    bimestre = models.PositiveSmallIntegerField(
+        choices=BIMESTRE_CHOICES,
+        null=True,
+        blank=True,
+        verbose_name='Bimestre'
+    )
     
     matricula_turma = models.ForeignKey(
         MatriculaTurma,
@@ -464,42 +269,40 @@ class NotaBimestral(UUIDModel):
     )
 
     nota_calculo_avaliacoes = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
+        max_digits=10,
+        decimal_places=5,
         null=True,
         blank=True,
-        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(VALOR_MAXIMO)],
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(999.9)],
         verbose_name='Nota Calculada pelas Avaliações'
     )
 
     nota_recuperacao = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
+        max_digits=10,
+        decimal_places=5,
         null=True,
         blank=True,
-        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(VALOR_MAXIMO)],
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(999.9)],
         verbose_name='Nota Recuperação'
     )
 
     nota_final = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
+        max_digits=10,
+        decimal_places=5,
         null=True,
         blank=True,
-        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(VALOR_MAXIMO)],
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(999.9)],
         verbose_name='Nota Final'
     )
 
-    fez_recuperacao = models.BooleanField(
-        default=False,
-        verbose_name='Fez Recuperação'
-    )
 
-    bimestre = models.PositiveSmallIntegerField(
-        choices=BIMESTRE_CHOICES,
-        null=True,
-        blank=True,
-        verbose_name='Bimestre'
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    criado_por = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='notas_bimestrais_criadas',
+        verbose_name='Criado por'
     )
     
     class Meta:
@@ -511,4 +314,55 @@ class NotaBimestral(UUIDModel):
     def __str__(self):
         return f"{self.matricula_turma} - {self.professor_disciplina_turma.disciplina_turma.disciplina}"
     
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        
+        # 1. Matrícula e professor/disciplina devem ser da mesma turma
+        if self.matricula_turma_id and self.professor_disciplina_turma_id:
+            turma_matricula = self.matricula_turma.turma_id
+            turma_professor = self.professor_disciplina_turma.disciplina_turma.turma_id
+            if turma_matricula != turma_professor:
+                raise ValidationError(
+                    "A matrícula e o professor/disciplina devem pertencer à mesma turma."
+                )
+        
+        # 2. nota_final não pode ser menor que nota_calculo_avaliacoes
+        if self.nota_final is not None and self.nota_calculo_avaliacoes is not None:
+            if self.nota_final < self.nota_calculo_avaliacoes:
+                raise ValidationError({
+                    'nota_final': "A nota final não pode ser menor que a nota calculada das avaliações."
+                })
     
+    # -------------------------------------------------------------------------
+    # Properties de Status de Recuperação
+    # -------------------------------------------------------------------------
+    
+    @property
+    def ficou_de_recuperacao(self) -> bool:
+        """Retorna True se o aluno ficou de recuperação (nota < média de aprovação)."""
+        if self.nota_calculo_avaliacoes is None:
+            return False
+        return self.nota_calculo_avaliacoes < MEDIA_APROVACAO
+    
+    @property
+    def fez_recuperacao(self) -> bool:
+        """Retorna True se o aluno fez a prova de recuperação (existe nota registrada)."""
+        return self.nota_recuperacao is not None
+    
+    @property
+    def melhorou_nota(self) -> bool:
+        """Retorna True se a nota de recuperação é maior que a nota original."""
+        if self.nota_calculo_avaliacoes is None or self.nota_recuperacao is None:
+            return False
+        return self.nota_recuperacao > self.nota_calculo_avaliacoes
+    
+    @property
+    def recuperou(self) -> bool:
+        """Retorna True se o aluno atingiu a média através da recuperação."""
+        if self.nota_recuperacao is None:
+            return False
+        return self.nota_recuperacao >= MEDIA_APROVACAO
+    
+
+
+

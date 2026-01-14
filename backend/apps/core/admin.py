@@ -131,7 +131,7 @@ class AnoLetivoAdmin(admin.ModelAdmin):
     list_display = ['ano', 'is_active']
     list_filter = ['is_active']
     search_fields = ['ano']
-    readonly_fields = ['controles']
+    readonly_fields = ['controles', 'datas_liberadas_aulas_faltas']
     fieldsets = (
         (None, {
             'fields': ('ano', 'is_active', 'numero_chamadas_turmas_travadas')
@@ -152,7 +152,7 @@ class AnoLetivoAdmin(admin.ModelAdmin):
             'fields': ('dias_letivos_extras', 'dias_nao_letivos')
         }),
         ('Cache de Controles', {
-            'fields': ('controles',),
+            'fields': ('controles', 'datas_liberadas_aulas_faltas'),
             'classes': ('collapse',),
         }),
     )
@@ -198,10 +198,6 @@ class ControleRegistrosVisualizacaoAdmin(admin.ModelAdmin):
     list_editable = ['data_inicio', 'data_fim', 'digitacao_futura']
     ordering = ['ano_letivo', 'bimestre', 'tipo']
     raw_id_fields = ['ano_letivo']
-
-    @admin.display(description='Status')
-    def status_liberacao(self, obj):
-        return obj.status_liberacao
 
     @admin.display(description='Status')
     def status_liberacao(self, obj):

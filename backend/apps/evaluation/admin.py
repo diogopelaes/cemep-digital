@@ -1,110 +1,78 @@
 from django.contrib import admin
-from apps.evaluation.models import (
-    ConfiguracaoAvaliacaoGeral,
-    ConfiguracaoAvaliacaoProfessor,
-    Avaliacao,
-    ControleVisto,
-    NotaAvaliacao,
-    NotaBimestral,
-)
-
-
-@admin.register(ConfiguracaoAvaliacaoGeral)
-class ConfiguracaoAvaliacaoGeralAdmin(admin.ModelAdmin):
-    list_display = [
-        'ano_letivo',
-        'livre_escolha_professor',
-        'forma_calculo',
-        'numero_casas_decimais_bimestral',
-        'numero_casas_decimais_avaliacao',
-        'regra_arredondamento',
-    ]
-    list_filter = ['ano_letivo', 'livre_escolha_professor', 'forma_calculo', 'regra_arredondamento']
-    search_fields = ['ano_letivo__ano']
-
-
-@admin.register(ConfiguracaoAvaliacaoProfessor)
-class ConfiguracaoAvaliacaoProfessorAdmin(admin.ModelAdmin):
-    list_display = [
-        'professor',
-        'ano_letivo',
-        'forma_calculo_1bim',
-        'forma_calculo_2bim',
-        'forma_calculo_3bim',
-        'forma_calculo_4bim',
-    ]
-    list_filter = ['ano_letivo', 'forma_calculo_1bim']
-    search_fields = ['professor__usuario__first_name', 'professor__usuario__last_name']
-    autocomplete_fields = ['professor', 'ano_letivo']
+from .models import Avaliacao, ControleVisto, NotaAvaliacao, NotaBimestral
 
 
 @admin.register(Avaliacao)
 class AvaliacaoAdmin(admin.ModelAdmin):
     list_display = [
-        'titulo',
-        'tipo',
-        'valor',
-        'bimestre',
-        'data_inicio',
-        'data_fim',
-        'criado_por',
-        'criado_em',
+        'titulo', 'tipo', 'bimestre', 'ano_letivo', 
+        'valor', 'data_inicio', 'data_fim', 'criado_por'
     ]
-    readonly_fields = ['criado_em', 'criado_por']
-    list_filter = ['tipo', 'bimestre']
+    list_filter = ['tipo', 'bimestre', 'ano_letivo', 'criado_por']
     search_fields = [
-        'titulo',
-        'professores_disciplinas_turmas__disciplina_turma__disciplina__nome',
-        'professores_disciplinas_turmas__disciplina_turma__turma__numero',
+        'titulo', 'descricao', 
+        'criado_por__first_name', 'criado_por__last_name',
+        'criado_por__username'
     ]
-    filter_horizontal = ['professores_disciplinas_turmas']
+    raw_id_fields = ['ano_letivo', 'criado_por']
+    filter_horizontal = ['professores_disciplinas_turmas', 'arquivos']
+    readonly_fields = ['criado_em', 'atualizado_em']
+    date_hierarchy = 'data_inicio'
+    ordering = ['-data_inicio']
 
 
 @admin.register(ControleVisto)
 class ControleVistoAdmin(admin.ModelAdmin):
     list_display = [
-        'matricula_turma',
-        'professor_disciplina_turma',
-        'titulo',
-        'visto',
-        'bimestre',
-        'data_visto',
+        'titulo', 'matricula_turma', 'professor_disciplina_turma', 
+        'data_visto', 'visto', 'bimestre'
     ]
-    list_filter = ['visto', 'bimestre']
-    search_fields = ['titulo', 'matricula_turma__matricula_cemep__estudante__usuario__first_name']
-    autocomplete_fields = ['matricula_turma', 'professor_disciplina_turma']
+    list_filter = ['visto', 'bimestre', 'data_visto']
+    search_fields = [
+        'titulo', 
+        'matricula_turma__matricula_cemep__estudante__usuario__first_name',
+        'matricula_turma__matricula_cemep__estudante__usuario__last_name',
+        'professor_disciplina_turma__professor__usuario__first_name',
+        'professor_disciplina_turma__professor__usuario__last_name'
+    ]
+    raw_id_fields = ['matricula_turma', 'professor_disciplina_turma']
+    filter_horizontal = ['arquivos']
+    date_hierarchy = 'data_visto'
 
 
 @admin.register(NotaAvaliacao)
 class NotaAvaliacaoAdmin(admin.ModelAdmin):
-    list_display = [
-        'avaliacao',
-        'matricula_turma',
-        'nota',
-        'is_active',
+    list_display = ['avaliacao', 'matricula_turma', 'nota', 'criado_em', 'criado_por']
+    list_filter = [
+        'avaliacao__tipo', 
+        'avaliacao__bimestre', 
+        'avaliacao__ano_letivo'
     ]
-    list_filter = ['is_active', 'avaliacao__tipo', 'avaliacao__bimestre']
     search_fields = [
+        'avaliacao__titulo', 
         'matricula_turma__matricula_cemep__estudante__usuario__first_name',
-        'avaliacao__titulo',
+        'matricula_turma__matricula_cemep__estudante__usuario__last_name'
     ]
-    autocomplete_fields = ['avaliacao', 'matricula_turma']
+    raw_id_fields = ['avaliacao', 'matricula_turma', 'criado_por']
+    readonly_fields = ['criado_em', 'atualizado_em']
 
 
 @admin.register(NotaBimestral)
 class NotaBimestralAdmin(admin.ModelAdmin):
     list_display = [
-        'matricula_turma',
-        'professor_disciplina_turma',
-        'bimestre',
-        'nota_calculo_avaliacoes',
-        'nota_recuperacao',
-        'nota_final',
-        'fez_recuperacao',
+        'matricula_turma', 'professor_disciplina_turma', 'bimestre', 
+        'nota_calculo_avaliacoes', 'nota_recuperacao', 'nota_final'
     ]
-    list_filter = ['bimestre', 'fez_recuperacao']
+    list_filter = [
+        'bimestre', 
+        'professor_disciplina_turma__disciplina_turma__turma__ano_letivo'
+    ]
     search_fields = [
         'matricula_turma__matricula_cemep__estudante__usuario__first_name',
-        'professor_disciplina_turma__disciplina_turma__disciplina__nome',
+        'matricula_turma__matricula_cemep__estudante__usuario__last_name',
+        'professor_disciplina_turma__professor__usuario__first_name',
+        'professor_disciplina_turma__professor__usuario__last_name'
     ]
-    autocomplete_fields = ['matricula_turma', 'professor_disciplina_turma']
+    raw_id_fields = ['matricula_turma', 'professor_disciplina_turma', 'criado_por']
+    readonly_fields = ['criado_em', 'atualizado_em']
+    ordering = ['matricula_turma', 'bimestre']

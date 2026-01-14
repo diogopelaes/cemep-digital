@@ -1,9 +1,3 @@
-from .configuracao import (
-    ConfiguracaoAvaliacaoGeralViewSet,
-    ConfiguracaoAvaliacaoProfessorViewSet,
-)
+from .avaliacao import AvaliacaoViewSet
 
-__all__ = [
-    'ConfiguracaoAvaliacaoGeralViewSet',
-    'ConfiguracaoAvaliacaoProfessorViewSet',
-]
+__all__ = ['AvaliacaoViewSet']

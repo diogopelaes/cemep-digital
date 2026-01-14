@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { HiCalendar, HiClock, HiAdjustments, HiAcademicCap, HiClipboardCheck } from 'react-icons/hi'
+import { HiCalendar, HiClock, HiAdjustments, HiAcademicCap } from 'react-icons/hi'
 import CalendarioTab from '../../components/configuracoes/CalendarioTab'
 import HorarioAulaTab from '../../components/configuracoes/HorarioAulaTab'
 import ControleTab from '../../components/configuracoes/ControleTab'
 import HabilidadesTab from '../../components/configuracoes/HabilidadesTab'
-import AvaliacaoTab from '../../components/configuracoes/AvaliacaoTab'
 import { useReferences } from '../../contexts/ReferenceContext'
 
 
@@ -24,7 +23,6 @@ export default function Configuracoes() {
         { id: 'calendario', label: 'Calendário', icon: HiCalendar },
         ...(hasActiveCalendar ? [{ id: 'horarios', label: 'Horários de Aula', icon: HiClock }] : []),
         ...(hasActiveCalendar ? [{ id: 'controle', label: 'Controle', icon: HiAdjustments }] : []),
-        ...(hasActiveCalendar ? [{ id: 'avaliacao', label: 'Avaliação', icon: HiClipboardCheck }] : []),
         { id: 'habilidades', label: 'Habilidades BNCC', icon: HiAcademicCap },
     ]
 
@@ -61,7 +59,6 @@ export default function Configuracoes() {
                 {activeTab === 'calendario' && <CalendarioTab />}
                 {activeTab === 'horarios' && hasActiveCalendar && <HorarioAulaTab />}
                 {activeTab === 'controle' && hasActiveCalendar && <ControleTab />}
-                {activeTab === 'avaliacao' && hasActiveCalendar && <AvaliacaoTab />}
                 {activeTab === 'habilidades' && <HabilidadesTab />}
             </div>
         </div>

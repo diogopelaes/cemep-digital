@@ -1,4 +1,7 @@
+from datetime import date, timedelta
 from django.db import models
+from django.db.models.signals import m2m_changed, post_save
+from django.dispatch import receiver
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from .base import UUIDModel
@@ -60,6 +63,7 @@ class AnoLetivo(UUIDModel):
     data_fim_4bim = models.DateField(null=True, blank=True, verbose_name='Fim do 4º Bimestre')
     dias_letivos_extras = models.ManyToManyField(DiaLetivoExtra, blank=True, verbose_name='Dias Letivos Especiais')
     dias_nao_letivos = models.ManyToManyField(DiaNaoLetivo, blank=True, verbose_name='Feriados e Recessos')
+    
     numero_chamadas_turmas_travadas = models.BooleanField(default=False, verbose_name='Número de chamadas de turmas travadas')
     
     controles = models.JSONField(
@@ -99,6 +103,47 @@ class AnoLetivo(UUIDModel):
             return 4
         
         return None
+
+    def get_dias_letivos(self, data=None) -> list[date]:
+        """
+        Retorna os dias letivos do bimestre acessando diretamente o cache JSON (Busca Direta).
+        """
+        num_bimestre = self.bimestre(data)
+        if not num_bimestre:
+            return []
+        
+        # Acessa o cache dentro do JSONField 'controles'
+        bim_data = self.controles.get(str(num_bimestre), {})
+        cache = bim_data.get('dias_letivos_base', [])
+        
+        return [date.fromisoformat(d) for d in cache]
+
+    def _calcular_dias_letivos_bimestre(self, num_bimestre, feriados_ano=None, extras_ano=None):
+        """Lógica interna para calcular e retornar os dias letivos em formato ISO string."""
+        inicio = getattr(self, f'data_inicio_{num_bimestre}bim')
+        fim = getattr(self, f'data_fim_{num_bimestre}bim')
+        
+        if not inicio or not fim:
+            return []
+
+        if feriados_ano is None:
+            feriados_ano = set(self.dias_nao_letivos.filter(data__range=(inicio, fim)).values_list('data', flat=True))
+        else:
+            feriados_ano = {d for d in feriados_ano if inicio <= d <= fim}
+            
+        if extras_ano is None:
+            extras_ano = set(self.dias_letivos_extras.filter(data__range=(inicio, fim)).values_list('data', flat=True))
+        else:
+            extras_ano = {d for d in extras_ano if inicio <= d <= fim}
+
+        dias_uteis = {
+            (inicio + timedelta(n))
+            for n in range((fim - inicio).days + 1)
+            if (inicio + timedelta(n)).weekday() < 5
+        }
+
+        dias = sorted(list((dias_uteis - feriados_ano) | extras_ano))
+        return [d.isoformat() for d in dias]
 
     def clean(self):
         bimestres = [
@@ -167,24 +212,38 @@ class AnoLetivo(UUIDModel):
         )
     
     def atualizar_controles_json(self):
-        from datetime import timedelta
-        
         controles_db = ControleRegistrosVisualizacao.objects.filter(ano_letivo=self)
         novo_controles = {}
-        datas_bimestres = {
-            1: (self.data_inicio_1bim, self.data_fim_1bim),
-            2: (self.data_inicio_2bim, self.data_fim_2bim),
-            3: (self.data_inicio_3bim, self.data_fim_3bim),
-            4: (self.data_inicio_4bim, self.data_fim_4bim),
+        
+        # Otimização: Busca feriados e extras uma única vez para o intervalo total do ano
+        datas_referencia = [
+            self.data_inicio_1bim, self.data_fim_1bim,
+            self.data_inicio_2bim, self.data_fim_2bim,
+            self.data_inicio_3bim, self.data_fim_3bim,
+            self.data_inicio_4bim, self.data_fim_4bim
+        ]
+        datas_validas = [d for d in datas_referencia if d]
+        
+        feriados_ano = set()
+        extras_ano = set()
+        if datas_validas:
+            inicio_ano, fim_ano = min(datas_validas), max(datas_validas)
+            feriados_ano = set(self.dias_nao_letivos.filter(data__range=(inicio_ano, fim_ano)).values_list('data', flat=True))
+            extras_ano = set(self.dias_letivos_extras.filter(data__range=(inicio_ano, fim_ano)).values_list('data', flat=True))
+
+        # Pré-calcula os dias letivos de todos os bimestres para usar no JSON
+        dias_por_bimestre = {
+            str(n): self._calcular_dias_letivos_bimestre(n, feriados_ano, extras_ano)
+            for n in range(1, 5)
         }
-        
-        feriados = set(d.data for d in self.dias_nao_letivos.all())
-        extras = set(d.data for d in self.dias_letivos_extras.all())
-        
+
         for controle in controles_db:
             bim_key = str(controle.bimestre)
             if bim_key not in novo_controles:
-                novo_controles[bim_key] = {}
+                # Inicializa o bimestre com a lista base de dias letivos
+                novo_controles[bim_key] = {
+                    'dias_letivos_base': dias_por_bimestre.get(bim_key, [])
+                }
                 
             c_data = {
                 'data_liberada_inicio': controle.data_inicio.isoformat() if controle.data_inicio else None,
@@ -193,28 +252,62 @@ class AnoLetivo(UUIDModel):
             }
             
             if controle.tipo == ControleRegistrosVisualizacao.TipoControle.REGISTRO_AULA and controle.bimestre in range(1, 5):
-                dias_letivos = []
-                inicio_bim, fim_bim = datas_bimestres.get(controle.bimestre, (None, None))
-                
-                if inicio_bim and fim_bim:
-                    curr = inicio_bim
-                    while curr <= fim_bim:
-                        is_weekday = curr.weekday() < 5
-                        is_feriado = curr in feriados
-                        is_extra = curr in extras
-                        
-                        if (is_weekday and not is_feriado) or is_extra:
-                            dias_letivos.append(curr.isoformat())
-                            
-                        curr += timedelta(days=1)
-                
-                c_data['dias_letivos'] = dias_letivos
+                c_data['dias_letivos'] = dias_por_bimestre.get(bim_key, [])
                 
             novo_controles[bim_key][controle.tipo] = c_data
             
+        # Garante que mesmo bimestres sem controles tenham seus dias letivos base no JSON
+        for bim_key, dias in dias_por_bimestre.items():
+            if bim_key not in novo_controles:
+                novo_controles[bim_key] = {'dias_letivos_base': dias}
+
         AnoLetivo.objects.filter(pk=self.pk).update(controles=novo_controles)
         self.controles = novo_controles
         self.invalidar_cache_datas_liberadas()
+
+    @classmethod
+    def obter_ano_letivo_da_data(cls, data):
+        """Busca o AnoLetivo correspondente a uma data ou levanta ValidationError."""
+        if not data:
+            return None
+        try:
+            return cls.objects.get(ano=data.year)
+        except cls.DoesNotExist:
+            from django.core.exceptions import ValidationError
+            raise ValidationError(f"Não existe um Ano Letivo cadastrado para o ano {data.year}.")
+
+    def validar_periodo_letivo(self, data_inicio, data_fim=None):
+        """
+        Valida se o período possui dias letivos e se a data_inicio tem bimestre.
+        Centraliza a lógica de validação de datas para todo o sistema.
+        """
+        from django.core.exceptions import ValidationError
+        from datetime import timedelta
+        
+        # 1. O bimestre deve existir para a data_inicio
+        if not self.bimestre(data_inicio):
+            raise ValidationError(
+                f"A data {data_inicio.strftime('%d/%m/%Y')} não pertence a nenhum bimestre no ano {self.ano}."
+            )
+        
+        # 2. Verificar se existe pelo menos um dia letivo no intervalo [data_inicio, data_fim]
+        fim_check = data_fim if data_fim else data_inicio
+        
+        # Otimização: busca O(1) com set
+        dias_letivos_set = set(self.get_dias_letivos(data_inicio))
+        
+        def datas_no_intervalo():
+            curr = data_inicio
+            while curr <= fim_check:
+                yield curr
+                curr += timedelta(days=1)
+        
+        if not any(d in dias_letivos_set for d in datas_no_intervalo()):
+            if data_inicio == fim_check:
+                msg = f"A data {data_inicio.strftime('%d/%m/%Y')} não é um dia letivo."
+            else:
+                msg = f"O intervalo de {data_inicio.strftime('%d/%m/%Y')} a {fim_check.strftime('%d/%m/%Y')} não contém nenhum dia letivo."
+            raise ValidationError(msg)
 
     def invalidar_cache_datas_liberadas(self):
         AnoLetivo.objects.filter(pk=self.pk).update(datas_liberadas_aulas_faltas=None)
@@ -319,3 +412,27 @@ class ControleRegistrosVisualizacao(UUIDModel):
     def __str__(self):
         bimestre_display = dict(self.BIMESTRE_CHOICES).get(self.bimestre, str(self.bimestre))
         return f"{self.ano_letivo.ano} - {bimestre_display} - {self.get_tipo_display()} ({self.status_liberacao})"
+
+
+# =============================================================================
+# SIGNALS PARA SINCRONIZAÇÃO DE CACHE
+# =============================================================================
+
+@receiver(m2m_changed, sender=AnoLetivo.dias_nao_letivos.through)
+@receiver(m2m_changed, sender=AnoLetivo.dias_letivos_extras.through)
+def sync_ano_letivo_days_m2m(sender, instance, action, **kwargs):
+    """Atualiza o cache quando feriados/dias extras são vinculados/desvinculados."""
+    if action in ["post_add", "post_remove", "post_clear"]:
+        instance.atualizar_controles_json()
+
+@receiver(post_save, sender=DiaNaoLetivo)
+@receiver(post_save, sender=DiaLetivoExtra)
+def sync_related_ano_letivo_on_save(sender, instance, **kwargs):
+    """Atualiza o cache de todos os Anos Letivos que utilizam este feriado/dia extra alterado."""
+    if sender == DiaNaoLetivo:
+        anos = AnoLetivo.objects.filter(dias_nao_letivos=instance)
+    else:
+        anos = AnoLetivo.objects.filter(dias_letivos_extras=instance)
+    
+    for ano in anos:
+        ano.atualizar_controles_json()

@@ -352,26 +352,6 @@ export const managementAPI = {
 }
 
 export const evaluationAPI = {
-  // Configuração Geral de Avaliação
-  configGeral: {
-    list: (params) => api.get('/evaluation/config-geral/', { params }),
-    get: (id) => api.get(`/evaluation/config-geral/${id}/`),
-    create: (data) => api.post('/evaluation/config-geral/', data),
-    update: (id, data) => api.patch(`/evaluation/config-geral/${id}/`, data),
-    delete: (id) => api.delete(`/evaluation/config-geral/${id}/`),
-    choices: () => api.get('/evaluation/config-geral/choices/'),
-    atual: () => api.get('/evaluation/config-geral/atual/'),
-  },
-  // Configuração do Professor
-  configProfessor: {
-    list: (params) => api.get('/evaluation/config-professor/', { params }),
-    get: (id) => api.get(`/evaluation/config-professor/${id}/`),
-    create: (data) => api.post('/evaluation/config-professor/', data),
-    update: (id, data) => api.patch(`/evaluation/config-professor/${id}/`, data),
-    delete: (id) => api.delete(`/evaluation/config-professor/${id}/`),
-    choices: () => api.get('/evaluation/config-professor/choices/'),
-    minha: () => api.get('/evaluation/config-professor/minha/'),
-  },
   // Avaliações
   avaliacoes: {
     list: (params) => api.get('/evaluation/avaliacoes/', { params }),
