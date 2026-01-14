@@ -294,6 +294,11 @@ class Atividade(UUIDModel):
         related_name='avaliacoes',
         verbose_name='Arquivos'
     )
+    habilidades = models.ManyToManyField(
+        Habilidade,
+        related_name='atividades',
+        blank=True
+    )
     
     data_inicio = models.DateField(verbose_name='Data de início da avaliação')
     data_fim = models.DateField(verbose_name='Data de fim da avaliação')

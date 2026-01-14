@@ -160,12 +160,10 @@ class PlanoAulaViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet
             # Formata dados da turma resumidos
             turma_data = {
                 'id': str(turma.id),
-                'numero': turma.numero,
-                'letra': turma.letra,
-                'curso': {'sigla': turma.curso.sigla if turma.curso else ''}
+                'numero_letra': turma.numero_letra
             }
             
-            # Adiciona turma à lista da disciplina se ainda não estiver (evita duplicatas se houver múltiplas atribuições na mesma turma)
+            # Adiciona turma à lista da disciplina se ainda não estiver
             if turma_data not in turmas_por_disciplina[str(disc.id)]:
                 turmas_por_disciplina[str(disc.id)].append(turma_data)
 

@@ -11,7 +11,7 @@ from .models import (
 class ResponsavelEstudanteInline(admin.TabularInline):
     model = ResponsavelEstudante
     extra = 1
-    raw_id_fields = ['estudante']
+    raw_id_fields = ['responsavel', 'estudante']
 
 
 @admin.register(Estudante)

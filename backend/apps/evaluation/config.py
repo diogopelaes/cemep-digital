@@ -123,3 +123,52 @@ def arredondar_bimestral(valor: Decimal, regra: str = REGRA_ARREDONDAMENTO) -> D
 def arredondar_avaliacao(valor: Decimal, regra: str = REGRA_ARREDONDAMENTO) -> Decimal:
     """Arredonda um valor para nota de avaliação (casas decimais pré-definidas)."""
     return arredondar(valor, regra, NUMERO_CASAS_DECIMAIS_AVALIACAO)
+
+
+def valida_valor_nota(
+    nota: Decimal,
+    valor_maximo: Decimal = VALOR_MAXIMO,
+    regra: str = REGRA_ARREDONDAMENTO,
+    casas: int = NUMERO_CASAS_DECIMAIS_BIMESTRAL,
+) -> bool:
+    """
+    Valida se a nota:
+    - Está no intervalo [0, valor_maximo]
+    - Respeita o incremento exigido pela regra de arredondamento
+    - Zero é sempre considerado válido
+    """
+
+    # Intervalo válido (zero explicitamente aceito)
+    if nota < 0 or nota > valor_maximo:
+        return False
+
+    # Zero é válido para qualquer regra
+    if nota == 0:
+        return True
+
+    # Regras baseadas em múltiplos de 0.5
+    if regra in ('FAIXAS_MULTIPLOS_05', 'SEMPRE_PARA_CIMA_05'):
+        # Ex.: 0.5, 1.0, 1.5, ...
+        return (nota * _D2) % _D1 == 0
+
+    # Regras baseadas em número fixo de casas decimais
+    fator = _D1.scaleb(casas)
+    return (nota * fator) % _D1 == 0
+
+
+def get_config() -> dict:
+    """
+    Retorna as configurações de avaliação em formato de dicionário (JSON-friendly).
+    """
+    return {
+        "VALOR_MAXIMO": float(VALOR_MAXIMO),
+        "MEDIA_APROVACAO": float(MEDIA_APROVACAO),
+        "BIMESTRE_CHOICES": [{"id": k, "label": v} for k, v in BIMESTRE_CHOICES],
+        "OPCOES_FORMA_CALCULO": [{"id": k, "label": v} for k, v in OPCOES_FORMA_CALCULO],
+        "OPCOES_REGRA_ARREDONDAMENTO": [{"id": k, "label": v} for k, v in OPCOES_REGRA_ARREDONDAMENTO],
+        "FORMA_CALCULO": FORMA_CALCULO,
+        "REGRA_ARREDONDAMENTO": REGRA_ARREDONDAMENTO,
+        "NUMERO_CASAS_DECIMAIS_BIMESTRAL": NUMERO_CASAS_DECIMAIS_BIMESTRAL,
+        "NUMERO_CASAS_DECIMAIS_AVALIACAO": NUMERO_CASAS_DECIMAIS_AVALIACAO,
+    }
+

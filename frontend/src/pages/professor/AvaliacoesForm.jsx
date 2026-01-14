@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Loading, Badge, FormActionsProfessor, MultiCombobox } from '../../components/ui'
+import {
+    Card, Button, Loading, FormActionsProfessor,
+    Input, Select, DateInputAnoLetivo,
+    TurmaDisciplinaSelector, MultiCombobox
+} from '../../components/ui'
 import { evaluationAPI } from '../../services/api'
 import toast from 'react-hot-toast'
-import { formatDateBR } from '../../utils/date'
 
 const TIPOS = [
     { value: 'AVALIACAO_REGULAR', label: 'Avaliação Regular' },
@@ -28,15 +31,62 @@ export default function AvaliacoesForm() {
     const [dataInicio, setDataInicio] = useState('')
     const [dataFim, setDataFim] = useState('')
     const [pdtsSelecionados, setPdtsSelecionados] = useState([])
+    const [selectedHabilidades, setSelectedHabilidades] = useState([])
 
     // Dados auxiliares
     const [atribuicoes, setAtribuicoes] = useState([])
     const [valorMaximo, setValorMaximo] = useState(10)
     const [anoLetivo, setAnoLetivo] = useState(null)
+    const [datasLiberadas, setDatasLiberadas] = useState([])
+    const [dataAtual, setDataAtual] = useState(null)
+    const [multiDisciplinas, setMultiDisciplinas] = useState(true)
+    const [avaliacaoConfig, setAvaliacaoConfig] = useState({})
+    const [habilidadesMap, setHabilidadesMap] = useState({})
+    const [availableHabilidades, setAvailableHabilidades] = useState([])
+    const habilidadesRef = useRef(null)
+
+    // Rola para mostrar habilidades quando elas aparecem
+    useEffect(() => {
+        if (availableHabilidades.length > 0 && habilidadesRef.current) {
+            const timeoutId = setTimeout(() => {
+                habilidadesRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 100);
+            return () => clearTimeout(timeoutId);
+        }
+    }, [availableHabilidades.length]);
 
     useEffect(() => {
         loadData()
     }, [id])
+
+    // Filtra habilidades disponíveis com base nas disciplinas das turmas selecionadas
+    useEffect(() => {
+        if (pdtsSelecionados.length > 0 && atribuicoes.length > 0) {
+            const selectedPdts = atribuicoes.filter(a => pdtsSelecionados.includes(a.id))
+            const uniqueDisciplinaIds = [...new Set(selectedPdts.map(a => a.disciplina_id))]
+
+            let habs = []
+            uniqueDisciplinaIds.forEach(discId => {
+                const discHabs = habilidadesMap[discId] || []
+                habs = [...habs, ...discHabs]
+            })
+
+            // Remove duplicatas (caso uma habilidade esteja em múltiplas disciplinas selecionadas)
+            const seen = new Set()
+            const uniqueHabs = habs.filter(h => {
+                const duplicate = seen.has(h.id)
+                seen.add(h.id)
+                return !duplicate
+            })
+
+            setAvailableHabilidades(uniqueHabs)
+        } else {
+            setAvailableHabilidades([])
+        }
+    }, [pdtsSelecionados, atribuicoes, habilidadesMap])
 
     const loadData = async () => {
         setLoading(true)
@@ -49,6 +99,11 @@ export default function AvaliacoesForm() {
             setAtribuicoes(choices.atribuicoes || [])
             setValorMaximo(choices.valor_maximo || 10)
             setAnoLetivo(choices.ano_letivo)
+            setDatasLiberadas(choices.datasLiberadas || [])
+            setDataAtual(choices.data_atual)
+            setMultiDisciplinas(choices.multi_disciplinas ?? true)
+            setAvaliacaoConfig(choices.config || {})
+            setHabilidadesMap(choices.habilidades_por_disciplina || {})
 
             if (isEditing) {
                 // Carrega avaliação existente
@@ -61,6 +116,7 @@ export default function AvaliacoesForm() {
                 setValor(avaliacao.valor ? parseFloat(avaliacao.valor).toString() : '')
                 setDataInicio(avaliacao.data_inicio || '')
                 setDataFim(avaliacao.data_fim || '')
+                setSelectedHabilidades(avaliacao.habilidades?.map(h => h.id) || [])
 
                 // Mapeia turmas_info para IDs de PDTs selecionados
                 if (avaliacao.turmas_info) {
@@ -89,11 +145,13 @@ export default function AvaliacoesForm() {
             toast.error('Título é obrigatório.')
             return
         }
-        if (!valor || parseFloat(valor) <= 0) {
+        const valorNumerico = parseFloat(String(valor).replace(',', '.'))
+
+        if (!valor || isNaN(valorNumerico) || valorNumerico <= 0) {
             toast.error('Valor deve ser maior que zero.')
             return
         }
-        if (parseFloat(valor) > valorMaximo) {
+        if (valorNumerico > valorMaximo) {
             toast.error(`Valor não pode exceder ${valorMaximo}.`)
             return
         }
@@ -121,10 +179,11 @@ export default function AvaliacoesForm() {
                 titulo: titulo.trim(),
                 descricao: descricao.trim() || null,
                 tipo,
-                valor: parseFloat(valor),
+                valor: parseFloat(String(valor).replace(',', '.')),
                 data_inicio: dataInicio,
                 data_fim: dataFim,
                 professores_disciplinas_turmas_ids: pdtsSelecionados,
+                habilidades_ids: selectedHabilidades,
             }
 
             if (isEditing) {
@@ -149,14 +208,6 @@ export default function AvaliacoesForm() {
             setSubmitting(false)
         }
     }
-
-    // Prepara opções para MultiCombobox
-    const atribuicoesOptions = atribuicoes.map(a => ({
-        value: a.id,
-        label: a.label,
-        turma: a.turma_nome,
-        disciplina: a.disciplina_nome,
-    }))
 
     if (loading) return <Loading />
 
@@ -185,23 +236,19 @@ export default function AvaliacoesForm() {
                 </div>
 
                 {/* Formulário */}
-                <Card hover={false} className="overflow-hidden border-none shadow-premium">
+                <Card hover={false}>
                     <div className="space-y-5">
                         {/* Título */}
-                        <div>
-                            <label className="label">Título da Avaliação *</label>
-                            <input
-                                type="text"
-                                className="input"
-                                placeholder="Ex: Prova 1, Trabalho em Grupo, etc."
-                                value={titulo}
-                                onChange={(e) => setTitulo(e.target.value)}
-                                maxLength={255}
-                            />
-                        </div>
+                        <Input
+                            label="Título da Avaliação *"
+                            placeholder="Ex: Prova 1, Trabalho em Grupo, etc."
+                            value={titulo}
+                            onChange={(e) => setTitulo(e.target.value)}
+                            maxLength={255}
+                        />
 
                         {/* Descrição */}
-                        <div>
+                        <div className="w-full">
                             <label className="label">Descrição (opcional)</label>
                             <textarea
                                 className="input h-24 resize-none"
@@ -213,90 +260,126 @@ export default function AvaliacoesForm() {
 
                         {/* Tipo e Valor */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label className="label">Tipo de Avaliação *</label>
-                                <select
-                                    className="input"
-                                    value={tipo}
-                                    onChange={(e) => setTipo(e.target.value)}
-                                >
-                                    {TIPOS.map(t => (
-                                        <option key={t.value} value={t.value}>{t.label}</option>
-                                    ))}
-                                </select>
-                            </div>
+                            <Select
+                                label="Tipo de Avaliação *"
+                                options={TIPOS}
+                                value={tipo}
+                                onChange={(e) => setTipo(e.target.value)}
+                                placeholder="Selecione o tipo..."
+                            />
 
-                            <div>
-                                <label className="label">Valor Máximo * (até {valorMaximo})</label>
-                                <input
-                                    type="number"
-                                    className="input"
-                                    placeholder="Ex: 10"
+                            <div className="space-y-1">
+                                <Input
+                                    label={`Valor Máximo * (até ${valorMaximo})`}
+                                    type="text"
+                                    placeholder="Ex: 10,0"
                                     value={valor}
-                                    onChange={(e) => setValor(e.target.value)}
-                                    min="0.1"
-                                    max={valorMaximo}
-                                    step="0.1"
+                                    onChange={(e) => {
+                                        let val = e.target.value.replace('.', ',')
+                                        if (/[^0-9,]/.test(val)) return
+                                        if ((val.match(/,/g) || []).length > 1) return
+
+                                        if (val.includes(',')) {
+                                            const parts = val.split(',')
+                                            const maxCasas = avaliacaoConfig.NUMERO_CASAS_DECIMAIS_AVALIACAO || 2
+                                            if (parts[1].length > maxCasas) return
+                                        }
+
+                                        if (val !== '' && val !== ',') {
+                                            const numVal = parseFloat(val.replace(',', '.'))
+                                            if (!isNaN(numVal) && numVal > valorMaximo) return
+                                        }
+
+                                        setValor(val)
+                                    }}
+                                    onBlur={() => {
+                                        if (!valor) return
+                                        let valFloat = parseFloat(valor.replace(',', '.'))
+                                        if (isNaN(valFloat)) { setValor(''); return }
+
+                                        const casas = avaliacaoConfig.NUMERO_CASAS_DECIMAIS_AVALIACAO || 2
+                                        setValor(valFloat.toFixed(casas).replace('.', ','))
+                                    }}
                                 />
+                                <p className="text-xs text-slate-500">
+                                    {`Máximo de ${avaliacaoConfig.NUMERO_CASAS_DECIMAIS_AVALIACAO || 2} casas decimais`}
+                                </p>
                             </div>
                         </div>
 
                         {/* Datas */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label className="label">Data de Início *</label>
-                                <input
-                                    type="date"
-                                    className="input"
-                                    value={dataInicio}
-                                    onChange={(e) => {
-                                        setDataInicio(e.target.value)
-                                        // Auto-preenche data fim se vazia
-                                        if (!dataFim) {
-                                            setDataFim(e.target.value)
-                                        }
-                                    }}
-                                />
-                            </div>
+                            <DateInputAnoLetivo
+                                label="Data de Início *"
+                                value={dataInicio}
+                                onChange={(e) => {
+                                    setDataInicio(e.target.value)
+                                    if (!dataFim) setDataFim(e.target.value)
+                                }}
+                                datasLiberadas={datasLiberadas}
+                                dataAtual={dataAtual}
+                                placeholder="dd/mm/aaaa"
+                            />
 
-                            <div>
-                                <label className="label">Data de Fim *</label>
-                                <input
-                                    type="date"
-                                    className="input"
-                                    value={dataFim}
-                                    onChange={(e) => setDataFim(e.target.value)}
-                                    min={dataInicio}
-                                />
-                            </div>
+                            <DateInputAnoLetivo
+                                label="Data de Fim *"
+                                value={dataFim}
+                                onChange={(e) => setDataFim(e.target.value)}
+                                min={dataInicio}
+                                datasLiberadas={datasLiberadas}
+                                dataAtual={dataAtual}
+                                placeholder="dd/mm/aaaa"
+                            />
                         </div>
 
                         {/* Turmas/Disciplinas */}
-                        <div>
+                        <div className="space-y-3">
                             <label className="label">Turmas e Disciplinas *</label>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
-                                Selecione as turmas/disciplinas onde esta avaliação será aplicada.
-                            </p>
-                            <MultiCombobox
-                                options={atribuicoesOptions}
-                                value={pdtsSelecionados}
+
+                            <TurmaDisciplinaSelector
+                                atribuicoes={atribuicoes}
+                                selectedIds={pdtsSelecionados}
                                 onChange={setPdtsSelecionados}
-                                placeholder="Selecione turmas/disciplinas..."
-                                emptyMessage="Nenhuma atribuição encontrada"
+                                multiDisciplinas={multiDisciplinas}
+                                label=""
                             />
-                            {pdtsSelecionados.length > 0 && (
-                                <div className="mt-2 flex flex-wrap gap-1">
-                                    {pdtsSelecionados.map(pdtId => {
-                                        const attr = atribuicoes.find(a => a.id === pdtId)
-                                        return attr ? (
-                                            <Badge key={pdtId} variant="primary" className="text-xs">
-                                                {attr.label}
-                                            </Badge>
-                                        ) : null
-                                    })}
-                                </div>
-                            )}
                         </div>
+
+                        {/* Habilidades */}
+                        {availableHabilidades.length > 0 && (
+                            <div
+                                className="mt-6"
+                                ref={habilidadesRef}
+                                onFocusCapture={() => {
+                                    setTimeout(() => {
+                                        habilidadesRef.current?.scrollIntoView({
+                                            behavior: 'smooth',
+                                            block: 'center'
+                                        });
+                                    }, 150);
+                                }}
+                                onClickCapture={() => {
+                                    setTimeout(() => {
+                                        habilidadesRef.current?.scrollIntoView({
+                                            behavior: 'smooth',
+                                            block: 'center'
+                                        });
+                                    }, 150);
+                                }}
+                            >
+                                <MultiCombobox
+                                    label="Habilidades Avaliadas"
+                                    placeholder="Selecione as habilidades..."
+                                    options={availableHabilidades.map(h => ({
+                                        value: h.id,
+                                        label: h.descricao,
+                                        subLabel: h.codigo
+                                    }))}
+                                    value={selectedHabilidades}
+                                    onChange={setSelectedHabilidades}
+                                />
+                            </div>
+                        )}
                     </div>
                 </Card>
 

@@ -1,42 +1,43 @@
 import { HiCheck } from 'react-icons/hi'
 
 /**
- * TurmaSelector - Componente padrão para seleção múltipla de turmas
+ * TurmaDisciplinaSelector - Componente para seleção múltipla de turmas/disciplinas (PDTs)
  * 
- * @param {Array} turmas - Lista de objetos de turma [{ id, numero_letra }]
- * @param {Array} selectedIds - Lista de IDs das turmas selecionadas
- * @param {Function} onChange - Callback disparado ao alterar a seleção (recebe o novo array de IDs)
- * @param {string} label - Rótulo opcional para o campo
+ * @param {Array} atribuicoes - Lista de objetos [{ id, turma_numero_letra, disciplina_sigla }]
+ * @param {Array} selectedIds - Lista de IDs selecionados
+ * @param {Function} onChange - Callback ao alterar seleção (recebe array de IDs)
+ * @param {string} label - Rótulo do campo
+ * @param {boolean} multiDisciplinas - Se true, mostra a sigla da disciplina junto à turma
  */
-export default function TurmaSelector({
-    turmas = [],
+export default function TurmaDisciplinaSelector({
+    atribuicoes = [],
     selectedIds = [],
     onChange,
-    label = "Selecione as Turmas"
+    label = "Turmas e Disciplinas",
+    multiDisciplinas = true
 }) {
-    // Verifica se "Todas" estão selecionadas
-    const isAllSelected = turmas.length > 0 && selectedIds.length === turmas.length
+    const isAllSelected = atribuicoes.length > 0 && selectedIds.length === atribuicoes.length
 
     const handleToggle = (id) => {
         if (!onChange) return
-
         const isSelected = selectedIds.includes(id)
         const newSelection = isSelected
             ? selectedIds.filter(item => item !== id)
             : [...selectedIds, id]
-
         onChange(newSelection)
     }
 
     const handleToggleAll = () => {
         if (!onChange) return
-        const allIds = turmas.map(t => t.id)
+        const allIds = atribuicoes.map(a => a.id)
         onChange(isAllSelected ? [] : allIds)
     }
 
-    // Obtém o label da turma (suporta formato novo e antigo)
-    const getTurmaLabel = (turma) => {
-        return turma.numero_letra || `${turma.numero}${turma.letra}`
+    const getLabel = (attr) => {
+        if (multiDisciplinas) {
+            return `${attr.turma_numero_letra} - ${attr.disciplina_sigla}`
+        }
+        return attr.turma_numero_letra
     }
 
     const renderOption = (key, isSelected, onClick, labelText) => (
@@ -74,25 +75,25 @@ export default function TurmaSelector({
             )}
 
             <div className="flex flex-wrap gap-2">
-                {turmas.length > 1 && renderOption(
-                    'all-turmas-option',
+                {atribuicoes.length > 1 && renderOption(
+                    'all-option',
                     isAllSelected,
                     handleToggleAll,
                     "Todas"
                 )}
 
-                {turmas.map((turma) => (
+                {atribuicoes.map((attr) => (
                     renderOption(
-                        turma.id,
-                        selectedIds.includes(turma.id),
-                        () => handleToggle(turma.id),
-                        getTurmaLabel(turma)
+                        attr.id,
+                        selectedIds.includes(attr.id),
+                        () => handleToggle(attr.id),
+                        getLabel(attr)
                     )
                 ))}
 
-                {turmas.length === 0 && (
+                {atribuicoes.length === 0 && (
                     <div className="w-full py-6 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
-                        <p className="text-sm text-slate-400">Nenhuma turma disponível.</p>
+                        <p className="text-sm text-slate-400">Nenhuma atribuição disponível.</p>
                     </div>
                 )}
             </div>

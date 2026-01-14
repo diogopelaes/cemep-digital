@@ -31,6 +31,7 @@ class DadosPermanenteResponsavelAdmin(admin.ModelAdmin):
     list_display = ['nome', 'cpf', 'estudante', 'parentesco']
     search_fields = ['nome', 'cpf']
     list_filter = ['parentesco']
+    raw_id_fields = ['estudante']
 
 
 class HistoricoEscolarAnoLetivoInline(admin.TabularInline):
@@ -43,6 +44,7 @@ class HistoricoEscolarAdmin(admin.ModelAdmin):
     list_display = ['estudante', 'numero_matricula', 'nome_curso', 'concluido']
     search_fields = ['estudante__nome', 'numero_matricula']
     list_filter = ['concluido']
+    raw_id_fields = ['estudante']
     inlines = [HistoricoEscolarAnoLetivoInline]
 
 
@@ -55,6 +57,7 @@ class HistoricoEscolarNotasInline(admin.TabularInline):
 class HistoricoEscolarAnoLetivoAdmin(admin.ModelAdmin):
     list_display = ['historico', 'ano_letivo', 'status_final']
     list_filter = ['ano_letivo', 'status_final']
+    raw_id_fields = ['historico']
     inlines = [HistoricoEscolarNotasInline]
 
 
@@ -62,6 +65,7 @@ class HistoricoEscolarAnoLetivoAdmin(admin.ModelAdmin):
 class HistoricoEscolarNotasAdmin(admin.ModelAdmin):
     list_display = ['ano_letivo_ref', 'nome_disciplina', 'nota_final', 'frequencia_total']
     list_filter = ['ano_letivo_ref__ano_letivo']
+    raw_id_fields = ['ano_letivo_ref']
 
 
 class RegistroProntuarioAnexoInline(admin.TabularInline):

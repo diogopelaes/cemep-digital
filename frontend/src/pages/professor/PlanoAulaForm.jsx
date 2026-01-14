@@ -45,6 +45,11 @@ export default function PlanoAulaForm() {
             const turmasDisc = turmasMap[formData.disciplina] || []
             setTurmasDisponiveis(turmasDisc)
 
+            // Se só houver uma turma, seleciona automaticamente
+            if (turmasDisc.length === 1 && formData.turmas.length === 0) {
+                setFormData(prev => ({ ...prev, turmas: [turmasDisc[0].id] }))
+            }
+
             // Busca habilidades do mapa por disciplina
             const habsDisc = habilidadesMap[formData.disciplina] || []
             setHabilidades(habsDisc)

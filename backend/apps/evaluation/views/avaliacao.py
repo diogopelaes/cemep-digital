@@ -17,6 +17,8 @@ from apps.evaluation.serializers import (
 )
 from apps.core.models import ProfessorDisciplinaTurma
 from apps.users.permissions import IsCreatorOrReadOnly, AnoLetivoFilterMixin
+from django.utils import timezone
+from apps.evaluation.config import get_config
 
 
 class AvaliacaoViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
@@ -34,7 +36,8 @@ class AvaliacaoViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
     ).prefetch_related(
         'professores_disciplinas_turmas__disciplina_turma__turma__curso',
         'professores_disciplinas_turmas__disciplina_turma__disciplina',
-        'professores_disciplinas_turmas__professor__usuario'
+        'professores_disciplinas_turmas__professor__usuario',
+        'habilidades'
     )
     
     permission_classes = [IsCreatorOrReadOnly]
@@ -90,20 +93,17 @@ class AvaliacaoViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         - Atribuições (Turmas/Disciplinas) do professor no ano selecionado.
         - Tipos de avaliação.
         - Valor máximo permitido.
+        - Dias letivos do ano.
         """
         user = request.user
         
         if not hasattr(user, 'funcionario'):
-            return Response({
-                'error': 'Usuário sem vínculo de funcionário.'
-            }, status=400)
+            return Response({'error': 'Usuário sem vínculo de funcionário.'}, status=400)
 
         ano_selecionado = user.get_ano_letivo_selecionado()
         
         if not ano_selecionado:
-            return Response({
-                'error': 'Nenhum ano letivo selecionado.'
-            }, status=400)
+            return Response({'error': 'Nenhum ano letivo selecionado.'}, status=400)
 
         # Busca Atribuições do professor
         atribuicoes = ProfessorDisciplinaTurma.objects.filter(
@@ -122,34 +122,10 @@ class AvaliacaoViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         
         data = serializer.data
         data['ano_letivo'] = ano_selecionado.ano
+        # Pega direto do cache (já em formato ISO string)
+        bim = ano_selecionado.bimestre()
+        data['datasLiberadas'] = ano_selecionado.controles.get(str(bim), {}).get('dias_letivos_base', []) if bim else []
+        data['data_atual'] = timezone.localdate().isoformat()
+        data['config'] = get_config()
         
         return Response(data)
-
-    @action(detail=True, methods=['get'])
-    def notas(self, request, pk=None):
-        """
-        Retorna notas dos estudantes para uma avaliação.
-        (Implementação futura para lançamento de notas)
-        """
-        avaliacao = self.get_object()
-        
-        # TODO: Implementar lógica de notas
-        return Response({
-            'avaliacao_id': str(avaliacao.id),
-            'avaliacao_titulo': avaliacao.titulo,
-            'notas': []
-        })
-
-    @action(detail=True, methods=['post'])
-    def salvar_notas(self, request, pk=None):
-        """
-        Salva notas dos estudantes em lote.
-        (Implementação futura para lançamento de notas)
-        """
-        avaliacao = self.get_object()
-        
-        # TODO: Implementar lógica de salvamento de notas
-        return Response({
-            'status': 'ok',
-            'message': 'Funcionalidade em desenvolvimento.'
-        })

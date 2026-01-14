@@ -6,10 +6,12 @@ de dados relacionados a Avaliações.
 """
 from rest_framework import serializers
 from django.db import transaction
+from decimal import Decimal
 
 from apps.evaluation.models import Avaliacao
-from apps.evaluation.config import VALOR_MAXIMO, BIMESTRE_CHOICES
-from apps.core.models import ProfessorDisciplinaTurma, AnoLetivo
+from apps.evaluation.config import VALOR_MAXIMO, BIMESTRE_CHOICES, valida_valor_nota
+from apps.core.models import ProfessorDisciplinaTurma, AnoLetivo, Habilidade
+from apps.core.serializers.habilidade import HabilidadeSerializer
 
 
 class AvaliacaoSerializer(serializers.ModelSerializer):
@@ -23,6 +25,13 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
         many=True,
         write_only=True,
         required=True
+    )
+    habilidades_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Habilidade.objects.all(),
+        source='habilidades',
+        many=True,
+        write_only=True,
+        required=False
     )
     
     # --- Read Fields ---
@@ -49,6 +58,8 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
             'professores_disciplinas_turmas',
             'professores_disciplinas_turmas_ids',
             'turmas_info',
+            'habilidades',
+            'habilidades_ids',
             'criado_por',
             'criado_por_nome',
             'is_owner',
@@ -61,15 +72,9 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
         ]
 
     def validate_valor(self, value):
-        """Valida que o valor não excede o máximo permitido."""
-        if value > VALOR_MAXIMO:
-            raise serializers.ValidationError(
-                f"O valor não pode exceder {VALOR_MAXIMO}."
-            )
-        if value <= 0:
-            raise serializers.ValidationError(
-                "O valor deve ser maior que zero."
-            )
+        """Valida o valor usando valida_valor_nota."""
+        if not valida_valor_nota(Decimal(str(value))):
+            raise serializers.ValidationError("Valor inválido.")
         return value
 
     def validate(self, attrs):
@@ -163,6 +168,7 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         pdts = validated_data.pop('professores_disciplinas_turmas', [])
+        habilidades = validated_data.pop('habilidades', [])
         
         # Seta criado_por do contexto
         request = self.context.get('request')
@@ -175,11 +181,15 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
         if pdts:
             avaliacao.professores_disciplinas_turmas.set(pdts)
         
+        if habilidades:
+            avaliacao.habilidades.set(habilidades)
+            
         return avaliacao
     
     @transaction.atomic
     def update(self, instance, validated_data):
         pdts = validated_data.pop('professores_disciplinas_turmas', None)
+        habilidades = validated_data.pop('habilidades', None)
         
         # Atualiza campos
         for attr, value in validated_data.items():
@@ -189,6 +199,9 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
         # Atualiza vínculos M2M se fornecido
         if pdts is not None:
             instance.professores_disciplinas_turmas.set(pdts)
+            
+        if habilidades is not None:
+            instance.habilidades.set(habilidades)
         
         return instance
 
@@ -254,6 +267,8 @@ class AvaliacaoChoicesSerializer(serializers.Serializer):
     atribuicoes = serializers.SerializerMethodField()
     tipos = serializers.SerializerMethodField()
     valor_maximo = serializers.SerializerMethodField()
+    multi_disciplinas = serializers.SerializerMethodField()
+    habilidades_por_disciplina = serializers.SerializerMethodField()
     
     def get_atribuicoes(self, atribuicoes_qs):
         """Lista atribuições do professor."""
@@ -265,6 +280,7 @@ class AvaliacaoChoicesSerializer(serializers.Serializer):
                 'id': str(pdt.id),
                 'turma_id': str(turma.id),
                 'turma_nome': turma.nome_completo,
+                'turma_numero_letra': turma.numero_letra,
                 'turma_sigla': turma.sigla,
                 'disciplina_id': str(disciplina.id),
                 'disciplina_nome': disciplina.nome,
@@ -284,3 +300,25 @@ class AvaliacaoChoicesSerializer(serializers.Serializer):
     def get_valor_maximo(self, _):
         """Retorna valor máximo permitido."""
         return float(VALOR_MAXIMO)
+    
+    def get_multi_disciplinas(self, atribuicoes_qs):
+        """Retorna True se o professor leciona mais de uma disciplina."""
+        disciplinas = set()
+        for pdt in atribuicoes_qs:
+            disciplinas.add(pdt.disciplina_turma.disciplina_id)
+        return len(disciplinas) > 1
+
+    def get_habilidades_por_disciplina(self, atribuicoes_qs):
+        """Retorna mapa de habilidades por disciplina para as atribuições fornecidas."""
+        disciplinas_ids = atribuicoes_qs.values_list('disciplina_turma__disciplina_id', flat=True).distinct()
+        
+        habilidades_map = {}
+        # Para cada disciplina, busca as habilidades vinculadas
+        for disc_id in disciplinas_ids:
+            habilidades = Habilidade.objects.filter(
+                disciplinas__id=disc_id,
+                is_active=True
+            ).distinct()
+            habilidades_map[str(disc_id)] = HabilidadeSerializer(habilidades, many=True).data
+            
+        return habilidades_map

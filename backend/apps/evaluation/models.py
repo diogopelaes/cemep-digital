@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
-from apps.core.models import Funcionario, ProfessorDisciplinaTurma, UUIDModel, Arquivo, AnoLetivo
+from apps.core.models import Funcionario, ProfessorDisciplinaTurma, UUIDModel, Arquivo, AnoLetivo, Habilidade
 from apps.academic.models import Estudante, MatriculaTurma
 from .config import *
 
@@ -79,6 +79,11 @@ class Avaliacao(UUIDModel):
         blank=True,
         related_name='avaliacoes_model',
         verbose_name='Arquivos'
+    )
+    habilidades = models.ManyToManyField(
+        Habilidade,
+        related_name='avaliacoes',
+        blank=True
     )
 
     criado_em = models.DateTimeField(auto_now_add=True)

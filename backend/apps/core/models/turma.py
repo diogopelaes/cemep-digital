@@ -64,6 +64,10 @@ class Turma(UUIDModel):
         return f"{self.numero}{self.letra} - {self.curso.sigla}"
     
     @property
+    def numero_letra(self):
+        return f"{self.numero}{self.letra}"
+    
+    @property
     def nome_completo(self):
         return f"{self.nome} - {self.curso.sigla}"
 
