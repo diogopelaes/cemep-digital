@@ -1,0 +1,293 @@
+SISTEMA DECLARATIVO DE PERMISSÕES
+CEMEP Digital – Django Rest Framework
+===================================
+
+Este documento descreve, de forma COMPLETA, EXPLÍCITA e OPERACIONAL,
+como criar um sistema genérico de permissões reutilizável por TODOS os apps
+do projeto CEMEP Digital.
+
+O sistema cobre TODAS as combinações possíveis envolvendo:
+
+TIPOS DE USUÁRIO (fixos no sistema):
+- GESTAO        = 'GESTAO'
+- SECRETARIA    = 'SECRETARIA'
+- PROFESSOR     = 'PROFESSOR'
+- MONITOR       = 'MONITOR'
+- ESTUDANTE     = 'ESTUDANTE'
+- RESPONSAVEL   = 'RESPONSAVEL'
+
+OUTROS CONCEITOS DE PERMISSÃO:
+- AUTHENTICATED → qualquer usuário autenticado
+- OWNER         → usuário dono do registro (criador)
+
+As regras de permissão passam a ser DECLARADAS nas views,
+sem criação contínua de novas classes.
+
+--------------------------------------------------------------------
+1. LOCALIZAÇÃO CORRETA DO DIRETÓRIO
+--------------------------------------------------------------------
+
+As permissões são GLOBAIS ao sistema e devem ficar no NÍVEL DO PROJETO,
+junto do settings.py.
+
+Diretório BASE do backend:
+
+C:\Projects\cemep-digital\backend\core_project
+
+É NESSE DIRETÓRIO que o pacote permissions deve existir.
+
+--------------------------------------------------------------------
+2. ESTRUTURA DE DIRETÓRIOS FINAL
+--------------------------------------------------------------------
+
+Crie exatamente a seguinte estrutura (se não existir):
+
+C:\Projects\cemep-digital\backend\core_project
+├── core_project
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   ├── wsgi.py
+│   └── permissions
+│       ├── __init__.py
+│       ├── constants.py
+│       ├── utils.py
+│       └── policy.py
+├── apps
+│   ├── academic
+│   ├── core
+│   ├── evaluation
+│   └── ...
+└── manage.py
+
+Observações importantes:
+- permissions NÃO é um app Django
+- permissions NÃO entra no INSTALLED_APPS
+- permissions é infraestrutura de controle de acesso
+
+--------------------------------------------------------------------
+3. ARQUIVO: permissions/constants.py
+--------------------------------------------------------------------
+
+Caminho:
+C:\Projects\cemep-digital\backend\core_project\core_project\permissions\constants.py
+
+Conteúdo COMPLETO do arquivo:
+
+--------------------------------------------------
+GESTAO        = "GESTAO"
+SECRETARIA    = "SECRETARIA"
+PROFESSOR     = "PROFESSOR"
+MONITOR       = "MONITOR"
+ESTUDANTE     = "ESTUDANTE"
+RESPONSAVEL   = "RESPONSAVEL"
+
+AUTHENTICATED = "AUTHENTICATED"
+OWNER         = "OWNER"
+--------------------------------------------------
+
+Regras:
+- Os valores DEVEM coincidir exatamente com user.tipo_usuario
+- AUTHENTICATED NÃO depende de tipo de usuário
+- OWNER representa o dono do objeto
+
+--------------------------------------------------------------------
+4. ARQUIVO: permissions/utils.py
+--------------------------------------------------------------------
+
+Caminho:
+C:\Projects\cemep-digital\backend\core_project\core_project\permissions\utils.py
+
+Conteúdo COMPLETO do arquivo:
+
+--------------------------------------------------
+READ_ACTIONS   = {"list", "retrieve"}
+UPDATE_ACTIONS = {"update", "partial_update"}
+DELETE_ACTIONS = {"destroy"}
+--------------------------------------------------
+
+Função:
+- Padronizar actions do DRF
+- Evitar if/else espalhado pelo código
+
+--------------------------------------------------------------------
+5. ARQUIVO: permissions/policy.py
+--------------------------------------------------------------------
+
+Caminho:
+C:\Projects\cemep-digital\backend\core_project\core_project\permissions\policy.py
+
+Este é o NÚCLEO do sistema.
+Uma ÚNICA classe cobre TODAS as combinações possíveis.
+
+Conteúdo COMPLETO do arquivo:
+
+--------------------------------------------------
+from rest_framework.permissions import BasePermission
+from core_project.permissions.constants import (
+    GESTAO,
+    SECRETARIA,
+    PROFESSOR,
+    MONITOR,
+    ESTUDANTE,
+    RESPONSAVEL,
+    AUTHENTICATED,
+    OWNER,
+)
+from core_project.permissions.utils import (
+    READ_ACTIONS,
+    UPDATE_ACTIONS,
+    DELETE_ACTIONS,
+)
+
+
+class Policy(BasePermission):
+    """
+    Policy declarativa baseada em CRUD.
+    """
+
+    def __init__(self, *, create=None, read=None, update=None, delete=None):
+        self.rules = {
+            "create": self._normalize(create),
+            "read": self._normalize(read),
+            "update": self._normalize(update),
+            "delete": self._normalize(delete),
+        }
+
+    def _normalize(self, value):
+        if value is None:
+            return set()
+        if isinstance(value, (list, tuple, set)):
+            return set(value)
+        return {value}
+
+    def _current_rule(self, view):
+        if view.action == "create":
+            return self.rules["create"]
+        if view.action in READ_ACTIONS:
+            return self.rules["read"]
+        if view.action in UPDATE_ACTIONS:
+            return self.rules["update"]
+        if view.action in DELETE_ACTIONS:
+            return self.rules["delete"]
+        return set()
+
+    def has_permission(self, request, view):
+        rule = self._current_rule(view)
+
+        if not rule:
+            return False
+
+        # Qualquer usuário autenticado
+        if AUTHENTICATED in rule:
+            return request.user.is_authenticated
+
+        # Verificação por tipo de usuário
+        if (
+            request.user.is_authenticated
+            and request.user.tipo_usuario in rule
+        ):
+            return True
+
+        # OWNER só é validado no nível do objeto
+        if OWNER in rule:
+            return request.user.is_authenticated
+
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        rule = self._current_rule(view)
+
+        if OWNER not in rule:
+            return True
+
+        # Padrão principal: criado_por
+        if hasattr(obj, "criado_por"):
+            return obj.criado_por == request.user
+
+        # Alternativa comum: usuario
+        if hasattr(obj, "usuario"):
+            return obj.usuario == request.user
+
+        return False
+--------------------------------------------------
+
+--------------------------------------------------------------------
+6. COMO USAR NAS VIEWS (QUALQUER APP)
+--------------------------------------------------------------------
+
+As views NÃO implementam lógica de permissão.
+Elas apenas DECLARAM a política desejada.
+
+IMPORTANTE:
+- Não sobrescrever get_permissions
+- Não criar classes IsXOrY
+- Não usar AllowAny
+
+--------------------------------------------------
+EXEMPLO – CASO SOLICITADO
+--------------------------------------------------
+
+Regras:
+- Criar: apenas PROFESSOR
+- Ler: qualquer usuário autenticado
+- Editar: apenas OWNER
+- Excluir: apenas OWNER
+
+Código da view:
+
+--------------------------------------------------
+from rest_framework.viewsets import ModelViewSet
+from core_project.permissions.policy import Policy
+from core_project.permissions.constants import (
+    PROFESSOR,
+    AUTHENTICATED,
+    OWNER,
+)
+
+
+class AvaliacaoViewSet(ModelViewSet):
+    permission_classes = [
+        Policy(
+            create=PROFESSOR,
+            read=AUTHENTICATED,
+            update=OWNER,
+            delete=OWNER,
+        )
+    ]
+--------------------------------------------------
+
+--------------------------------------------------------------------
+7. REGRAS FIXAS DO SISTEMA
+--------------------------------------------------------------------
+
+1. Toda permissão deve ser declarativa
+2. Não criar novas classes para combinações
+3. OWNER só é avaliado em has_object_permission
+4. AUTHENTICATED não depende de tipo_usuario
+5. permissions é infraestrutura global
+
+--------------------------------------------------------------------
+8. LIMITES CONSCIENTES
+--------------------------------------------------------------------
+
+Este sistema NÃO cobre:
+- regras baseadas em datas
+- workflow com múltiplos estados
+- regras dependentes de múltiplos relacionamentos
+
+Nesses casos, criar uma Policy especializada, isolada.
+
+--------------------------------------------------------------------
+9. RESULTADO FINAL
+--------------------------------------------------------------------
+
+- Um único mecanismo de permissão
+- Todas as combinações possíveis
+- Código previsível
+- Manutenção simples
+- Arquitetura estável
+- Uso uniforme em todos os apps
+
+FIM DO DOCUMENTO
