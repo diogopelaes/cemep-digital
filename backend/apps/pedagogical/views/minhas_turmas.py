@@ -1,137 +1,58 @@
-"""
-View para MinhasTurmas (Turmas do Professor)
-"""
+from django.db.models import Count, Q, Prefetch
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from apps.core.models import Turma, ProfessorDisciplinaTurma
-from apps.core.serializers.turma import TurmaSerializer
+from apps.core.models import Turma, ProfessorDisciplinaTurma, DisciplinaTurma
+from apps.pedagogical.serializers.minhas_turmas import MinhasTurmasSerializer, MinhaTurmaDetalhesSerializer
 
 
-class MinhasTurmasViewSet(viewsets.ViewSet):
+class MinhasTurmasViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ViewSet para retornar as turmas onde o professor autenticado leciona.
-    
-    Permissões: Qualquer usuário autenticado pode acessar (filtra automaticamente).
-    
-    GET /pedagogical/minhas-turmas/ - Retorna as turmas do professor no ano letivo selecionado
-    GET /pedagogical/minhas-turmas/{id}/ - Retorna os detalhes de uma turma específica
+    Otimizado para performance máxima com Annotation e Prefetch.
     """
     permission_classes = [IsAuthenticated]
+    serializer_class = MinhasTurmasSerializer
 
-    def _get_disciplinas_por_turma(self, professor, ano_letivo):
-        """
-        Retorna um dicionário mapeando turma_id -> lista de disciplinas (sigla, nome).
-        """
-        if not ano_letivo:
-            return {}
-            
-        atribuicoes = ProfessorDisciplinaTurma.objects.filter(
-            professor=professor,
-            disciplina_turma__turma__ano_letivo=ano_letivo.ano
-        ).select_related(
-            'disciplina_turma__disciplina',
-            'disciplina_turma__turma'
-        )
+    def get_queryset(self):
+        user = self.request.user
         
-        disciplinas_map = {}
-        for atribuicao in atribuicoes:
-            turma_id = str(atribuicao.disciplina_turma.turma.id)
-            disciplina = atribuicao.disciplina_turma.disciplina
-            
-            if turma_id not in disciplinas_map:
-                disciplinas_map[turma_id] = []
-            
-            # Evita duplicatas caso haja múltiplas atribuições (ex: titular e substituto na mesma disciplina?? improvável, mas seguro)
-            dados_brutos = {'sigla': disciplina.sigla, 'nome': disciplina.nome}
-            if dados_brutos not in disciplinas_map[turma_id]:
-                disciplinas_map[turma_id].append(dados_brutos)
-                
-        return disciplinas_map
+        # 1. Validações iniciais
+        if not hasattr(user, 'funcionario'):
+            return Turma.objects.none()
 
-    def list(self, request):
-        """Retorna as turmas onde o professor leciona no ano letivo selecionado."""
-        user = request.user
         ano_letivo = user.get_ano_letivo_selecionado()
-        
         if not ano_letivo:
-            return Response(
-                {'detail': 'Nenhum ano letivo selecionado ou ativo.'},
-                status=status.HTTP_404_NOT_FOUND
+            return Turma.objects.none()
+
+        # 2. Prefetch otimizado: Carrega apenas as disciplinas que o professor leciona nesta turma
+        prof_atribuicoes_prefetch = Prefetch(
+            'disciplinas_vinculadas',
+            queryset=DisciplinaTurma.objects.filter(
+                professores__professor=user.funcionario
+            ).select_related('disciplina'),
+            to_attr='disciplinas_docente' # Disponível no objeto Turma
+        )
+
+        # 3. Query principal com Annotation
+        return Turma.objects.filter(
+            disciplinas_vinculadas__professores__professor=user.funcionario,
+            ano_letivo=ano_letivo.ano,
+            is_active=True
+        ).annotate(
+            total_estudantes=Count(
+                'matriculas', 
+                filter=Q(matriculas__status__in=['CURSANDO', 'RETIDO', 'PROMOVIDO']),
+                distinct=True
             )
-        
-        try:
-            funcionario = user.funcionario
-        except AttributeError:
-            return Response(
-                {'detail': 'Usuário não possui perfil de funcionário.'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        # Mapa de disciplinas
-        disciplinas_map = self._get_disciplinas_por_turma(funcionario, ano_letivo)
-        turma_ids = list(disciplinas_map.keys())
-        
-        turmas = Turma.objects.filter(
-            id__in=turma_ids
         ).select_related(
             'curso'
-        ).order_by('numero', 'letra')
-        
-        serializer = TurmaSerializer(turmas, many=True)
-        data = serializer.data
-        
-        # Injeta as disciplinas
-        for turma_data in data:
-            turma_data['disciplinas_lecionadas'] = disciplinas_map.get(turma_data['id'], [])
-            
-        return Response({
-            'results': data,
-            'count': len(data)
-        })
+        ).prefetch_related(
+            prof_atribuicoes_prefetch
+        ).distinct().order_by('numero', 'letra')
 
-    def retrieve(self, request, pk=None):
-        """Retorna os detalhes de uma turma específica."""
-        user = request.user
-        ano_letivo = user.get_ano_letivo_selecionado()
-        
-        try:
-            funcionario = user.funcionario
-        except AttributeError:
-            return Response(
-                {'detail': 'Usuário não possui perfil de funcionário.'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        # Verifica atribuição
-        leciona_turma = ProfessorDisciplinaTurma.objects.filter(
-            professor=funcionario,
-            disciplina_turma__turma__id=pk,
-            disciplina_turma__turma__ano_letivo=ano_letivo.ano if ano_letivo else None
-        ).exists()
-        
-        if not leciona_turma:
-            return Response(
-                {'detail': 'Você não leciona nesta turma.'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        try:
-            turma = Turma.objects.select_related(
-                'curso'
-            ).get(id=pk)
-        except Turma.DoesNotExist:
-            return Response(
-                {'detail': 'Turma não encontrada.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-            
-        # Busca disciplinas desta turma específica
-        disciplinas_map = self._get_disciplinas_por_turma(funcionario, ano_letivo)
-        
-        serializer = TurmaSerializer(turma)
-        data = serializer.data
-        data['disciplinas_lecionadas'] = disciplinas_map.get(str(turma.id), [])
-        
-        return Response(data)
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return MinhaTurmaDetalhesSerializer
+        return MinhasTurmasSerializer

@@ -35,7 +35,9 @@ class DescritorOcorrenciaPedagogicaViewSet(GestaoWriteFuncionarioReadMixin, view
 class OcorrenciaPedagogicaViewSet(GestaoSecretariaWritePublicReadMixin, viewsets.ModelViewSet):
     """ViewSet de Ocorrências. Leitura: Todos autenticados | Escrita: Gestão/Secretaria"""
     queryset = OcorrenciaPedagogica.objects.select_related(
-        'estudante__usuario', 'autor__usuario', 'tipo'
+        'estudante__usuario', 
+        'autor__usuario', 
+        'tipo__gestor__usuario'
     )
     serializer_class = OcorrenciaPedagogicaSerializer
     filter_backends = [DjangoFilterBackend]

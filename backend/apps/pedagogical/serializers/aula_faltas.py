@@ -72,14 +72,16 @@ class AulaFaltasSerializer(serializers.ModelSerializer):
     )
     
     # --- Read Fields ---
-    turma_nome = serializers.SerializerMethodField()
-    turma_sigla = serializers.SerializerMethodField()
-    turma_id = serializers.SerializerMethodField()
-    disciplina_nome = serializers.SerializerMethodField()
-    disciplina_sigla = serializers.SerializerMethodField()
-    disciplina_id = serializers.SerializerMethodField()
-    professor_nome = serializers.SerializerMethodField()
-    total_faltas = serializers.SerializerMethodField()
+    turma_nome = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.turma.nome')
+    turma_sigla = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.turma.sigla')
+    turma_numero = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.turma.numero')
+    turma_letra = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.turma.letra')
+    turma_id = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.turma.id')
+    disciplina_nome = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.disciplina.nome')
+    disciplina_sigla = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.disciplina.sigla')
+    disciplina_id = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.disciplina.id')
+    professor_nome = serializers.ReadOnlyField(source='professor_disciplina_turma.professor.usuario.get_full_name')
+    total_faltas = serializers.IntegerField(source='total_faltas_count', read_only=True)
     total_estudantes = serializers.SerializerMethodField()
     bimestre = serializers.SerializerMethodField()
     faltas = serializers.SerializerMethodField()
@@ -96,6 +98,8 @@ class AulaFaltasSerializer(serializers.ModelSerializer):
             'faltas_data',    # Write payload
             'turma_nome',     # Read
             'turma_sigla',    # Read
+            'turma_numero',   # Read
+            'turma_letra',    # Read
             'turma_id',       # Read
             'disciplina_nome',# Read
             'disciplina_sigla', # Read
@@ -141,29 +145,10 @@ class AulaFaltasSerializer(serializers.ModelSerializer):
 
     # --- Field Methods ---
 
-    def get_turma_sigla(self, obj):
-        return obj.professor_disciplina_turma.disciplina_turma.turma.sigla
-
-    def get_turma_nome(self, obj):
-        return obj.professor_disciplina_turma.disciplina_turma.turma.nome_completo
-    
-    def get_turma_id(self, obj):
-        return obj.professor_disciplina_turma.disciplina_turma.turma.id
-
-    def get_disciplina_nome(self, obj):
-        return obj.professor_disciplina_turma.disciplina_turma.disciplina.nome
-    
-    def get_disciplina_sigla(self, obj):
-        return obj.professor_disciplina_turma.disciplina_turma.disciplina.sigla
-
-    def get_disciplina_id(self, obj):
-        return obj.professor_disciplina_turma.disciplina_turma.disciplina.id
-    
-    def get_professor_nome(self, obj):
-        return obj.professor_disciplina_turma.professor.usuario.get_full_name()
-    
     def get_total_faltas(self, obj):
-        # Retorna quantidade de alunos com falta (contagem de registros) ao invés do total de aulas perdidas
+        # Fallback para quando não vier por annotation (ex: detail view direto)
+        if hasattr(obj, 'total_faltas_count'):
+            return obj.total_faltas_count
         return obj.faltas.count()
     
     def get_total_estudantes(self, obj):
@@ -234,36 +219,34 @@ class AulaFaltasListSerializer(serializers.ModelSerializer):
     """
     Serializer otimizado para listagem de aulas (menos campos).
     """
-    turma_nome = serializers.SerializerMethodField()
-    turma_sigla = serializers.SerializerMethodField()
-    disciplina_sigla = serializers.SerializerMethodField()
-    total_faltas = serializers.SerializerMethodField()
+    turma_nome = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.turma.nome')
+    turma_sigla = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.turma.sigla')
+    turma_numero = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.turma.numero')
+    turma_letra = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.turma.letra')
+    disciplina_sigla = serializers.ReadOnlyField(source='professor_disciplina_turma.disciplina_turma.disciplina.sigla')
+    total_faltas = serializers.IntegerField(source='total_faltas_count', read_only=True)
     bimestre = serializers.SerializerMethodField()
     
     class Meta:
         model = Aula
         fields = [
             'id', 
+            'professor_disciplina_turma_id',
             'data', 
             'conteudo',
             'numero_aulas',
             'turma_nome',
             'turma_sigla',
+            'turma_numero',
+            'turma_letra',
             'disciplina_sigla',
             'total_faltas',
             'bimestre',
         ]
     
-    def get_turma_nome(self, obj):
-        return obj.professor_disciplina_turma.disciplina_turma.turma.nome_completo
-    
-    def get_turma_sigla(self, obj):
-        return obj.professor_disciplina_turma.disciplina_turma.turma.sigla
-    
-    def get_disciplina_sigla(self, obj):
-        return obj.professor_disciplina_turma.disciplina_turma.disciplina.sigla
-    
     def get_total_faltas(self, obj):
+        if hasattr(obj, 'total_faltas_count'):
+            return obj.total_faltas_count
         return obj.faltas.count()
     
     def get_bimestre(self, obj):

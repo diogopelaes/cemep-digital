@@ -13,11 +13,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
+from django.db.models import Count
 from apps.pedagogical.models import Aula, Faltas
 from apps.pedagogical.serializers.aula_faltas import (
     AulaFaltasSerializer,
     AulaFaltasListSerializer,
-    AtualizarFaltasSerializer
+    AtualizarFaltasSerializer,
+    ContextoAulaSerializer
 )
 from apps.academic.models import MatriculaTurma
 from apps.core.models import ProfessorDisciplinaTurma
@@ -63,9 +65,16 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         
         if user.tipo_usuario == 'PROFESSOR':
             # Garante que o professor veja apenas suas atribuições
-            return qs.filter(professor_disciplina_turma__professor__usuario=user)
+            qs = qs.filter(professor_disciplina_turma__professor__usuario=user)
             
-        return qs.order_by('-data', '-criado_em')
+        return qs.annotate(
+            total_faltas_count=Count('faltas')
+        ).order_by(
+            '-data', 
+            'professor_disciplina_turma__disciplina_turma__turma__numero',
+            'professor_disciplina_turma__disciplina_turma__turma__letra',
+            'professor_disciplina_turma__disciplina_turma__disciplina__nome'
+        )
 
     # =========================================================================
     # ACTIONS: DADOS AUXILIARES & FORMULÁRIOS
@@ -99,7 +108,9 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
             'disciplina_turma__disciplina'
         ).order_by('disciplina_turma__turma__numero', 'disciplina_turma__turma__letra')
 
-        # 3. Formata os dados de atribuição manualmente (sem necessidade de serializer pesado)
+        # 3. Formata os dados de atribuição e contexto
+        contexto_serializer = ContextoAulaSerializer(atribuicoes)
+        
         lista_atribuicoes = []
         for atrib in atribuicoes:
             turma = atrib.disciplina_turma.turma
@@ -108,14 +119,19 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
                 'id': str(atrib.id),
                 'turma_id': str(turma.id),
                 'turma_nome': turma.nome_completo,
+                'turma_numero': turma.numero,
+                'turma_letra': turma.letra,
                 'disciplina_id': str(disciplina.id),
                 'disciplina_nome': disciplina.nome,
+                'disciplina_sigla': disciplina.sigla,
                 'aulas_semanais': atrib.disciplina_turma.aulas_semanais
             })
 
         scope = request.query_params.get('scope', 'full')
         data = {
             'atribuicoes': lista_atribuicoes,
+            'turmas': contexto_serializer.data.get('turmas', []),
+            'disciplinas_por_turma': contexto_serializer.data.get('disciplinas_por_turma', {}),
             'ano_letivo': str(ano_selecionado.ano),
         }
 

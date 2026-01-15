@@ -26,13 +26,19 @@ class PlanoAulaViewSet(ProfessorWriteFuncionarioReadMixin, viewsets.ModelViewSet
     - Update/Destroy: Owner (Professor criador) ou Gestão
     - Read: Funcionários (filtrado para professor ver apenas os seus)
     """
-    queryset = PlanoAula.objects.select_related('professor__usuario', 'disciplina').prefetch_related('turmas', 'habilidades')
+    queryset = PlanoAula.objects.select_related(
+        'professor__usuario', 
+        'disciplina'
+    ).prefetch_related(
+        'turmas__curso', 
+        'habilidades'
+    )
     serializer_class = PlanoAulaSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['professor', 'disciplina', 'turmas', 'ano_letivo', 'bimestre']
     search_fields = ['titulo', 'conteudo']
-    ordering_fields = ['data_inicio', 'disciplina__nome', 'titulo']
-    ordering = ['data_inicio']  # Ordenação padrão
+    ordering_fields = ['data_inicio', 'bimestre', 'disciplina__nome', 'titulo']
+    ordering = ['-data_inicio', '-bimestre', 'disciplina__nome', 'titulo']  # Ordenação padrão
 
     def get_permissions(self):
         if self.action == 'create':

@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     Card, Button, Loading, Badge, Table, TableHead, TableBody, TableRow,
-    TableHeader, TableCell, PopConfirm, ActionSelect
+    TableHeader, TableCell, PopConfirm, ActionSelect,
+    TurmaBadge, BimestreBadge, DateDisplay, DisciplinaBadge,
+    MobileActionRow, MobileActionButton
 } from '../../components/ui'
-import { HiPlus, HiPencil, HiTrash, HiCalendar, HiClipboardList, HiCalculator } from 'react-icons/hi'
+import { HiPlus, HiPencil, HiTrash, HiCalendar, HiClipboardList, HiCalculator, HiArrowNarrowRight } from 'react-icons/hi'
 import { evaluationAPI, coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../contexts/AuthContext'
@@ -89,7 +91,7 @@ export default function Avaliacoes() {
     })
 
     // Badge de tipo
-    const TipoBadge = ({ tipo }) => {
+    const TipoBadge = ({ tipo, className = '' }) => {
         const variants = {
             'AVALIACAO_REGULAR': 'primary',
             'AVALIACAO_RECUPERACAO': 'warning',
@@ -100,7 +102,14 @@ export default function Avaliacoes() {
             'AVALIACAO_RECUPERACAO': 'Recuperação',
             'AVALIACAO_EXTRA': 'Extra',
         }
-        return <Badge variant={variants[tipo] || 'outline'}>{labels[tipo] || tipo}</Badge>
+        return (
+            <Badge
+                variant={variants[tipo] || 'outline'}
+                className={`text-[10px] h-5 flex items-center px-2 font-bold ${className}`}
+            >
+                {labels[tipo] || tipo}
+            </Badge>
+        )
     }
 
     // Componente Card para Mobile
@@ -124,19 +133,27 @@ export default function Avaliacoes() {
                             </div>
 
                             {/* Informações */}
-                            <div className="min-w-0">
+                            <div className="min-w-0 flex-1">
                                 <h3
                                     className="font-bold text-slate-800 dark:text-white text-sm cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors truncate"
                                     onClick={() => navigate(`/avaliacoes/${avaliacao.id}/editar`)}
                                 >
                                     {avaliacao.titulo}
                                 </h3>
-                                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                                    <span className="text-[10px] text-slate-500 flex items-center gap-1 font-medium">
-                                        <HiCalendar className="w-3 h-3" />
-                                        {formatDateShortBR(avaliacao.data_inicio)}
-                                    </span>
-                                    <TipoBadge tipo={avaliacao.tipo} />
+                                <div className="flex items-center gap-x-3 gap-y-1 mt-1.5 flex-wrap">
+                                    <DisciplinaBadge sigla={avaliacao.disciplina_sigla} />
+                                    {bimestreSelecionado === '' && (
+                                        <BimestreBadge bimestre={avaliacao.bimestre} />
+                                    )}
+                                    <div className="flex items-center gap-1">
+                                        <DateDisplay date={avaliacao.data_inicio} />
+                                        {avaliacao.data_inicio !== avaliacao.data_fim && (
+                                            <>
+                                                <HiArrowNarrowRight className="text-slate-400 dark:text-slate-500 w-3 h-3" />
+                                                <DateDisplay date={avaliacao.data_fim} />
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -158,67 +175,57 @@ export default function Avaliacoes() {
                         )}
                     </div>
 
-                    {/* Resumo */}
-                    <div className="mt-4 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <Badge variant="primary" className="text-[10px] px-1.5 py-0">
-                                Valor: {parseFloat(avaliacao.valor).toFixed(1)}
-                            </Badge>
-                            {avaliacao.turmas_resumo?.slice(0, 2).map((t, i) => (
-                                <Badge key={i} variant="outline" className="text-[9px] px-1 py-0 uppercase font-bold">
-                                    {t}
-                                </Badge>
-                            ))}
-                            {avaliacao.turmas_resumo?.length > 2 && (
-                                <Badge variant="outline" className="text-[9px] px-1 py-0">
-                                    +{avaliacao.turmas_resumo.length - 2}
-                                </Badge>
-                            )}
+                    {/* Detalhes Extras */}
+                    <div className="mt-3 pt-3 border-t border-slate-50 dark:border-slate-800/50 flex flex-col gap-3">
+                        {/* Turmas Todas Juntas */}
+                        <div className="flex flex-wrap items-center gap-1.5">
+                            {avaliacao.turmas_resumo?.map((t, i) => {
+                                const match = t.match(/(\d+)([A-Z])/);
+                                return match ? (
+                                    <TurmaBadge key={i} numero={match[1]} letra={match[2]} />
+                                ) : (
+                                    <Badge key={i} variant="outline">{t.toUpperCase()}</Badge>
+                                );
+                            })}
                         </div>
-                        <span className="text-[10px] text-slate-400 font-medium">
-                            Bimestre: {avaliacao.bimestre}º
-                        </span>
+
+                        {/* Status e Valor */}
+                        <div className="flex flex-wrap items-center gap-2">
+                            <TipoBadge tipo={avaliacao.tipo} />
+                            <Badge variant="primary">
+                                VALOR: {parseFloat(avaliacao.valor).toFixed(1)}
+                            </Badge>
+                        </div>
                     </div>
                 </div>
 
-                {/* BARRA DE AÇÕES EXPANSÍVEL */}
+                {/* BARRA DE AÇÕES EXPANSÍVEL PADRONIZADA */}
                 {avaliacao.is_owner && (
-                    <div className={`
-                        grid transition-all duration-300 ease-in-out border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30
-                        ${showActions ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}
-                    `}>
-                        <div className="overflow-hidden grid grid-cols-3">
-                            <button
-                                onClick={() => navigate(`/avaliacoes/${avaliacao.id}/notas`)}
-                                className="py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-success-600 dark:hover:text-success-400 transition-all border-r border-slate-100 dark:border-slate-800 active:scale-95"
-                            >
-                                <HiCalculator className="h-6 w-6" />
-                                <span>Notas</span>
-                            </button>
-
-                            <button
-                                onClick={() => navigate(`/avaliacoes/${avaliacao.id}/editar`)}
-                                className="py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all border-r border-slate-100 dark:border-slate-800 active:scale-95"
-                            >
-                                <HiPencil className="h-6 w-6" />
-                                <span>Editar</span>
-                            </button>
-
-                            <div className="flex-1">
-                                <PopConfirm
-                                    title="Excluir esta avaliação?"
-                                    onConfirm={() => handleDelete(avaliacao.id)}
-                                >
-                                    <button
-                                        className="w-full py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-danger-600 dark:hover:text-danger-400 transition-all active:scale-95"
-                                    >
-                                        <HiTrash className="h-6 w-6" />
-                                        <span>Excluir</span>
-                                    </button>
-                                </PopConfirm>
-                            </div>
-                        </div>
-                    </div>
+                    <MobileActionRow isOpen={showActions}>
+                        <MobileActionButton
+                            icon={HiCalculator}
+                            label="Notas"
+                            variant="success"
+                            onClick={() => navigate(`/avaliacoes/${avaliacao.id}/notas`)}
+                        />
+                        <MobileActionButton
+                            icon={HiPencil}
+                            label="Editar"
+                            onClick={() => navigate(`/avaliacoes/${avaliacao.id}/editar`)}
+                        />
+                        <PopConfirm
+                            title="Excluir esta avaliação?"
+                            onConfirm={() => handleDelete(avaliacao.id)}
+                            wrapperClassName="flex-1"
+                        >
+                            <MobileActionButton
+                                icon={HiTrash}
+                                label="Excluir"
+                                variant="danger"
+                                className="w-full"
+                            />
+                        </PopConfirm>
+                    </MobileActionRow>
                 )}
             </Card>
         )
@@ -332,20 +339,20 @@ export default function Avaliacoes() {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <TipoBadge tipo={avaliacao.tipo} />
+                                            <div className="flex">
+                                                <TipoBadge tipo={avaliacao.tipo} />
+                                            </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex flex-wrap gap-1">
-                                                {avaliacao.turmas_resumo?.slice(0, 2).map((t, i) => (
-                                                    <Badge key={i} variant="outline" className="text-xs font-bold">
-                                                        {t}
-                                                    </Badge>
-                                                ))}
-                                                {avaliacao.turmas_resumo?.length > 2 && (
-                                                    <Badge variant="outline" className="text-xs">
-                                                        +{avaliacao.turmas_resumo.length - 2}
-                                                    </Badge>
-                                                )}
+                                                {avaliacao.turmas_resumo?.map((t, i) => {
+                                                    const match = t.match(/(\d+)([A-Z])/);
+                                                    return match ? (
+                                                        <TurmaBadge key={i} numero={match[1]} letra={match[2]} />
+                                                    ) : (
+                                                        <Badge key={i} variant="outline" className="text-xs font-bold">{t}</Badge>
+                                                    );
+                                                })}
                                             </div>
                                         </TableCell>
                                         <TableCell className="td-center">
@@ -354,18 +361,19 @@ export default function Avaliacoes() {
                                             </span>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="text-sm text-slate-500 whitespace-nowrap font-medium">
-                                                {formatDateShortBR(avaliacao.data_inicio)}
+                                            <div className="flex items-center gap-2">
+                                                <DateDisplay date={avaliacao.data_inicio} />
                                                 {avaliacao.data_fim !== avaliacao.data_inicio && (
-                                                    <> - {formatDateShortBR(avaliacao.data_fim)}</>
+                                                    <>
+                                                        <span className="text-slate-300">→</span>
+                                                        <DateDisplay date={avaliacao.data_fim} />
+                                                    </>
                                                 )}
-                                            </span>
+                                            </div>
                                         </TableCell>
                                         {bimestreSelecionado === '' && (
                                             <TableCell>
-                                                <Badge variant="outline" className="text-xs font-semibold">
-                                                    {avaliacao.bimestre ? `${avaliacao.bimestre}º Bim` : '-'}
-                                                </Badge>
+                                                <BimestreBadge bimestre={avaliacao.bimestre} />
                                             </TableCell>
                                         )}
                                         <TableCell className="td-center">

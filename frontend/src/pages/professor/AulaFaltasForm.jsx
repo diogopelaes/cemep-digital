@@ -357,7 +357,7 @@ export default function AulaFaltasForm() {
                                     onChange={(e) => handlePlanoSelect(e.target.value)}
                                     defaultValue=""
                                 >
-                                    <option value="" disabled>Selecione um plano de aula...</option>
+                                    <option value="" >Selecione um plano de aula...</option>
                                     {planosAula.map(plano => (
                                         <option key={plano.id} value={plano.id}>
                                             {plano.titulo}

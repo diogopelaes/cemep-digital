@@ -27,4 +27,5 @@ export { default as FormActionsProfessor } from './FormActionsProfessor'
 export { default as ActionSelect } from './ActionSelect'
 export { default as TurmaDisciplinaSelector } from './TurmaDisciplinaSelector'
 export { default as InputNota } from './InputNota'
-
+export { DisciplinaBadge, TurmaBadge, BimestreBadge, TurmaDisciplinaBadge, DateDisplay, TurmaPrimaryBadge } from './SpecializedBadges'
+export { MobileActionRow, MobileActionButton } from './MobileActionRow'

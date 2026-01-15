@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Loading, Badge, FormActionsProfessor, Combobox, InputNota } from '../../components/ui'
-import { HiBookOpen, HiAcademicCap } from 'react-icons/hi'
+import { Card, Button, Loading, Badge, FormActionsProfessor, InputNota } from '../../components/ui'
 import { evaluationAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 
@@ -180,52 +179,41 @@ export default function AvaliacaoDigitarNota() {
                 </div>
 
                 {/* Seleção de Turma/Disciplina */}
-                <div className="grid grid-cols-1 gap-4">
-                    {turmasInfo.length > 1 ? (
-                        <Card hover={false} className="border-none shadow-premium overflow-visible">
-                            <div className="p-1">
-                                <Combobox
-                                    label="Selecionar Turma / Disciplina"
-                                    value={pdtSelecionado}
-                                    onChange={setPdtSelecionado}
-                                    options={turmasInfo.map(t => ({
-                                        value: t.pdt_id,
-                                        label: t.disciplina_sigla,
-                                        subLabel: t.turma_nome
-                                    }))}
-                                    placeholder="Escolha a turma..."
-                                />
-                                {turmaSelecionada && (
-                                    <div className="flex flex-wrap gap-2 mt-3 px-1">
-                                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 text-xs font-bold border border-primary-100 dark:border-primary-800/50">
-                                            <HiAcademicCap className="w-3.5 h-3.5" />
-                                            {turmaSelecionada.turma_nome}
-                                        </div>
-                                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold border border-slate-200 dark:border-slate-700">
-                                            <HiBookOpen className="w-3.5 h-3.5" />
-                                            {turmaSelecionada.disciplina_nome}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </Card>
-                    ) : (
-                        <div className="flex flex-wrap gap-2 px-1">
-                            {turmaSelecionada && (
-                                <>
-                                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 text-xs font-bold border border-primary-100 dark:border-primary-800/50">
-                                        <HiAcademicCap className="w-3.5 h-3.5" />
-                                        {turmaSelecionada.turma_nome}
-                                    </div>
-                                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold border border-slate-200 dark:border-slate-700">
-                                        <HiBookOpen className="w-3.5 h-3.5" />
-                                        {turmaSelecionada.disciplina_nome}
-                                    </div>
-                                </>
-                            )}
+                {turmasInfo.length > 1 ? (
+                    <Card hover={false}>
+                        <div className="w-full">
+                            <label className="label">Turma / Disciplina</label>
+                            <select
+                                className="input"
+                                value={pdtSelecionado}
+                                onChange={(e) => setPdtSelecionado(e.target.value)}
+                            >
+                                <option value="">Selecione uma opção...</option>
+                                {turmasInfo.map(t => (
+                                    <option key={t.pdt_id} value={t.pdt_id}>
+                                        {t.turma_numero}{t.turma_letra} - {t.disciplina_sigla}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
-                    )}
-                </div>
+                    </Card>
+                ) : (
+                    turmasInfo.length === 1 && (
+                        <div className="flex items-center gap-3 px-1 py-1">
+                            <Badge variant="primary" className="text-sm font-bold py-1 px-3">
+                                {turmasInfo[0].turma_numero}{turmasInfo[0].turma_letra} - {turmasInfo[0].disciplina_sigla}
+                            </Badge>
+                            <div className="flex flex-col">
+                                <span className="text-xs font-bold text-slate-700 dark:text-slate-200 leading-tight">
+                                    {turmasInfo[0].turma_nome}
+                                </span>
+                                <span className="text-[10px] text-slate-500 leading-tight">
+                                    {turmasInfo[0].disciplina_nome}
+                                </span>
+                            </div>
+                        </div>
+                    )
+                )}
 
                 {/* Lista de Estudantes */}
                 {pdtSelecionado && (

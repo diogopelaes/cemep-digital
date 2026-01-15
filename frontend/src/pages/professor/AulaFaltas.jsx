@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     Card, Button, Loading, Badge, Table, TableHead, TableBody, TableRow,
-    TableHeader, TableCell, PopConfirm, Select, ActionSelect
+    TableHeader, TableCell, PopConfirm, Select, ActionSelect,
+    TurmaBadge, BimestreBadge, DateDisplay, DisciplinaBadge, TurmaPrimaryBadge,
+    MobileActionRow, MobileActionButton
 } from '../../components/ui'
 import { HiPlus, HiPencil, HiTrash, HiCalendar, HiClipboardCheck } from 'react-icons/hi'
 import { pedagogicalAPI, coreAPI } from '../../services/api'
@@ -25,11 +27,9 @@ export default function AulaFaltas() {
     const [aulas, setAulas] = useState([])
     const [anoLetivo, setAnoLetivo] = useState(null)
     const [bimestreSelecionado, setBimestreSelecionado] = useState('')
-    const [turmaSelecionada, setTurmaSelecionada] = useState('')
-    const [disciplinaSelecionada, setDisciplinaSelecionada] = useState('')
+    const [atribuicaoSelecionada, setAtribuicaoSelecionada] = useState('')
     const [disciplinasCount, setDisciplinasCount] = useState(1)
-    const [turmas, setTurmas] = useState([])
-    const [disciplinas, setDisciplinas] = useState([])
+    const [atribuicoes, setAtribuicoes] = useState([])
 
     // Se professor tem mais de uma disciplina, mostra a coluna
     const showDisciplinaColumn = disciplinasCount > 1
@@ -56,25 +56,18 @@ export default function AulaFaltas() {
             setAulas(aulasRes.data.results || [])
             setDisciplinasCount(aulasRes.data.disciplinas_count || 1)
 
+            // Salvar atribuições para filtro
+            const atts = contextoRes.data.atribuicoes || []
+            setAtribuicoes(atts)
+
+            // Se só tem uma atribuição, seleciona automaticamente para o filtro
+            if (atts.length === 1) {
+                setAtribuicaoSelecionada(atts[0].id)
+            }
+
             if (selecRes.data.ano_letivo_details) {
                 setAnoLetivo(selecRes.data.ano_letivo_details)
             }
-
-            // Extrair turmas únicas para filtro
-            const turmasUnicas = contextoRes.data.turmas || []
-            setTurmas(turmasUnicas)
-
-            // Extrair disciplinas únicas para filtro
-            const todasDisciplinas = []
-            const disciplinasMap = contextoRes.data.disciplinas_por_turma || {}
-            Object.values(disciplinasMap).forEach(discs => {
-                discs.forEach(d => {
-                    if (!todasDisciplinas.find(x => x.disciplina_id === d.disciplina_id)) {
-                        todasDisciplinas.push(d)
-                    }
-                })
-            })
-            setDisciplinas(todasDisciplinas)
 
         } catch (error) {
             console.error(error)
@@ -96,8 +89,7 @@ export default function AulaFaltas() {
     // Filtrar aulas
     const aulasFiltradas = aulas.filter(a => {
         if (bimestreSelecionado !== '' && a.bimestre !== parseInt(bimestreSelecionado)) return false
-        if (turmaSelecionada && a.turma_nome !== turmas.find(t => t.id === turmaSelecionada)?.nome) return false
-        if (disciplinaSelecionada && a.disciplina_sigla !== disciplinas.find(d => d.disciplina_id === disciplinaSelecionada)?.disciplina_sigla) return false
+        if (atribuicaoSelecionada && a.professor_disciplina_turma_id !== atribuicaoSelecionada) return false
         return true
     })
 
@@ -120,32 +112,28 @@ export default function AulaFaltas() {
                 <div className="p-4">
                     <div className="flex items-start justify-between gap-3">
                         <div className="flex gap-3 min-w-0">
-                            {/* Ícone contextual */}
+                            {/* Ícone contextual - link para edição */}
                             <div
-                                className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-primary-500 flex items-center justify-center shadow-md cursor-pointer hover:scale-105 transition-transform"
+                                className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-md cursor-pointer hover:scale-105 transition-transform"
                                 onClick={() => navigate(`/aula-faltas/${aula.id}/editar`)}
                             >
                                 <HiClipboardCheck className="text-white h-5 w-5" />
                             </div>
 
                             {/* Informações */}
-                            <div className="min-w-0">
+                            <div className="min-w-0 flex-1">
                                 <h3
                                     className="font-bold text-slate-800 dark:text-white text-sm cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors truncate"
                                     onClick={() => navigate(`/aula-faltas/${aula.id}/editar`)}
                                 >
-                                    {aula.turma_nome}
+                                    {aula.turma_nome || `${aula.turma_numero}${aula.turma_letra}`}
                                 </h3>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="text-[10px] text-slate-500 flex items-center gap-1 font-medium">
-                                        <HiCalendar className="w-3 h-3" />
-                                        {formatDateShortBR(aula.data)}
-                                    </span>
-                                    {showDisciplinaColumn && (
-                                        <Badge variant="outline" className="text-[9px] px-1 py-0 uppercase font-bold border-slate-200 dark:border-slate-700">
-                                            {aula.disciplina_sigla || 'DISC'}
-                                        </Badge>
+                                <div className="flex items-center gap-x-3 gap-y-1 mt-1.5 flex-wrap">
+                                    <DisciplinaBadge sigla={aula.disciplina_sigla} />
+                                    {bimestreSelecionado === '' && (
+                                        <BimestreBadge bimestre={aula.bimestre} />
                                     )}
+                                    <DateDisplay date={aula.data} />
                                 </div>
                             </div>
                         </div>
@@ -166,48 +154,38 @@ export default function AulaFaltas() {
                     </div>
 
                     {/* Resumo da Aula */}
-                    <div className="mt-4 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                            <Badge variant="primary" className="text-[10px] px-1.5 py-0">
-                                {aula.numero_aulas} aula{aula.numero_aulas > 1 ? 's' : ''}
+                    <div className="mt-3 pt-3 border-t border-slate-50 dark:border-slate-800/50 flex items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="outline">
+                                {aula.numero_aulas} {aula.numero_aulas > 1 ? 'AULAS' : 'AULA'}
                             </Badge>
-                            <Badge variant={aula.total_faltas > 0 ? 'warning' : 'success'} className="text-[10px] px-1.5 py-0">
-                                {aula.total_faltas} {aula.total_faltas === 1 ? 'estudante' : 'estudantes'}
+                            <Badge variant={aula.total_faltas > 0 ? 'warning' : 'success'}>
+                                FALTAS: {aula.total_faltas}
                             </Badge>
-                        </div>
-                        <span className="text-[10px] text-slate-400 font-medium">Bimestre: {aula.bimestre}º</span>
-                    </div>
-                </div>
-
-                {/* BARRA DE AÇÕES EXPANSÍVEL */}
-                <div className={`
-                    grid transition-all duration-300 ease-in-out border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30
-                    ${showActions ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}
-                `}>
-                    <div className="overflow-hidden grid grid-cols-2">
-                        <button
-                            onClick={() => navigate(`/aula-faltas/${aula.id}/editar`)}
-                            className="py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all border-r border-slate-100 dark:border-slate-800"
-                        >
-                            <HiPencil className="h-5 w-5" />
-                            <span>Editar</span>
-                        </button>
-
-                        <div className="flex-1">
-                            <PopConfirm
-                                title="Excluir esta aula?"
-                                onConfirm={() => handleDelete(aula.id)}
-                            >
-                                <button
-                                    className="w-full py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-danger-600 dark:hover:text-danger-400 transition-all"
-                                >
-                                    <HiTrash className="h-5 w-5" />
-                                    <span>Excluir</span>
-                                </button>
-                            </PopConfirm>
                         </div>
                     </div>
                 </div>
+
+                {/* BARRA DE AÇÕES EXPANSÍVEL PADRONIZADA */}
+                <MobileActionRow isOpen={showActions}>
+                    <MobileActionButton
+                        icon={HiPencil}
+                        label="Editar"
+                        onClick={() => navigate(`/aula-faltas/${aula.id}/editar`)}
+                    />
+                    <PopConfirm
+                        title="Excluir esta aula?"
+                        onConfirm={() => handleDelete(aula.id)}
+                        wrapperClassName="flex-1"
+                    >
+                        <MobileActionButton
+                            icon={HiTrash}
+                            label="Excluir"
+                            variant="danger"
+                            className="w-full"
+                        />
+                    </PopConfirm>
+                </MobileActionRow>
             </Card>
         )
     }
@@ -264,36 +242,36 @@ export default function AulaFaltas() {
                         </select>
                     </div>
 
-                    <div className="w-full sm:w-48">
-                        <label className="label">Turma</label>
-                        <select
-                            className="input"
-                            value={turmaSelecionada}
-                            onChange={(e) => setTurmaSelecionada(e.target.value)}
-                        >
-                            <option value="">Todas</option>
-                            {turmas.map(t => (
-                                <option key={t.id} value={t.id}>{t.nome}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {showDisciplinaColumn && (
-                        <div className="w-full sm:w-48">
-                            <label className="label">Disciplina</label>
+                    {atribuicoes.length > 1 ? (
+                        <div className="w-full sm:w-64">
+                            <label className="label">Turma / Disciplina</label>
                             <select
                                 className="input"
-                                value={disciplinaSelecionada}
-                                onChange={(e) => setDisciplinaSelecionada(e.target.value)}
+                                value={atribuicaoSelecionada}
+                                onChange={(e) => setAtribuicaoSelecionada(e.target.value)}
                             >
                                 <option value="">Todas</option>
-                                {disciplinas.map(d => (
-                                    <option key={d.disciplina_id} value={d.disciplina_id}>
-                                        {d.disciplina_nome}
+                                {atribuicoes.map(atrib => (
+                                    <option key={atrib.id} value={atrib.id}>
+                                        {atrib.turma_numero}{atrib.turma_letra} - {atrib.disciplina_sigla}
                                     </option>
                                 ))}
                             </select>
                         </div>
+                    ) : (
+                        atribuicoes.length === 1 && (
+                            <div className="flex flex-col justify-end pb-1">
+                                <label className="label">Turma / Disciplina</label>
+                                <div className="flex items-center gap-2 h-[42px]">
+                                    <TurmaBadge numero={atribuicoes[0].turma_numero} letra={atribuicoes[0].turma_letra} />
+                                    <span className="mx-1 text-slate-300">-</span>
+                                    <DisciplinaBadge sigla={atribuicoes[0].disciplina_sigla} />
+                                    <span className="text-[10px] text-slate-500 font-medium truncate max-w-[150px] hidden sm:block">
+                                        {atribuicoes[0].turma_nome}
+                                    </span>
+                                </div>
+                            </div>
+                        )
                     )}
                 </div>
             </Card>
@@ -319,7 +297,7 @@ export default function AulaFaltas() {
                                     <TableHeader>Data</TableHeader>
                                     {showDisciplinaColumn && <TableHeader>Disciplina</TableHeader>}
                                     {bimestreSelecionado === '' && <TableHeader>Bimestre</TableHeader>}
-                                    <TableHeader className="th-center">Faltas</TableHeader>
+                                    <TableHeader className="th-center">Estudantes com Faltas</TableHeader>
                                     <TableHeader className="th-center">Nº Aulas</TableHeader>
                                     <TableHeader className="th-center font-bold text-primary-600 dark:text-primary-400">Ações</TableHeader>
                                 </TableRow>
@@ -328,37 +306,24 @@ export default function AulaFaltas() {
                                 {aulasOrdenadas.map((aula) => (
                                     <TableRow key={aula.id}>
                                         <TableCell>
-                                            <div
-                                                className="cursor-pointer group inline-block"
+                                            <TurmaPrimaryBadge
+                                                numero={aula.turma_numero}
+                                                letra={aula.turma_letra}
+                                                nome={aula.turma_nome}
                                                 onClick={() => navigate(`/aula-faltas/${aula.id}/editar`)}
-                                            >
-                                                <p className="font-medium text-slate-800 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                                                    {aula.turma_nome}
-                                                </p>
-                                            </div>
+                                            />
                                         </TableCell>
                                         <TableCell>
-                                            <div
-                                                className="cursor-pointer group inline-block"
-                                                onClick={() => navigate(`/aula-faltas/${aula.id}/editar`)}
-                                            >
-                                                <span className="text-sm text-slate-500 whitespace-nowrap font-medium group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                                                    {formatDateShortBR(aula.data)}
-                                                </span>
-                                            </div>
+                                            <DateDisplay date={aula.data} />
                                         </TableCell>
                                         {showDisciplinaColumn && (
                                             <TableCell>
-                                                <Badge variant="outline" className="text-xs font-bold">
-                                                    {aula.disciplina_sigla || 'DISC'}
-                                                </Badge>
+                                                <DisciplinaBadge sigla={aula.disciplina_sigla} />
                                             </TableCell>
                                         )}
                                         {bimestreSelecionado === '' && (
                                             <TableCell>
-                                                <Badge variant="outline" className="text-xs font-semibold">
-                                                    {aula.bimestre ? `${aula.bimestre}º Bim` : '-'}
-                                                </Badge>
+                                                <BimestreBadge bimestre={aula.bimestre} />
                                             </TableCell>
                                         )}
                                         <TableCell className="td-center">

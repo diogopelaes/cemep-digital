@@ -214,13 +214,13 @@
     text-align: center !important;
   }
 
-  .td-actions > div {
+  .td-actions>div {
     @apply flex items-center justify-center;
   }
 
   /* Badges */
   .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+    @apply inline-flex items-center justify-center px-2 h-5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all;
   }
 
   .badge-success {
@@ -277,6 +277,33 @@
     @apply transition-colors duration-150;
     @apply cursor-pointer;
   }
+
+  /* Specialized Badges */
+  .badge-turma {
+    width: 24px;
+    height: 24px;
+    @apply shrink-0 rounded-md bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-sm text-white font-black tracking-tighter transition-transform hover:scale-110;
+  }
+
+  .badge-turma span {
+    font-size: 12px;
+    /* <--- AJUSTE O TAMANHO DA LETRA AQUI (px, rem, etc) */
+    line-height: 1;
+    @apply font-black;
+  }
+
+  .badge-disciplina {
+    @apply badge bg-primary-500/10 dark:bg-primary-500/20 border border-primary-500/20 text-primary-600 dark:text-primary-500;
+  }
+
+  .badge-bimestre {
+    @apply badge bg-slate-100/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 shadow-sm;
+  }
+
+  .badge-date {
+    @apply badge bg-indigo-50/80 dark:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 shadow-sm;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
 }
 
 /* Animations */
@@ -297,8 +324,17 @@
 }
 
 @keyframes pulse-subtle {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.02); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
 }
 
 .animate-pulse-subtle {

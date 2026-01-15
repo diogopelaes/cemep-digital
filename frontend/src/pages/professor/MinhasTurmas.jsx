@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
     Card, Table, TableHead, TableBody, TableRow,
-    TableHeader, TableCell, TableEmpty, Loading, Badge, ActionSelect
+    TableHeader, TableCell, TableEmpty, Loading, Badge, ActionSelect,
+    TurmaBadge, DisciplinaBadge, TurmaPrimaryBadge,
+    MobileActionRow, MobileActionButton
 } from '../../components/ui'
 import { HiUserGroup, HiTable, HiPhotograph } from 'react-icons/hi'
 import { FaFilePdf } from 'react-icons/fa'
@@ -93,14 +95,11 @@ export default function MinhasTurmas() {
                     <div className="flex items-start justify-between gap-3">
                         <div className="flex gap-3">
                             {/* Avatar da Turma - clicável */}
-                            <div
-                                className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-md cursor-pointer hover:scale-105 transition-transform"
+                            <TurmaBadge
+                                numero={turma.numero}
+                                letra={turma.letra}
                                 onClick={() => navigate(`/minhas-turmas/${turma.id}`)}
-                            >
-                                <span className="text-white font-bold text-sm">
-                                    {turma.numero}{turma.letra}
-                                </span>
-                            </div>
+                            />
 
                             {/* Informações */}
                             <div className="min-w-0">
@@ -110,7 +109,7 @@ export default function MinhasTurmas() {
                                 >
                                     {formatTurmaNome(turma)}
                                 </h3>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-medium">
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-medium mt-1">
                                     {turma.curso?.nome || 'Curso não definido'}
                                 </p>
                             </div>
@@ -120,7 +119,7 @@ export default function MinhasTurmas() {
                         <button
                             onClick={() => setShowActions(!showActions)}
                             className={`
-                                text-[10px] font-bold px-3 py-1 rounded-full transition-all duration-200
+                                text-[10px] font-bold px-3 py-1 rounded-full transition-all duration-200 shrink-0
                                 ${showActions
                                     ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/30 ring-2 ring-primary-500/20'
                                     : 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 border border-primary-100 dark:border-primary-800/50'
@@ -132,60 +131,39 @@ export default function MinhasTurmas() {
                     </div>
 
                     {/* Rodapé do Card: Disciplinas e Alunos */}
-                    <div className="mt-4 flex items-center justify-between gap-2">
-                        <div className="flex flex-wrap gap-1">
+                    <div className="mt-4 pt-3 border-t border-slate-50 dark:border-slate-800/50 flex items-center justify-between gap-2">
+                        <div className="flex flex-wrap gap-1.5">
                             {turma.disciplinas_lecionadas?.map((disc, idx) => (
-                                <Badge key={idx} variant="outline" className="text-[10px] px-1.5 py-0 border-slate-200 dark:border-slate-700">
-                                    {disc.sigla}
-                                </Badge>
+                                <DisciplinaBadge key={idx} sigla={disc.sigla} />
                             ))}
                         </div>
 
-                        <div className="flex items-center gap-1 text-[11px] font-bold text-slate-400 bg-slate-50 dark:bg-slate-800/50 px-2 py-0.5 rounded-lg">
-                            <HiUserGroup className="h-3 w-3" />
+                        <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 h-5 px-2 rounded-lg uppercase tracking-wider">
+                            <HiUserGroup className="h-3.5 w-3.5 text-primary-500" />
                             <span>{turma.estudantes_count || 0}</span>
                         </div>
                     </div>
                 </div>
 
-                {/* BARRA DE AÇÕES EXPANSÍVEL (MODO GIGANTE AO CLICAR) */}
-                <div className={`
-                    grid transition-all duration-300 ease-in-out border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30
-                    ${showActions ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}
-                `}>
-                    <div className="overflow-hidden flex">
-                        <button
-                            onClick={(e) => handleGerarLista(turma, e)}
-                            disabled={generatingPDF === turma.id}
-                            className="flex-1 py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all border-r border-slate-100 dark:border-slate-800 active:scale-95 disabled:opacity-50"
-                        >
-                            {generatingPDF === turma.id ? (
-                                <Loading size="sm" />
-                            ) : (
-                                <>
-                                    <FaFilePdf className="h-5 w-5" />
-                                    <span>PDF</span>
-                                </>
-                            )}
-                        </button>
-
-                        <button
-                            onClick={() => navigate(`/turmas/${turma.id}/carometro`)}
-                            className="flex-1 py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all border-r border-slate-100 dark:border-slate-800 active:scale-95"
-                        >
-                            <HiPhotograph className="h-6 w-6" />
-                            <span>Fotos</span>
-                        </button>
-
-                        <button
-                            onClick={() => navigate(`/grade-turma/${turma.ano_letivo}/${turma.numero}/${turma.letra}`)}
-                            className="flex-1 py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all active:scale-95"
-                        >
-                            <HiTable className="h-6 w-6" />
-                            <span>Grade</span>
-                        </button>
-                    </div>
-                </div>
+                {/* BARRA DE AÇÕES EXPANSÍVEL PADRONIZADA */}
+                <MobileActionRow isOpen={showActions}>
+                    <MobileActionButton
+                        icon={FaFilePdf}
+                        label="PDF"
+                        onClick={(e) => handleGerarLista(turma, e)}
+                        disabled={generatingPDF === turma.id}
+                    />
+                    <MobileActionButton
+                        icon={HiPhotograph}
+                        label="Fotos"
+                        onClick={() => navigate(`/turmas/${turma.id}/carometro`)}
+                    />
+                    <MobileActionButton
+                        icon={HiTable}
+                        label="Grade"
+                        onClick={() => navigate(`/grade-turma/${turma.ano_letivo}/${turma.numero}/${turma.letra}`)}
+                    />
+                </MobileActionRow>
             </Card>
         )
     }
@@ -251,21 +229,12 @@ export default function MinhasTurmas() {
                                 {turmas.map((turma) => (
                                     <TableRow key={turma.id}>
                                         <TableCell>
-                                            <div
-                                                className="flex items-center gap-3 cursor-pointer group"
+                                            <TurmaPrimaryBadge
+                                                numero={turma.numero}
+                                                letra={turma.letra}
+                                                nome={formatTurmaNome(turma)}
                                                 onClick={() => navigate(`/minhas-turmas/${turma.id}`)}
-                                            >
-                                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
-                                                    <span className="text-white font-bold text-sm">
-                                                        {turma.numero}{turma.letra}
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-slate-800 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                                                        {formatTurmaNome(turma)}
-                                                    </p>
-                                                </div>
-                                            </div>
+                                            />
                                         </TableCell>
                                         <TableCell>
                                             <span className="text-sm text-slate-600 dark:text-slate-400">
@@ -275,9 +244,7 @@ export default function MinhasTurmas() {
                                         <TableCell>
                                             <div className="flex flex-wrap gap-1 max-w-xs">
                                                 {turma.disciplinas_lecionadas?.map((disc, idx) => (
-                                                    <Badge key={idx} variant="outline" className="text-xs">
-                                                        {disc.sigla}
-                                                    </Badge>
+                                                    <DisciplinaBadge key={idx} sigla={disc.sigla} />
                                                 ))}
                                             </div>
                                         </TableCell>

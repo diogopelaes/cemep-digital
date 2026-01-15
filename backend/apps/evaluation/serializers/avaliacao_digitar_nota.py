@@ -62,10 +62,12 @@ class AvaliacaoDigitarNotaSerializer(serializers.Serializer):
                 'turma_id': str(turma.id),
                 'turma_nome': turma.nome,
                 'turma_sigla': turma.sigla,
+                'turma_numero': turma.numero,
+                'turma_letra': turma.letra,
                 'disciplina_id': str(disciplina.id),
                 'disciplina_nome': disciplina.nome,
                 'disciplina_sigla': disciplina.sigla,
-                'label': f"{turma.numero_letra} - {disciplina.sigla}",
+                'label': f"{turma.numero}{turma.letra} - {disciplina.sigla}",
             })
         return result
 

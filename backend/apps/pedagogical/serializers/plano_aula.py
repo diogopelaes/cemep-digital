@@ -5,9 +5,23 @@ from apps.core.serializers.turma import TurmaSerializer
 
 from apps.core.serializers.disciplina import DisciplinaSerializer
 
+class TurmaResumoSerializer(serializers.ModelSerializer):
+    """Serializer ultra-leve para listagens."""
+    nome = serializers.ReadOnlyField()
+    sigla = serializers.ReadOnlyField()
+    class Meta:
+        model = TurmaSerializer.Meta.model # Pega o model de Turma
+        fields = ['id', 'nome', 'sigla', 'numero', 'letra']
+
+class HabilidadeResumoSerializer(serializers.ModelSerializer):
+    """Serializer ultra-leve para listagens."""
+    class Meta:
+        model = HabilidadeSerializer.Meta.model
+        fields = ['id', 'codigo', 'descricao']
+
 class PlanoAulaSerializer(serializers.ModelSerializer):
-    habilidades_detalhes = HabilidadeSerializer(source='habilidades', many=True, read_only=True)
-    turmas_detalhes = TurmaSerializer(source='turmas', many=True, read_only=True)
+    habilidades_detalhes = HabilidadeResumoSerializer(source='habilidades', many=True, read_only=True)
+    turmas_detalhes = TurmaResumoSerializer(source='turmas', many=True, read_only=True)
     disciplina_detalhes = DisciplinaSerializer(source='disciplina', read_only=True)
     
     class Meta:
