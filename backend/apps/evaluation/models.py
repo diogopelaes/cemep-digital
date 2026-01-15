@@ -4,7 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from apps.core.models import Funcionario, ProfessorDisciplinaTurma, UUIDModel, Arquivo, AnoLetivo, Habilidade
 from apps.academic.models import Estudante, MatriculaTurma
-from .config import BIMESTRE_CHOICES
+from .config import BIMESTRE_CHOICES, OPCOES_FORMA_CALCULO
 
 # =============================================================================
 # AVALIAÇÕES
@@ -113,6 +113,15 @@ class Avaliacao(UUIDModel):
             # - Garante que o intervalo escolhido possua ao menos um dia letivo (ignora feriados/recessos).
             ano_letivo = AnoLetivo.obter_ano_letivo_da_data(self.data_inicio)
             ano_letivo.validar_periodo_letivo(self.data_inicio, self.data_fim)
+
+            # 3. Verifica se a criação de avaliações está permitida para este ano letivo
+            if not self.pk: # Apenas na criação
+                config_avaliacao = ano_letivo.controles.get('avaliacao', {})
+                if not config_avaliacao.get('pode_criar', False):
+                    raise ValidationError(
+                        "A criação de novas avaliações está bloqueada para este ano letivo no momento. "
+                        "Entre em contato com a secretaria/gestão."
+                    )
 
     def save(self, *args, **kwargs):
         if self.data_inicio:
@@ -375,5 +384,74 @@ class NotaBimestral(UUIDModel):
         return self.nota_recuperacao >= self._get_media_aprovacao()
     
 
+class AvaliacaoConfigProfessor(UUIDModel):
+    ano_letivo = models.ForeignKey(
+        AnoLetivo, 
+        on_delete=models.CASCADE, 
+        related_name='configuracoes_professores',
+        verbose_name='Ano Letivo'
+    )
+    professor = models.ForeignKey(
+        Funcionario, 
+        on_delete=models.CASCADE, 
+        related_name='configuracoes_avaliacoes',
+        verbose_name='Professor'
+    )
+    forma_calculo = models.CharField(
+        max_length=20, 
+        choices=[(k, v) for k, v in OPCOES_FORMA_CALCULO if k != 'LIVRE_ESCOLHA'], 
+        default='SOMA',
+        verbose_name='Forma de Cálculo'
+    )
+    pode_alterar = models.BooleanField(
+        default=True,
+        verbose_name='Pode Alterar'
+    )
 
+    class Meta:
+        verbose_name = 'Configuração de Avaliação do Professor'
+        verbose_name_plural = 'Configurações de Avaliação dos Professores'
+        unique_together = ['ano_letivo', 'professor']
 
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.pk:
+            old_obj = AvaliacaoConfigProfessor.objects.get(pk=self.pk)
+            
+            # 1. Regra de pode_alterar (vinda do Ano Letivo)
+            if not old_obj.pode_alterar and self.forma_calculo != old_obj.forma_calculo:
+                raise ValidationError("A forma de cálculo não pode ser alterada para este ano letivo conforme configuração geral.")
+
+            # 2. Regra de existência de avaliações (Independentemente de pode_alterar ser True)
+            if self.forma_calculo != old_obj.forma_calculo:
+                # Verifica se o professor já criou alguma avaliação neste ano letivo
+                tem_avaliacoes = Avaliacao.objects.filter(
+                    ano_letivo=self.ano_letivo,
+                    criado_por=self.professor.usuario
+                ).exists()
+
+                if tem_avaliacoes:
+                    raise ValidationError(
+                        "Não é possível alterar a forma de cálculo pois você já possui avaliações "
+                        "registradas neste ano letivo. Exclua as avaliações para mudar a configuração."
+                    )
+
+    def save(self, *args, **kwargs):
+        config_geral = self.ano_letivo.controles.get('avaliacao', {})
+        forma_calculo_geral = config_geral.get('forma_calculo', 'LIVRE_ESCOLHA')
+        
+        if forma_calculo_geral == 'LIVRE_ESCOLHA':
+            # Se for LIVRE_ESCOLHA, o professor escolhe. 
+            # Se for criação e não tiver definido, default SOMA.
+            if not self.pk and not self.forma_calculo:
+                self.forma_calculo = 'SOMA'
+            self.pode_alterar = True
+        else:
+            # Se NÃO for LIVRE_ESCOLHA, segue a regra do ano letivo
+            self.forma_calculo = forma_calculo_geral
+            self.pode_alterar = False
+            
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.professor} - {self.ano_letivo} ({self.forma_calculo})"

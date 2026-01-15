@@ -60,6 +60,7 @@ AVALIACAO_CONFIG_PADRAO = {
     'casas_decimais_bimestral': 1,
     'casas_decimais_avaliacao': 2,
     'livre_escolha_professor': True,
+    'pode_criar': False,
 }
 
 
@@ -178,12 +179,27 @@ class AnoLetivo(UUIDModel):
                     raise ValidationError(f'O {nome} deve começar após o fim do bimestre anterior.')
                 last_date = fim
 
+        # Restrição para alteração da forma de cálculo no controles se houver avaliações
+        if self.pk:
+            old_obj = AnoLetivo.objects.get(pk=self.pk)
+            old_config = old_obj.controles.get('avaliacao', {}) if old_obj.controles else {}
+            new_config = self.controles.get('avaliacao', {}) if self.controles else {}
+            
+            if old_config.get('forma_calculo') != new_config.get('forma_calculo'):
+                from apps.evaluation.models import Avaliacao
+                if Avaliacao.objects.filter(ano_letivo=self).exists():
+                    raise ValidationError(
+                        "Não é possível alterar a forma de cálculo do ano letivo pois já existem avaliações "
+                        "cadastradas por professores. Remova ou altere as avaliações antes de mudar esta configuração global."
+                    )
+
     def save(self, *args, **kwargs):
         is_new = self._state.adding
         super().save(*args, **kwargs)
         if is_new:
             self._criar_controles_iniciais()
         self.atualizar_controles_json()
+        self.sincronizar_configuracoes_professores()
     
     def _criar_controles_iniciais(self):
         controles_a_criar = []
@@ -269,6 +285,25 @@ class AnoLetivo(UUIDModel):
         AnoLetivo.objects.filter(pk=self.pk).update(controles=novo_controles)
         self.controles = novo_controles
         self.invalidar_cache_datas_liberadas()
+
+    def sincronizar_configuracoes_professores(self):
+        """
+        Sincroniza as configurações de avaliação de todos os professores deste ano letivo
+        sempre que a configuração global do Ano Letivo é alterada.
+        """
+        from apps.evaluation.models import AvaliacaoConfigProfessor
+        
+        config_av = self.controles.get('avaliacao', {})
+        forma_geral = config_av.get('forma_calculo', 'LIVRE_ESCOLHA')
+
+        queryset = AvaliacaoConfigProfessor.objects.filter(ano_letivo=self)
+
+        if forma_geral == 'LIVRE_ESCOLHA':
+            # Se for LIVRE_ESCOLHA, permite alteração e não mexe na forma atual do professor
+            queryset.update(pode_alterar=True)
+        else:
+            # Caso contrário, força a forma geral e bloqueia alteração
+            queryset.update(forma_calculo=forma_geral, pode_alterar=False)
 
     @classmethod
     def obter_ano_letivo_da_data(cls, data):

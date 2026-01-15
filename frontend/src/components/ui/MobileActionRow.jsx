@@ -9,7 +9,8 @@ export const MobileActionButton = ({
     label,
     onClick,
     variant = 'default', // default, danger, success
-    className = ''
+    className = '',
+    preventPropagation = true
 }) => {
     const variants = {
         default: 'hover:text-primary-600 dark:hover:text-primary-400',
@@ -20,7 +21,9 @@ export const MobileActionButton = ({
     return (
         <button
             onClick={(e) => {
-                e.stopPropagation()
+                if (preventPropagation) {
+                    e.stopPropagation()
+                }
                 onClick && onClick()
             }}
             className={`

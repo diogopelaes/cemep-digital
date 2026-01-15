@@ -98,6 +98,7 @@ export default function PopConfirm({
                         transform: 'translateX(-100%)' // Alinha a direita do popup com a direita do botão
                     }}
                     onClick={(e) => e.stopPropagation()} // Impede que clicks no popup fechem ele (pelo listener do document)
+                    onMouseDown={(e) => e.stopPropagation()} // Impede que mousedown feche componentes pai (ex: ActionSelect)
                 >
                     <span className="text-sm font-medium text-slate-700 dark:text-slate-200 pl-1">
                         {title}

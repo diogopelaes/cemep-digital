@@ -374,5 +374,10 @@ export const evaluationAPI = {
     porTurma: (pdt, bimestre) => api.get('/evaluation/notas-bimestrais/por_turma/', { params: { pdt, bimestre } }),
     salvar: (pdt, bimestre, data) => api.post('/evaluation/notas-bimestrais/por_turma/', data, { params: { pdt, bimestre } }),
   },
+  // Configuração do Professor
+  configuracaoProfessor: {
+    mine: () => api.get('/evaluation/configuracao-professor/mine/'),
+    updateMine: (data) => api.patch('/evaluation/configuracao-professor/mine/', data),
+  },
 }
 

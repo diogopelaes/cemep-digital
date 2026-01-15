@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { HiChevronDown, HiChevronRight, HiInformationCircle } from 'react-icons/hi'
 import { coreAPI } from '../../services/api'
-import { Loading, Badge, FormActions, Card } from '../ui'
+import { Loading, Badge, FormActions, Card, Switch, Input, Select } from '../ui'
 import ControleForm from '../../pages/gestao-secretaria/ControleForm'
 import toast from 'react-hot-toast'
 import { useReferences } from '../../contexts/ReferenceContext'
@@ -20,12 +20,23 @@ const TIPOS = [
     { value: 'BOLETIM', label: 'Visualização do boletim', bimestres: [1, 2, 3, 4, 5] },
 ]
 
+const FORMA_CALCULO_OPTIONS = [
+    { value: 'SOMA', label: 'Soma Simples (acumulativo)' },
+    { value: 'MEDIA_PONDERADA', label: 'Média Ponderada' },
+    { value: 'LIVRE_ESCOLHA', label: 'Livre Escolha (Professor define)' },
+]
+
 export default function ControleTab() {
     const [controles, setControles] = useState([])
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [activeAno, setActiveAno] = useState(null)
     const [hasChanges, setHasChanges] = useState(false)
+    const [podeCriarAvaliacao, setPodeCriarAvaliacao] = useState(false)
+    const [formaCalculo, setFormaCalculo] = useState('LIVRE_ESCOLHA')
+    const [casasDecimaisAvaliacao, setCasasDecimaisAvaliacao] = useState(2)
+    const [casasDecimaisBimestral, setCasasDecimaisBimestral] = useState(1)
+    const [hasConfigChanges, setHasConfigChanges] = useState(false)
 
     const [expandedBimestres, setExpandedBimestres] = useState([1])
     const { anosLetivos } = useReferences()
@@ -34,6 +45,11 @@ export default function ControleTab() {
         if (anosLetivos && anosLetivos.length > 0) {
             const ativo = anosLetivos.find(a => a.is_active) || anosLetivos[0]
             setActiveAno(ativo)
+            const avConfig = ativo?.controles?.avaliacao || {}
+            setPodeCriarAvaliacao(avConfig.pode_criar || false)
+            setFormaCalculo(avConfig.forma_calculo || 'LIVRE_ESCOLHA')
+            setCasasDecimaisAvaliacao(avConfig.casas_decimais_avaliacao ?? 2)
+            setCasasDecimaisBimestral(avConfig.casas_decimais_bimestral ?? 1)
         }
     }, [anosLetivos])
 
@@ -62,26 +78,45 @@ export default function ControleTab() {
     }
 
     const handleSave = async () => {
-        const dirtyControles = controles.filter(c => c._dirty)
-        if (dirtyControles.length === 0) return
-
         setSaving(true)
         try {
-            const payload = dirtyControles.map(c => ({
-                ano_letivo: c.ano_letivo || activeAno?.id,
-                bimestre: c.bimestre,
-                tipo: c.tipo,
-                data_inicio: c.data_inicio || null,
-                data_fim: c.data_fim || null,
-                digitacao_futura: c.digitacao_futura
-            }))
+            // Salva controles por lote se houver mudanças nos períodos
+            const dirtyControles = controles.filter(c => c._dirty)
+            if (dirtyControles.length > 0) {
+                const payload = dirtyControles.map(c => ({
+                    ano_letivo: c.ano_letivo || activeAno?.id,
+                    bimestre: c.bimestre,
+                    tipo: c.tipo,
+                    data_inicio: c.data_inicio || null,
+                    data_fim: c.data_fim || null,
+                    digitacao_futura: c.digitacao_futura
+                }))
+                await coreAPI.controleRegistros.salvarLote({ controles: payload })
+            }
 
-            await coreAPI.controleRegistros.salvarLote({ controles: payload })
+            // Salva configuração de avaliação no AnoLetivo se houver mudanças
+            if (hasConfigChanges) {
+                const newControles = {
+                    ...activeAno.controles,
+                    avaliacao: {
+                        ...(activeAno.controles?.avaliacao || {}),
+                        pode_criar: podeCriarAvaliacao,
+                        forma_calculo: formaCalculo,
+                        casas_decimais_avaliacao: parseInt(casasDecimaisAvaliacao),
+                        casas_decimais_bimestral: parseInt(casasDecimaisBimestral)
+                    }
+                }
+                await coreAPI.anosLetivos.update(activeAno.ano, { controles: newControles })
+
+                // Atualiza o objeto no estado local para refletir a mudança salva
+                setActiveAno(prev => ({ ...prev, controles: newControles }))
+            }
 
             // Recarregar para pegar status atualizado
             const { data } = await coreAPI.controleRegistros.porAno(activeAno?.ano)
             setControles(Array.isArray(data) ? data : [])
             setHasChanges(false)
+            setHasConfigChanges(false)
 
             toast.success('Alterações salvas com sucesso!')
         } catch (error) {
@@ -93,9 +128,15 @@ export default function ControleTab() {
     }
 
     const handleCancel = () => {
-        if (hasChanges) {
+        if (hasChanges || hasConfigChanges) {
             loadControles()
+            const avConfig = activeAno?.controles?.avaliacao || {}
+            setPodeCriarAvaliacao(avConfig.pode_criar || false)
+            setFormaCalculo(avConfig.forma_calculo || 'LIVRE_ESCOLHA')
+            setCasasDecimaisAvaliacao(avConfig.casas_decimais_avaliacao ?? 2)
+            setCasasDecimaisBimestral(avConfig.casas_decimais_bimestral ?? 1)
             setHasChanges(false)
+            setHasConfigChanges(false)
             toast('Alterações descartadas', { icon: 'ℹ️' })
         }
     }
@@ -174,17 +215,79 @@ export default function ControleTab() {
                     </div>
                 </div>
 
+                {/* Configurações Globais de Avaliação */}
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
+                        <div>
+                            <h3 className="font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                                <span className="text-primary-600 dark:text-primary-400">⚙️</span>
+                                Configurações de Avaliação
+                            </h3>
+                            <p className="text-xs text-slate-500 mt-1">Regras aplicadas a todas as avaliações deste ano letivo.</p>
+                        </div>
+                        <div className="flex items-center gap-3 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Pode criar Avaliação</span>
+                            <Switch
+                                checked={podeCriarAvaliacao}
+                                onChange={(e) => {
+                                    setPodeCriarAvaliacao(e.target.checked)
+                                    setHasConfigChanges(true)
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <Select
+                            label="Forma de Cálculo"
+                            value={formaCalculo}
+                            options={FORMA_CALCULO_OPTIONS}
+                            onChange={(e) => {
+                                setFormaCalculo(e.target.value)
+                                setHasConfigChanges(true)
+                            }}
+                            help="Define como a nota bimestral é calculada."
+                        />
+
+                        <Input
+                            label="Casas Decimais (Avaliação)"
+                            type="number"
+                            min="0"
+                            max="4"
+                            value={casasDecimaisAvaliacao}
+                            onChange={(e) => {
+                                setCasasDecimaisAvaliacao(e.target.value)
+                                setHasConfigChanges(true)
+                            }}
+                        />
+
+                        <Input
+                            label="Casas Decimais (Média Bimestral)"
+                            type="number"
+                            min="0"
+                            max="4"
+                            value={casasDecimaisBimestral}
+                            onChange={(e) => {
+                                setCasasDecimaisBimestral(e.target.value)
+                                setHasConfigChanges(true)
+                            }}
+                        />
+                    </div>
+                </div>
+
                 {/* Info Box */}
-                <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                    <HiInformationCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-blue-700 dark:text-blue-300">
-                        <p className="font-medium mb-1">Como funciona a liberação:</p>
-                        <ul className="list-disc list-inside space-y-0.5 text-blue-600 dark:text-blue-400">
-                            <li><strong>Com data início e fim:</strong> Liberado no período definido</li>
-                            <li><strong>Só data início:</strong> Liberado dessa data em diante</li>
-                            <li><strong>Só data fim:</strong> Liberado até essa data</li>
-                            <li><strong>Sem datas:</strong> Não liberado</li>
-                        </ul>
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex-1 flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                        <HiInformationCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                        <div className="text-sm text-blue-700 dark:text-blue-300">
+                            <p className="font-medium mb-1">Como funciona a liberação:</p>
+                            <ul className="list-disc list-inside space-y-0.5 text-blue-600 dark:text-blue-400">
+                                <li><strong>Com data início e fim:</strong> Liberado no período definido</li>
+                                <li><strong>Só data início:</strong> Liberado dessa data em diante</li>
+                                <li><strong>Só data fim:</strong> Liberado até essa data</li>
+                                <li><strong>Sem datas:</strong> Não liberado</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
@@ -259,7 +362,7 @@ export default function ControleTab() {
                     saving={saving}
                     isEditing={true}
                     saveLabel="Salvar Configurações"
-                    disabled={!hasChanges}
+                    disabled={!hasChanges && !hasConfigChanges}
                     className="mt-6"
                 />
             </div>

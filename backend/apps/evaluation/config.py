@@ -63,6 +63,7 @@ def get_config_from_ano_letivo(ano_letivo) -> dict:
         "CASAS_DECIMAIS_BIMESTRAL": cfg['casas_decimais_bimestral'],
         "CASAS_DECIMAIS_AVALIACAO": cfg['casas_decimais_avaliacao'],
         "LIVRE_ESCOLHA_PROFESSOR": cfg['livre_escolha_professor'],
+        "PODE_CRIAR": cfg.get('pode_criar', False),
         "BIMESTRE_CHOICES": [{"id": k, "label": v} for k, v in BIMESTRE_CHOICES],
         "OPCOES_FORMA_CALCULO": [{"id": k, "label": v} for k, v in OPCOES_FORMA_CALCULO],
         "OPCOES_REGRA_ARREDONDAMENTO": [{"id": k, "label": v} for k, v in OPCOES_REGRA_ARREDONDAMENTO],

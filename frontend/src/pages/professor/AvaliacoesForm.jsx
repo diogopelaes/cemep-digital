@@ -105,6 +105,10 @@ export default function AvaliacoesForm() {
             setAvaliacaoConfig(choices.config || {})
             setHabilidadesMap(choices.habilidades_por_disciplina || {})
 
+            if (!isEditing && choices.config && choices.config.PODE_CRIAR === false) {
+                setError('A criação de novas avaliações está temporariamente bloqueada pela gestão.')
+            }
+
             if (isEditing) {
                 // Carrega avaliação existente
                 const avaliacaoRes = await evaluationAPI.avaliacoes.get(id)

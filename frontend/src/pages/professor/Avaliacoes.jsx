@@ -6,7 +6,7 @@ import {
     TurmaBadge, BimestreBadge, DateDisplay, DisciplinaBadge,
     MobileActionRow, MobileActionButton
 } from '../../components/ui'
-import { HiPlus, HiPencil, HiTrash, HiCalendar, HiClipboardList, HiCalculator, HiArrowNarrowRight } from 'react-icons/hi'
+import { HiPlus, HiPencil, HiTrash, HiCalendar, HiClipboardList, HiCalculator, HiArrowNarrowRight, HiCog } from 'react-icons/hi'
 import { evaluationAPI, coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../contexts/AuthContext'
@@ -33,6 +33,7 @@ export default function Avaliacoes() {
     const [anoLetivo, setAnoLetivo] = useState(null)
     const [bimestreSelecionado, setBimestreSelecionado] = useState('')
     const [tipoSelecionado, setTipoSelecionado] = useState('')
+    const [configProfessor, setConfigProfessor] = useState(null)
 
     useEffect(() => {
         loadInitialData()
@@ -47,15 +48,20 @@ export default function Avaliacoes() {
     const loadInitialData = async () => {
         setLoading(true)
         try {
-            const [avaliacoesRes, selecRes] = await Promise.all([
+            const [avaliacoesRes, selecRes, configRes] = await Promise.all([
                 evaluationAPI.avaliacoes.list({ page_size: 1000 }),
-                coreAPI.anoLetivoSelecionado.get()
+                coreAPI.anoLetivoSelecionado.get(),
+                evaluationAPI.configuracaoProfessor.mine()
             ])
 
             setAvaliacoes(avaliacoesRes.data.results || [])
 
             if (selecRes.data.ano_letivo_details) {
                 setAnoLetivo(selecRes.data.ano_letivo_details)
+            }
+
+            if (configRes.data) {
+                setConfigProfessor(configRes.data)
             }
         } catch (error) {
             console.error(error)
@@ -223,6 +229,7 @@ export default function Avaliacoes() {
                                 label="Excluir"
                                 variant="danger"
                                 className="w-full"
+                                preventPropagation={false}
                             />
                         </PopConfirm>
                     </MobileActionRow>
@@ -252,14 +259,39 @@ export default function Avaliacoes() {
         <div className="space-y-6 animate-fade-in">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
-                        Avaliações
-                    </h1>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
+                            Avaliações
+                        </h1>
+                        <button
+                            onClick={() => navigate('/avaliacoes/configuracao')}
+                            className="text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mt-1"
+                            title="Configurações de Avaliação"
+                        >
+                            <HiCog className="h-6 w-6" />
+                        </button>
+                        {configProfessor && (
+                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 uppercase tracking-tight" title="Forma de Cálculo das Notas">
+                                <HiCalculator className="w-3 h-3" />
+                                {configProfessor.forma_calculo_display}
+                            </div>
+                        )}
+                    </div>
                     <p className="text-slate-500 dark:text-slate-400 mt-1">Gerencie suas avaliações e provas</p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button onClick={() => navigate('/avaliacoes/nova')} variant="primary">
+                    {anoLetivo && !anoLetivo.controles?.avaliacao?.pode_criar && (
+                        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg text-amber-700 dark:text-amber-400 text-xs font-medium">
+                            <span>Criação bloqueada</span>
+                        </div>
+                    )}
+                    <Button
+                        onClick={() => navigate('/avaliacoes/nova')}
+                        variant="primary"
+                        disabled={anoLetivo && !anoLetivo.controles?.avaliacao?.pode_criar}
+                        title={anoLetivo && !anoLetivo.controles?.avaliacao?.pode_criar ? "A criação de avaliações está temporariamente bloqueada pela gestão." : "Nova Avaliação"}
+                    >
                         <HiPlus className="sm:mr-1" />
                         <span className="hidden sm:inline">Nova Avaliação</span>
                     </Button>
@@ -396,10 +428,10 @@ export default function Avaliacoes() {
                                                             label: 'Excluir',
                                                             icon: HiTrash,
                                                             danger: true,
-                                                            popConfirm: {
+                                                            onClick: () => handleDelete(avaliacao.id),
+                                                            confirm: {
                                                                 title: "Excluir Avaliação?",
                                                                 message: "Esta ação não poderá ser desfeita.",
-                                                                onConfirm: () => handleDelete(avaliacao.id)
                                                             }
                                                         }
                                                     ]}
