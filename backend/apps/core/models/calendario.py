@@ -49,6 +49,20 @@ class DiaNaoLetivo(UUIDModel):
         return f"{self.data.strftime('%d/%m/%Y')} - {self.get_tipo_display()}"
 
 
+# -----------------------------------------------------------------------------
+# Configurações Padrão de Avaliação (usadas para inicializar o JSON controles)
+# -----------------------------------------------------------------------------
+AVALIACAO_CONFIG_PADRAO = {
+    'valor_maximo': 10.00,
+    'media_aprovacao': 6.00,
+    'forma_calculo': 'LIVRE_ESCOLHA',
+    'regra_arredondamento': 'FAIXAS_MULTIPLOS_05',
+    'casas_decimais_bimestral': 1,
+    'casas_decimais_avaliacao': 2,
+    'livre_escolha_professor': True,
+}
+
+
 class AnoLetivo(UUIDModel):
     """Ano letivo escolar."""
     ano = models.PositiveSmallIntegerField(unique=True, verbose_name='Ano')
@@ -169,22 +183,7 @@ class AnoLetivo(UUIDModel):
         super().save(*args, **kwargs)
         if is_new:
             self._criar_controles_iniciais()
-            self._criar_configuracao_avaliacao_geral()
         self.atualizar_controles_json()
-    
-    def _criar_configuracao_avaliacao_geral(self):
-        try:
-            from apps.evaluation.models import ConfiguracaoAvaliacaoGeral
-            ConfiguracaoAvaliacaoGeral.objects.get_or_create(
-                ano_letivo=self,
-                defaults={
-                    'livre_escolha_professor': True,
-                    'numero_casas_decimais_bimestral': 1,
-                    'numero_casas_decimais_avaliacao': 2,
-                }
-            )
-        except Exception:
-            pass
     
     def _criar_controles_iniciais(self):
         controles_a_criar = []
@@ -260,6 +259,12 @@ class AnoLetivo(UUIDModel):
         for bim_key, dias in dias_por_bimestre.items():
             if bim_key not in novo_controles:
                 novo_controles[bim_key] = {'dias_letivos_base': dias}
+
+        # Configurações de avaliação: preserva existente ou cria com valores padrão
+        novo_controles['avaliacao'] = (
+            self.controles.get('avaliacao', AVALIACAO_CONFIG_PADRAO.copy())
+            if self.controles else AVALIACAO_CONFIG_PADRAO.copy()
+        )
 
         AnoLetivo.objects.filter(pk=self.pk).update(controles=novo_controles)
         self.controles = novo_controles

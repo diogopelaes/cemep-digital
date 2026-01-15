@@ -18,7 +18,7 @@ from apps.evaluation.serializers import (
 from apps.core.models import ProfessorDisciplinaTurma
 from apps.users.permissions import IsCreatorOrReadOnly, AnoLetivoFilterMixin
 from django.utils import timezone
-from apps.evaluation.config import get_config
+from apps.evaluation.config import get_config_from_ano_letivo
 
 
 class AvaliacaoViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
@@ -126,6 +126,6 @@ class AvaliacaoViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         bim = ano_selecionado.bimestre()
         data['datasLiberadas'] = ano_selecionado.controles.get(str(bim), {}).get('dias_letivos_base', []) if bim else []
         data['data_atual'] = timezone.localdate().isoformat()
-        data['config'] = get_config()
+        data['config'] = get_config_from_ano_letivo(ano_selecionado)
         
         return Response(data)

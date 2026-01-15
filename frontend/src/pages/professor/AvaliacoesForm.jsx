@@ -97,7 +97,7 @@ export default function AvaliacoesForm() {
             const choices = choicesRes.data
 
             setAtribuicoes(choices.atribuicoes || [])
-            setValorMaximo(choices.valor_maximo || 10)
+            setValorMaximo(choices.config?.VALOR_MAXIMO || 10)
             setAnoLetivo(choices.ano_letivo)
             setDatasLiberadas(choices.datasLiberadas || [])
             setDataAtual(choices.data_atual)
@@ -281,7 +281,7 @@ export default function AvaliacoesForm() {
 
                                         if (val.includes(',')) {
                                             const parts = val.split(',')
-                                            const maxCasas = avaliacaoConfig.NUMERO_CASAS_DECIMAIS_AVALIACAO || 2
+                                            const maxCasas = avaliacaoConfig.CASAS_DECIMAIS_AVALIACAO || 2
                                             if (parts[1].length > maxCasas) return
                                         }
 
@@ -297,12 +297,12 @@ export default function AvaliacoesForm() {
                                         let valFloat = parseFloat(valor.replace(',', '.'))
                                         if (isNaN(valFloat)) { setValor(''); return }
 
-                                        const casas = avaliacaoConfig.NUMERO_CASAS_DECIMAIS_AVALIACAO || 2
+                                        const casas = avaliacaoConfig.CASAS_DECIMAIS_AVALIACAO || 2
                                         setValor(valFloat.toFixed(casas).replace('.', ','))
                                     }}
                                 />
                                 <p className="text-xs text-slate-500">
-                                    {`Máximo de ${avaliacaoConfig.NUMERO_CASAS_DECIMAIS_AVALIACAO || 2} casas decimais`}
+                                    {`Máximo de ${avaliacaoConfig.CASAS_DECIMAIS_AVALIACAO || 2} casas decimais`}
                                 </p>
                             </div>
                         </div>

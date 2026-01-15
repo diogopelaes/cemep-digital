@@ -1,6 +1,14 @@
 # =============================================================================
 # CONSTANTES GLOBAIS E CONFIGURAÇÕES DE AVALIAÇÃO
 # =============================================================================
+"""
+Este módulo centraliza as configurações de avaliação.
+
+IMPORTANTE:
+- As constantes definidas aqui são VALORES PADRÃO usados para inicialização
+- Em runtime, os valores devem ser obtidos de AnoLetivo.controles['avaliacao']
+- Use get_config_from_ano_letivo(ano_letivo) para obter as configs de um ano específico
+"""
 from decimal import Decimal, ROUND_CEILING, ROUND_HALF_UP
 from typing import Callable
 
@@ -10,11 +18,10 @@ from typing import Callable
 _D1 = Decimal('1')
 _D2 = Decimal('2')
 
-VALOR_MAXIMO = Decimal('10.00')
-MEDIA_APROVACAO = Decimal('6.00')
+
 
 # -----------------------------------------------------------------------------
-# Opções para Formulários/Choices
+# Opções para Formulários/Choices (constantes fixas, nunca mudam por ano)
 # -----------------------------------------------------------------------------
 BIMESTRE_CHOICES = [
     (1, '1º Bimestre'),
@@ -36,17 +43,40 @@ OPCOES_REGRA_ARREDONDAMENTO = [
     ('SEMPRE_PARA_CIMA_05', 'Arredondamento Sempre para Cima (Múltiplos de 0,5)'),
 ]
 
-# -----------------------------------------------------------------------------
-# Configurações Padrão
-# -----------------------------------------------------------------------------
-FORMA_CALCULO = 'LIVRE_ESCOLHA'
-REGRA_ARREDONDAMENTO = 'FAIXAS_MULTIPLOS_05'
-NUMERO_CASAS_DECIMAIS_BIMESTRAL = 1
-NUMERO_CASAS_DECIMAIS_AVALIACAO = 2
 
-# -----------------------------------------------------------------------------
-# Funções de Arredondamento (assinatura unificada para eliminar overhead)
-# -----------------------------------------------------------------------------
+# =============================================================================
+# FUNÇÕES PARA OBTER CONFIGURAÇÃO DO ANO LETIVO
+# =============================================================================
+
+def get_config_from_ano_letivo(ano_letivo) -> dict:
+    """
+    Retorna as configurações de avaliação do ano letivo.
+    Acessa diretamente AnoLetivo.controles['avaliacao'].
+    """
+    cfg = ano_letivo.controles['avaliacao']
+    
+    return {
+        "VALOR_MAXIMO": cfg['valor_maximo'],
+        "MEDIA_APROVACAO": cfg['media_aprovacao'],
+        "FORMA_CALCULO": cfg['forma_calculo'],
+        "REGRA_ARREDONDAMENTO": cfg['regra_arredondamento'],
+        "CASAS_DECIMAIS_BIMESTRAL": cfg['casas_decimais_bimestral'],
+        "CASAS_DECIMAIS_AVALIACAO": cfg['casas_decimais_avaliacao'],
+        "LIVRE_ESCOLHA_PROFESSOR": cfg['livre_escolha_professor'],
+        "BIMESTRE_CHOICES": [{"id": k, "label": v} for k, v in BIMESTRE_CHOICES],
+        "OPCOES_FORMA_CALCULO": [{"id": k, "label": v} for k, v in OPCOES_FORMA_CALCULO],
+        "OPCOES_REGRA_ARREDONDAMENTO": [{"id": k, "label": v} for k, v in OPCOES_REGRA_ARREDONDAMENTO],
+    }
+
+
+
+
+
+
+# =============================================================================
+# FUNÇÕES DE ARREDONDAMENTO
+# =============================================================================
+
 def _arredondar_matematico_classico(valor: Decimal, casas: int) -> Decimal:
     """Arredondamento matemático clássico (ROUND_HALF_UP)."""
     return valor.quantize(_D1.scaleb(-casas), rounding=ROUND_HALF_UP)
@@ -70,9 +100,7 @@ def _arredondar_sempre_para_cima_05(valor: Decimal, casas: int) -> Decimal:
     return (valor * _D2).quantize(_D1, rounding=ROUND_CEILING) / _D2
 
 
-# -----------------------------------------------------------------------------
-# Mapa de Despacho (lookup direto, sem lambdas, sem overhead)
-# -----------------------------------------------------------------------------
+# Mapa de Despacho (lookup direto)
 _MAPA_ARREDONDAMENTO: dict[str, Callable[[Decimal, int], Decimal]] = {
     'MATEMATICO_CLASSICO': _arredondar_matematico_classico,
     'FAIXAS_MULTIPLOS_05': _arredondar_faixas_multiplos_05,
@@ -80,33 +108,23 @@ _MAPA_ARREDONDAMENTO: dict[str, Callable[[Decimal, int], Decimal]] = {
     'SEMPRE_PARA_CIMA_05': _arredondar_sempre_para_cima_05,
 }
 
-# Cache local para evitar lookup repetido em dict global
-_ARREDONDAR_PADRAO = _MAPA_ARREDONDAMENTO[REGRA_ARREDONDAMENTO]
-
 
 def arredondar(
     valor: Decimal,
-    regra: str = REGRA_ARREDONDAMENTO,
+    regra: str,
     casas_decimais: int = 1,
 ) -> Decimal:
-    """Arredonda um valor decimal com base na regra e casas decimais informadas.
+    """
+    Arredonda um valor decimal com base na regra e casas decimais informadas.
     
     Args:
         valor: Valor decimal a ser arredondado.
-        regra: Chave da regra de arredondamento (padrão: REGRA_ARREDONDAMENTO).
-        casas_decimais: Número de casas decimais (usado por algumas regras).
+        regra: Chave da regra de arredondamento (obtida do ano letivo).
+        casas_decimais: Número de casas decimais.
     
     Returns:
         Valor arredondado conforme a regra especificada.
-    
-    Raises:
-        ValueError: Se o valor ou regra forem inválidos.
     """
-    # Fast path: regra padrão (evita lookup no dict)
-    if regra == REGRA_ARREDONDAMENTO:
-        return _ARREDONDAR_PADRAO(valor, casas_decimais)
-    
-    # Lookup direto com fallback
     func = _MAPA_ARREDONDAMENTO.get(regra)
     if func is not None:
         return func(valor, casas_decimais)
@@ -115,60 +133,61 @@ def arredondar(
     return valor
 
 
-def arredondar_bimestral(valor: Decimal, regra: str = REGRA_ARREDONDAMENTO) -> Decimal:
-    """Arredonda um valor para nota bimestral (casas decimais pré-definidas)."""
-    return arredondar(valor, regra, NUMERO_CASAS_DECIMAIS_BIMESTRAL)
+def arredondar_bimestral(valor: Decimal, ano_letivo) -> Decimal:
+    """
+    Arredonda um valor para nota bimestral usando config do ano letivo.
+    
+    Args:
+        valor: Valor a ser arredondado
+        ano_letivo: Instância de AnoLetivo para obter a config
+    """
+    cfg = get_config_from_ano_letivo(ano_letivo)
+    return arredondar(
+        valor,
+        cfg["REGRA_ARREDONDAMENTO"],
+        cfg["CASAS_DECIMAIS_BIMESTRAL"]
+    )
 
 
-def arredondar_avaliacao(valor: Decimal, regra: str = REGRA_ARREDONDAMENTO) -> Decimal:
-    """Arredonda um valor para nota de avaliação (casas decimais pré-definidas)."""
-    return arredondar(valor, regra, NUMERO_CASAS_DECIMAIS_AVALIACAO)
+def arredondar_avaliacao(valor: Decimal, ano_letivo) -> Decimal:
+    """
+    Arredonda um valor para nota de avaliação usando config do ano letivo.
+    
+    Args:
+        valor: Valor a ser arredondado
+        ano_letivo: Instância de AnoLetivo para obter a config
+    """
+    cfg = get_config_from_ano_letivo(ano_letivo)
+    return arredondar(
+        valor,
+        cfg["REGRA_ARREDONDAMENTO"],
+        cfg["CASAS_DECIMAIS_AVALIACAO"]
+    )
 
 
-def valida_valor_nota(
-    nota: Decimal,
-    valor_maximo: Decimal = VALOR_MAXIMO,
-    regra: str = REGRA_ARREDONDAMENTO,
-    casas: int = NUMERO_CASAS_DECIMAIS_BIMESTRAL,
-) -> bool:
+def valida_valor_nota(nota: Decimal, ano_letivo) -> bool:
     """
     Valida se a nota:
     - Está no intervalo [0, valor_maximo]
     - Respeita o incremento exigido pela regra de arredondamento
     - Zero é sempre considerado válido
     """
+    cfg = ano_letivo.controles['avaliacao']
+    
+    max_valor = Decimal(str(cfg['valor_maximo']))
+    regra = cfg['regra_arredondamento']
+    casas = cfg['casas_decimais_avaliacao']
 
-    # Intervalo válido (zero explicitamente aceito)
-    if nota < 0 or nota > valor_maximo:
+    if nota < 0 or nota > max_valor:
         return False
 
-    # Zero é válido para qualquer regra
     if nota == 0:
         return True
 
     # Regras baseadas em múltiplos de 0.5
     if regra in ('FAIXAS_MULTIPLOS_05', 'SEMPRE_PARA_CIMA_05'):
-        # Ex.: 0.5, 1.0, 1.5, ...
         return (nota * _D2) % _D1 == 0
 
     # Regras baseadas em número fixo de casas decimais
     fator = _D1.scaleb(casas)
     return (nota * fator) % _D1 == 0
-
-
-def get_config() -> dict:
-    """
-    Retorna as configurações de avaliação em formato de dicionário (JSON-friendly).
-    """
-    return {
-        "VALOR_MAXIMO": float(VALOR_MAXIMO),
-        "MEDIA_APROVACAO": float(MEDIA_APROVACAO),
-        "BIMESTRE_CHOICES": [{"id": k, "label": v} for k, v in BIMESTRE_CHOICES],
-        "OPCOES_FORMA_CALCULO": [{"id": k, "label": v} for k, v in OPCOES_FORMA_CALCULO],
-        "OPCOES_REGRA_ARREDONDAMENTO": [{"id": k, "label": v} for k, v in OPCOES_REGRA_ARREDONDAMENTO],
-        "FORMA_CALCULO": FORMA_CALCULO,
-        "REGRA_ARREDONDAMENTO": REGRA_ARREDONDAMENTO,
-        "NUMERO_CASAS_DECIMAIS_BIMESTRAL": NUMERO_CASAS_DECIMAIS_BIMESTRAL,
-        "NUMERO_CASAS_DECIMAIS_AVALIACAO": NUMERO_CASAS_DECIMAIS_AVALIACAO,
-    }
-

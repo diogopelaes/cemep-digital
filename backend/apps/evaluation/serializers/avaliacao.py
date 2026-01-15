@@ -9,7 +9,7 @@ from django.db import transaction
 from decimal import Decimal
 
 from apps.evaluation.models import Avaliacao
-from apps.evaluation.config import VALOR_MAXIMO, BIMESTRE_CHOICES, valida_valor_nota
+from apps.evaluation.config import BIMESTRE_CHOICES, valida_valor_nota
 from apps.core.models import ProfessorDisciplinaTurma, AnoLetivo, Habilidade
 from apps.core.serializers.habilidade import HabilidadeSerializer
 
@@ -73,7 +73,10 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
 
     def validate_valor(self, value):
         """Valida o valor usando valida_valor_nota."""
-        if not valida_valor_nota(Decimal(str(value))):
+        request = self.context.get('request')
+        ano_letivo = request.user.get_ano_letivo_selecionado()
+        
+        if not valida_valor_nota(Decimal(str(value)), ano_letivo):
             raise serializers.ValidationError("Valor inválido.")
         return value
 
@@ -263,10 +266,12 @@ class AvaliacaoListSerializer(serializers.ModelSerializer):
 class AvaliacaoChoicesSerializer(serializers.Serializer):
     """
     Serializer para dados auxiliares do formulário.
+    
+    NOTA: O valor_maximo e outras configs agora vêm via get_config_from_ano_letivo()
+    na view choices(), dentro do campo 'config' da resposta.
     """
     atribuicoes = serializers.SerializerMethodField()
     tipos = serializers.SerializerMethodField()
-    valor_maximo = serializers.SerializerMethodField()
     multi_disciplinas = serializers.SerializerMethodField()
     habilidades_por_disciplina = serializers.SerializerMethodField()
     
@@ -296,10 +301,6 @@ class AvaliacaoChoicesSerializer(serializers.Serializer):
             {'value': 'AVALIACAO_RECUPERACAO', 'label': 'Avaliação de Recuperação'},
             {'value': 'AVALIACAO_EXTRA', 'label': 'Avaliação Extra'},
         ]
-    
-    def get_valor_maximo(self, _):
-        """Retorna valor máximo permitido."""
-        return float(VALOR_MAXIMO)
     
     def get_multi_disciplinas(self, atribuicoes_qs):
         """Retorna True se o professor leciona mais de uma disciplina."""

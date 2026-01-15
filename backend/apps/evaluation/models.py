@@ -4,7 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from apps.core.models import Funcionario, ProfessorDisciplinaTurma, UUIDModel, Arquivo, AnoLetivo, Habilidade
 from apps.academic.models import Estudante, MatriculaTurma
-from .config import *
+from .config import BIMESTRE_CHOICES
 
 # =============================================================================
 # AVALIAÇÕES
@@ -342,12 +342,18 @@ class NotaBimestral(UUIDModel):
     # Properties de Status de Recuperação
     # -------------------------------------------------------------------------
     
+    def _get_media_aprovacao(self) -> 'Decimal':
+        """Obtém a média de aprovação do ano letivo relacionado."""
+        from decimal import Decimal
+        cfg = self.matricula_turma.turma.ano_letivo.controles['avaliacao']
+        return Decimal(str(cfg['media_aprovacao']))
+    
     @property
     def ficou_de_recuperacao(self) -> bool:
         """Retorna True se o aluno ficou de recuperação (nota < média de aprovação)."""
         if self.nota_calculo_avaliacoes is None:
             return False
-        return self.nota_calculo_avaliacoes < MEDIA_APROVACAO
+        return self.nota_calculo_avaliacoes < self._get_media_aprovacao()
     
     @property
     def fez_recuperacao(self) -> bool:
@@ -366,7 +372,7 @@ class NotaBimestral(UUIDModel):
         """Retorna True se o aluno atingiu a média através da recuperação."""
         if self.nota_recuperacao is None:
             return False
-        return self.nota_recuperacao >= MEDIA_APROVACAO
+        return self.nota_recuperacao >= self._get_media_aprovacao()
     
 
 
