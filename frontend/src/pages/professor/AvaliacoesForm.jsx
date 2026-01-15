@@ -385,9 +385,6 @@ export default function AvaliacoesForm() {
 
                 <FormActionsProfessor
                     saving={submitting}
-                    isEditing={isEditing}
-                    entityName="Avaliação"
-                    saveLabel={isEditing ? "Salvar Alterações" : "Criar Avaliação"}
                 />
             </form>
         </div>

@@ -8,12 +8,12 @@ import Button from './Button'
 export default function FormActionsProfessor({
     saving = false,
     saveLabel,
-    isEditing = false,
-    entityName = '',
     disabled = false,
     className = '',
     onSave,
-    onCancel
+    onCancel,
+    icon = HiSave,
+    iconPosition = 'left'
 }) {
     const navigate = useNavigate()
 
@@ -26,12 +26,7 @@ export default function FormActionsProfessor({
     }
 
     // Define o label do botão salvar
-    const getSaveLabel = () => {
-        if (saveLabel) return saveLabel
-        if (isEditing) return 'Salvar Alterações'
-        if (entityName) return `Criar ${entityName}`
-        return 'Salvar'
-    }
+    const getSaveLabel = () => saveLabel || 'Salvar'
 
     return (
         <div className={`flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700 ${className}`}>
@@ -45,7 +40,8 @@ export default function FormActionsProfessor({
             </Button>
             <Button
                 type={onSave ? "button" : "submit"}
-                icon={HiSave}
+                icon={icon}
+                iconPosition={iconPosition}
                 loading={saving}
                 disabled={disabled}
                 onClick={onSave}

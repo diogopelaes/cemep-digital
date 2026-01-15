@@ -502,9 +502,6 @@ export default function AulaFaltasForm() {
 
                 <FormActionsProfessor
                     saving={submitting}
-                    isEditing={isEditing}
-                    entityName="Aula"
-                    saveLabel={isEditing ? "Salvar Alterações" : "Registrar Aula"}
                 />
             </form>
         </div>

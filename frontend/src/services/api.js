@@ -360,8 +360,12 @@ export const evaluationAPI = {
     update: (id, data) => api.patch(`/evaluation/avaliacoes/${id}/`, data),
     delete: (id) => api.delete(`/evaluation/avaliacoes/${id}/`),
     choices: () => api.get('/evaluation/avaliacoes/choices/'),
-    notas: (id) => api.get(`/evaluation/avaliacoes/${id}/notas/`),
-    salvarNotas: (id, data) => api.post(`/evaluation/avaliacoes/${id}/notas/`, data),
+  },
+  // Digitar Notas de Avaliação
+  digitarNotas: {
+    get: (avaliacaoId) => api.get(`/evaluation/digitar-notas/${avaliacaoId}/`),
+    estudantes: (avaliacaoId, pdtId) => api.get(`/evaluation/digitar-notas/${avaliacaoId}/estudantes/`, { params: { pdt: pdtId } }),
+    salvar: (avaliacaoId, data) => api.post(`/evaluation/digitar-notas/${avaliacaoId}/salvar/`, data),
   },
   // Notas Bimestrais
   notasBimestrais: {

@@ -282,8 +282,6 @@ export default function PlanoAulaForm() {
 
                     <FormActionsProfessor
                         saving={submitting}
-                        isEditing={isEditing}
-                        entityName="Plano"
                     />
                 </form>
             </Card>

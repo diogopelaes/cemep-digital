@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Card, Button, Loading, DateInputAnoLetivo, FormActions } from '../../components/ui'
+import { Card, Button, Loading, DateInputAnoLetivo, FormActionsProfessor } from '../../components/ui'
 import { HiArrowRight } from 'react-icons/hi'
 import { pedagogicalAPI } from '../../services/api'
 import toast from 'react-hot-toast'
@@ -276,12 +276,14 @@ export default function AulaFaltasOptions() {
                     )}
 
                     {/* Botões */}
-                    <FormActions
-                        isEditing={false}
-                        saveLabel={submitting ? <Loading size="sm" /> : 'Continuar'}
+                    <FormActionsProfessor
+                        saveLabel="Continuar"
+                        icon={HiArrowRight}
+                        iconPosition="right"
                         onSave={handleContinuar}
                         onCancel={() => navigate('/aula-faltas')}
                         disabled={submitting || !turmaSelecionada || !dataValida}
+                        saving={submitting}
                         className="pb-0"
                     />
                 </div>

@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     Card, Button, Loading, Badge, Table, TableHead, TableBody, TableRow,
-    TableHeader, TableCell, PopConfirm
+    TableHeader, TableCell, PopConfirm, ActionSelect
 } from '../../components/ui'
-import { HiPlus, HiPencil, HiTrash, HiCalendar, HiClipboardList } from 'react-icons/hi'
+import { HiPlus, HiPencil, HiTrash, HiCalendar, HiClipboardList, HiCalculator } from 'react-icons/hi'
 import { evaluationAPI, coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../contexts/AuthContext'
@@ -187,12 +187,20 @@ export default function Avaliacoes() {
                         grid transition-all duration-300 ease-in-out border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30
                         ${showActions ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}
                     `}>
-                        <div className="overflow-hidden grid grid-cols-2">
+                        <div className="overflow-hidden grid grid-cols-3">
+                            <button
+                                onClick={() => navigate(`/avaliacoes/${avaliacao.id}/notas`)}
+                                className="py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-success-600 dark:hover:text-success-400 transition-all border-r border-slate-100 dark:border-slate-800 active:scale-95"
+                            >
+                                <HiCalculator className="h-6 w-6" />
+                                <span>Notas</span>
+                            </button>
+
                             <button
                                 onClick={() => navigate(`/avaliacoes/${avaliacao.id}/editar`)}
-                                className="py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all border-r border-slate-100 dark:border-slate-800"
+                                className="py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary-600 dark:hover:text-primary-400 transition-all border-r border-slate-100 dark:border-slate-800 active:scale-95"
                             >
-                                <HiPencil className="h-5 w-5" />
+                                <HiPencil className="h-6 w-6" />
                                 <span>Editar</span>
                             </button>
 
@@ -202,9 +210,9 @@ export default function Avaliacoes() {
                                     onConfirm={() => handleDelete(avaliacao.id)}
                                 >
                                     <button
-                                        className="w-full py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-danger-600 dark:hover:text-danger-400 transition-all"
+                                        className="w-full py-4 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-danger-600 dark:hover:text-danger-400 transition-all active:scale-95"
                                     >
-                                        <HiTrash className="h-5 w-5" />
+                                        <HiTrash className="h-6 w-6" />
                                         <span>Excluir</span>
                                     </button>
                                 </PopConfirm>
@@ -362,27 +370,32 @@ export default function Avaliacoes() {
                                         )}
                                         <TableCell className="td-center">
                                             {avaliacao.is_owner ? (
-                                                <div className="flex items-center justify-center gap-1">
-                                                    <button
-                                                        onClick={() => navigate(`/avaliacoes/${avaliacao.id}/editar`)}
-                                                        className="p-2 text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20"
-                                                        title="Editar"
-                                                    >
-                                                        <HiPencil className="h-5 w-5" />
-                                                    </button>
-                                                    <PopConfirm
-                                                        title="Excluir Avaliação?"
-                                                        message="Esta ação não poderá ser desfeita."
-                                                        onConfirm={() => handleDelete(avaliacao.id)}
-                                                    >
-                                                        <button
-                                                            className="p-2 text-slate-400 hover:text-danger-600 dark:hover:text-danger-400 transition-colors rounded-lg hover:bg-danger-50 dark:hover:bg-danger-900/20"
-                                                            title="Excluir"
-                                                        >
-                                                            <HiTrash className="h-5 w-5" />
-                                                        </button>
-                                                    </PopConfirm>
-                                                </div>
+                                                <ActionSelect
+                                                    size="sm"
+                                                    actions={[
+                                                        {
+                                                            label: 'Digitar Notas',
+                                                            icon: HiCalculator,
+                                                            onClick: () => navigate(`/avaliacoes/${avaliacao.id}/notas`),
+                                                            variant: 'success' // Opcional, se o componente suportar, senão fica padrão
+                                                        },
+                                                        {
+                                                            label: 'Editar Avaliação',
+                                                            icon: HiPencil,
+                                                            onClick: () => navigate(`/avaliacoes/${avaliacao.id}/editar`)
+                                                        },
+                                                        {
+                                                            label: 'Excluir',
+                                                            icon: HiTrash,
+                                                            danger: true,
+                                                            popConfirm: {
+                                                                title: "Excluir Avaliação?",
+                                                                message: "Esta ação não poderá ser desfeita.",
+                                                                onConfirm: () => handleDelete(avaliacao.id)
+                                                            }
+                                                        }
+                                                    ]}
+                                                />
                                             ) : (
                                                 <span className="text-xs text-slate-400">—</span>
                                             )}

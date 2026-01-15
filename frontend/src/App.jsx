@@ -51,6 +51,7 @@ import AulaFaltasForm from './pages/professor/AulaFaltasForm'
 import GradeProfessor from './pages/professor/GradeProfessor'
 import Avaliacoes from './pages/professor/Avaliacoes'
 import AvaliacoesForm from './pages/professor/AvaliacoesForm'
+import AvaliacaoDigitarNota from './pages/professor/AvaliacaoDigitarNota'
 
 // Constantes de perfis para evitar repetição
 const GESTAO_ONLY = ['GESTAO']
@@ -218,6 +219,9 @@ function App() {
         } />
         <Route path="/avaliacoes/:id/editar" element={
           <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><AvaliacoesForm /></ProtectedRoute>
+        } />
+        <Route path="/avaliacoes/:id/notas" element={
+          <ProtectedRoute allowedRoles={PROFESSOR_ONLY}><AvaliacaoDigitarNota /></ProtectedRoute>
         } />
         <Route path="/diario" element={<PlaceholderPage title="Diário de Classe" />} />
         <Route path="/notas" element={<PlaceholderPage title="Notas" />} />
