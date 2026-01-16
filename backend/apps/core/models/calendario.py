@@ -185,12 +185,43 @@ class AnoLetivo(UUIDModel):
             old_config = old_obj.controles.get('avaliacao', {}) if old_obj.controles else {}
             new_config = self.controles.get('avaliacao', {}) if self.controles else {}
             
-            if old_config.get('forma_calculo') != new_config.get('forma_calculo'):
+            # Verificação de campos críticos da configuração de avaliação
+            campos_criticos = [
+                ('forma_calculo', 'Forma de Cálculo'),
+                ('valor_maximo', 'Valor Máximo'),
+                ('media_aprovacao', 'Média de Aprovação'),
+                ('casas_decimais_bimestral', 'Casas Decimais (Bimestre)'),
+                ('casas_decimais_avaliacao', 'Casas Decimais (Avaliação)')
+            ]
+
+            alteracoes_bloqueadas = []
+            # Verificação robusta com normalização de tipos
+            def normalize_val(v):
+                if v is None: return ''
+                s = str(v)
+                # Tenta converter para float para comparar números de forma agnóstica (10.0 == 10)
+                try:
+                    f = float(s)
+                    return f
+                except ValueError:
+                    return s
+
+            for campo, label in campos_criticos:
+                val_old = normalize_val(old_config.get(campo))
+                val_new = normalize_val(new_config.get(campo))
+                
+                if val_old != val_new:
+                    alteracoes_bloqueadas.append(label)
+
+            if alteracoes_bloqueadas:
                 from apps.evaluation.models import Avaliacao
-                if Avaliacao.objects.filter(ano_letivo=self).exists():
+                # Verifica se existe avaliação para este ano letivo
+                # Usamos self.pk para garantir que estamos buscando pelo ID correto
+                if Avaliacao.objects.filter(ano_letivo_id=self.pk).exists():
+                    lista_campos = ", ".join(alteracoes_bloqueadas)
                     raise ValidationError(
-                        "Não é possível alterar a forma de cálculo do ano letivo pois já existem avaliações "
-                        "cadastradas por professores. Remova ou altere as avaliações antes de mudar esta configuração global."
+                        f"Não é possível alterar as configurações ({lista_campos}) do ano letivo pois já existem avaliações "
+                        "cadastradas. Remova as avaliações antes de mudar estas configurações globais."
                     )
 
     def save(self, *args, **kwargs):

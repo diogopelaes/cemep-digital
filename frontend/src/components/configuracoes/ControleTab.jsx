@@ -127,7 +127,41 @@ export default function ControleTab() {
             toast.success('Alterações salvas com sucesso!')
         } catch (error) {
             console.error('Erro ao salvar:', error)
-            toast.error('Erro ao salvar alterações')
+
+            let errorMessage = 'Erro ao salvar alterações'
+
+            if (error.response?.data) {
+                const data = error.response.data
+
+                // Erros gerais (non_field_errors)
+                if (data.non_field_errors && Array.isArray(data.non_field_errors)) {
+                    errorMessage = data.non_field_errors[0]
+                }
+                // Lista de erros simples
+                else if (Array.isArray(data)) {
+                    errorMessage = data[0]
+                }
+                // Objeto com detalhes
+                else if (data.detail) {
+                    errorMessage = data.detail
+                }
+                // Fallback para string direta
+                else if (typeof data === 'string') {
+                    errorMessage = data
+                }
+                // Erros de campos específicos - tenta pegar o primeiro
+                else if (typeof data === 'object') {
+                    const firstKey = Object.keys(data)[0]
+                    const firstError = data[firstKey]
+                    if (Array.isArray(firstError)) {
+                        errorMessage = `${firstKey}: ${firstError[0]}`
+                    } else {
+                        errorMessage = `${firstKey}: ${firstError}`
+                    }
+                }
+            }
+
+            toast.error(errorMessage)
         } finally {
             setSaving(false)
         }
@@ -255,6 +289,7 @@ export default function ControleTab() {
                                 setHasConfigChanges(true)
                             }}
                             help="Define como a nota bimestral é calculada."
+                            disabled={activeAno?.tem_avaliacoes}
                         />
 
                         <Input
@@ -267,6 +302,7 @@ export default function ControleTab() {
                                 setHasConfigChanges(true)
                             }}
                             help="Valor máximo de pontos no bimestre."
+                            disabled={activeAno?.tem_avaliacoes}
                         />
 
                         <Input
@@ -279,6 +315,7 @@ export default function ControleTab() {
                                 setHasConfigChanges(true)
                             }}
                             help="Nota mínima para ser aprovado no bimestre."
+                            disabled={activeAno?.tem_avaliacoes}
                         />
 
                         <Input
@@ -291,6 +328,7 @@ export default function ControleTab() {
                                 setCasasDecimaisAvaliacao(e.target.value)
                                 setHasConfigChanges(true)
                             }}
+                            disabled={activeAno?.tem_avaliacoes}
                         />
 
                         <Input
@@ -303,8 +341,14 @@ export default function ControleTab() {
                                 setCasasDecimaisBimestral(e.target.value)
                                 setHasConfigChanges(true)
                             }}
+                            disabled={activeAno?.tem_avaliacoes}
                         />
                     </div>
+                    {activeAno?.tem_avaliacoes && (
+                        <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 text-sm rounded-lg border border-yellow-200 dark:border-yellow-800">
+                            Algumas configurações não podem ser alteradas pois já existem avaliações cadastradas neste ano letivo.
+                        </div>
+                    )}
                 </div>
 
                 {/* Info Box */}

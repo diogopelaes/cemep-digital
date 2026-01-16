@@ -182,8 +182,7 @@ export default function AvaliacaoConfigDisciplinaTurma() {
             </div>
 
             <FormActionsProfessor
-                onCancel={() => navigate(location.state?.returnTo || '/avaliacoes')}
-                onSubmit={handleSubmit}
+                onSave={handleSubmit}
                 loading={submitting}
                 saveLabel="Salvar"
                 cancelLabel="Voltar"

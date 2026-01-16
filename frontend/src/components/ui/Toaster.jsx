@@ -8,7 +8,7 @@ import { Toaster as HotToaster } from 'react-hot-toast'
 export default function Toaster() {
     return (
         <HotToaster
-            position="top-right"
+            position="top-center"
             reverseOrder={false}
             gutter={8}
             toastOptions={{

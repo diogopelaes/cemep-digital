@@ -83,40 +83,6 @@ class AvaliacaoViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         context['request'] = self.request
         return context
 
-    def perform_create(self, serializer):
-        instance = serializer.save()
-        self._print_config_pode_alterar(instance)
-
-    def perform_update(self, serializer):
-        instance = serializer.save()
-        self._print_config_pode_alterar(instance)
-
-    def _print_config_pode_alterar(self, instance):
-        """Debug print para verificar o status de pode_alterar das configurações vinculadas."""
-        try:
-            ano_letivo = instance.ano_letivo
-            # Força o refresh para garantir que as relações M2M estejam carregadas
-            instance.refresh_from_db()
-            pdts = instance.professores_disciplinas_turmas.all()
-            
-            print(f"\n{'='*60}")
-            print(f"DEBUG: AVALIAÇÃO SALVA (ID: {instance.id})")
-            print(f"Título: {instance.titulo}")
-            print(f"Bimestre: {instance.bimestre}")
-            
-            for pdt in pdts:
-                dt = pdt.disciplina_turma
-                config = AvaliacaoConfigDisciplinaTurma.objects.filter(
-                    ano_letivo=ano_letivo,
-                    disciplina_turma=dt
-                ).first()
-                
-                status_pode_alterar = config.pode_alterar if config else "N/A"
-                print(f"-> Turma/Disc: {dt}")
-                print(f"   pode_alterar: {status_pode_alterar}")
-            print(f"{'='*60}\n")
-        except Exception as e:
-            print(f"DEBUG ERROR: Falha ao imprimir config: {e}")
 
     # =========================================================================
     # ACTIONS: DADOS AUXILIARES
