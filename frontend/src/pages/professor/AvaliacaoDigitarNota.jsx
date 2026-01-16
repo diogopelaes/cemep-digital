@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, Button, Loading, Badge, FormActionsProfessor, InputNota } from '../../components/ui'
+import { Card, Button, Loading, Badge, FormActionsProfessor, InputValor } from '../../components/ui'
 import { evaluationAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 
@@ -16,6 +16,7 @@ export default function AvaliacaoDigitarNota() {
     const [avaliacao, setAvaliacao] = useState(null)
     const [turmasInfo, setTurmasInfo] = useState([])
     const [casasDecimais, setCasasDecimais] = useState(2)
+    const [formaCalculo, setFormaCalculo] = useState('SOMA')
 
     // PDT selecionado e estudantes
     const [pdtSelecionado, setPdtSelecionado] = useState('')
@@ -45,12 +46,14 @@ export default function AvaliacaoDigitarNota() {
                 id: data.avaliacao_id,
                 titulo: data.titulo,
                 valor: parseFloat(data.valor),
+                peso: data.peso ? parseFloat(data.peso) : null,
                 data_inicio: data.data_inicio,
                 data_fim: data.data_fim,
                 bimestre: data.bimestre,
             })
             setTurmasInfo(data.turmas_info || [])
             setCasasDecimais(data.casas_decimais ?? 2)
+            setFormaCalculo(data.forma_calculo || 'SOMA')
 
             // Se só tem uma turma, seleciona automaticamente
             if (data.turmas_info?.length === 1) {
@@ -156,8 +159,11 @@ export default function AvaliacaoDigitarNota() {
                                 {avaliacao?.titulo}
                             </span>
                             <span className="text-slate-300 dark:text-slate-600">•</span>
-                            <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wider">
-                                Valor: {avaliacao?.valor?.toFixed(casasDecimais).replace('.', ',')}
+                            <span className={`bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wider ${formaCalculo === 'MEDIA_PONDERADA' ? 'text-violet-600 dark:text-violet-400' : ''}`}>
+                                {formaCalculo === 'MEDIA_PONDERADA'
+                                    ? `Peso: ${avaliacao?.peso?.toFixed(1).replace('.', ',')}`
+                                    : `Valor: ${avaliacao?.valor?.toFixed(casasDecimais).replace('.', ',')}`
+                                }
                             </span>
                             <span className="text-slate-300 dark:text-slate-600">•</span>
                             <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wider">
@@ -256,8 +262,8 @@ export default function AvaliacaoDigitarNota() {
 
                                             {/* Right Side: Nota input */}
                                             <div className="flex items-center gap-2 shrink-0">
-                                                <InputNota
-                                                    className="w-20 sm:w-24"
+                                                <InputValor
+                                                    className="w-20 sm:w-24 text-center font-bold"
                                                     value={estudante.nota}
                                                     maxValor={avaliacao.valor}
                                                     casasDecimais={casasDecimais}

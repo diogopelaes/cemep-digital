@@ -5,6 +5,7 @@ from .avaliacao_digitar_nota import (
     SalvarNotasSerializer,
     NotaAvaliacaoItemSerializer
 )
+from .avaliacao_config_disciplina_turma import AvaliacaoConfigDisciplinaTurmaSerializer
 
 __all__ = [
     'AvaliacaoSerializer', 
@@ -14,4 +15,5 @@ __all__ = [
     'EstudantesNotasSerializer',
     'SalvarNotasSerializer',
     'NotaAvaliacaoItemSerializer',
+    'AvaliacaoConfigDisciplinaTurmaSerializer',
 ]

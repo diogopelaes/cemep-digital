@@ -217,22 +217,24 @@ export default function MinhaTurmaDetalhes() {
                     <Button
                         variant="secondary"
                         icon={FaFilePdf}
+                        responsive
                         onClick={handleGerarLista}
                         disabled={generatingPDF || estudantes.length === 0}
                         loading={generatingPDF}
                         className="shrink-0"
                         title="Lista de Estudantes (PDF)"
                     >
-                        <span className="hidden sm:inline">Lista PDF</span>
+                        Lista PDF
                     </Button>
                     <Button
                         variant="secondary"
                         icon={HiPhotograph}
+                        responsive
                         onClick={() => navigate(`/turmas/${id}/carometro`)}
                         className="shrink-0"
                         title="Fotos"
                     >
-                        <span className="hidden sm:inline">Fotos</span>
+                        Fotos
                     </Button>
                 </div>
             </div>

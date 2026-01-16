@@ -36,6 +36,8 @@ export default function ControleTab() {
     const [formaCalculo, setFormaCalculo] = useState('LIVRE_ESCOLHA')
     const [casasDecimaisAvaliacao, setCasasDecimaisAvaliacao] = useState(2)
     const [casasDecimaisBimestral, setCasasDecimaisBimestral] = useState(1)
+    const [valorMaximo, setValorMaximo] = useState(15.00)
+    const [mediaAprovacao, setMediaAprovacao] = useState(6.00)
     const [hasConfigChanges, setHasConfigChanges] = useState(false)
 
     const [expandedBimestres, setExpandedBimestres] = useState([1])
@@ -50,6 +52,8 @@ export default function ControleTab() {
             setFormaCalculo(avConfig.forma_calculo || 'LIVRE_ESCOLHA')
             setCasasDecimaisAvaliacao(avConfig.casas_decimais_avaliacao ?? 2)
             setCasasDecimaisBimestral(avConfig.casas_decimais_bimestral ?? 1)
+            setValorMaximo(avConfig.valor_maximo ?? 15.00)
+            setMediaAprovacao(avConfig.media_aprovacao ?? 6.00)
         }
     }, [anosLetivos])
 
@@ -103,7 +107,9 @@ export default function ControleTab() {
                         pode_criar: podeCriarAvaliacao,
                         forma_calculo: formaCalculo,
                         casas_decimais_avaliacao: parseInt(casasDecimaisAvaliacao),
-                        casas_decimais_bimestral: parseInt(casasDecimaisBimestral)
+                        casas_decimais_bimestral: parseInt(casasDecimaisBimestral),
+                        valor_maximo: parseFloat(String(valorMaximo).replace(',', '.')),
+                        media_aprovacao: parseFloat(String(mediaAprovacao).replace(',', '.'))
                     }
                 }
                 await coreAPI.anosLetivos.update(activeAno.ano, { controles: newControles })
@@ -135,6 +141,8 @@ export default function ControleTab() {
             setFormaCalculo(avConfig.forma_calculo || 'LIVRE_ESCOLHA')
             setCasasDecimaisAvaliacao(avConfig.casas_decimais_avaliacao ?? 2)
             setCasasDecimaisBimestral(avConfig.casas_decimais_bimestral ?? 1)
+            setValorMaximo(avConfig.valor_maximo ?? 15.00)
+            setMediaAprovacao(avConfig.media_aprovacao ?? 6.00)
             setHasChanges(false)
             setHasConfigChanges(false)
             toast('Alterações descartadas', { icon: 'ℹ️' })
@@ -247,6 +255,30 @@ export default function ControleTab() {
                                 setHasConfigChanges(true)
                             }}
                             help="Define como a nota bimestral é calculada."
+                        />
+
+                        <Input
+                            label="Valor Máximo"
+                            type="number"
+                            step="0.5"
+                            value={valorMaximo}
+                            onChange={(e) => {
+                                setValorMaximo(e.target.value)
+                                setHasConfigChanges(true)
+                            }}
+                            help="Valor máximo de pontos no bimestre."
+                        />
+
+                        <Input
+                            label="Média para Aprovação"
+                            type="number"
+                            step="0.1"
+                            value={mediaAprovacao}
+                            onChange={(e) => {
+                                setMediaAprovacao(e.target.value)
+                                setHasConfigChanges(true)
+                            }}
+                            help="Nota mínima para ser aprovado no bimestre."
                         />
 
                         <Input

@@ -112,13 +112,6 @@ Todo upload deve atender **obrigatoriamente** às seguintes regras:
 - ✔️ Nenhum arquivo pode ser executado automaticamente
 - ✔️ Arquivos armazenados fora de acesso público direto
 
-### 📦 Armazenamento
-
-- Organização recomendada:
-  - Por **ano letivo**
-  - Por **turma**
-  - Por **disciplina**
-
 ---
 
 ## 📌 Regras Gerais

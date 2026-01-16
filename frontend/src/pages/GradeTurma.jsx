@@ -277,11 +277,12 @@ export default function GradeTurma() {
                     <Button
                         variant="secondary"
                         icon={FaFilePdf}
+                        responsive
                         onClick={handleGerarPDF}
                         loading={generatingPDF}
                         className="w-auto"
                     >
-                        <span className="hidden md:inline">Visualizar PDF</span>
+                        Visualizar PDF
                     </Button>
                 </div>
             </div>

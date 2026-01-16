@@ -46,3 +46,28 @@ class AnoLetivoSerializer(serializers.ModelSerializer):
 
     def get_bimestre_atual(self, obj):
         return obj.bimestre()
+
+    def validate_controles(self, value):
+        """Valida as configurações de avaliação dentro do JSON controles."""
+        if not value or 'avaliacao' not in value:
+            return value
+            
+        av = value['avaliacao']
+        
+        # Garante que campos numéricos sejam válidos
+        try:
+            if 'valor_maximo' in av:
+                val = float(av['valor_maximo'])
+                if val <= 0:
+                    raise serializers.ValidationError("O valor máximo deve ser maior que zero.")
+                av['valor_maximo'] = val
+                
+            if 'media_aprovacao' in av:
+                med = float(av['media_aprovacao'])
+                if med < 0:
+                    raise serializers.ValidationError("A média de aprovação não pode ser negativa.")
+                av['media_aprovacao'] = med
+        except (ValueError, TypeError):
+            raise serializers.ValidationError("Valores numéricos inválidos nas configurações de avaliação.")
+            
+        return value

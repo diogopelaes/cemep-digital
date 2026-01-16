@@ -230,9 +230,13 @@ export default function PlanoAula() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button onClick={() => navigate('/plano-aula/novo')} variant="primary">
-                        <HiPlus className="sm:mr-1" />
-                        <span className="hidden sm:inline">Novo Plano</span>
+                    <Button
+                        onClick={() => navigate('/plano-aula/novo')}
+                        variant="primary"
+                        icon={HiPlus}
+                        responsive
+                    >
+                        Novo Plano
                     </Button>
                 </div>
             </div>

@@ -24,10 +24,14 @@ const Button = forwardRef(({
   icon: Icon,
   iconPosition = 'left',
   type = 'button',
+  responsive = false,
   ...props
 }, ref) => {
   const baseClasses = variants[variant] || variants.primary
-  const sizeClasses = sizes[size] || sizes.md
+  const baseSizeClasses = sizes[size] || sizes.md
+
+  // Padding reduzido no mobile quando é responsivo com ícone
+  const sizeClasses = (responsive && Icon) ? `p-3 sm:${baseSizeClasses}` : baseSizeClasses
 
   return (
     <button
@@ -45,7 +49,11 @@ const Button = forwardRef(({
       ) : (
         <>
           {Icon && iconPosition === 'left' && <Icon className="h-5 w-5" />}
-          {children}
+          {responsive ? (
+            <span className="hidden sm:inline">{children}</span>
+          ) : (
+            children
+          )}
           {Icon && iconPosition === 'right' && <Icon className="h-5 w-5" />}
         </>
       )}

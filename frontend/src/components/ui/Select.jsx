@@ -16,7 +16,7 @@ const Select = forwardRef(({
       )}
       <select
         ref={ref}
-        className={`input ${error ? 'input-error' : ''} ${className}`}
+        className={`input h-12 py-0 ${error ? 'input-error' : ''} ${className}`}
         {...props}
       >
         <option value="">{placeholder}</option>

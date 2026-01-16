@@ -43,6 +43,13 @@ class Turma(UUIDModel):
         verbose_name='Grade Horária (Cache)',
         help_text='Grade horária da turma gerada automaticamente'
     )
+
+    @property
+    def get_ano_letivo_object(self):
+        try:
+            return AnoLetivo.objects.get(ano=self.ano_letivo)
+        except AnoLetivo.DoesNotExist:
+            return None
     
     class Meta:
         verbose_name = 'Turma'

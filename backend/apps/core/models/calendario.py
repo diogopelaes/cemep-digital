@@ -199,7 +199,7 @@ class AnoLetivo(UUIDModel):
         if is_new:
             self._criar_controles_iniciais()
         self.atualizar_controles_json()
-        self.sincronizar_configuracoes_professores()
+        self.sincronizar_configuracoes_disciplinas_turmas()
     
     def _criar_controles_iniciais(self):
         controles_a_criar = []
@@ -286,20 +286,20 @@ class AnoLetivo(UUIDModel):
         self.controles = novo_controles
         self.invalidar_cache_datas_liberadas()
 
-    def sincronizar_configuracoes_professores(self):
+    def sincronizar_configuracoes_disciplinas_turmas(self):
         """
-        Sincroniza as configurações de avaliação de todos os professores deste ano letivo
+        Sincroniza as configurações de avaliação de todas as disciplinas/turmas deste ano letivo
         sempre que a configuração global do Ano Letivo é alterada.
         """
-        from apps.evaluation.models import AvaliacaoConfigProfessor
+        from apps.evaluation.models import AvaliacaoConfigDisciplinaTurma
         
         config_av = self.controles.get('avaliacao', {})
         forma_geral = config_av.get('forma_calculo', 'LIVRE_ESCOLHA')
 
-        queryset = AvaliacaoConfigProfessor.objects.filter(ano_letivo=self)
+        queryset = AvaliacaoConfigDisciplinaTurma.objects.filter(disciplina_turma__turma__ano_letivo=self.ano)
 
         if forma_geral == 'LIVRE_ESCOLHA':
-            # Se for LIVRE_ESCOLHA, permite alteração e não mexe na forma atual do professor
+            # Se for LIVRE_ESCOLHA, permite alteração e não mexe na forma atual
             queryset.update(pode_alterar=True)
         else:
             # Caso contrário, força a forma geral e bloqueia alteração

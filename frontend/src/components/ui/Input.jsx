@@ -21,7 +21,7 @@ const Input = forwardRef(({
         )}
         <input
           ref={ref}
-          className={`input ${Icon ? 'pl-12' : ''} ${rightElement ? 'pr-12' : ''} ${error ? 'input-error' : ''} ${className}`}
+          className={`input h-12 ${Icon ? 'pl-12' : ''} ${rightElement ? 'pr-12' : ''} ${error ? 'input-error' : ''} ${className}`}
           {...props}
         />
         {rightElement && (

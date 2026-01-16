@@ -218,9 +218,13 @@ export default function AulaFaltas() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button onClick={() => navigate('/aula-faltas/nova')} variant="primary">
-                        <HiPlus className="sm:mr-1" />
-                        <span className="hidden sm:inline">Nova Aula</span>
+                    <Button
+                        onClick={() => navigate('/aula-faltas/nova')}
+                        variant="primary"
+                        icon={HiPlus}
+                        responsive
+                    >
+                        Nova Aula
                     </Button>
                 </div>
             </div>

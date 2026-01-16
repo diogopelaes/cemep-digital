@@ -9,11 +9,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from apps.evaluation.models import Avaliacao
+from apps.evaluation.models import Avaliacao, AvaliacaoConfigDisciplinaTurma
 from apps.evaluation.serializers import (
     AvaliacaoSerializer,
     AvaliacaoListSerializer,
-    AvaliacaoChoicesSerializer
+    AvaliacaoChoicesSerializer,
+    AvaliacaoConfigDisciplinaTurmaSerializer
 )
 from apps.core.models import ProfessorDisciplinaTurma
 from apps.users.permissions import IsCreatorOrReadOnly, AnoLetivoFilterMixin
@@ -82,6 +83,41 @@ class AvaliacaoViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         context['request'] = self.request
         return context
 
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        self._print_config_pode_alterar(instance)
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        self._print_config_pode_alterar(instance)
+
+    def _print_config_pode_alterar(self, instance):
+        """Debug print para verificar o status de pode_alterar das configurações vinculadas."""
+        try:
+            ano_letivo = instance.ano_letivo
+            # Força o refresh para garantir que as relações M2M estejam carregadas
+            instance.refresh_from_db()
+            pdts = instance.professores_disciplinas_turmas.all()
+            
+            print(f"\n{'='*60}")
+            print(f"DEBUG: AVALIAÇÃO SALVA (ID: {instance.id})")
+            print(f"Título: {instance.titulo}")
+            print(f"Bimestre: {instance.bimestre}")
+            
+            for pdt in pdts:
+                dt = pdt.disciplina_turma
+                config = AvaliacaoConfigDisciplinaTurma.objects.filter(
+                    ano_letivo=ano_letivo,
+                    disciplina_turma=dt
+                ).first()
+                
+                status_pode_alterar = config.pode_alterar if config else "N/A"
+                print(f"-> Turma/Disc: {dt}")
+                print(f"   pode_alterar: {status_pode_alterar}")
+            print(f"{'='*60}\n")
+        except Exception as e:
+            print(f"DEBUG ERROR: Falha ao imprimir config: {e}")
+
     # =========================================================================
     # ACTIONS: DADOS AUXILIARES
     # =========================================================================
@@ -118,10 +154,43 @@ class AvaliacaoViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
             'disciplina_turma__disciplina__nome'
         )
 
+        # Verifica configurações existentes para estas turmas
+        disciplinas_turmas_ids = [pdt.disciplina_turma_id for pdt in atribuicoes]
+        configs_existentes = AvaliacaoConfigDisciplinaTurma.objects.filter(
+            ano_letivo=ano_selecionado,
+            disciplina_turma_id__in=disciplinas_turmas_ids
+        )
+        configs_map = {str(c.disciplina_turma_id): c for c in configs_existentes}
+
+        # Identifica as turmas que ainda não têm configuração
+        tem_pendencia = False
+        for dt_id in disciplinas_turmas_ids:
+            if str(dt_id) not in configs_map:
+                tem_pendencia = True
+                break
+
+        # Verifica se o professor tem formas de cálculo mistas
+        formas_calculo_unicas = set(c.forma_calculo for c in configs_existentes)
+        has_mixed_methods = len(formas_calculo_unicas) > 1
+
         serializer = AvaliacaoChoicesSerializer(atribuicoes)
         
         data = serializer.data
         data['ano_letivo'] = ano_selecionado.ano
+        data['has_pending_configs'] = tem_pendencia
+        data['has_mixed_methods'] = has_mixed_methods
+        data['available_methods'] = list(formas_calculo_unicas) if has_mixed_methods else []
+        
+        # Adiciona a forma_calculo específica para cada atribuição (usado no frontend)
+        for attr in data['atribuicoes']:
+            config = configs_map.get(attr['disciplina_turma_id']) # Nota: AvaliacaoChoicesSerializer precisa retornar disciplina_turma_id
+            if config:
+                attr['forma_calculo'] = config.forma_calculo
+                attr['pode_alterar_config'] = config.pode_alterar
+            else:
+                attr['forma_calculo'] = None
+                attr['pode_alterar_config'] = True
+
         # Pega direto do cache (já em formato ISO string)
         bim = ano_selecionado.bimestre()
         data['datasLiberadas'] = ano_selecionado.controles.get(str(bim), {}).get('dias_letivos_base', []) if bim else []
