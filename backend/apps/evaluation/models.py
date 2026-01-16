@@ -4,7 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from apps.core.models import Funcionario, DisciplinaTurma, ProfessorDisciplinaTurma, UUIDModel, Arquivo, AnoLetivo, Habilidade
 from apps.academic.models import Estudante, MatriculaTurma
-from django.db.models.signals import m2m_changed
+from django.db.models.signals import m2m_changed, post_delete
 from django.dispatch import receiver
 from .config import BIMESTRE_CHOICES, OPCOES_FORMA_CALCULO
 
@@ -147,6 +147,16 @@ class Avaliacao(UUIDModel):
 
     def __str__(self):
         return f"{self.titulo} ({self.get_tipo_display()})"
+
+
+@receiver(post_delete, sender=Avaliacao)
+def delete_arquivos_on_avaliacao_delete(sender, instance, **kwargs):
+    """
+    Deleta os registros de arquivos (e arquivos físicos via signal do Arquivo)
+    quando a avaliação é excluída.
+    """
+    for arquivo in instance.arquivos.all():
+        arquivo.delete()
 
 
 class ControleVisto(UUIDModel):

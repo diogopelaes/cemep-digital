@@ -83,7 +83,11 @@ class Arquivo(UUIDModel):
     class Categoria(models.TextChoices):
         AVALIACAO = 'avaliacoes', 'Avaliação'
         VISTO = 'vistos', 'Visto'
+        ATIVIDADE = 'atividades', 'Atividade'
+        REUNIAO = 'reunioes', 'Reunião'
         DOCUMENTO = 'documentos', 'Documento'
+        ATESTADO = 'atestados', 'Atestado'
+        OCORRENCIA = 'ocorrencias', 'Ocorrência'
         OUTRO = 'outros', 'Outro'
     
     arquivo = models.FileField(
@@ -143,3 +147,17 @@ class Arquivo(UUIDModel):
             except Exception:
                 pass
         super().save(*args, **kwargs)
+
+
+# Signals para limpeza física de arquivos
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+
+@receiver(post_delete, sender=Arquivo)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """
+    Deleta o arquivo físico do disco quando o objeto Arquivo é deletado.
+    """
+    if instance.arquivo:
+        if os.path.isfile(instance.arquivo.path):
+            os.remove(instance.arquivo.path)

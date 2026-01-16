@@ -10,8 +10,9 @@ from decimal import Decimal
 
 from apps.evaluation.models import Avaliacao
 from apps.evaluation.config import BIMESTRE_CHOICES, valida_valor_nota
-from apps.core.models import ProfessorDisciplinaTurma, AnoLetivo, Habilidade
+from apps.core.models import ProfessorDisciplinaTurma, AnoLetivo, Habilidade, Arquivo
 from apps.core.serializers.habilidade import HabilidadeSerializer
+from apps.core.serializers.arquivo import ArquivoSerializer
 
 
 class AvaliacaoSerializer(serializers.ModelSerializer):
@@ -33,6 +34,17 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
+    arquivos_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Arquivo.objects.all(),
+        source='arquivos',
+        many=True,
+        write_only=True,
+        required=False
+    )
+    
+    # --- Read-Only Nested Fields ---
+    habilidades = HabilidadeSerializer(many=True, read_only=True)
+    arquivos = ArquivoSerializer(many=True, read_only=True)
     
     # --- Read Fields ---
     turmas_info = serializers.SerializerMethodField()
@@ -62,6 +74,8 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
             'turmas_info',
             'habilidades',
             'habilidades_ids',
+            'arquivos',
+            'arquivos_ids',
             'criado_por',
             'criado_por_nome',
             'is_owner',
@@ -174,6 +188,7 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         pdts = validated_data.pop('professores_disciplinas_turmas', [])
         habilidades = validated_data.pop('habilidades', [])
+        arquivos = validated_data.pop('arquivos', [])
         
         # Seta criado_por do contexto
         request = self.context.get('request')
@@ -189,12 +204,16 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
         if habilidades:
             avaliacao.habilidades.set(habilidades)
             
+        if arquivos:
+            avaliacao.arquivos.set(arquivos)
+
         return avaliacao
     
     @transaction.atomic
     def update(self, instance, validated_data):
         pdts = validated_data.pop('professores_disciplinas_turmas', None)
         habilidades = validated_data.pop('habilidades', None)
+        arquivos = validated_data.pop('arquivos', None)
         
         # Atualiza campos
         for attr, value in validated_data.items():
@@ -207,6 +226,18 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
             
         if habilidades is not None:
             instance.habilidades.set(habilidades)
+
+        if arquivos is not None:
+            # Identifica arquivos removidos para deletá-los fisicamente
+            arquivos_atuais = set(instance.arquivos.all())
+            arquivos_novos = set(arquivos)
+            arquivos_para_deletar = arquivos_atuais - arquivos_novos
+            
+            instance.arquivos.set(arquivos)
+            
+            # Deleta os arquivos que foram desvinculados
+            for arquivo in arquivos_para_deletar:
+                arquivo.delete()
         
         return instance
 

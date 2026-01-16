@@ -49,7 +49,7 @@ Imagens utilizadas como anexos, ilustrações ou evidências visuais.
   - `jpeg`
   - `png`
 - **Tamanho máximo**
-  - `2 MB`
+  - `5 MB`
 - **Restrições adicionais**
   - Largura máxima: `3000 px`
   - Altura máxima: `3000 px`

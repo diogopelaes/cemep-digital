@@ -49,6 +49,7 @@ export default function Login() {
             onChange={(e) => setFormData({ ...formData, username: e.target.value })}
             autoComplete="username"
             required
+            className="!text-slate-900 dark:!text-white !caret-slate-900 dark:!caret-white !font-sans !text-base !antialiased dark:[color-scheme:dark]"
           />
 
           <Input
@@ -60,6 +61,7 @@ export default function Login() {
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             autoComplete="current-password"
             required
+            className="!text-slate-900 dark:!text-white !caret-slate-900 dark:!caret-white !font-sans !text-base !antialiased dark:[color-scheme:dark]"
             rightElement={
               <button
                 type="button"

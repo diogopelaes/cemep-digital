@@ -3,9 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import {
     Card, Button, Loading, FormActionsProfessor,
     Input, Select, DateInputAnoLetivo,
-    TurmaDisciplinaSelector, MultiCombobox, InputValor
+    TurmaDisciplinaSelector, MultiCombobox, InputValor, FileUpload
 } from '../../components/ui'
-import { evaluationAPI } from '../../services/api'
+import { evaluationAPI, coreAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { HiCalculator, HiScale, HiCog } from 'react-icons/hi'
 
@@ -48,6 +48,7 @@ export default function AvaliacoesForm() {
     const [avaliacaoConfig, setAvaliacaoConfig] = useState({})
     const [habilidadesMap, setHabilidadesMap] = useState({})
     const [availableHabilidades, setAvailableHabilidades] = useState([])
+    const [arquivos, setArquivos] = useState([]) // Armazena objetos de arquivo (locais ou remotos)
 
     // Verifica se é tipo especial (recuperação ou extra) - mostra todas as turmas
     const isTipoEspecial = tipo === 'AVALIACAO_RECUPERACAO' || tipo === 'AVALIACAO_EXTRA'
@@ -187,6 +188,7 @@ export default function AvaliacoesForm() {
                 setDataInicio(avaliacao.data_inicio || '')
                 setDataFim(avaliacao.data_fim || '')
                 setSelectedHabilidades(avaliacao.habilidades?.map(h => h.id) || [])
+                setArquivos(avaliacao.arquivos || [])
 
                 if (avaliacao.turmas_info) {
                     const pdtIds = avaliacao.turmas_info.map(t => t.pdt_id)
@@ -270,6 +272,37 @@ export default function AvaliacoesForm() {
         setSubmitting(true)
 
         try {
+            // 1. Upload de novos arquivos (locais)
+            const arquivosParaEnviar = arquivos.filter(a => a.isLocal)
+            const arquivosJaSalvosIds = arquivos.filter(a => !a.isLocal).map(a => a.id)
+            const novosArquivosIds = []
+
+            if (arquivosParaEnviar.length > 0) {
+                const toastId = toast.loading(`Enviando ${arquivosParaEnviar.length} arquivos...`)
+
+                try {
+                    // Upload sequencial para garantir ordem e tratar erros individualmente se necessário
+                    for (const fileObj of arquivosParaEnviar) {
+                        const formData = new FormData()
+                        formData.append('arquivo', fileObj) // fileObj é um File nativo extendido
+                        formData.append('categoria', 'avaliacoes')
+
+                        const response = await coreAPI.arquivos.create(formData)
+                        novosArquivosIds.push(response.data.id)
+                    }
+                    toast.dismiss(toastId)
+                } catch (uploadError) {
+                    toast.dismiss(toastId)
+                    console.error('Erro no upload:', uploadError)
+                    toast.error('Erro ao enviar arquivos. Tente novamente.')
+                    setSubmitting(false)
+                    return
+                }
+            }
+
+            // Combine IDs antigos e novos
+            const todosArquivosIds = [...arquivosJaSalvosIds, ...novosArquivosIds]
+
             const payload = {
                 titulo: titulo.trim(),
                 descricao: descricao.trim() || null,
@@ -280,6 +313,7 @@ export default function AvaliacoesForm() {
                 data_fim: dataFim,
                 professores_disciplinas_turmas_ids: pdtsSelecionados,
                 habilidades_ids: selectedHabilidades,
+                arquivos_ids: todosArquivosIds,
             }
 
             if (isEditing) {
@@ -542,6 +576,16 @@ export default function AvaliacoesForm() {
                                 datasLiberadas={datasLiberadas}
                                 dataAtual={dataAtual}
                                 placeholder="dd/mm/aaaa"
+                            />
+                        </div>
+
+                        {/* Upload de Arquivos */}
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <FileUpload
+                                label="Anexar Arquivos (Opcional)"
+                                initialFiles={arquivos}
+                                onChange={setArquivos}
+                                category="avaliacoes"
                             />
                         </div>
                     </div>

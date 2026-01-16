@@ -237,6 +237,13 @@ export const coreAPI = {
     porAno: (ano) => api.get(`/core/controle-registros/por-ano/${ano}/`),
     salvarLote: (data) => api.post('/core/controle-registros/salvar-lote/', data),
   },
+  // Arquivos
+  arquivos: {
+    create: (formData) => api.post('/core/arquivos/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    delete: (id) => api.delete(`/core/arquivos/${id}/`),
+  },
 }
 
 export const academicAPI = {

@@ -9,10 +9,13 @@ from .views import (
     ProfessorDisciplinaTurmaViewSet, HabilidadeViewSet,
     AnoLetivoViewSet, HorarioAulaViewSet, GradeHorariaViewSet,
     AnoLetivoSelecionadoViewSet,
-    ControleRegistrosVisualizacaoViewSet
+    AnoLetivoSelecionadoViewSet,
+    ControleRegistrosVisualizacaoViewSet,
+    ArquivoViewSet
 )
 
 router = DefaultRouter()
+router.register('arquivos', ArquivoViewSet)
 router.register('funcionarios', FuncionarioViewSet)
 router.register('periodos-trabalho', PeriodoTrabalhoViewSet)
 router.register('disciplinas', DisciplinaViewSet)
