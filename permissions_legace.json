@@ -1,0 +1,81 @@
+{
+    "IsGestao": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\grade_horaria.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\media.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\plano_aula.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\users\\views\\user.py"
+    ],
+    "IsGestaoOrSecretaria": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\grade_horaria.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\media.py"
+    ],
+    "IsGestaoSecretariaOrProfessor": [],
+    "IsFuncionario": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\media.py"
+    ],
+    "IsProfessor": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\evaluation\\views\\avaliacao_config_disciplina_turma.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\plano_aula.py"
+    ],
+    "IsEstudanteOrResponsavel": [],
+    "IsOwnerOrGestao": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\plano_aula.py"
+    ],
+    "IsCreatorOrReadOnly": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\evaluation\\views\\avaliacao.py"
+    ],
+    "IsOwnerProfessorStrict": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\aula_faltas.py"
+    ],
+    "GestaoOnlyMixin": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\controle.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\permanent\\views\\__init__.py"
+    ],
+    "GestaoSecretariaMixin": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\disciplina_turma.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\turma.py"
+    ],
+    "NeverAllow": [],
+    "GestaoSecretariaCRUMixin": [],
+    "GestaoWriteSecretariaReadMixin": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\permanent\\views\\__init__.py"
+    ],
+    "GestaoWriteFuncionarioReadMixin": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\funcionario.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\periodo_trabalho.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\professor_disciplina_turma.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\management\\views\\__init__.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\ocorrencia.py"
+    ],
+    "GestaoSecretariaWriteFuncionarioReadMixin": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\atestado.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\estudante.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\matricula.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\responsavel.py"
+    ],
+    "GestaoWritePublicReadMixin": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\calendario.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\disciplina.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\horario_aula.py"
+    ],
+    "GestaoSecretariaWritePublicReadMixin": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\curso.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\grade_horaria.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\habilidade.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\management\\views\\__init__.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\ocorrencia.py"
+    ],
+    "GestaoSecretariaProfessorWritePublicReadMixin": [],
+    "ProfessorWriteFuncionarioReadMixin": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\plano_aula.py"
+    ],
+    "FuncionarioMixin": [],
+    "AnoLetivoFilterMixin": [
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\disciplina_turma.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\horario_aula.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\professor_disciplina_turma.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\turma.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\evaluation\\views\\avaliacao.py",
+        "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\aula_faltas.py"
+    ]
+}

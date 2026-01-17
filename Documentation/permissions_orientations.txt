@@ -290,4 +290,189 @@ Nesses casos, criar uma Policy especializada, isolada.
 - Arquitetura estável
 - Uso uniforme em todos os apps
 
+--------------------------------------------------------------------
+10. CONSTANTES COMPLEMENTARES
+--------------------------------------------------------------------
+
+Adicionar em permissions/constants.py:
+
+--------------------------------------------------
+NONE        = "NONE"        # Bloqueia operação explicitamente
+FUNCIONARIO = "FUNCIONARIO" # Grupo: GESTAO, SECRETARIA, PROFESSOR, MONITOR
+--------------------------------------------------
+
+Uso:
+- NONE: Indica bloqueio intencional (ex: delete=NONE)
+- FUNCIONARIO: Evita listar [GESTAO, SECRETARIA, PROFESSOR, MONITOR]
+
+A classe Policy deve expandir FUNCIONARIO para os tipos correspondentes.
+
+--------------------------------------------------------------------
+11. COMBINAÇÃO OWNER + TIPO DE USUÁRIO
+--------------------------------------------------------------------
+
+Cenário: update=[OWNER, GESTAO]
+Significado: O owner OU qualquer GESTAO pode editar.
+
+Comportamento esperado:
+
+has_permission:
+1. Se tipo do usuário está na regra → permitir
+2. Se OWNER na regra → permitir (checagem real em object_permission)
+
+has_object_permission:
+1. Se tipo do usuário já autorizou no has_permission → retornar True
+2. Se OWNER na regra → verificar ownership
+
+Exemplo prático:
+--------------------------------------------------
+Policy(
+    create=PROFESSOR,
+    read=AUTHENTICATED,
+    update=[OWNER, GESTAO],  # Owner ou Gestão editam
+    delete=OWNER,            # Apenas owner exclui
+)
+--------------------------------------------------
+
+--------------------------------------------------------------------
+12. CUSTOM ACTIONS (@action)
+--------------------------------------------------------------------
+
+Para ações customizadas do DRF, há duas abordagens:
+
+OPÇÃO A - Permissão inline na action (RECOMENDADA):
+--------------------------------------------------
+@action(
+    detail=True,
+    methods=['post'],
+    permission_classes=[Policy(create=GESTAO)]
+)
+def aprovar(self, request, pk=None):
+    ...
+--------------------------------------------------
+
+OPÇÃO B - Atributo 'custom' na Policy (para views complexas):
+--------------------------------------------------
+Policy(
+    create=PROFESSOR,
+    read=AUTHENTICATED,
+    custom={
+        'aprovar': GESTAO,
+        'rejeitar': GESTAO,
+        'publicar': [GESTAO, SECRETARIA],
+    }
+)
+--------------------------------------------------
+
+Se usar Opção B, ajustar _current_rule para verificar custom actions.
+
+--------------------------------------------------------------------
+13. OWNERSHIP CUSTOMIZÁVEL
+--------------------------------------------------------------------
+
+Para modelos com campo de ownership diferente de 'criado_por' ou 'usuario',
+passar como parâmetro na Policy:
+
+Campo simples:
+--------------------------------------------------
+Policy(
+    update=OWNER,
+    owner_field='professor'  # Verifica obj.professor == request.user
+)
+--------------------------------------------------
+
+Relacionamento aninhado (lookup path):
+--------------------------------------------------
+Policy(
+    update=OWNER,
+    owner_lookup='professor_disciplina_turma.professor.usuario'
+)
+--------------------------------------------------
+
+has_object_permission deve resolver o path:
+
+def _resolve_owner(self, obj):
+    if self.owner_lookup:
+        parts = self.owner_lookup.split('.')
+        value = obj
+        for part in parts:
+            value = getattr(value, part, None)
+            if value is None:
+                return None
+        return value
+    if self.owner_field:
+        return getattr(obj, self.owner_field, None)
+    # Fallback padrão
+    if hasattr(obj, 'criado_por'):
+        return obj.criado_por
+    if hasattr(obj, 'usuario'):
+        return obj.usuario
+    return None
+
+--------------------------------------------------------------------
+14. TESTES DE PERMISSÃO
+--------------------------------------------------------------------
+
+Criar arquivo de testes:
+C:\Projects\cemep-digital\backend\core_project\permissions\tests.py
+
+Cenários mínimos a testar:
+
+1. AUTENTICAÇÃO
+   - Usuário não autenticado → negado
+   - Usuário autenticado → permitido (se AUTHENTICATED)
+
+2. TIPO DE USUÁRIO
+   - Tipo correto → permitido
+   - Tipo incorreto → negado
+
+3. OWNER
+   - Usuário é owner → permitido
+   - Usuário não é owner → negado
+   - OWNER + GESTAO: gestão sem ser owner → permitido
+
+4. OPERAÇÕES CRUD
+   - create com tipo permitido
+   - read (list/retrieve) com tipo permitido
+   - update com tipo permitido
+   - delete com tipo permitido
+
+5. CUSTOM ACTIONS (se implementado)
+   - Action com permissão específica
+
+Estrutura sugerida:
+--------------------------------------------------
+from django.test import TestCase
+from rest_framework.test import APIRequestFactory
+from core_project.permissions.policy import Policy
+from core_project.permissions.constants import *
+
+class PolicyTestCase(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        # Criar usuários de teste para cada tipo
+        
+    def test_authenticated_allows_any_logged_user(self):
+        ...
+        
+    def test_owner_allows_only_creator(self):
+        ...
+--------------------------------------------------
+
+--------------------------------------------------------------------
+15. RESULTADO FINAL (ATUALIZADO)
+--------------------------------------------------------------------
+
+Com estas melhorias, o sistema oferece:
+
+- Um único mecanismo de permissão
+- Todas as combinações possíveis de tipo + OWNER
+- Suporte a custom actions
+- Ownership customizável
+- Constantes para grupos (FUNCIONARIO) e bloqueio (NONE)
+- Código previsível e testável
+- Manutenção simples
+- Arquitetura estável
+- Uso uniforme em todos os apps
+
 FIM DO DOCUMENTO
