@@ -25,6 +25,7 @@ def build_upload_path(
     turma_numero: int | None = None,
     turma_letra: str | None = None,
     disciplina_sigla: str | None = None,
+    user_id: str | None = None,
     filename: str = ""
 ) -> str:
     """
@@ -56,8 +57,15 @@ def build_upload_path(
         if sigla_clean:
             segments.append(sigla_clean)
     
-    # Sempre presentes
-    segments.extend([base_folder, data_hoje, f"{file_uuid}{ext}"])
+    # Peças fixas
+    segments.extend([base_folder, data_hoje])
+    
+    # ID do usuário (opcional se não fornecido)
+    if user_id:
+        segments.append(str(user_id))
+    
+    # Nome do arquivo final (UUID)
+    segments.append(f"{file_uuid}{ext}")
     
     return "/".join(segments)
 
@@ -70,6 +78,7 @@ def arquivo_upload_path(instance, filename):
         turma_numero=instance.turma_numero,
         turma_letra=instance.turma_letra,
         disciplina_sigla=instance.disciplina_sigla,
+        user_id=str(instance.criado_por.id) if instance.criado_por else None,
         filename=filename
     )
 

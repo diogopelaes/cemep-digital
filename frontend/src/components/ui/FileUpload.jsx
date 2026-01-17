@@ -160,23 +160,32 @@ export default function FileUpload({
         return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
     }
 
+    const isLimitReached = files.length >= maxFiles;
+
     return (
         <div className="w-full space-y-3">
-            <label className="label">{label}</label>
+            <div className="flex justify-between items-end">
+                <label className="label mb-0">{label}</label>
+                <span className={`text-xs font-medium ${isLimitReached ? 'text-rose-500' : 'text-slate-500'}`}>
+                    {files.length} / {maxFiles} arquivos
+                </span>
+            </div>
 
             <div
                 className={`
-                    border-2 border-dashed rounded-xl p-6 text-center transition-colors cursor-pointer
-                    ${isDragging
-                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/10'
-                        : 'border-slate-300 dark:border-slate-600 hover:border-primary-400 dark:hover:border-primary-500'
+                    border-2 border-dashed rounded-xl p-6 text-center transition-colors
+                    ${isLimitReached
+                        ? 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 cursor-not-allowed opacity-70'
+                        : isDragging
+                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/10 cursor-pointer'
+                            : 'border-slate-300 dark:border-slate-600 hover:border-primary-400 dark:hover:border-primary-500 cursor-pointer'
                     }
                 `}
-                onDragEnter={handleDragEnter}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
+                onDragEnter={!isLimitReached ? handleDragEnter : undefined}
+                onDragOver={!isLimitReached ? handleDragOver : undefined}
+                onDragLeave={!isLimitReached ? handleDragLeave : undefined}
+                onDrop={!isLimitReached ? handleDrop : undefined}
+                onClick={() => !isLimitReached && fileInputRef.current?.click()}
             >
                 <input
                     type="file"
@@ -184,17 +193,21 @@ export default function FileUpload({
                     className="hidden"
                     ref={fileInputRef}
                     onChange={(e) => handleFiles(Array.from(e.target.files))}
+                    disabled={isLimitReached}
                 />
 
                 <div className="flex flex-col items-center gap-2 text-slate-500 dark:text-slate-400">
-                    <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-full">
-                        <HiUpload className="w-6 h-6" />
+                    <div className={`p-3 rounded-full transition-colors ${isLimitReached ? 'bg-slate-200 dark:bg-slate-700' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                        <HiUpload className={`w-6 h-6 ${isLimitReached ? 'text-slate-400' : 'text-slate-500'}`} />
                     </div>
                     <p className="text-sm font-medium">
-                        Clique ou arraste arquivos aqui
+                        {isLimitReached ? 'Limite de arquivos atingido' : 'Clique ou arraste arquivos aqui'}
                     </p>
                     <p className="text-xs text-slate-400">
-                        PDF, DOCX, Imagens (max 10MB)
+                        {isLimitReached
+                            ? `Remova algum arquivo para adicionar novos`
+                            : `PDF, DOCX, Imagens (max 10MB)`
+                        }
                     </p>
                 </div>
             </div>
