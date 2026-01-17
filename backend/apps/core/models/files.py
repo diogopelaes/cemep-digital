@@ -165,8 +165,8 @@ from django.dispatch import receiver
 @receiver(post_delete, sender=Arquivo)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
-    Deleta o arquivo físico do disco quando o objeto Arquivo é deletado.
+    Deleta o arquivo físico do storage quando o objeto Arquivo é deletado.
+    Funciona tanto localmente quanto em cloud storage (GCS, S3, etc).
     """
     if instance.arquivo:
-        if os.path.isfile(instance.arquivo.path):
-            os.remove(instance.arquivo.path)
+        instance.arquivo.delete(save=False)
