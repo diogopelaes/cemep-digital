@@ -10,6 +10,7 @@ from django.db import transaction
 from apps.academic.models import MatriculaCEMEP, MatriculaTurma
 from apps.academic.serializers import MatriculaCEMEPSerializer, MatriculaTurmaSerializer
 from apps.core.models import Turma
+from core_project.permissions import Policy, GESTAO, SECRETARIA, FUNCIONARIO, NONE
 
 
 
@@ -20,6 +21,13 @@ class MatriculaCEMEPViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['status', 'curso', 'estudante']
     search_fields = ['numero_matricula', 'estudante__usuario__first_name']
+    
+    permission_classes = [Policy(
+        create=[GESTAO, SECRETARIA],
+        read=FUNCIONARIO,
+        update=[GESTAO, SECRETARIA],
+        delete=NONE,
+    )]
 
     def destroy(self, request, *args, **kwargs):
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -35,6 +43,20 @@ class MatriculaTurmaViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['status', 'turma', 'matricula_cemep', 'turma__ano_letivo']
     search_fields = ['matricula_cemep__estudante__usuario__first_name', 'matricula_cemep__numero_matricula']
+    
+    permission_classes = [Policy(
+        create=[GESTAO, SECRETARIA],
+        read=FUNCIONARIO,
+        update=[GESTAO, SECRETARIA],
+        delete=[GESTAO, SECRETARIA],
+        custom={
+            'estudantes_elegiveis': [GESTAO, SECRETARIA],
+            'enturmar_lote': [GESTAO, SECRETARIA],
+            'download_modelo': [GESTAO, SECRETARIA],
+            'importar_arquivo': [GESTAO, SECRETARIA],
+        }
+    )]
+
 
     @action(detail=False, methods=['get'], url_path='estudantes-elegiveis')
     def estudantes_elegiveis(self, request):

@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from apps.core.models import AnoLetivo, DiaLetivoExtra, DiaNaoLetivo
 from apps.core.serializers import AnoLetivoSerializer, DiaLetivoExtraSerializer, DiaNaoLetivoSerializer
+from core_project.permissions import Policy, GESTAO, AUTHENTICATED
 
 
 class AnoLetivoViewSet(viewsets.ModelViewSet):
@@ -14,6 +15,22 @@ class AnoLetivoViewSet(viewsets.ModelViewSet):
     serializer_class = AnoLetivoSerializer
     lookup_field = 'ano'
     pagination_class = None
+    
+    permission_classes = [
+        Policy(
+            create=[GESTAO],
+            read=AUTHENTICATED,
+            update=[GESTAO],
+            delete=[GESTAO],
+            custom={
+                'calendario': AUTHENTICATED,
+                'add_dia_nao_letivo': [GESTAO],
+                'add_dia_letivo_extra': [GESTAO],
+                'remove_dia': [GESTAO],
+            }
+        )
+    ]
+
 
     @decorators.action(detail=True, methods=['get'])
     def calendario(self, request, ano=None):

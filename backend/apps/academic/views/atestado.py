@@ -9,6 +9,7 @@ from django.http import FileResponse
 
 from apps.academic.models import Atestado
 from apps.academic.serializers import AtestadoSerializer
+from core_project.permissions import Policy, GESTAO, SECRETARIA, FUNCIONARIO, NONE
 
 
 
@@ -18,6 +19,14 @@ class AtestadoViewSet(viewsets.ModelViewSet):
     serializer_class = AtestadoSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['usuario_alvo']
+    
+    permission_classes = [Policy(
+        create=[GESTAO, SECRETARIA],
+        read=FUNCIONARIO,
+        update=[GESTAO, SECRETARIA],
+        delete=NONE,
+    )]
+
     
     @action(detail=True, methods=['get'])
     def download(self, request, pk=None):

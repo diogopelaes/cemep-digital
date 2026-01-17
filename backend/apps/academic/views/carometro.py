@@ -5,11 +5,19 @@ from django.shortcuts import get_object_or_404
 from apps.core.models import Turma
 from apps.academic.models import MatriculaTurma
 from django.db.models import F
+from core_project.permissions import Policy, FUNCIONARIO, NONE
 
 class CarometroView(APIView):
     """
     API View para exibir o Fotos (lista de fotos e nomes) de uma turma.
     """
+    permission_classes = [Policy(
+        create=NONE,
+        read=FUNCIONARIO,
+        update=NONE,
+        delete=NONE,
+    )]
+
 
     def get(self, request, turma_id):
         turma = get_object_or_404(Turma, pk=turma_id)

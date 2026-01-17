@@ -7,3 +7,10 @@ RESPONSAVEL   = "RESPONSAVEL"
 
 AUTHENTICATED = "AUTHENTICATED"
 OWNER         = "OWNER"
+
+# Constantes complementares
+NONE        = "NONE"        # Bloqueia operação explicitamente
+FUNCIONARIO = "FUNCIONARIO" # Grupo: GESTAO, SECRETARIA, PROFESSOR, MONITOR
+
+# Expansão do grupo FUNCIONARIO
+FUNCIONARIO_TIPOS = {GESTAO, SECRETARIA, PROFESSOR, MONITOR}

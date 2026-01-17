@@ -22,6 +22,7 @@ from apps.academic.serializers import (
 
 from apps.users.utils import send_credentials_email
 from apps.core.validators import clean_digits
+from core_project.permissions import Policy, GESTAO, SECRETARIA, FUNCIONARIO, NONE
 
 
 class EstudanteViewSet(viewsets.ModelViewSet):
@@ -31,6 +32,22 @@ class EstudanteViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['bolsa_familia', 'pe_de_meia', 'usa_onibus']
     search_fields = ['usuario__first_name', 'usuario__last_name', 'cpf', 'nome_social']
+    
+    permission_classes = [Policy(
+        create=[GESTAO, SECRETARIA],
+        read=FUNCIONARIO,
+        update=[GESTAO, SECRETARIA],
+        delete=NONE,
+        custom={
+            'criar_completo': [GESTAO, SECRETARIA],
+            'importar_arquivo': [GESTAO, SECRETARIA],
+            'download_modelo': [GESTAO, SECRETARIA],
+            'atualizar_completo': [GESTAO, SECRETARIA],
+            'upload_foto': [GESTAO, SECRETARIA],
+            'remover_foto': [GESTAO, SECRETARIA],
+            'prontuario': FUNCIONARIO,
+        }
+    )]
 
     def destroy(self, request, *args, **kwargs):
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -39,6 +56,7 @@ class EstudanteViewSet(viewsets.ModelViewSet):
         if self.action in ['create']:
             return EstudanteCreateSerializer
         return EstudanteSerializer
+
     
     @action(detail=False, methods=['post'], url_path='criar-completo')
     def criar_completo(self, request):

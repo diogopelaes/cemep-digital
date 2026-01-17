@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 
 from apps.academic.models import Estudante, Responsavel, ResponsavelEstudante
 from apps.academic.serializers import ResponsavelSerializer, ResponsavelCreateSerializer
+from core_project.permissions import Policy, GESTAO, SECRETARIA, FUNCIONARIO, NONE
 
 
 
@@ -17,6 +18,16 @@ class ResponsavelViewSet(viewsets.ModelViewSet):
     queryset = Responsavel.objects.select_related('usuario').all()
     filter_backends = [DjangoFilterBackend]
     search_fields = ['usuario__first_name', 'usuario__last_name', 'usuario__email']
+    
+    permission_classes = [Policy(
+        create=[GESTAO, SECRETARIA],
+        read=FUNCIONARIO,
+        update=[GESTAO, SECRETARIA],
+        delete=NONE,
+        custom={
+            'vincular_estudante': [GESTAO, SECRETARIA],
+        }
+    )]
 
     def destroy(self, request, *args, **kwargs):
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -25,6 +36,7 @@ class ResponsavelViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return ResponsavelCreateSerializer
         return ResponsavelSerializer
+
     
     @action(detail=True, methods=['post'])
     def vincular_estudante(self, request, pk=None):
