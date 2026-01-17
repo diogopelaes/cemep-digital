@@ -12,6 +12,8 @@ from apps.users.serializers import (
     UserSerializer, UserCreateSerializer, UserUpdateSerializer
 )
 
+from core_project.permissions import Policy, GESTAO, AUTHENTICATED, NONE
+
 
 User = get_user_model()
 
@@ -19,6 +21,18 @@ User = get_user_model()
 class UserViewSet(viewsets.ModelViewSet):
     """ViewSet para gerenciamento de usuários."""
     queryset = User.objects.all()
+    
+    permission_classes = [Policy(
+        create=[GESTAO],
+        read=[GESTAO],
+        update=[GESTAO],
+        delete=NONE,
+        custom={
+            'me': AUTHENTICATED,
+            'toggle_dark_mode': AUTHENTICATED,
+            'send_credentials': [GESTAO]
+        }
+    )]
 
     def destroy(self, request, *args, **kwargs):
         # Mesmo para Gestão, a exclusão direta pode ser perigosa.
@@ -34,9 +48,7 @@ class UserViewSet(viewsets.ModelViewSet):
         elif self.action in ['update', 'partial_update']:
             return UserUpdateSerializer
         return UserSerializer
-    
-    def get_permissions(self):
-        return [IsAuthenticated()]
+
     
     @action(detail=False, methods=['get'])
     def me(self, request):

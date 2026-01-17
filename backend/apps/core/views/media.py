@@ -3,236 +3,188 @@
 SISTEMA DE MÍDIA PROTEGIDA - CEMEP Digital
 ================================================================================
 
-Este módulo implementa controle de acesso a arquivos de mídia baseado em pastas.
-O nível de acesso é determinado automaticamente pelo DIRETÓRIO onde o arquivo
-está salvo.
+Este módulo implementa controle de acesso a arquivos de mídia.
 
-COMO FUNCIONA:
---------------
-1. Quando você define um ImageField/FileField no modelo, o parâmetro 'upload_to'
-   determina a pasta onde o arquivo será salvo.
-   
-2. A pasta determina automaticamente quem pode acessar o arquivo.
+REGRAS DE ACESSO:
+-----------------
+1. Arquivos em `public/`: Acesso livre (logos, assets)
+2. Arquivos registrados no model `Arquivo`: Verificação de ownership
+   - OWNER: Usuário que fez upload pode acessar
+   - FUNCIONARIO: Gestão, Secretaria, Professor, Monitor podem acessar
+3. Arquivos não registrados (legacy/direto no model): Requer autenticação
 
-3. O frontend receberá URLs no formato /api/v1/media/... que requerem JWT.
+FLUXO DE VERIFICAÇÃO:
+---------------------
+1. Se path começa com `public/` → AllowAny
+2. Busca registro `Arquivo` pelo path do arquivo
+3. Se encontrado → Verifica is_owner() OU is_funcionario()
+4. Se não encontrado → Apenas autenticados (fallback seguro)
 
-
-NÍVEIS DE ACESSO DISPONÍVEIS:
------------------------------
-
-┌─────────────────────┬──────────────────────────────────────────────────────┐
-│ PASTA               │ QUEM PODE ACESSAR                                    │
-├─────────────────────┼──────────────────────────────────────────────────────┤
-│ public/             │ QUALQUER PESSOA (mesmo sem login)                    │
-│                     │ Uso: logos, imagens institucionais, assets públicos  │
-├─────────────────────┼──────────────────────────────────────────────────────┤
-│ authenticated/      │ QUALQUER USUÁRIO LOGADO                              │
-│                     │ Uso: avisos gerais, materiais para todos os perfis   │
-├─────────────────────┼──────────────────────────────────────────────────────┤
-│ profile_pics/       │ FUNCIONÁRIOS (Gestão, Secretaria, Professor, Monitor)│
-│                     │ Uso: fotos de estudantes, fotos de funcionários      │
-├─────────────────────┼──────────────────────────────────────────────────────┤
-│ pedagogical/        │ FUNCIONÁRIOS (Gestão, Secretaria, Professor, Monitor)│
-│                     │ Uso: materiais didáticos, planos de aula, atividades │
-├─────────────────────┼──────────────────────────────────────────────────────┤
-│ secretaria/         │ GESTÃO e SECRETARIA apenas                           │
-│                     │ Uso: documentos de matrícula, declarações, ofícios   │
-├─────────────────────┼──────────────────────────────────────────────────────┤
-│ gestao/             │ GESTÃO apenas                                        │
-│                     │ Uso: documentos financeiros, contratos, RH           │
-├─────────────────────┼──────────────────────────────────────────────────────┤
-│ (outros)            │ FUNCIONÁRIOS (padrão de segurança)                   │
-│                     │ Qualquer pasta não listada usa este nível            │
-└─────────────────────┴──────────────────────────────────────────────────────┘
-
-
-EXEMPLOS DE USO NOS MODELS:
----------------------------
-
-# Foto de estudante - apenas funcionários podem ver
-foto = models.ImageField(upload_to='profile_pics/', blank=True)
-
-# Logo da instituição - público
-logo = models.ImageField(upload_to='public/', blank=True)
-
-# Material didático - professores e staff
-material = models.FileField(upload_to='pedagogical/', blank=True)
-
-# Contrato de trabalho - apenas gestão
-contrato = models.FileField(upload_to='gestao/', blank=True)
-
-# Declaração de matrícula - gestão e secretaria
-declaracao = models.FileField(upload_to='secretaria/', blank=True)
-
-# Aviso para todos os usuários logados
-imagem_aviso = models.ImageField(upload_to='authenticated/', blank=True)
-
-
-PARA MAIS INFORMAÇÕES SOBRE PERMISSÕES:
----------------------------------------
-Veja: apps/users/permissions.py
+COMPATIBILIDADE GCS:
+--------------------
+- Em produção (USE_GCS=True): Gera Signed URL temporária
+- Em desenvolvimento: Serve arquivo do disco local
 
 ================================================================================
 """
 import os
 import mimetypes
 from django.conf import settings
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, HttpResponseForbidden
 from django.shortcuts import redirect
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from core_project.permissions.constants import FUNCIONARIO_TIPOS
 
-
-# =============================================================================
-# CONFIGURAÇÃO DE NÍVEIS DE ACESSO POR PASTA
-# =============================================================================
-# 
-# Adicione novas pastas aqui conforme necessário.
-# A ordem importa: a primeira correspondência será usada.
-# Use None como valor para indicar acesso público (AllowAny).
-#
-MEDIA_ACCESS_LEVELS = {
-    # -------------------------------------------------------------------------
-    # PÚBLICO - Qualquer pessoa pode acessar (sem login necessário)
-    # -------------------------------------------------------------------------
-    'public/': None,  # None = AllowAny
-    
-    # -------------------------------------------------------------------------
-    # AUTENTICADO - Qualquer usuário logado (todos os perfis)
-    # -------------------------------------------------------------------------
-    'authenticated/': IsAuthenticated,
-    'avisos/': IsAuthenticated,
-    
-    # -------------------------------------------------------------------------
-    # FUNCIONÁRIOS - Gestão, Secretaria, Professor, Monitor
-    # -------------------------------------------------------------------------
-    'profile_pics/': None,
-    'pedagogical/': None,
-    'materiais/': None,
-    'atividades/': None,
-    
-    # -------------------------------------------------------------------------
-    # GESTÃO + SECRETARIA - Documentos administrativos
-    # -------------------------------------------------------------------------
-    'secretaria/': None,
-    'matriculas/': None,
-    'declaracoes/': None,
-    
-    # -------------------------------------------------------------------------
-    # APENAS GESTÃO - Documentos sensíveis/confidenciais
-    # -------------------------------------------------------------------------
-    'gestao/': None,
-    'financeiro/': None,
-    'rh/': None,
-    'contratos/': None,
-}
-
-# Nível padrão para pastas não configuradas (segurança por padrão)
-DEFAULT_ACCESS_LEVEL = IsAuthenticated
-
-
-# =============================================================================
-# VIEW DE MÍDIA PROTEGIDA
-# =============================================================================
 
 class ProtectedMediaView(APIView):
     """
-    Serve arquivos de mídia com controle de acesso baseado em pastas.
+    Serve arquivos de mídia com controle de acesso baseado em ownership.
     
-    O nível de acesso é determinado automaticamente pelo diretório do arquivo.
-    Veja a documentação no início deste módulo para detalhes.
+    Política:
+    - public/: Qualquer pessoa
+    - Outros: OWNER ou FUNCIONARIO (consistente com ArquivoViewSet)
     
     Segurança:
-    - Previne ataques de path traversal (../../etc/passwd)
-    - Retorna 401 se não autenticado (quando requerido)
-    - Retorna 403 se autenticado mas sem permissão
-    - Retorna 404 se arquivo não existe
+    - Previne ataques de path traversal
+    - Verifica ownership via model Arquivo
+    - Retorna 401/403/404 conforme apropriado
     
     Performance:
-    - Cache de 1 hora para imagens (Cache-Control: private)
-    - Content-Type detectado automaticamente
+    - Cache de 1 hora para imagens
+    - Signed URLs para GCS (não passa pelo Django)
     """
     
-    def get_permissions(self):
+    # Sempre permite a requisição chegar ao método get()
+    # A verificação de permissão é feita manualmente para suportar lógica complexa
+    permission_classes = [AllowAny]
+    
+    def _is_public_path(self, file_path: str) -> bool:
+        """Verifica se o path é público (não requer autenticação)."""
+        return file_path.startswith('public/')
+    
+    def _is_funcionario(self, user) -> bool:
+        """Verifica se o usuário é funcionário."""
+        if not user.is_authenticated:
+            return False
+        return getattr(user, 'tipo_usuario', None) in FUNCIONARIO_TIPOS
+    
+    
+    def _can_access_file(self, request, file_path: str) -> tuple[bool, str]:
         """
-        Determina as permissões baseado no path do arquivo.
+        Verifica se o usuário pode acessar o arquivo.
+        A autenticação é feita via Sessão (Browser) ou JWT (API).
+        
+        Returns:
+            tuple: (pode_acessar: bool, motivo: str)
         """
-        file_path = self.kwargs.get('file_path', '')
+        user = request.user
         
-        # Encontra o nível de acesso baseado no prefixo da pasta
-        for prefix, permission_class in MEDIA_ACCESS_LEVELS.items():
-            if file_path.startswith(prefix):
-                if permission_class is None:
-                    return [AllowAny()]
-                return [permission_class()]
+        # 1. Arquivos públicos: acesso livre
+        if self._is_public_path(file_path):
+            return True, "public"
         
-        # Pasta não configurada: usa nível padrão (funcionários)
-        return [DEFAULT_ACCESS_LEVEL()]
+        # 2. Requer autenticação
+        if not user.is_authenticated:
+            return False, "not_authenticated"
+        
+        # 3. Funcionários podem acessar qualquer arquivo protegido
+        if self._is_funcionario(user):
+            return True, "funcionario"
+        
+        # 4. Busca o registro Arquivo para verificar ownership
+        from apps.core.models import Arquivo
+        
+        try:
+            # O path do arquivo no FileField inclui o caminho relativo
+            arquivo = Arquivo.objects.filter(arquivo=file_path).first()
+            
+            if arquivo:
+                # Verifica se é o dono
+                if arquivo.is_owner(user):
+                    return True, "owner"
+                else:
+                    return False, "not_owner"
+            else:
+                # Arquivo não registrado no model Arquivo
+                # Pode ser um arquivo de model legado (ImageField direto)
+                # Para esses, permite apenas funcionários (já verificado acima)
+                # Usuários não-funcionários não podem acessar
+                return False, "not_registered"
+                
+        except Exception:
+            # Em caso de erro, bloqueia por segurança
+            return False, "error"
 
     def get(self, request, file_path):
         """
         Serve o arquivo após verificação de permissões.
-        
-        Em desenvolvimento (USE_GCS=False):
-            - Serve arquivo diretamente do disco local
-        
-        Em produção com GCS (USE_GCS=True):
-            - Gera Signed URL temporária (15 min)
-            - Redireciona o cliente para essa URL
-            - O arquivo nunca passa pelo servidor Django
         """
+        # Verifica permissão de acesso
+        can_access, reason = self._can_access_file(request, file_path)
+        
+        if not can_access:
+            # Se for requisição de navegador (espera HTML), redireciona para página bonita
+            accept_header = request.META.get('HTTP_ACCEPT', '')
+            is_browser_request = 'text/html' in accept_header
+            
+            if is_browser_request:
+                from django.conf import settings
+                if reason == "not_authenticated":
+                    # Redireciona para login
+                    return redirect(f"{settings.FRONTEND_URL}/login")
+                else:
+                    # Redireciona para Forbidden
+                    return redirect(f"{settings.FRONTEND_URL}/forbidden")
+
+            # Retorno padrão JSON para APIs
+            if reason == "not_authenticated":
+                from rest_framework.exceptions import NotAuthenticated
+                raise NotAuthenticated("Autenticação necessária para acessar este arquivo.")
+            else:
+                return HttpResponseForbidden(
+                    "Você não tem permissão para acessar este arquivo."
+                )
+        
         # =====================================================================
         # GOOGLE CLOUD STORAGE: Redireciona para Signed URL
         # =====================================================================
         if getattr(settings, 'USE_GCS', False):
             from django.core.files.storage import default_storage
             
-            # Verifica se o arquivo existe no bucket
             if not default_storage.exists(file_path):
                 raise Http404("Arquivo não encontrado")
             
-            # Gera URL assinada temporária (definida em GS_SIGNED_URL_EXPIRY)
-            # Esta URL expira e não pode ser reutilizada após expiração
+            # Gera URL assinada temporária
             signed_url = default_storage.url(file_path)
-            
-            # Redireciona o cliente para a URL do GCS
-            # O arquivo é baixado diretamente do Google, não passa pelo Django
             return redirect(signed_url)
         
         # =====================================================================
         # ARMAZENAMENTO LOCAL: Serve do disco
         # =====================================================================
-        # Constrói o caminho absoluto do arquivo
         absolute_path = os.path.join(settings.MEDIA_ROOT, file_path)
         
-        # =====================================================================
-        # SEGURANÇA: Previne Path Traversal Attack
-        # =====================================================================
-        # Normaliza o path para remover ../ e garante que está dentro de MEDIA_ROOT
+        # Previne Path Traversal Attack
         absolute_path = os.path.normpath(absolute_path)
         if not absolute_path.startswith(str(settings.MEDIA_ROOT)):
             raise Http404("Arquivo não encontrado")
         
-        # Verifica se o arquivo existe e é um arquivo (não diretório)
         if not os.path.exists(absolute_path) or not os.path.isfile(absolute_path):
             raise Http404("Arquivo não encontrado")
         
-        # =====================================================================
-        # RESPOSTA: Serve o arquivo
-        # =====================================================================
-        # Detecta o content type baseado na extensão
+        # Detecta content type
         content_type, _ = mimetypes.guess_type(absolute_path)
         if content_type is None:
             content_type = 'application/octet-stream'
         
-        # Cria resposta com streaming do arquivo
+        # Serve o arquivo
         response = FileResponse(
             open(absolute_path, 'rb'),
             content_type=content_type
         )
         
-        # Headers de cache para imagens (1 hora, privado = não cachear em proxies)
+        # Cache para imagens
         if content_type.startswith('image/'):
             response['Cache-Control'] = 'private, max-age=3600'
         

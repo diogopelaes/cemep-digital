@@ -13,6 +13,7 @@ import pandas as pd
 
 from apps.core.models import Disciplina
 from apps.core.serializers import DisciplinaSerializer
+from core_project.permissions import Policy, GESTAO, AUTHENTICATED, NONE
 
 
 
@@ -26,9 +27,22 @@ class DisciplinaViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['is_active']
     search_fields = ['nome', 'sigla']
+    
+    permission_classes = [Policy(
+        create=[GESTAO],
+        read=AUTHENTICATED,
+        update=[GESTAO],
+        delete=NONE,
+        custom={
+            'toggle_active': [GESTAO],
+            'importar_arquivo': [GESTAO],
+            'download_modelo': AUTHENTICATED,
+        }
+    )]
 
     def destroy(self, request, *args, **kwargs):
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
     @action(detail=True, methods=['post'], url_path='toggle-ativo')
     @transaction.atomic

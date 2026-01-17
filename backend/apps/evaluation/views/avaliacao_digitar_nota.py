@@ -15,6 +15,7 @@ from apps.evaluation.serializers import (
     EstudantesNotasSerializer,
     SalvarNotasSerializer
 )
+from core_project.permissions import Policy, PROFESSOR, OWNER, NONE
 
 
 class DigitarNotaViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -33,8 +34,18 @@ class DigitarNotaViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         'professores_disciplinas_turmas__disciplina_turma__turma__curso',
         'professores_disciplinas_turmas__disciplina_turma__disciplina',
     )
-    permission_classes = [IsAuthenticated]
+    permission_classes = [Policy(
+        create=NONE,
+        read=OWNER,
+        update=NONE,
+        delete=NONE,
+        custom={
+            'estudantes': [PROFESSOR],
+            'salvar': OWNER,
+        }
+    )]
     lookup_field = 'pk'
+
 
     def retrieve(self, request, pk=None):
         """

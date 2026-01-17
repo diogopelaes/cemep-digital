@@ -7,6 +7,7 @@ from django.utils import timezone
 from apps.management.models import ReuniaoHTPC, NotificacaoHTPC
 from apps.management.serializers import ReuniaoHTPCSerializer, NotificacaoHTPCSerializer
 from apps.core.models import Funcionario
+from core_project.permissions import Policy, GESTAO, FUNCIONARIO, OWNER, NONE
 
 
 class ReuniaoHTPCViewSet(viewsets.ModelViewSet):
@@ -15,6 +16,16 @@ class ReuniaoHTPCViewSet(viewsets.ModelViewSet):
     serializer_class = ReuniaoHTPCSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['data_reuniao']
+    
+    permission_classes = [Policy(
+        create=[GESTAO],
+        read=[FUNCIONARIO],
+        update=[GESTAO],
+        delete=[GESTAO],
+        custom={
+            'registrar_presenca': [GESTAO]
+        }
+    )]
     
     def perform_create(self, serializer):
         reuniao = serializer.save(quem_registrou=self.request.user)
@@ -36,6 +47,17 @@ class NotificacaoHTPCViewSet(viewsets.ModelViewSet):
     serializer_class = NotificacaoHTPCSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['funcionario', 'visualizado']
+    
+    permission_classes = [Policy(
+        create=NONE,
+        read=[FUNCIONARIO],
+        update=[FUNCIONARIO],
+        delete=NONE,
+        custom={
+            'marcar_visualizado': OWNER
+        }
+    )]
+
     
     @action(detail=True, methods=['post'])
     def marcar_visualizado(self, request, pk=None):

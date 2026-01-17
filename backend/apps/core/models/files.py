@@ -178,12 +178,17 @@ class Arquivo(UUIDModel):
         
         # Só valida se um usuário for explicitamente passado (ex: via View/Serializer)
         if user is not None:
+            # Verifica se é Gestão
+            from apps.users.models import User
+            is_gestao = getattr(user, 'tipo_usuario', None) == User.TipoUsuario.GESTAO
+            
             if self.criado_por_id:
-                if self.criado_por_id != user.id and not getattr(user, 'is_superuser', False):
-                    raise PermissionDenied("Apenas o criador do arquivo pode excluí-lo.")
+                # Permite se for dono, gestão ou superusuário
+                if self.criado_por_id != user.id and not is_gestao and not getattr(user, 'is_superuser', False):
+                    raise PermissionDenied("Apenas o criador do arquivo ou gestão pode excluí-lo.")
             else:
-                # Arquivo sem dono: apenas superusuário
-                if not getattr(user, 'is_superuser', False):
+                # Arquivo sem dono: gestão ou superusuário
+                if not is_gestao and not getattr(user, 'is_superuser', False):
                     raise PermissionDenied("Apenas administradores podem deletar este arquivo.")
         
         # O super().delete() dispara o signal post_delete (que limpa o GCS)

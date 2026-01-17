@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from apps.management.models import Tarefa, NotificacaoTarefa
 from apps.management.serializers import TarefaSerializer, NotificacaoTarefaSerializer
+from core_project.permissions import Policy, GESTAO, FUNCIONARIO, OWNER, NONE
 
 
 class TarefaViewSet(viewsets.ModelViewSet):
@@ -15,6 +16,18 @@ class TarefaViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['concluido', 'funcionarios']
     
+    permission_classes = [Policy(
+        create=[GESTAO],
+        read=[FUNCIONARIO],
+        update=[GESTAO],
+        delete=[GESTAO],
+        custom={
+            'concluir': [FUNCIONARIO],
+            'minhas_tarefas': [FUNCIONARIO],
+            'relatorio': [GESTAO]
+        }
+    )]
+
     def perform_create(self, serializer):
         tarefa = serializer.save(criado_por=self.request.user)
         for funcionario in tarefa.funcionarios.all():
@@ -54,6 +67,18 @@ class NotificacaoTarefaViewSet(viewsets.ModelViewSet):
     serializer_class = NotificacaoTarefaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['funcionario', 'visualizado']
+    
+    permission_classes = [Policy(
+        create=NONE,
+        read=[FUNCIONARIO],
+        update=[FUNCIONARIO],
+        delete=NONE,
+        custom={
+            'marcar_visualizado': OWNER,
+            'minhas_notificacoes': OWNER
+        }
+    )]
+
     
     @action(detail=True, methods=['post'])
     def marcar_visualizado(self, request, pk=None):

@@ -16,7 +16,10 @@ from apps.pedagogical.serializers import (
     DescritorOcorrenciaPedagogicaSerializer, OcorrenciaPedagogicaSerializer,
     OcorrenciaResponsavelCienteSerializer
 )
-
+from core_project.permissions import (
+    Policy, GESTAO, SECRETARIA, FUNCIONARIO, 
+    RESPONSAVEL, AUTHENTICATED, OWNER, NONE
+)
 
 
 class DescritorOcorrenciaPedagogicaViewSet(viewsets.ModelViewSet):
@@ -25,6 +28,13 @@ class DescritorOcorrenciaPedagogicaViewSet(viewsets.ModelViewSet):
     serializer_class = DescritorOcorrenciaPedagogicaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['ativo']
+    
+    permission_classes = [Policy(
+        create=[GESTAO],
+        read=[FUNCIONARIO],
+        update=[GESTAO],
+        delete=[GESTAO],
+    )]
     
     def perform_create(self, serializer):
         serializer.save(gestor=self.request.user.funcionario)
@@ -40,6 +50,13 @@ class OcorrenciaPedagogicaViewSet(viewsets.ModelViewSet):
     serializer_class = OcorrenciaPedagogicaSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['estudante', 'tipo', 'autor']
+    
+    permission_classes = [Policy(
+        create=[GESTAO, SECRETARIA],
+        read=AUTHENTICATED,
+        update=[GESTAO, SECRETARIA],
+        delete=[GESTAO, SECRETARIA],
+    )]
     
     def perform_create(self, serializer):
         ocorrencia = serializer.save(autor=self.request.user.funcionario)
@@ -62,8 +79,16 @@ class OcorrenciaResponsavelCienteViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['responsavel', 'ciente']
     
-    def get_permissions(self):
-        return [IsAuthenticated()]
+    permission_classes = [Policy(
+        create=NONE,
+        read=[RESPONSAVEL, GESTAO, SECRETARIA],
+        update=OWNER,
+        delete=NONE,
+        custom={
+            'marcar_ciente': OWNER,
+        }
+    )]
+
     
     @action(detail=True, methods=['post'])
     def marcar_ciente(self, request, pk=None):

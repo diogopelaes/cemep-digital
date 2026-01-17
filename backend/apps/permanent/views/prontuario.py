@@ -6,6 +6,7 @@ from django.http import FileResponse
 
 from apps.permanent.models import RegistroProntuario
 from apps.permanent.serializers import RegistroProntuarioSerializer
+from core_project.permissions import Policy, GESTAO, NONE
 
 
 class RegistroProntuarioViewSet(viewsets.ModelViewSet):
@@ -15,6 +16,17 @@ class RegistroProntuarioViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['cpf']
     search_fields = ['nome_estudante', 'cpf', 'descricao']
+    
+    permission_classes = [Policy(
+        create=[GESTAO],
+        read=[GESTAO],
+        update=[GESTAO],
+        delete=NONE,
+        custom={
+            'download_anexo': [GESTAO]
+        }
+    )]
+
 
     def destroy(self, request, *args, **kwargs):
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)

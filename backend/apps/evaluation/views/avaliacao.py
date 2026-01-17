@@ -18,6 +18,7 @@ from apps.evaluation.serializers import (
 )
 from apps.core.models import ProfessorDisciplinaTurma
 from apps.core.mixins import AnoLetivoFilterMixin
+from core_project.permissions import Policy, PROFESSOR, AUTHENTICATED, OWNER
 
 from django.utils import timezone
 from apps.evaluation.config import get_config_from_ano_letivo
@@ -32,6 +33,16 @@ class AvaliacaoViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
     - Read: Qualquer autenticado
     - Update/Delete: Apenas o criador (criado_por)
     """
+    permission_classes = [Policy(
+        create=[PROFESSOR],
+        read=AUTHENTICATED,
+        update=OWNER,
+        delete=OWNER,
+        custom={
+            'choices': [PROFESSOR]
+        }
+    )]
+
     queryset = Avaliacao.objects.select_related(
         'ano_letivo',
         'criado_por'

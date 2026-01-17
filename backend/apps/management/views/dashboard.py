@@ -4,12 +4,13 @@ View para Dashboard - Estatísticas e Dados Consolidados
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 
 from apps.academic.models import Estudante, MatriculaTurma
 from apps.core.models import Turma
 from apps.management.models import Tarefa
+from core_project.permissions import Policy, AUTHENTICATED, NONE
+
 
 
 class DashboardViewSet(viewsets.ViewSet):
@@ -22,7 +23,16 @@ class DashboardViewSet(viewsets.ViewSet):
     Nota: Não usa Mixin pois o Dashboard é acessível por todos os perfis,
     retornando dados específicos conforme o tipo de usuário.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [Policy(
+        create=NONE,
+        read=AUTHENTICATED,
+        update=NONE,
+        delete=NONE,
+        custom={
+            'estatisticas': AUTHENTICATED
+        }
+    )]
+
 
     @action(detail=False, methods=['get'], url_path='estatisticas')
     def estatisticas(self, request):

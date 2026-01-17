@@ -1,10 +1,10 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.core.models import Arquivo
 from apps.core.serializers.arquivo import ArquivoSerializer
+from core_project.permissions import Policy, AUTHENTICATED, OWNER, FUNCIONARIO, GESTAO
 
 class ArquivoViewSet(mixins.CreateModelMixin,
                      mixins.RetrieveModelMixin,
@@ -17,10 +17,23 @@ class ArquivoViewSet(mixins.CreateModelMixin,
     - POST /api/core/arquivos/ (Upload)
     - GET /api/core/arquivos/{id}/ (Detalhes)
     - DELETE /api/core/arquivos/{id}/ (Remoção)
+    
+    Permissões:
+    - Create: Qualquer autenticado
+    - Read: Dono OU Funcionário (protege dados sensíveis como fotos de estudantes)
+    - Delete: Dono OU Gestão
     """
     queryset = Arquivo.objects.all()
     serializer_class = ArquivoSerializer
-    permission_classes = [IsAuthenticated]
+    
+    permission_classes = [Policy(
+        create=AUTHENTICATED,
+        read=[OWNER, FUNCIONARIO],
+        update=OWNER,
+        delete=[OWNER, GESTAO],
+    )]
+
+
     parser_classes = [MultiPartParser, FormParser]
 
     def perform_create(self, serializer):

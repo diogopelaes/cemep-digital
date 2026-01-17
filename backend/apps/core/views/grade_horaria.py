@@ -16,6 +16,7 @@ from apps.core.serializers.grade_horaria import (
     HorarioAulaSerializer, GradeHorariaValidadeSerializer
 )
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from core_project.permissions import Policy, GESTAO, SECRETARIA, FUNCIONARIO
 
 
 class GradeHorariaViewSet(viewsets.ModelViewSet):
@@ -25,6 +26,18 @@ class GradeHorariaViewSet(viewsets.ModelViewSet):
     """
     queryset = GradeHoraria.objects.all()
     serializer_class = GradeHorariaSerializer
+    
+    permission_classes = [Policy(
+        create=[GESTAO, SECRETARIA],
+        read=FUNCIONARIO,
+        update=[GESTAO, SECRETARIA],
+        delete=[GESTAO, SECRETARIA],
+        custom={
+            'dados_edicao': [GESTAO, SECRETARIA],
+            'salvar_lote': [GESTAO, SECRETARIA],
+        }
+    )]
+
 
 
 

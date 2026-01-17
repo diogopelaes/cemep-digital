@@ -7,6 +7,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from apps.core.models import ProfessorDisciplinaTurma
 from apps.core.serializers import ProfessorDisciplinaTurmaSerializer
 from apps.core.mixins import AnoLetivoFilterMixin
+from core_project.permissions import Policy, GESTAO, SECRETARIA, FUNCIONARIO
 
 
 
@@ -26,9 +27,17 @@ class ProfessorDisciplinaTurmaViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSe
     
     ano_letivo_field = 'disciplina_turma__turma__ano_letivo'  # Campo de filtro do AnoLetivoFilterMixin
     
+    permission_classes = [Policy(
+        create=[GESTAO, SECRETARIA],
+        read=FUNCIONARIO,
+        update=[GESTAO, SECRETARIA],
+        delete=[GESTAO, SECRETARIA],
+    )]
+    
     def get_queryset(self):
         qs = super().get_queryset()
         turma = self.request.query_params.get('turma')
         if turma:
             qs = qs.filter(disciplina_turma__turma_id=turma)
         return qs
+

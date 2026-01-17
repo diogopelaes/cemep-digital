@@ -11,6 +11,7 @@ import RecuperarSenha from './pages/RecuperarSenha'
 import RedefinirSenha from './pages/RedefinirSenha'
 import Avisos from './pages/Avisos'
 import NotFound from './pages/NotFound'
+import Forbidden from './pages/Forbidden'
 import GradeTurma from './pages/GradeTurma'
 
 // Dashboards por perfil
@@ -237,6 +238,7 @@ function App() {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
       {/* 404 */}
+      <Route path="/forbidden" element={<Forbidden />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )

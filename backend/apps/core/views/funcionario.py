@@ -24,6 +24,7 @@ from apps.core.serializers import (
 
 from apps.users.models import User
 from apps.users.utils import send_credentials_email
+from core_project.permissions import Policy, GESTAO, SECRETARIA, FUNCIONARIO, NONE
 
 
 class FuncionarioViewSet(viewsets.ModelViewSet):
@@ -36,6 +37,20 @@ class FuncionarioViewSet(viewsets.ModelViewSet):
     filterset_fields = ['usuario__tipo_usuario', 'usuario__is_active']
     search_fields = ['matricula', 'usuario__first_name', 'apelido']
     
+    permission_classes = [Policy(
+        create=[GESTAO, SECRETARIA],
+        read=FUNCIONARIO,
+        update=[GESTAO, SECRETARIA],
+        delete=NONE,
+        custom={
+            'toggle_ativo': [GESTAO, SECRETARIA],
+            'importar_arquivo': [GESTAO, SECRETARIA],
+            'download_modelo': [GESTAO, SECRETARIA],
+            'criar_completo': [GESTAO, SECRETARIA],
+            'atualizar_completo': [GESTAO, SECRETARIA],
+        }
+    )]
+    
     def destroy(self, request, *args, **kwargs):
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -45,6 +60,7 @@ class FuncionarioViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update']:
             return FuncionarioCreateSerializer
         return FuncionarioSerializer
+
     
     @action(detail=True, methods=['post'], url_path='toggle-ativo')
     def toggle_ativo(self, request, pk=None):

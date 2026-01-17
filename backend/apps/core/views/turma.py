@@ -14,6 +14,7 @@ import pandas as pd
 from apps.core.models import Turma, Curso, AnoLetivo
 from apps.core.serializers import TurmaSerializer
 from apps.core.mixins import AnoLetivoFilterMixin
+from core_project.permissions import Policy, GESTAO, SECRETARIA, NONE
 
 
 
@@ -35,9 +36,24 @@ class TurmaViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
     search_fields = ['numero', 'letra']
     
     ano_letivo_field = 'ano_letivo'  # Campo de filtro do AnoLetivoFilterMixin
+    
+    permission_classes = [Policy(
+        create=[GESTAO, SECRETARIA],
+        read=[GESTAO, SECRETARIA],
+        update=[GESTAO, SECRETARIA],
+        delete=NONE,
+        custom={
+            'anos_disponiveis': [GESTAO, SECRETARIA],
+            'toggle_ativo': [GESTAO, SECRETARIA],
+            'importar_arquivo': [GESTAO, SECRETARIA],
+            'download_modelo': [GESTAO, SECRETARIA],
+            'exportar_dados': [GESTAO, SECRETARIA],
+        }
+    )]
 
     def destroy(self, request, *args, **kwargs):
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
     @action(detail=False, methods=['get'], url_path='anos-disponiveis')
     def anos_disponiveis(self, request):

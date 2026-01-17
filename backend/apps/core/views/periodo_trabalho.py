@@ -6,6 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from apps.core.models import PeriodoTrabalho
 from apps.core.serializers import PeriodoTrabalhoSerializer
+from core_project.permissions import Policy, GESTAO, FUNCIONARIO
 
 
 
@@ -18,3 +19,11 @@ class PeriodoTrabalhoViewSet(viewsets.ModelViewSet):
     serializer_class = PeriodoTrabalhoSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['funcionario']
+    
+    permission_classes = [Policy(
+        create=[GESTAO],
+        read=FUNCIONARIO,
+        update=[GESTAO],
+        delete=[GESTAO],
+    )]
+

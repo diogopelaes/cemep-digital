@@ -31,19 +31,19 @@ export function AuthProvider({ children }) {
 
   const login = async (username, password) => {
     try {
-      // O endpoint JWT está em /api/token/, não em /api/v1/
-      const response = await axios.post('/api/token/', { username, password })
+      // Usa o endpoint de login híbrido (JWT + Sessão) para segurança de arquivos
+      const response = await api.post('/users/login/', { username, password })
       const { access, refresh } = response.data
-      
+
       localStorage.setItem('access_token', access)
       localStorage.setItem('refresh_token', refresh)
-      
+
       const userResponse = await api.get('/users/me/')
       setUser(userResponse.data)
-      
+
       toast.success('Login realizado com sucesso!')
       navigate('/dashboard')
-      
+
       return { success: true }
     } catch (error) {
       const message = error.response?.data?.detail || 'Erro ao fazer login'

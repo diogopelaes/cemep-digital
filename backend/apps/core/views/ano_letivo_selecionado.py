@@ -3,10 +3,10 @@ View para AnoLetivoSelecionado
 """
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 
 from apps.core.models import AnoLetivoSelecionado, AnoLetivo
 from apps.core.serializers import AnoLetivoSelecionadoSerializer
+from core_project.permissions import Policy, AUTHENTICATED, NONE
 
 
 class AnoLetivoSelecionadoViewSet(viewsets.ViewSet):
@@ -18,7 +18,13 @@ class AnoLetivoSelecionadoViewSet(viewsets.ViewSet):
     GET /core/ano-letivo-selecionado/ - Retorna o ano selecionado do usuário
     POST /core/ano-letivo-selecionado/ - Atualiza o ano selecionado
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [Policy(
+        create=AUTHENTICATED,
+        read=AUTHENTICATED,
+        update=AUTHENTICATED,
+        delete=NONE,
+    )]
+
 
     def list(self, request):
         """Retorna o ano letivo selecionado do usuário atual."""

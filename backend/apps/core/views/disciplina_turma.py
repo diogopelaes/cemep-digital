@@ -13,6 +13,7 @@ import pandas as pd
 from apps.core.models import DisciplinaTurma, Turma, Disciplina
 from apps.core.serializers import DisciplinaTurmaSerializer
 from apps.core.mixins import AnoLetivoFilterMixin
+from core_project.permissions import Policy, GESTAO, SECRETARIA
 
 
 
@@ -29,6 +30,19 @@ class DisciplinaTurmaViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
     filterset_fields = ['disciplina', 'turma', 'turma__ano_letivo']
     
     ano_letivo_field = 'turma__ano_letivo'  # Campo de filtro do AnoLetivoFilterMixin
+    
+    permission_classes = [Policy(
+        create=[GESTAO, SECRETARIA],
+        read=[GESTAO, SECRETARIA],
+        update=[GESTAO, SECRETARIA],
+        delete=[GESTAO, SECRETARIA],
+        custom={
+            'importar_arquivo': [GESTAO, SECRETARIA],
+            'importar_em_massa': [GESTAO, SECRETARIA],
+            'download_modelo': [GESTAO, SECRETARIA],
+        }
+    )]
+
 
     @action(detail=False, methods=['post'], url_path='importar-arquivo')
     @transaction.atomic

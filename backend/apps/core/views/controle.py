@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from apps.core.models import ControleRegistrosVisualizacao
 from apps.core.serializers import ControleRegistrosVisualizacaoSerializer
+from core_project.permissions import Policy, GESTAO
 
 
 
@@ -15,6 +16,18 @@ class ControleRegistrosVisualizacaoViewSet(viewsets.ModelViewSet):
     serializer_class = ControleRegistrosVisualizacaoSerializer
     filterset_fields = ['ano_letivo', 'bimestre', 'tipo', 'digitacao_futura']
     pagination_class = None
+    
+    permission_classes = [Policy(
+        create=[GESTAO],
+        read=[GESTAO],
+        update=[GESTAO],
+        delete=[GESTAO],
+        custom={
+            'por_ano': [GESTAO],
+            'salvar_lote': [GESTAO],
+        }
+    )]
+
 
     def get_queryset(self):
         """Permite filtrar por ano_letivo__ano via query param."""

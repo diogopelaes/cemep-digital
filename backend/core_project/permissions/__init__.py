@@ -23,6 +23,12 @@ from core_project.permissions.utils import (
 
 from core_project.permissions.policy import Policy
 
+from core_project.permissions.file_permissions import (
+    IsFuncionario,
+    IsGestaoOrSecretaria,
+    IsGestao,
+)
+
 __all__ = [
     # Tipos de usuário
     'GESTAO',
@@ -43,4 +49,9 @@ __all__ = [
     'DELETE_ACTIONS',
     # Policy class
     'Policy',
+    # Role-based permission classes
+    'IsFuncionario',
+    'IsGestaoOrSecretaria',
+    'IsGestao',
 ]
+

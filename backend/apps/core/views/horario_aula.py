@@ -1,11 +1,11 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 
 from apps.core.models import HorarioAula
 from apps.core.serializers import HorarioAulaSerializer
 from apps.core.mixins import AnoLetivoFilterMixin
+from core_project.permissions import Policy, GESTAO, AUTHENTICATED
 
 
 
@@ -26,3 +26,11 @@ class HorarioAulaViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
     ordering = ['dia_semana', 'hora_inicio']
     
     ano_letivo_field = 'ano_letivo__ano'  # Campo de filtro do AnoLetivoFilterMixin
+    
+    permission_classes = [Policy(
+        create=[GESTAO],
+        read=AUTHENTICATED,
+        update=[GESTAO],
+        delete=[GESTAO],
+    )]
+

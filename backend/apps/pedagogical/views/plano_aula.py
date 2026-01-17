@@ -18,6 +18,7 @@ from apps.core.serializers.habilidade import HabilidadeSerializer
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from core_project.permissions import Policy, PROFESSOR, FUNCIONARIO, OWNER, GESTAO
 
 class PlanoAulaViewSet(viewsets.ModelViewSet):
     """
@@ -26,6 +27,15 @@ class PlanoAulaViewSet(viewsets.ModelViewSet):
     - Update/Destroy: Owner (Professor criador) ou Gestão
     - Read: Funcionários (filtrado para professor ver apenas os seus)
     """
+    permission_classes = [Policy(
+        create=[PROFESSOR],
+        read=[FUNCIONARIO],
+        update=[OWNER, GESTAO],
+        delete=[OWNER, GESTAO],
+        custom={
+            'contexto_formulario': [PROFESSOR]
+        }
+    )]
     queryset = PlanoAula.objects.select_related(
         'professor__usuario', 
         'disciplina'
@@ -33,6 +43,7 @@ class PlanoAulaViewSet(viewsets.ModelViewSet):
         'turmas__curso', 
         'habilidades'
     )
+
     serializer_class = PlanoAulaSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['professor', 'disciplina', 'turmas', 'ano_letivo', 'bimestre']

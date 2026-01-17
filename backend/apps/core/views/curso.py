@@ -13,6 +13,7 @@ import pandas as pd
 
 from apps.core.models import Curso
 from apps.core.serializers import CursoSerializer
+from core_project.permissions import Policy, GESTAO, SECRETARIA, AUTHENTICATED, NONE
 
 
 
@@ -26,9 +27,22 @@ class CursoViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['is_active']
     search_fields = ['nome', 'sigla']
+    
+    permission_classes = [Policy(
+        create=[GESTAO, SECRETARIA],
+        read=[AUTHENTICATED],
+        update=[GESTAO, SECRETARIA],
+        delete=NONE,
+        custom={
+            'toggle_active': [GESTAO, SECRETARIA],
+            'importar_arquivo': [GESTAO, SECRETARIA],
+            'download_modelo': AUTHENTICATED,
+        }
+    )]
 
     def destroy(self, request, *args, **kwargs):
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
     @action(detail=True, methods=['post'], url_path='toggle-ativo')
     @transaction.atomic

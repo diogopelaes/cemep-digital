@@ -63,8 +63,20 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Configurações de Sessão e Cookies (Necessário para Protected Media)
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_HTTPONLY = True  # Proteção contra XSS (JS não acessa cookie)
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # 1 semana
+SESSION_COOKIE_NAME = 'sessionid'
+SESSION_COOKIE_SAMESITE = 'Lax'  # Proteção CSRF
+# Em produção, exige HTTPS
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 ROOT_URLCONF = 'core_project.urls'
 
@@ -130,7 +142,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Media files (Uploads)
-MEDIA_URL = '/media/'
+# SEGURANÇA: Todos os arquivos passam pelo ProtectedMediaView
+MEDIA_URL = '/api/v1/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # =============================================================================
@@ -170,6 +183,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # SessionAuthentication permite que o browser envie cookie em requests de imagem
+        # JWT continua sendo o método principal para APIs
+        'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -223,7 +239,8 @@ DJOSER = {
 }
 
 # CORS Configuration
-CORS_ALLOWED_ORIGINS = [os.getenv('FRONTEND_URL')] if os.getenv('FRONTEND_URL') else []
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
 CORS_ALLOW_CREDENTIALS = True
 
 

@@ -31,8 +31,8 @@ urlpatterns = [
     ])),
 ]
 
-# Serve media files in development (ainda necessário para DEBUG=True)
+# Serve static files in development (CSS, JS, etc - não sensíveis)
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
+    # NOTA: Media files NÃO são servidos aqui!
+    # Todos os arquivos de mídia devem passar pelo ProtectedMediaView em /api/v1/media/

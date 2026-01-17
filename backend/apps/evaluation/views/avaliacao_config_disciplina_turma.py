@@ -4,11 +4,25 @@ from rest_framework.response import Response
 from apps.evaluation.models import AvaliacaoConfigDisciplinaTurma
 from apps.evaluation.serializers.avaliacao_config_disciplina_turma import AvaliacaoConfigDisciplinaTurmaSerializer
 from apps.core.models import ProfessorDisciplinaTurma, DisciplinaTurma
+from core_project.permissions import Policy, PROFESSOR, NONE
 
 
 class AvaliacaoConfigDisciplinaTurmaViewSet(viewsets.ModelViewSet):
     queryset = AvaliacaoConfigDisciplinaTurma.objects.all()
     serializer_class = AvaliacaoConfigDisciplinaTurmaSerializer
+    
+    permission_classes = [Policy(
+        create=[PROFESSOR],
+        read=[PROFESSOR],
+        update=[PROFESSOR],
+        delete=NONE,
+        custom={
+            'pending': [PROFESSOR],
+            'my_configs': [PROFESSOR],
+            'bulk_create': [PROFESSOR],
+        }
+    )]
+
 
 
     def get_queryset(self):

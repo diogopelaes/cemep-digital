@@ -27,12 +27,29 @@ from apps.core.mixins import AnoLetivoFilterMixin
 
 from apps.pedagogical.validators import verificar_data_registro_aula, obter_datas_liberadas_cached
 from apps.pedagogical.services.faltas_service import FaltasService
+from core_project.permissions import Policy, PROFESSOR, FUNCIONARIO, OWNER
 
 
 class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
     """
     ViewSet unificado para Aulas e Faltas.
     """
+    permission_classes = [Policy(
+        create=[PROFESSOR],
+        read=[FUNCIONARIO],
+        update=OWNER,
+        delete=OWNER,
+        custom={
+            'opcoes_nova_aula': [PROFESSOR],
+            'contexto_formulario': [PROFESSOR],
+            'verificar_data_registro': [PROFESSOR],
+            'verificar_existente': [PROFESSOR],
+            'estudantes': [PROFESSOR],
+            'estudantes_por_turma': [PROFESSOR],
+            'atualizar_faltas': OWNER,
+        }
+    )]
+
     queryset = Aula.objects.select_related(
         'professor_disciplina_turma__professor__usuario',
         'professor_disciplina_turma__disciplina_turma__disciplina',

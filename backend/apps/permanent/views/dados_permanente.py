@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from apps.permanent.models import DadosPermanenteEstudante, DadosPermanenteResponsavel, RegistroProntuario
 from apps.permanent.serializers import DadosPermanenteEstudanteSerializer, DadosPermanenteResponsavelSerializer, RegistroProntuarioSerializer
+from core_project.permissions import Policy, GESTAO, SECRETARIA, NONE
 
 
 class DadosPermanenteEstudanteViewSet(viewsets.ModelViewSet):
@@ -13,6 +14,16 @@ class DadosPermanenteEstudanteViewSet(viewsets.ModelViewSet):
     serializer_class = DadosPermanenteEstudanteSerializer
     filter_backends = [DjangoFilterBackend]
     search_fields = ['nome', 'cpf']
+    
+    permission_classes = [Policy(
+        create=[GESTAO],
+        read=[GESTAO, SECRETARIA],
+        update=[GESTAO],
+        delete=NONE,
+        custom={
+            'historico_completo': [GESTAO, SECRETARIA]
+        }
+    )]
 
     def destroy(self, request, *args, **kwargs):
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -33,6 +44,14 @@ class DadosPermanenteResponsavelViewSet(viewsets.ModelViewSet):
     serializer_class = DadosPermanenteResponsavelSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['estudante']
+    
+    permission_classes = [Policy(
+        create=[GESTAO],
+        read=[GESTAO, SECRETARIA],
+        update=[GESTAO],
+        delete=NONE,
+    )]
+
 
     def destroy(self, request, *args, **kwargs):
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.core.models import Turma, ProfessorDisciplinaTurma, DisciplinaTurma
 from apps.pedagogical.serializers.minhas_turmas import MinhasTurmasSerializer, MinhaTurmaDetalhesSerializer
+from core_project.permissions import Policy, PROFESSOR, NONE
 
 
 class MinhasTurmasViewSet(viewsets.ReadOnlyModelViewSet):
@@ -12,8 +13,14 @@ class MinhasTurmasViewSet(viewsets.ReadOnlyModelViewSet):
     ViewSet para retornar as turmas onde o professor autenticado leciona.
     Otimizado para performance máxima com Annotation e Prefetch.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [Policy(
+        create=NONE,
+        read=[PROFESSOR],
+        update=NONE,
+        delete=NONE,
+    )]
     serializer_class = MinhasTurmasSerializer
+
 
     def get_queryset(self):
         user = self.request.user
