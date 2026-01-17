@@ -145,18 +145,24 @@ class Avaliacao(UUIDModel):
                 
         super().save(*args, **kwargs)
 
+    def delete(self, *args, user=None, **kwargs):
+        """
+        Sobrescreve delete para garantir que arquivos vinculados 
+        também sejam validados pelo usuário que está excluindo.
+        """
+        # Deleta arquivos vinculados passando o usuário
+        # Fazemos uma cópia da lista para evitar problemas de mutação durante o loop
+        arquivos_list = list(self.arquivos.all())
+        for arquivo in arquivos_list:
+            arquivo.delete(user=user)
+            
+        super().delete(*args, **kwargs)
+
     def __str__(self):
         return f"{self.titulo} ({self.get_tipo_display()})"
 
 
-@receiver(post_delete, sender=Avaliacao)
-def delete_arquivos_on_avaliacao_delete(sender, instance, **kwargs):
-    """
-    Deleta os registros de arquivos (e arquivos físicos via signal do Arquivo)
-    quando a avaliação é excluída.
-    """
-    for arquivo in instance.arquivos.all():
-        arquivo.delete()
+
 
 
 class ControleVisto(UUIDModel):

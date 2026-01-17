@@ -83,6 +83,10 @@ class AvaliacaoViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         context['request'] = self.request
         return context
 
+    def perform_destroy(self, instance):
+        """Garante que o usuário seja passado para a exclusão lógica/arquivos."""
+        instance.delete(user=self.request.user)
+
 
     # =========================================================================
     # ACTIONS: DADOS AUXILIARES

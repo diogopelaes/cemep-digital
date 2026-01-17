@@ -236,8 +236,9 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
             instance.arquivos.set(arquivos)
             
             # Deleta os arquivos que foram desvinculados
+            user = self.context.get('request').user if self.context.get('request') else None
             for arquivo in arquivos_para_deletar:
-                arquivo.delete()
+                arquivo.delete(user=user)
         
         return instance
 

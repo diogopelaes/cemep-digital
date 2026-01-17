@@ -13,7 +13,7 @@ from .models import (
 
 @admin.register(Arquivo)
 class ArquivoAdmin(admin.ModelAdmin):
-    list_display = ['nome_original', 'categoria', 'tamanho', 'mime_type', 'criado_em', 'criado_por']
+    list_display = ['id', 'nome_original', 'categoria', 'tamanho', 'mime_type', 'criado_em', 'criado_por']
     list_filter = ['categoria', 'ano_letivo', 'criado_em']
     search_fields = ['nome_original', 'criado_por__first_name', 'criado_por__last_name']
     raw_id_fields = ['criado_por']

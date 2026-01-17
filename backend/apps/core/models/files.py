@@ -156,6 +156,32 @@ class Arquivo(UUIDModel):
             except Exception:
                 pass
         super().save(*args, **kwargs)
+    
+    def delete(self, *args, user=None, **kwargs):
+        """
+        Sobrescreve delete para garantir que apenas o criador pode excluir.
+        
+        Args:
+            user: Usuário que está tentando deletar. Se omitido (None), 
+                  prossegue (permite deleções via CASCADE do sistema).
+            
+        Raises:
+            PermissionDenied: Se o usuário for informado e não for o criador.
+        """
+        from django.core.exceptions import PermissionDenied
+        
+        # Só valida se um usuário for explicitamente passado (ex: via View/Serializer)
+        if user is not None:
+            if self.criado_por_id:
+                if self.criado_por_id != user.id and not getattr(user, 'is_superuser', False):
+                    raise PermissionDenied("Apenas o criador do arquivo pode excluí-lo.")
+            else:
+                # Arquivo sem dono: apenas superusuário
+                if not getattr(user, 'is_superuser', False):
+                    raise PermissionDenied("Apenas administradores podem deletar este arquivo.")
+        
+        # O super().delete() dispara o signal post_delete (que limpa o GCS)
+        super().delete(*args, **kwargs)
 
 
 # Signals para limpeza física de arquivos

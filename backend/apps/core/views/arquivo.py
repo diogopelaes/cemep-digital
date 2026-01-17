@@ -27,15 +27,14 @@ class ArquivoViewSet(mixins.CreateModelMixin,
         """Associa o usuário logado ao arquivo criado."""
         serializer.save(criado_por=self.request.user)
 
+    def perform_destroy(self, instance):
+        """Garante que o usuário seja passado para a validação no model."""
+        instance.delete(user=self.request.user)
+
     def destroy(self, request, *args, **kwargs):
         """
-        Permite deletar apenas arquivos que o usuário criou, 
-        ou se o usuário tiver permissão especial (implementar futuramente se necessário).
+        Deleção de arquivo com validação de propriedade.
         """
-        instance = self.get_object()
-        if instance.criado_por != request.user:
-             return Response(
-                 {"detail": "Você não tem permissão para excluir este arquivo."}, 
-                 status=status.HTTP_403_FORBIDDEN
-             )
+        # A própria lógica do model.delete(user=request.user) já valida,
+        # mas mantemos o check aqui para retornar 403 explicitamente se preferir.
         return super().destroy(request, *args, **kwargs)

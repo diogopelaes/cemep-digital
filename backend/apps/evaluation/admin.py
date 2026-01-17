@@ -3,7 +3,7 @@ from .models import Avaliacao, ControleVisto, NotaAvaliacao, NotaBimestral, Aval
 
 @admin.register(Avaliacao)
 class AvaliacaoAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'tipo', 'valor', 'peso', 'bimestre', 'ano_letivo', 'data_inicio', 'data_fim')
+    list_display = ('id', 'titulo', 'tipo', 'valor', 'peso', 'bimestre', 'ano_letivo', 'data_inicio', 'data_fim')
     list_filter = ('tipo', 'bimestre', 'ano_letivo', 'data_inicio')
     search_fields = ('titulo', 'descricao')
     filter_horizontal = ('professores_disciplinas_turmas', 'arquivos', 'habilidades')
