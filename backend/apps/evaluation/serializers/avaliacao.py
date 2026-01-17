@@ -206,6 +206,12 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
             
         if arquivos:
             avaliacao.arquivos.set(arquivos)
+            # Força visibilidade AUTHENTICATED para arquivos de avaliação
+            # Garante que alunos consigam baixar
+            for arq in arquivos:
+                if arq.visibilidade != Arquivo.Visibilidade.AUTENTICADO:
+                    arq.visibilidade = Arquivo.Visibilidade.AUTENTICADO
+                    arq.save(update_fields=['visibilidade'])
 
         return avaliacao
     
@@ -234,6 +240,12 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
             arquivos_para_deletar = arquivos_atuais - arquivos_novos
             
             instance.arquivos.set(arquivos)
+
+            # Atualiza visibilidade dos novos arquivos
+            for arq in arquivos_novos:
+                if arq.visibilidade != Arquivo.Visibilidade.AUTENTICADO:
+                    arq.visibilidade = Arquivo.Visibilidade.AUTENTICADO
+                    arq.save(update_fields=['visibilidade'])
             
             # Deleta os arquivos que foram desvinculados
             user = self.context.get('request').user if self.context.get('request') else None

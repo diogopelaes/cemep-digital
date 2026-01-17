@@ -114,11 +114,25 @@ class Arquivo(UUIDModel):
         verbose_name='Categoria'
     )
     
-    # Metadados para organização do path (preenchidos antes do save)
+    class Visibilidade(models.TextChoices):
+        PRIVADO = 'PRIVATE', 'Privado (Dono/Gestão)'
+        AUTENTICADO = 'AUTHENTICATED', 'Qualquer Autenticado'
+        PUBLICO = 'PUBLIC', 'Público'
+
+    # Metadados para organização do path
     ano_letivo = models.PositiveSmallIntegerField(null=True, blank=True)
     turma_numero = models.PositiveSmallIntegerField(null=True, blank=True)
     turma_letra = models.CharField(max_length=1, null=True, blank=True)
     disciplina_sigla = models.CharField(max_length=20, null=True, blank=True)
+    
+    # Controle de Acesso
+    visibilidade = models.CharField(
+        max_length=20,
+        choices=Visibilidade.choices,
+        default=Visibilidade.PRIVADO,
+        verbose_name='Visibilidade',
+        help_text="Define quem pode acessar este arquivo."
+    )
     
     # Auditoria
     tamanho = models.PositiveIntegerField(

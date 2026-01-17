@@ -21,25 +21,44 @@ export function createPDF(options = {}) {
 }
 
 /**
- * Converte imagem URL para base64
+ * Converte imagem URL para base64 (com autenticação)
  * @param {string} url - URL da imagem
  * @returns {Promise<string>} Base64 da imagem
  */
 export async function imageToBase64(url) {
-    return new Promise((resolve, reject) => {
-        const img = new Image()
-        img.crossOrigin = 'anonymous'
-        img.onload = () => {
-            const canvas = document.createElement('canvas')
-            canvas.width = img.width
-            canvas.height = img.height
-            const ctx = canvas.getContext('2d')
-            ctx.drawImage(img, 0, 0)
-            resolve(canvas.toDataURL('image/jpeg', 0.95))
+    try {
+        // Faz fetch com token de autenticação
+        const token = localStorage.getItem('access_token')
+        const headers = token ? { Authorization: `Bearer ${token}` } : {}
+
+        const response = await fetch(url, { headers })
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`)
         }
-        img.onerror = reject
-        img.src = url
-    })
+
+        const blob = await response.blob()
+
+        // Converte blob para base64 via canvas para garantir formato JPEG
+        return new Promise((resolve, reject) => {
+            const img = new Image()
+            img.onload = () => {
+                const canvas = document.createElement('canvas')
+                canvas.width = img.width
+                canvas.height = img.height
+                const ctx = canvas.getContext('2d')
+                ctx.drawImage(img, 0, 0)
+                URL.revokeObjectURL(img.src)
+                resolve(canvas.toDataURL('image/jpeg', 0.95))
+            }
+            img.onerror = () => {
+                URL.revokeObjectURL(img.src)
+                reject(new Error('Failed to load image'))
+            }
+            img.src = URL.createObjectURL(blob)
+        })
+    } catch (error) {
+        throw error
+    }
 }
 
 /**

@@ -1,4 +1,4 @@
-from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
@@ -7,9 +7,10 @@ from apps.academic.models import MatriculaTurma
 from django.db.models import F
 from core_project.permissions import Policy, FUNCIONARIO, NONE
 
-class CarometroView(APIView):
+
+class CarometroViewSet(ViewSet):
     """
-    API View para exibir o Fotos (lista de fotos e nomes) de uma turma.
+    ViewSet para exibir o Fotos (lista de fotos e nomes) de uma turma.
     """
     permission_classes = [Policy(
         create=NONE,
@@ -18,8 +19,7 @@ class CarometroView(APIView):
         delete=NONE,
     )]
 
-
-    def get(self, request, turma_id):
+    def retrieve(self, request, turma_id=None):
         turma = get_object_or_404(Turma, pk=turma_id)
         
         # Filtra alunos ativos na turma (Cursando, mas talvez incluir outros status se necessário)

@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     EstudanteViewSet, ResponsavelViewSet,
     MatriculaCEMEPViewSet, MatriculaTurmaViewSet, AtestadoViewSet,
-    CarometroView
+    CarometroViewSet
 )
 
 router = DefaultRouter()
@@ -18,6 +18,6 @@ router.register('atestados', AtestadoViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('turmas/<str:turma_id>/carometro/', CarometroView.as_view(), name='turma-carometro'),
+    path('turmas/<str:turma_id>/carometro/', CarometroViewSet.as_view({'get': 'retrieve'}), name='turma-carometro'),
 ]
 

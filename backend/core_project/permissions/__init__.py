@@ -13,6 +13,9 @@ from core_project.permissions.constants import (
     NONE,
     FUNCIONARIO,
     FUNCIONARIO_TIPOS,
+    ADMIN,
+    DOCENTE,
+    ALUNO,
 )
 
 from core_project.permissions.utils import (
@@ -22,12 +25,6 @@ from core_project.permissions.utils import (
 )
 
 from core_project.permissions.policy import Policy
-
-from core_project.permissions.file_permissions import (
-    IsFuncionario,
-    IsGestaoOrSecretaria,
-    IsGestao,
-)
 
 __all__ = [
     # Tipos de usuário
@@ -43,15 +40,14 @@ __all__ = [
     'NONE',
     'FUNCIONARIO',
     'FUNCIONARIO_TIPOS',
+    'ADMIN',
+    'DOCENTE',
+    'ALUNO',
     # Actions sets
     'READ_ACTIONS',
     'UPDATE_ACTIONS',
     'DELETE_ACTIONS',
     # Policy class
     'Policy',
-    # Role-based permission classes
-    'IsFuncionario',
-    'IsGestaoOrSecretaria',
-    'IsGestao',
 ]
 
