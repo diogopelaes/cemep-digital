@@ -10,7 +10,7 @@ from .models import (
 
 @admin.register(Tarefa)
 class TarefaAdmin(admin.ModelAdmin):
-    list_display = ['titulo', 'prazo', 'concluido', 'criador']
+    list_display = ['titulo', 'prazo', 'concluido', 'criado_por']
     list_filter = ['concluido', 'prazo']
     filter_horizontal = ['funcionarios']
 
@@ -36,7 +36,7 @@ class NotificacaoHTPCAdmin(admin.ModelAdmin):
 
 @admin.register(Aviso)
 class AvisoAdmin(admin.ModelAdmin):
-    list_display = ['titulo', 'data_aviso', 'criador']
+    list_display = ['titulo', 'data_aviso', 'criado_por']
     list_filter = ['data_aviso']
     filter_horizontal = ['destinatarios']
 

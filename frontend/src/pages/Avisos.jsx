@@ -71,7 +71,7 @@ export default function Avisos() {
                         {aviso.titulo}
                       </h3>
                       <p className="text-sm text-slate-500 mt-1">
-                        Por: {aviso.criador?.usuario?.first_name || 'Sistema'} • {formatDateBR(aviso.data_aviso, {
+                        Por: {aviso.criado_por?.usuario?.first_name || 'Sistema'} • {formatDateBR(aviso.data_aviso, {
                           day: '2-digit',
                           month: 'long',
                           year: 'numeric',

@@ -58,6 +58,12 @@ class PlanoAula(UUIDModel):
         verbose_name = 'Plano de Aula'
         verbose_name_plural = 'Planos de Aula'
         ordering = ['-data_inicio']
+    
+    def is_owner(self, user) -> bool:
+        if not user or user.is_anonymous or not user.is_active:
+            return False
+
+        return self.professor.usuario == user
 
     def save(self, *args, **kwargs):
         if self.ano_letivo and self.data_inicio:
@@ -107,6 +113,15 @@ class Aula(UUIDModel):
         verbose_name_plural = 'Aulas'
         ordering = ['-data']
         unique_together = ['professor_disciplina_turma', 'data']
+    
+    def is_owner(self, user) -> bool:
+        if not user or user.is_anonymous or not user.is_active:
+            return False
+
+        return ProfessorDisciplinaTurma.objects.filter(
+            disciplina_turma=self.professor_disciplina_turma.disciplina_turma,
+            professor__usuario=user
+        ).exists()
     
     def __str__(self):
         return f"{self.professor_disciplina_turma} - {self.data.strftime('%d/%m/%Y')}"
@@ -192,12 +207,6 @@ class Faltas(UUIDModel):
 
 class DescritorOcorrenciaPedagogica(UUIDModel):
     """Tipos de ocorrências pedagógicas cadastradas pelo gestor."""
-    
-    gestor = models.ForeignKey(
-        Funcionario,
-        on_delete=models.CASCADE,
-        related_name='tipos_ocorrencia_criados'
-    )
     texto = models.CharField(max_length=100, verbose_name='Descrição do Tipo')
     ativo = models.BooleanField(default=True)
     
@@ -313,6 +322,12 @@ class Atividade(UUIDModel):
         related_name='atividades_criadas',
         verbose_name='Criado por'
     )
+
+    def is_owner(self, user) -> bool:
+        if not user or user.is_anonymous or not user.is_active:
+            return False
+
+        return self.criado_por == user
     
     class Meta:
         verbose_name = 'Atividade'

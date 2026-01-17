@@ -18,6 +18,12 @@ class AtestadoSerializer(serializers.ModelSerializer):
         source='usuario_alvo',
         write_only=True
     )
+
+    def is_owner(self, user) -> bool:
+        if not user or user.is_anonymous or not user.is_active:
+            return False
+
+        return self.criado_por == user
     
     class Meta:
         model = Atestado

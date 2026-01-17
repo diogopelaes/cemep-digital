@@ -18,6 +18,10 @@ class AnoLetivoSelecionado(UUIDModel):
         verbose_name='Ano Letivo'
     )
 
+    def is_owner(self, user) -> bool:
+        """Verifica se o usuário é o dono desta seleção."""
+        return self.usuario == user
+
     class Meta:
         verbose_name = 'Ano Letivo Selecionado'
         verbose_name_plural = 'Anos Letivos Selecionados'

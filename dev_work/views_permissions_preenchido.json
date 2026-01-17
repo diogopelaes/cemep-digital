@@ -1,0 +1,1251 @@
+{
+    "academic": {
+        "atestado": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\atestado.py",
+            "viewsets": [
+                {
+                    "name": "AtestadoViewSet",
+                    "description": "Controle de acesso para AtestadoViewSet - Atestados médicos dos estudantes",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "download": [
+                                "GESTAO",
+                                "SECRETARIA",
+                                "OWNER"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user) → False (UUIDModel base). Action download usa lógica inline: GESTAO/SECRETARIA ou atestado.usuario_alvo == user.",
+                    "notes": "Docstring: Leitura: Funcionários | Escrita: Gestão/Secretaria. Action download tem permissão customizada inline."
+                }
+            ]
+        },
+        "carometro": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\carometro.py",
+            "viewsets": [
+                {
+                    "name": "CarometroView",
+                    "description": "Controle de acesso para CarometroView - Fotos e nomes dos estudantes de uma turma",
+                    "policy": {
+                        "create": "NONE",
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": "NONE",
+                        "delete": "NONE",
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "APIView simples (GET only). Apenas funcionários devem ver fotos dos estudantes."
+                }
+            ]
+        },
+        "estudante": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\estudante.py",
+            "viewsets": [
+                {
+                    "name": "EstudanteViewSet",
+                    "description": "Controle de acesso para EstudanteViewSet - Cadastro de estudantes",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "criar_completo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "importar_arquivo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "download_modelo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "atualizar_completo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "upload_foto": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "remover_foto": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "prontuario": [
+                                "FUNCIONARIO"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: CRU: Gestão/Secretaria | Delete: Bloqueado. Destroy retorna 405."
+                }
+            ]
+        },
+        "matricula": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\matricula.py",
+            "viewsets": [
+                {
+                    "name": "MatriculaCEMEPViewSet",
+                    "description": "Controle de acesso para MatriculaCEMEPViewSet - Matrículas no CEMEP",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": "NONE",
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Funcionários | Escrita: Gestão/Secretaria"
+                },
+                {
+                    "name": "MatriculaTurmaViewSet",
+                    "description": "Controle de acesso para MatriculaTurmaViewSet - Enturmação de estudantes",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "custom": {
+                            "estudantes_elegiveis": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "enturmar_lote": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "download_modelo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "importar_arquivo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Funcionários | Escrita: Gestão/Secretaria"
+                }
+            ]
+        },
+        "responsavel": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\responsavel.py",
+            "viewsets": [
+                {
+                    "name": "ResponsavelViewSet",
+                    "description": "Controle de acesso para ResponsavelViewSet - Cadastro de responsáveis",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "vincular_estudante": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Funcionários | Escrita: Gestão/Secretaria"
+                }
+            ]
+        }
+    },
+    "core": {
+        "ano_letivo_selecionado": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\ano_letivo_selecionado.py",
+            "viewsets": [
+                {
+                    "name": "AnoLetivoSelecionadoViewSet",
+                    "description": "Controle de acesso para AnoLetivoSelecionadoViewSet - Seleção de ano letivo do usuário",
+                    "policy": {
+                        "create": "AUTHENTICATED",
+                        "read": "AUTHENTICATED",
+                        "update": "AUTHENTICATED",
+                        "delete": "NONE",
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user) → True se self.usuario == user (cada usuário pode atualizar apenas sua própria seleção).",
+                    "notes": "Docstring: Qualquer usuário autenticado pode ler/atualizar sua própria seleção. OWNER via is_owner do model."
+                }
+            ]
+        },
+        "calendario": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\calendario.py",
+            "viewsets": [
+                {
+                    "name": "AnoLetivoViewSet",
+                    "description": "Controle de acesso para AnoLetivoViewSet - Configuração do calendário escolar",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": "AUTHENTICATED",
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": [
+                            "GESTAO"
+                        ],
+                        "custom": {
+                            "calendario": "AUTHENTICATED",
+                            "add_dia_nao_letivo": [
+                                "GESTAO"
+                            ],
+                            "add_dia_letivo_extra": [
+                                "GESTAO"
+                            ],
+                            "remove_dia": [
+                                "GESTAO"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Público (Autenticado) | Escrita: Gestão"
+                }
+            ]
+        },
+        "controle": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\controle.py",
+            "viewsets": [
+                {
+                    "name": "ControleRegistrosVisualizacaoViewSet",
+                    "description": "Controle de acesso para ControleRegistrosVisualizacaoViewSet - Janelas de digitação de notas/frequência",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": [
+                            "GESTAO"
+                        ],
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": [
+                            "GESTAO"
+                        ],
+                        "custom": {
+                            "por_ano": [
+                                "GESTAO"
+                            ],
+                            "salvar_lote": [
+                                "GESTAO"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Apenas GESTÃO pode CRUD."
+                }
+            ]
+        },
+        "curso": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\curso.py",
+            "viewsets": [
+                {
+                    "name": "CursoViewSet",
+                    "description": "Controle de acesso para CursoViewSet - Cadastro de cursos",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "toggle_active": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "importar_arquivo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "download_modelo": "AUTHENTICATED"
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Gestão / Secretaria | Escrita: Gestão / Secretaria. Action download_modelo usa AllowAny."
+                }
+            ]
+        },
+        "disciplina": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\disciplina.py",
+            "viewsets": [
+                {
+                    "name": "DisciplinaViewSet",
+                    "description": "Controle de acesso para DisciplinaViewSet - Cadastro de disciplinas",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": "AUTHENTICATED",
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "toggle_active": [
+                                "GESTAO"
+                            ],
+                            "importar_arquivo": [
+                                "GESTAO"
+                            ],
+                            "download_modelo": "AUTHENTICATED"
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Público (Autenticado) | Escrita: Gestão. Action download_modelo usa AllowAny."
+                }
+            ]
+        },
+        "disciplina_turma": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\disciplina_turma.py",
+            "viewsets": [
+                {
+                    "name": "DisciplinaTurmaViewSet",
+                    "description": "Controle de acesso para DisciplinaTurmaViewSet - Vínculo disciplina-turma",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "custom": {
+                            "importar_arquivo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "importar_em_massa": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "download_modelo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Gestão / Secretaria | Escrita: Gestão / Secretaria"
+                }
+            ]
+        },
+        "funcionario": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\funcionario.py",
+            "viewsets": [
+                {
+                    "name": "FuncionarioViewSet",
+                    "description": "Controle de acesso para FuncionarioViewSet - Cadastro de funcionários",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "toggle_ativo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "importar_arquivo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "download_modelo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "criar_completo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "atualizar_completo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Gestão, Secretaria, Professor, Monitor | Escrita: Gestão, Secretaria"
+                }
+            ]
+        },
+        "grade_horaria": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\grade_horaria.py",
+            "viewsets": [
+                {
+                    "name": "GradeHorariaViewSet",
+                    "description": "Controle de acesso para GradeHorariaViewSet - Grade horária das turmas",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "custom": {
+                            "dados_edicao": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "salvar_lote": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Focado nas operações de edição administrativa (Gestão/Secretaria)."
+                }
+            ]
+        },
+        "habilidade": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\habilidade.py",
+            "viewsets": [
+                {
+                    "name": "HabilidadeViewSet",
+                    "description": "Controle de acesso para HabilidadeViewSet - Cadastro de habilidades BNCC",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": "AUTHENTICATED",
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Qualquer autenticado | Escrita: Gestão e Secretaria"
+                }
+            ]
+        },
+        "horario_aula": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\horario_aula.py",
+            "viewsets": [
+                {
+                    "name": "HorarioAulaViewSet",
+                    "description": "Controle de acesso para HorarioAulaViewSet - Horários de aula por período",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": "AUTHENTICATED",
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": [
+                            "GESTAO"
+                        ],
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Público (Autenticado) | Escrita: Gestão"
+                }
+            ]
+        },
+        "media": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\media.py",
+            "viewsets": [
+                {
+                    "name": "ProtectedMediaView",
+                    "description": "Controle de acesso para ProtectedMediaView - Arquivos de mídia protegidos",
+                    "policy": {
+                        "create": "NONE",
+                        "read": "AUTHENTICATED",
+                        "update": "NONE",
+                        "delete": "NONE",
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "NÃO USA Policy. Controle baseado em pastas (MEDIA_ACCESS_LEVELS). Ver documentação no código."
+                }
+            ]
+        },
+        "periodo_trabalho": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\periodo_trabalho.py",
+            "viewsets": [
+                {
+                    "name": "PeriodoTrabalhoViewSet",
+                    "description": "Controle de acesso para PeriodoTrabalhoViewSet - Períodos de trabalho dos funcionários",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": [
+                            "GESTAO"
+                        ],
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Gestão, Secretaria, Professor, Monitor | Escrita: Gestão"
+                }
+            ]
+        },
+        "professor_disciplina_turma": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\professor_disciplina_turma.py",
+            "viewsets": [
+                {
+                    "name": "ProfessorDisciplinaTurmaViewSet",
+                    "description": "Controle de acesso para ProfessorDisciplinaTurmaViewSet - Atribuição professor-disciplina-turma",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Gestão, Secretaria, Professor, Monitor | Escrita: Gestão, Secretaria"
+                }
+            ]
+        },
+        "turma": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\turma.py",
+            "viewsets": [
+                {
+                    "name": "TurmaViewSet",
+                    "description": "Controle de acesso para TurmaViewSet - Cadastro de turmas",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "anos_disponiveis": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "toggle_ativo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "importar_arquivo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "download_modelo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ],
+                            "exportar_dados": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Gestão / Secretaria | Escrita: Gestão / Secretaria"
+                }
+            ]
+        }
+    },
+    "evaluation": {
+        "avaliacao": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\evaluation\\views\\avaliacao.py",
+            "viewsets": [
+                {
+                    "name": "AvaliacaoViewSet",
+                    "description": "Controle de acesso para AvaliacaoViewSet - Avaliações criadas por professores",
+                    "policy": {
+                        "create": [
+                            "PROFESSOR"
+                        ],
+                        "read": "AUTHENTICATED",
+                        "update": "OWNER",
+                        "delete": "OWNER",
+                        "custom": {
+                            "choices": [
+                                "PROFESSOR"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user) → True se user possui vínculo (PDT) com TODAS as DisciplinaTurmas da avaliação. Permite múltiplos owners (regente + substituto) se ambos cobrem o mesmo escopo.",
+                    "notes": "Docstring: Create: Apenas PROFESSOR | Read: Qualquer autenticado | Update/Delete: OWNER (via is_owner do model Avaliacao)"
+                }
+            ]
+        },
+        "avaliacao_config_disciplina_turma": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\evaluation\\views\\avaliacao_config_disciplina_turma.py",
+            "viewsets": [
+                {
+                    "name": "AvaliacaoConfigDisciplinaTurmaViewSet",
+                    "description": "Controle de acesso para AvaliacaoConfigDisciplinaTurmaViewSet - Config de forma de cálculo de notas",
+                    "policy": {
+                        "create": [
+                            "PROFESSOR"
+                        ],
+                        "read": [
+                            "PROFESSOR"
+                        ],
+                        "update": [
+                            "PROFESSOR"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "pending": [
+                                "PROFESSOR"
+                            ],
+                            "my_configs": [
+                                "PROFESSOR"
+                            ],
+                            "bulk_create": [
+                                "PROFESSOR"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user) → True se user é um dos professores vinculados à DisciplinaTurma (via ProfessorDisciplinaTurma).",
+                    "notes": "ViewSet filtrado para mostrar apenas configs das turmas do professor logado. Professor define forma de cálculo."
+                }
+            ]
+        },
+        "avaliacao_digitar_nota": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\evaluation\\views\\avaliacao_digitar_nota.py",
+            "viewsets": [
+                {
+                    "name": "DigitarNotaViewSet",
+                    "description": "Controle de acesso para DigitarNotaViewSet - Digitação de notas de avaliações",
+                    "policy": {
+                        "create": "NONE",
+                        "read": [
+                            "OWNER"
+                        ],
+                        "update": "NONE",
+                        "delete": "NONE",
+                        "custom": {
+                            "estudantes": [
+                                "PROFESSOR"
+                            ],
+                            "salvar": [
+                                "OWNER"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user) → Delega para avaliacao.is_owner(user). True se user possui vínculo (PDT) com TODAS as DisciplinaTurmas da avaliação.",
+                    "notes": "ReadOnlyMixin + Actions. Professor digita notas das avaliações que é owner."
+                }
+            ]
+        }
+    },
+    "management": {
+        "dashboard": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\management\\views\\dashboard.py",
+            "viewsets": [
+                {
+                    "name": "DashboardViewSet",
+                    "description": "Controle de acesso para DashboardViewSet - Estatísticas e dados consolidados",
+                    "policy": {
+                        "create": "NONE",
+                        "read": "AUTHENTICATED",
+                        "update": "NONE",
+                        "delete": "NONE",
+                        "custom": {
+                            "estatisticas": "AUTHENTICATED"
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Qualquer usuário autenticado. Retorna dados específicos conforme tipo de usuário."
+                }
+            ]
+        },
+        "tarefa": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\management\\views\\tarefa.py",
+            "viewsets": [
+                {
+                    "name": "TarefaViewSet",
+                    "description": "Controle de acesso para TarefaViewSet - Tarefas administrativas",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": [
+                            "GESTAO"
+                        ],
+                        "custom": {
+                            "concluir": [
+                                "FUNCIONARIO"
+                            ],
+                            "minhas_tarefas": [
+                                "FUNCIONARIO"
+                            ],
+                            "relatorio": [
+                                "GESTAO"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Funcionários | Escrita: Gestão. Funcionário pode ver suas tarefas e marcar como concluída."
+                },
+                {
+                    "name": "NotificacaoTarefaViewSet",
+                    "description": "Controle de acesso para NotificacaoTarefaViewSet - Notificações de tarefas",
+                    "policy": {
+                        "create": "NONE",
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "FUNCIONARIO"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "marcar_visualizado": "OWNER",
+                            "minhas_notificacoes": "OWNER"
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Funcionário pode ver e marcar como visualizadas apenas suas próprias notificações."
+                }
+            ]
+        },
+        "htpc": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\management\\views\\htpc.py",
+            "viewsets": [
+                {
+                    "name": "ReuniaoHTPCViewSet",
+                    "description": "Controle de acesso para ReuniaoHTPCViewSet - Reuniões HTPC",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": [
+                            "GESTAO"
+                        ],
+                        "custom": {
+                            "registrar_presenca": [
+                                "GESTAO"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Funcionários | Escrita: Gestão"
+                },
+                {
+                    "name": "NotificacaoHTPCViewSet",
+                    "description": "Controle de acesso para NotificacaoHTPCViewSet - Notificações de HTPC",
+                    "policy": {
+                        "create": "NONE",
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "FUNCIONARIO"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "marcar_visualizado": "OWNER"
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Funcionário pode ver e marcar como visualizadas apenas suas próprias notificações."
+                }
+            ]
+        },
+        "aviso": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\management\\views\\aviso.py",
+            "viewsets": [
+                {
+                    "name": "AvisoViewSet",
+                    "description": "Controle de acesso para AvisoViewSet - Avisos gerais",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": "AUTHENTICATED",
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "custom": {
+                            "meus_avisos": "AUTHENTICATED"
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Todos autenticados | Escrita: Gestão/Secretaria"
+                },
+                {
+                    "name": "AvisoVisualizacaoViewSet",
+                    "description": "Controle de acesso para AvisoVisualizacaoViewSet - Visualização de avisos",
+                    "policy": {
+                        "create": "NONE",
+                        "read": "AUTHENTICATED",
+                        "update": "OWNER",
+                        "delete": "NONE",
+                        "custom": {
+                            "marcar_visualizado": "OWNER"
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Usuário pode marcar como visualizado apenas seus próprios avisos."
+                }
+            ]
+        }
+    },
+    "pedagogical": {
+        "aula_faltas": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\aula_faltas.py",
+            "viewsets": [
+                {
+                    "name": "AulaFaltasViewSet",
+                    "description": "Controle de acesso para AulaFaltasViewSet - Registro de aulas e faltas",
+                    "policy": {
+                        "create": [
+                            "PROFESSOR"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": "OWNER",
+                        "delete": "OWNER",
+                        "custom": {
+                            "opcoes_nova_aula": [
+                                "PROFESSOR"
+                            ],
+                            "contexto_formulario": [
+                                "PROFESSOR"
+                            ],
+                            "verificar_data_registro": [
+                                "PROFESSOR"
+                            ],
+                            "verificar_existente": [
+                                "PROFESSOR"
+                            ],
+                            "estudantes": [
+                                "PROFESSOR"
+                            ],
+                            "estudantes_por_turma": [
+                                "PROFESSOR"
+                            ],
+                            "atualizar_faltas": "OWNER"
+                        }
+                    },
+                    "owner_method": "is_owner(user) → True se user possui vínculo (PDT) com a MESMA DisciplinaTurma (permite regente ou substituto).",
+                    "notes": "Professor cria aulas e registra faltas nas suas turmas. OWNER para edição via is_owner do model Aula."
+                }
+            ]
+        },
+        "minhas_turmas": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\minhas_turmas.py",
+            "viewsets": [
+                {
+                    "name": "MinhasTurmasViewSet",
+                    "description": "Controle de acesso para MinhasTurmasViewSet - Turmas do professor",
+                    "policy": {
+                        "create": "NONE",
+                        "read": [
+                            "PROFESSOR"
+                        ],
+                        "update": "NONE",
+                        "delete": "NONE",
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "ReadOnlyModelViewSet. Professor vê apenas suas próprias turmas (via queryset filtrado)."
+                }
+            ]
+        },
+        "ocorrencia": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\ocorrencia.py",
+            "viewsets": [
+                {
+                    "name": "DescritorOcorrenciaPedagogicaViewSet",
+                    "description": "Controle de acesso para DescritorOcorrenciaPedagogicaViewSet - Tipos de ocorrência",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": [
+                            "GESTAO"
+                        ],
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Funcionários | Escrita: Gestão"
+                },
+                {
+                    "name": "OcorrenciaPedagogicaViewSet",
+                    "description": "Controle de acesso para OcorrenciaPedagogicaViewSet - Ocorrências disciplinares",
+                    "policy": {
+                        "create": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "read": "AUTHENTICATED",
+                        "update": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "delete": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Todos autenticados | Escrita: Gestão/Secretaria. Responsável pode ver ocorrências dos seus dependentes."
+                },
+                {
+                    "name": "OcorrenciaResponsavelCienteViewSet",
+                    "description": "Controle de acesso para OcorrenciaResponsavelCienteViewSet - Ciência do responsável",
+                    "policy": {
+                        "create": "NONE",
+                        "read": [
+                            "RESPONSAVEL",
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "update": "OWNER",
+                        "delete": "NONE",
+                        "custom": {
+                            "marcar_ciente": "OWNER"
+                        }
+                    },
+                    "owner_method": "is_owner(user) → False (UUIDModel base). Ownership via lógica inline na action: responsavel.usuario == request.user.",
+                    "notes": "Responsável pode marcar ciência apenas das suas próprias notificações. Verificação inline na view."
+                }
+            ]
+        },
+        "plano_aula": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\plano_aula.py",
+            "viewsets": [
+                {
+                    "name": "PlanoAulaViewSet",
+                    "description": "Controle de acesso para PlanoAulaViewSet - Planos de aula",
+                    "policy": {
+                        "create": [
+                            "PROFESSOR"
+                        ],
+                        "read": [
+                            "FUNCIONARIO"
+                        ],
+                        "update": [
+                            "OWNER",
+                            "GESTAO"
+                        ],
+                        "delete": [
+                            "OWNER",
+                            "GESTAO"
+                        ],
+                        "custom": {
+                            "contexto_formulario": [
+                                "PROFESSOR"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user) → True se professor.usuario == user (criador do plano é owner).",
+                    "notes": "Docstring: Create: Professor | Update/Destroy: Owner ou Gestão | Read: Funcionários. Professor vê apenas seus planos via queryset."
+                }
+            ]
+        }
+    },
+    "permanent": {
+        "__init__": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\permanent\\views\\__init__.py",
+            "viewsets": [
+                {
+                    "name": "DadosPermanenteEstudanteViewSet",
+                    "description": "Controle de acesso para DadosPermanenteEstudanteViewSet - Dados permanentes do estudante",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "historico_completo": [
+                                "GESTAO",
+                                "SECRETARIA"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Gestão/Secretaria | Escrita: Gestão"
+                },
+                {
+                    "name": "DadosPermanenteResponsavelViewSet",
+                    "description": "Controle de acesso para DadosPermanenteResponsavelViewSet - Dados permanentes do responsável",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": "NONE",
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Gestão/Secretaria | Escrita: Gestão"
+                },
+                {
+                    "name": "HistoricoEscolarViewSet",
+                    "description": "Controle de acesso para HistoricoEscolarViewSet - Histórico escolar",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": "NONE",
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Gestão/Secretaria | Escrita: Gestão"
+                },
+                {
+                    "name": "HistoricoEscolarAnoLetivoViewSet",
+                    "description": "Controle de acesso para HistoricoEscolarAnoLetivoViewSet - Histórico por ano letivo",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": "NONE",
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Gestão/Secretaria | Escrita: Gestão"
+                },
+                {
+                    "name": "HistoricoEscolarNotasViewSet",
+                    "description": "Controle de acesso para HistoricoEscolarNotasViewSet - Notas do histórico",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": [
+                            "GESTAO",
+                            "SECRETARIA"
+                        ],
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": "NONE",
+                        "custom": {}
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura: Gestão/Secretaria | Escrita: Gestão"
+                },
+                {
+                    "name": "RegistroProntuarioViewSet",
+                    "description": "Controle de acesso para RegistroProntuarioViewSet - Prontuário do estudante",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": [
+                            "GESTAO"
+                        ],
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "download_anexo": [
+                                "GESTAO"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Docstring: Leitura e Escrita: Gestão. Dados sensíveis."
+                }
+            ]
+        }
+    },
+    "users": {
+        "user": {
+            "file_path": "C:\\Projects\\cemep-digital\\backend\\apps\\users\\views\\user.py",
+            "viewsets": [
+                {
+                    "name": "UserViewSet",
+                    "description": "Controle de acesso para UserViewSet - Gerenciamento de usuários",
+                    "policy": {
+                        "create": [
+                            "GESTAO"
+                        ],
+                        "read": [
+                            "GESTAO"
+                        ],
+                        "update": [
+                            "GESTAO"
+                        ],
+                        "delete": "NONE",
+                        "custom": {
+                            "me": "AUTHENTICATED",
+                            "toggle_dark_mode": "AUTHENTICATED",
+                            "send_credentials": [
+                                "GESTAO"
+                            ]
+                        }
+                    },
+                    "owner_method": "is_owner(user)",
+                    "notes": "Escrita exclusiva de Gestão. Actions 'me' e 'toggle_dark_mode' são para o próprio usuário (AUTHENTICATED)."
+                }
+            ]
+        }
+    }
+}

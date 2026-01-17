@@ -432,6 +432,12 @@ class Atestado(UUIDModel):
         null=True,
         related_name='atestados_criados'
     )
+
+    def is_owner(self, user) -> bool:
+        if not user or user.is_anonymous or not user.is_active:
+            return False
+
+        return self.criado_por == user
     
     class Meta:
         verbose_name = 'Atestado'

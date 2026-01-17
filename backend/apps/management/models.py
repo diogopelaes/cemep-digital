@@ -11,7 +11,7 @@ from datetime import datetime
 
 def get_anexo_path(instance, filename):
     """
-    Gera o caminho do arquivo baseado no tipo de anexo, usuário criador e data.
+    Gera o caminho do arquivo baseado no tipo de anexo, usuário criado_por e data.
     Estrutura: {tipo}/{username}/{ano}/{mes}/{dia}/{filename}
     """
     model_type = type(instance).__name__
@@ -21,7 +21,7 @@ def get_anexo_path(instance, filename):
 
     if model_type == 'TarefaAnexo':
         base_folder = 'tarefas'
-        username = instance.tarefa.criador.username
+        username = instance.tarefa.criado_por.username
     elif model_type == 'TarefaRespostaAnexo':
         base_folder = 'tarefas/respostas'
         username = instance.resposta.funcionario.usuario.username
@@ -30,7 +30,7 @@ def get_anexo_path(instance, filename):
         username = instance.reuniao.quem_registrou.username
     elif model_type == 'AvisoAnexo':
         base_folder = 'avisos'
-        username = instance.aviso.criador.usuario.username
+        username = instance.aviso.criado_por.usuario.username
 
     return f"{base_folder}/{username}/{date_path}/{filename}"
 
@@ -49,12 +49,15 @@ class Tarefa(UUIDModel):
     concluido = models.BooleanField(default=False, verbose_name='Concluído')
     data_conclusao = models.DateTimeField(null=True, blank=True)
     data_cadastro = models.DateTimeField(auto_now_add=True)
-    criador = models.ForeignKey(
+    criado_por = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='tarefas_criadas'
     )
     # documento removed (moved to TarefaAnexo)
+
+    def is_owner(self, user):
+        return self.criado_por == user
     
     class Meta:
         verbose_name = 'Tarefa'
@@ -232,7 +235,7 @@ class Aviso(UUIDModel):
     texto = RichTextField(verbose_name='Texto')
     # documento removed (moved to AvisoAnexo)
     data_aviso = models.DateTimeField(auto_now_add=True)
-    criador = models.ForeignKey(
+    criado_por = models.ForeignKey(
         Funcionario,
         on_delete=models.CASCADE,
         related_name='avisos_criados'
@@ -242,6 +245,9 @@ class Aviso(UUIDModel):
         related_name='avisos_recebidos',
         verbose_name='Destinatários'
     )
+    
+    def is_owner(self, user):
+        return self.criado_por == user
     
     class Meta:
         verbose_name = 'Aviso'

@@ -3,7 +3,7 @@ from .models import Avaliacao, ControleVisto, NotaAvaliacao, NotaBimestral, Aval
 
 @admin.register(Avaliacao)
 class AvaliacaoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'titulo', 'tipo', 'valor', 'peso', 'bimestre', 'ano_letivo', 'data_inicio', 'data_fim')
+    list_display = ('titulo', 'tipo', 'valor', 'peso', 'bimestre', 'ano_letivo', 'data_inicio', 'data_fim')
     list_filter = ('tipo', 'bimestre', 'ano_letivo', 'data_inicio')
     search_fields = ('titulo', 'descricao')
     filter_horizontal = ('professores_disciplinas_turmas', 'arquivos', 'habilidades')
@@ -15,7 +15,7 @@ class AvaliacaoAdmin(admin.ModelAdmin):
 class ControleVistoAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'matricula_turma', 'professor_disciplina_turma', 'visto', 'bimestre', 'data_visto')
     list_filter = ('visto', 'bimestre', 'data_visto')
-    search_fields = ('titulo', 'matricula_turma__matricula_cemep__estudante__nome_social', 'professor_disciplina_turma__professor__nome_social')
+    search_fields = ('titulo', 'matricula_turma__matricula_cemep__estudante__nome_social', 'professor_disciplina_turma__professor__usuario__first_name')
     filter_horizontal = ('arquivos',)
     raw_id_fields = ('matricula_turma', 'professor_disciplina_turma')
 
@@ -34,17 +34,17 @@ class NotaAvaliacaoAdmin(admin.ModelAdmin):
 @admin.register(NotaBimestral)
 class NotaBimestralAdmin(admin.ModelAdmin):
     list_display = (
-        'matricula_turma', 'professor_disciplina_turma', 'bimestre', 
+        'matricula_turma', 'disciplina', 'bimestre', 
         'nota_calculo_avaliacoes', 'nota_recuperacao', 'nota_final',
         'ficou_de_recuperacao_status'
     )
     list_filter = (
         'bimestre', 
-        'professor_disciplina_turma__disciplina_turma__disciplina',
-        'professor_disciplina_turma__disciplina_turma__turma'
+        'disciplina',
+        'matricula_turma__turma'
     )
-    search_fields = ('matricula_turma__matricula_cemep__estudante__nome_social', 'professor_disciplina_turma__professor__nome_social')
-    raw_id_fields = ('matricula_turma', 'professor_disciplina_turma', 'criado_por')
+    search_fields = ('matricula_turma__matricula_cemep__estudante__nome_social', 'disciplina__nome')
+    raw_id_fields = ('matricula_turma', 'disciplina', 'criado_por')
     readonly_fields = ('criado_em', 'atualizado_em')
 
     @admin.display(description='Recup.', boolean=True)
@@ -62,4 +62,3 @@ class AvaliacaoConfigDisciplinaTurmaAdmin(admin.ModelAdmin):
     )
     raw_id_fields = ('ano_letivo', 'disciplina_turma')
     ordering = ('-ano_letivo', 'disciplina_turma__turma__numero')
-

@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
-from apps.core.models import Funcionario, DisciplinaTurma, ProfessorDisciplinaTurma, UUIDModel, Arquivo, AnoLetivo, Habilidade
+from apps.core.models import Funcionario, DisciplinaTurma, ProfessorDisciplinaTurma, UUIDModel, Arquivo, AnoLetivo, Habilidade, Disciplina
 from apps.academic.models import Estudante, MatriculaTurma
 from django.db.models.signals import m2m_changed, post_delete
 from django.dispatch import receiver
@@ -108,6 +108,40 @@ class Avaliacao(UUIDModel):
         related_name='avaliacoes_criadas',
         verbose_name='Criado por'
     )
+
+    def is_owner(self, user) -> bool:
+        if not user or user.is_anonymous or not user.is_active:
+            return False
+
+        return self.criado_por == user
+
+    def is_owner(self, user) -> bool:
+        """
+        Garante que o usuário seja considerado owner se ele possuir vínculo 
+        com TODAS as turmas/disciplinas que esta avaliação abrange.
+        Isso permite que múltiplos professores (regente/substituto) sejam 
+        owners simultaneamente se ambos compartilharem o mesmo escopo.
+        """
+        if not user or user.is_anonymous or not user.is_active:
+            return False
+            
+        # Pega a lista de IDs únicos de DisciplinaTurma (o escopo da avaliação)
+        dt_ids_escopo = list(self.professores_disciplinas_turmas.values_list(
+            'disciplina_turma_id', flat=True
+        ).distinct())
+
+        if not dt_ids_escopo:
+            return False
+            
+        # Conta em quantas dessas turmas/disciplinas do escopo o usuário logado está presente
+        # através da sua própria atribuição (ProfessorDisciplinaTurma)
+        cobertura_usuario = self.professores_disciplinas_turmas.filter(
+            professor__usuario=user
+        ).values('disciplina_turma_id').distinct().count()
+        
+        return cobertura_usuario == len(dt_ids_escopo)
+
+
       
     class Meta:
         verbose_name = 'Avaliação'
@@ -160,9 +194,6 @@ class Avaliacao(UUIDModel):
 
     def __str__(self):
         return f"{self.titulo} ({self.get_tipo_display()})"
-
-
-
 
 
 class ControleVisto(UUIDModel):
@@ -257,11 +288,21 @@ class NotaAvaliacao(UUIDModel):
         related_name='notas_avaliacoes_criadas',
         verbose_name='Criado por'
     )
+
+    def is_owner(self, user) -> bool:
+        if not user or user.is_anonymous or not user.is_active:
+            return False
+
+        return self.criado_por == user
     
     class Meta:
         verbose_name = 'Nota de Avaliação'
         verbose_name_plural = 'Notas de Avaliações'
         unique_together = ['avaliacao', 'matricula_turma']
+
+    def is_owner(self, user):
+        return self.avaliacao.is_owner(user)
+    
     
     def __str__(self):
         return f"{self.avaliacao} - {self.matricula_turma}"
@@ -306,8 +347,8 @@ class NotaBimestral(UUIDModel):
         on_delete=models.CASCADE,
         related_name='notas_bimestrais'
     )
-    professor_disciplina_turma = models.ForeignKey(
-        ProfessorDisciplinaTurma,
+    disciplina = models.ForeignKey(
+        Disciplina,
         on_delete=models.CASCADE,
         related_name='notas_bimestrais'
     )
@@ -348,29 +389,36 @@ class NotaBimestral(UUIDModel):
         related_name='notas_bimestrais_criadas',
         verbose_name='Criado por'
     )
+
+    def is_owner(self, user) -> bool:
+        if not user or user.is_anonymous or not user.is_active:
+            return False
+
+        return self.criado_por == user
     
     class Meta:
         verbose_name = 'Nota Bimestral'
         verbose_name_plural = 'Notas Bimestrais'
-        unique_together = ['matricula_turma', 'professor_disciplina_turma', 'bimestre']
+        unique_together = ['matricula_turma', 'disciplina', 'bimestre']
         ordering = ['matricula_turma']
     
+    def is_owner(self, user) -> bool:
+        if not user or user.is_anonymous or not user.is_active:
+            return False
+            
+        return ProfessorDisciplinaTurma.objects.filter(
+            professor__usuario=user,
+            disciplina_turma__disciplina=self.disciplina,
+            disciplina_turma__turma=self.matricula_turma.turma
+        ).exists()
+
     def __str__(self):
-        return f"{self.matricula_turma} - {self.professor_disciplina_turma.disciplina_turma.disciplina}"
+        return f"{self.matricula_turma} - {self.disciplina}"
     
     def clean(self):
         from django.core.exceptions import ValidationError
         
-        # 1. Matrícula e professor/disciplina devem ser da mesma turma
-        if self.matricula_turma_id and self.professor_disciplina_turma_id:
-            turma_matricula = self.matricula_turma.turma_id
-            turma_professor = self.professor_disciplina_turma.disciplina_turma.turma_id
-            if turma_matricula != turma_professor:
-                raise ValidationError(
-                    "A matrícula e o professor/disciplina devem pertencer à mesma turma."
-                )
-        
-        # 2. nota_final não pode ser menor que nota_calculo_avaliacoes
+        # nota_final não pode ser menor que nota_calculo_avaliacoes
         if self.nota_final is not None and self.nota_calculo_avaliacoes is not None:
             if self.nota_final < self.nota_calculo_avaliacoes:
                 raise ValidationError({
@@ -442,6 +490,19 @@ class AvaliacaoConfigDisciplinaTurma(UUIDModel):
         verbose_name = 'Configuração de Avaliação da Disciplina na Turma'
         verbose_name_plural = 'Configurações de Avaliação das Disciplinas nas Turmas'
         unique_together = ['ano_letivo', 'disciplina_turma']
+
+    def is_owner(self, user) -> bool:
+        """
+        Retorna True se o usuário for um dos professores vinculados 
+        a esta DisciplinaTurma e estiver com a conta ativa.
+        """
+        if not user or user.is_anonymous or not user.is_active:
+            return False
+            
+        return ProfessorDisciplinaTurma.objects.filter(
+            disciplina_turma=self.disciplina_turma,
+            professor__usuario=user
+        ).exists()
 
 
     def __str__(self):
