@@ -243,6 +243,12 @@ FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
 CORS_ALLOW_CREDENTIALS = True
 
+# CSRF Configuration
+CSRF_TRUSTED_ORIGINS = [FRONTEND_URL]
+# Adiciona variantes comuns de localhost para evitar problemas em dev
+if 'localhost' in FRONTEND_URL:
+    CSRF_TRUSTED_ORIGINS.append('http://127.0.0.1:5173')
+
 
 
 # Email Configuration

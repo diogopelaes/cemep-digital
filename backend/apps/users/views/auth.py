@@ -16,9 +16,9 @@ class LoginView(APIView):
     Login híbrido: Sessão (para Mídia) + JWT (para API).
     
     Cria um cookie de sessão HttpOnly que permite ao navegador acessar
-    imagens protegidas automaticamente, sem scripts.
     """
     permission_classes = [AllowAny]
+    authentication_classes = []  # Remove autenticação padrão (e verificação CSRF)
     
     def post(self, request):
         username = request.data.get('username', '')

@@ -1,32 +1,3 @@
-"""
-================================================================================
-SISTEMA DE MÍDIA PROTEGIDA - CEMEP Digital
-================================================================================
-
-Este módulo implementa controle de acesso a arquivos de mídia.
-
-REGRAS DE ACESSO:
------------------
-1. Arquivos em `public/`: Acesso livre (logos, assets)
-2. Arquivos registrados no model `Arquivo`: Verificação de ownership
-   - OWNER: Usuário que fez upload pode acessar
-   - FUNCIONARIO: Gestão, Secretaria, Professor, Monitor podem acessar
-3. Arquivos não registrados (legacy/direto no model): Requer autenticação
-
-FLUXO DE VERIFICAÇÃO:
----------------------
-1. Se path começa com `public/` → AllowAny
-2. Busca registro `Arquivo` pelo path do arquivo
-3. Se encontrado → Verifica is_owner() OU is_funcionario()
-4. Se não encontrado → Apenas autenticados (fallback seguro)
-
-COMPATIBILIDADE GCS:
---------------------
-- Em produção (USE_GCS=True): Gera Signed URL temporária
-- Em desenvolvimento: Serve arquivo do disco local
-
-================================================================================
-"""
 import os
 import mimetypes
 from django.conf import settings
@@ -130,7 +101,7 @@ class ProtectedMediaView(APIView):
             is_browser_request = 'text/html' in accept_header
             
             if is_browser_request:
-                from django.conf import settings
+                # from django.conf import settings (Usando global)
                 if reason == "not_authenticated":
                     # Redireciona para login
                     return redirect(f"{settings.FRONTEND_URL}/login")
