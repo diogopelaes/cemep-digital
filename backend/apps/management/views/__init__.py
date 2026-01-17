@@ -18,13 +18,11 @@ from apps.management.serializers import (
     ReuniaoHTPCSerializer, NotificacaoHTPCSerializer,
     AvisoSerializer, AvisoVisualizacaoSerializer
 )
-from apps.users.permissions import (
-    GestaoWriteFuncionarioReadMixin, GestaoSecretariaWritePublicReadMixin
-)
+
 from apps.core.models import Funcionario
 
 
-class TarefaViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+class TarefaViewSet(viewsets.ModelViewSet):
     """ViewSet de Tarefas. Leitura: Funcionários | Escrita: Gestão"""
     queryset = Tarefa.objects.select_related('criador').prefetch_related('funcionarios__usuario')
     serializer_class = TarefaSerializer
@@ -87,7 +85,7 @@ class NotificacaoTarefaViewSet(viewsets.ModelViewSet):
         return Response(self.get_serializer(notificacoes, many=True).data)
 
 
-class ReuniaoHTPCViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+class ReuniaoHTPCViewSet(viewsets.ModelViewSet):
     """ViewSet de HTPC. Leitura: Funcionários | Escrita: Gestão"""
     queryset = ReuniaoHTPC.objects.select_related('quem_registrou').prefetch_related('presentes__usuario')
     serializer_class = ReuniaoHTPCSerializer
@@ -124,7 +122,7 @@ class NotificacaoHTPCViewSet(viewsets.ModelViewSet):
         return Response(NotificacaoHTPCSerializer(obj).data)
 
 
-class AvisoViewSet(GestaoSecretariaWritePublicReadMixin, viewsets.ModelViewSet):
+class AvisoViewSet(viewsets.ModelViewSet):
     """ViewSet de Avisos. Leitura: Todos autenticados | Escrita: Gestão/Secretaria"""
     queryset = Aviso.objects.select_related('criador__usuario').prefetch_related('destinatarios')
     serializer_class = AvisoSerializer

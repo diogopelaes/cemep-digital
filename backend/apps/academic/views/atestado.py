@@ -9,10 +9,10 @@ from django.http import FileResponse
 
 from apps.academic.models import Atestado
 from apps.academic.serializers import AtestadoSerializer
-from apps.users.permissions import GestaoSecretariaWriteFuncionarioReadMixin
 
 
-class AtestadoViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+
+class AtestadoViewSet(viewsets.ModelViewSet):
     """ViewSet de Atestados. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
     queryset = Atestado.objects.select_related('usuario_alvo', 'criado_por').all()
     serializer_class = AtestadoSerializer

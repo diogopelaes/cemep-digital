@@ -9,10 +9,10 @@ from django.shortcuts import get_object_or_404
 
 from apps.academic.models import Estudante, Responsavel, ResponsavelEstudante
 from apps.academic.serializers import ResponsavelSerializer, ResponsavelCreateSerializer
-from apps.users.permissions import GestaoSecretariaWriteFuncionarioReadMixin
 
 
-class ResponsavelViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+
+class ResponsavelViewSet(viewsets.ModelViewSet):
     """ViewSet de Responsáveis. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
     queryset = Responsavel.objects.select_related('usuario').all()
     filter_backends = [DjangoFilterBackend]

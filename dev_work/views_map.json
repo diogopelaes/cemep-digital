@@ -1,0 +1,230 @@
+{
+    "app academic": {
+        "path": "C:\\Projects\\cemep-digital\\backend\\apps\\academic",
+        "views": [
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\atestado.py",
+                "classes": [
+                    "AtestadoViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\carometro.py",
+                "classes": [
+                    "CarometroView"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\estudante.py",
+                "classes": [
+                    "EstudanteViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\matricula.py",
+                "classes": [
+                    "MatriculaCEMEPViewSet",
+                    "MatriculaTurmaViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\academic\\views\\responsavel.py",
+                "classes": [
+                    "ResponsavelViewSet"
+                ]
+            }
+        ]
+    },
+    "app core": {
+        "path": "C:\\Projects\\cemep-digital\\backend\\apps\\core",
+        "views": [
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\ano_letivo_selecionado.py",
+                "classes": [
+                    "AnoLetivoSelecionadoViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\calendario.py",
+                "classes": [
+                    "AnoLetivoViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\controle.py",
+                "classes": [
+                    "ControleRegistrosVisualizacaoViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\curso.py",
+                "classes": [
+                    "CursoViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\disciplina.py",
+                "classes": [
+                    "DisciplinaViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\disciplina_turma.py",
+                "classes": [
+                    "DisciplinaTurmaViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\funcionario.py",
+                "classes": [
+                    "FuncionarioViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\grade_horaria.py",
+                "classes": [
+                    "GradeHorariaViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\habilidade.py",
+                "classes": [
+                    "HabilidadeViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\horario_aula.py",
+                "classes": [
+                    "HorarioAulaViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\media.py",
+                "classes": [
+                    "ProtectedMediaView"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\periodo_trabalho.py",
+                "classes": [
+                    "PeriodoTrabalhoViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\professor_disciplina_turma.py",
+                "classes": [
+                    "ProfessorDisciplinaTurmaViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\core\\views\\turma.py",
+                "classes": [
+                    "TurmaViewSet"
+                ]
+            }
+        ]
+    },
+    "app evaluation": {
+        "path": "C:\\Projects\\cemep-digital\\backend\\apps\\evaluation",
+        "views": [
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\evaluation\\views\\avaliacao.py",
+                "classes": [
+                    "AvaliacaoViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\evaluation\\views\\avaliacao_config_disciplina_turma.py",
+                "classes": [
+                    "AvaliacaoConfigDisciplinaTurmaViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\evaluation\\views\\avaliacao_digitar_nota.py",
+                "classes": [
+                    "DigitarNotaViewSet"
+                ]
+            }
+        ]
+    },
+    "app management": {
+        "path": "C:\\Projects\\cemep-digital\\backend\\apps\\management",
+        "views": [
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\management\\views\\dashboard.py",
+                "classes": [
+                    "DashboardViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\management\\views\\__init__.py",
+                "classes": [
+                    "TarefaViewSet",
+                    "NotificacaoTarefaViewSet",
+                    "ReuniaoHTPCViewSet",
+                    "NotificacaoHTPCViewSet",
+                    "AvisoViewSet",
+                    "AvisoVisualizacaoViewSet"
+                ]
+            }
+        ]
+    },
+    "app pedagogical": {
+        "path": "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical",
+        "views": [
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\aula_faltas.py",
+                "classes": [
+                    "AulaFaltasViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\minhas_turmas.py",
+                "classes": [
+                    "MinhasTurmasViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\ocorrencia.py",
+                "classes": [
+                    "DescritorOcorrenciaPedagogicaViewSet",
+                    "OcorrenciaPedagogicaViewSet",
+                    "OcorrenciaResponsavelCienteViewSet"
+                ]
+            },
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\pedagogical\\views\\plano_aula.py",
+                "classes": [
+                    "PlanoAulaViewSet"
+                ]
+            }
+        ]
+    },
+    "app permanent": {
+        "path": "C:\\Projects\\cemep-digital\\backend\\apps\\permanent",
+        "views": [
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\permanent\\views\\__init__.py",
+                "classes": [
+                    "DadosPermanenteEstudanteViewSet",
+                    "DadosPermanenteResponsavelViewSet",
+                    "HistoricoEscolarViewSet",
+                    "HistoricoEscolarAnoLetivoViewSet",
+                    "HistoricoEscolarNotasViewSet",
+                    "RegistroProntuarioViewSet"
+                ]
+            }
+        ]
+    },
+    "app users": {
+        "path": "C:\\Projects\\cemep-digital\\backend\\apps\\users",
+        "views": [
+            {
+                "file": "C:\\Projects\\cemep-digital\\backend\\apps\\users\\views\\user.py",
+                "classes": [
+                    "UserViewSet"
+                ]
+            }
+        ]
+    }
+}

@@ -6,10 +6,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from apps.core.models import ProfessorDisciplinaTurma
 from apps.core.serializers import ProfessorDisciplinaTurmaSerializer
-from apps.users.permissions import GestaoWriteFuncionarioReadMixin, AnoLetivoFilterMixin
+from apps.core.mixins import AnoLetivoFilterMixin
 
 
-class ProfessorDisciplinaTurmaViewSet(AnoLetivoFilterMixin, GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+
+class ProfessorDisciplinaTurmaViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
     """
     ViewSet para ProfessorDisciplinaTurma.
     Leitura: Gestão, Secretaria, Professor, Monitor | Escrita: Gestão

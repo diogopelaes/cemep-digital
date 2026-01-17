@@ -4,12 +4,12 @@ from rest_framework.response import Response
 from apps.evaluation.models import AvaliacaoConfigDisciplinaTurma
 from apps.evaluation.serializers.avaliacao_config_disciplina_turma import AvaliacaoConfigDisciplinaTurmaSerializer
 from apps.core.models import ProfessorDisciplinaTurma, DisciplinaTurma
-from apps.users.permissions import IsProfessor
+
 
 class AvaliacaoConfigDisciplinaTurmaViewSet(viewsets.ModelViewSet):
     queryset = AvaliacaoConfigDisciplinaTurma.objects.all()
     serializer_class = AvaliacaoConfigDisciplinaTurmaSerializer
-    permission_classes = [IsProfessor]
+
 
     def get_queryset(self):
         user = self.request.user

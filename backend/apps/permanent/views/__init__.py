@@ -19,10 +19,10 @@ from apps.permanent.serializers import (
     HistoricoEscolarSerializer, HistoricoEscolarAnoLetivoSerializer,
     HistoricoEscolarNotasSerializer, RegistroProntuarioSerializer
 )
-from apps.users.permissions import GestaoOnlyMixin, GestaoWriteSecretariaReadMixin
 
 
-class DadosPermanenteEstudanteViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
+
+class DadosPermanenteEstudanteViewSet(viewsets.ModelViewSet):
     """ViewSet de Dados Permanentes (Estudante). Leitura: Gestão/Secretaria | Escrita: Gestão"""
     queryset = DadosPermanenteEstudante.objects.prefetch_related('responsaveis')
     serializer_class = DadosPermanenteEstudanteSerializer
@@ -42,7 +42,7 @@ class DadosPermanenteEstudanteViewSet(GestaoWriteSecretariaReadMixin, viewsets.M
         })
 
 
-class DadosPermanenteResponsavelViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
+class DadosPermanenteResponsavelViewSet(viewsets.ModelViewSet):
     """ViewSet de Dados Permanentes (Responsável). Leitura: Gestão/Secretaria | Escrita: Gestão"""
     queryset = DadosPermanenteResponsavel.objects.select_related('estudante')
     serializer_class = DadosPermanenteResponsavelSerializer
@@ -53,7 +53,7 @@ class DadosPermanenteResponsavelViewSet(GestaoWriteSecretariaReadMixin, viewsets
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class HistoricoEscolarViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
+class HistoricoEscolarViewSet(viewsets.ModelViewSet):
     """ViewSet de Histórico Escolar. Leitura: Gestão/Secretaria | Escrita: Gestão"""
     queryset = HistoricoEscolar.objects.select_related('estudante').prefetch_related('anos_letivos__notas')
     serializer_class = HistoricoEscolarSerializer
@@ -64,7 +64,7 @@ class HistoricoEscolarViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelView
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class HistoricoEscolarAnoLetivoViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
+class HistoricoEscolarAnoLetivoViewSet(viewsets.ModelViewSet):
     """ViewSet de Histórico por Ano Letivo. Leitura: Gestão/Secretaria | Escrita: Gestão"""
     queryset = HistoricoEscolarAnoLetivo.objects.select_related('historico__estudante').prefetch_related('notas')
     serializer_class = HistoricoEscolarAnoLetivoSerializer
@@ -75,7 +75,7 @@ class HistoricoEscolarAnoLetivoViewSet(GestaoWriteSecretariaReadMixin, viewsets.
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class HistoricoEscolarNotasViewSet(GestaoWriteSecretariaReadMixin, viewsets.ModelViewSet):
+class HistoricoEscolarNotasViewSet(viewsets.ModelViewSet):
     """ViewSet de Histórico de Notas. Leitura: Gestão/Secretaria | Escrita: Gestão"""
     queryset = HistoricoEscolarNotas.objects.select_related('ano_letivo_ref')
     serializer_class = HistoricoEscolarNotasSerializer
@@ -86,7 +86,7 @@ class HistoricoEscolarNotasViewSet(GestaoWriteSecretariaReadMixin, viewsets.Mode
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class RegistroProntuarioViewSet(GestaoOnlyMixin, viewsets.ModelViewSet):
+class RegistroProntuarioViewSet(viewsets.ModelViewSet):
     """ViewSet de Prontuário. Leitura e Escrita: Gestão"""
     queryset = RegistroProntuario.objects.all()
     serializer_class = RegistroProntuarioSerializer

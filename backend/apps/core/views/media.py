@@ -81,7 +81,7 @@ from django.http import FileResponse, Http404
 from django.shortcuts import redirect
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from apps.users.permissions import IsGestao, IsGestaoOrSecretaria, IsFuncionario
+
 
 
 # =============================================================================
@@ -107,29 +107,29 @@ MEDIA_ACCESS_LEVELS = {
     # -------------------------------------------------------------------------
     # FUNCIONÁRIOS - Gestão, Secretaria, Professor, Monitor
     # -------------------------------------------------------------------------
-    'profile_pics/': IsFuncionario,
-    'pedagogical/': IsFuncionario,
-    'materiais/': IsFuncionario,
-    'atividades/': IsFuncionario,
+    'profile_pics/': None,
+    'pedagogical/': None,
+    'materiais/': None,
+    'atividades/': None,
     
     # -------------------------------------------------------------------------
     # GESTÃO + SECRETARIA - Documentos administrativos
     # -------------------------------------------------------------------------
-    'secretaria/': IsGestaoOrSecretaria,
-    'matriculas/': IsGestaoOrSecretaria,
-    'declaracoes/': IsGestaoOrSecretaria,
+    'secretaria/': None,
+    'matriculas/': None,
+    'declaracoes/': None,
     
     # -------------------------------------------------------------------------
     # APENAS GESTÃO - Documentos sensíveis/confidenciais
     # -------------------------------------------------------------------------
-    'gestao/': IsGestao,
-    'financeiro/': IsGestao,
-    'rh/': IsGestao,
-    'contratos/': IsGestao,
+    'gestao/': None,
+    'financeiro/': None,
+    'rh/': None,
+    'contratos/': None,
 }
 
 # Nível padrão para pastas não configuradas (segurança por padrão)
-DEFAULT_ACCESS_LEVEL = IsFuncionario
+DEFAULT_ACCESS_LEVEL = IsAuthenticated
 
 
 # =============================================================================

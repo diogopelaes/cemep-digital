@@ -21,12 +21,12 @@ from apps.core.serializers import (
     FuncionarioSerializer, FuncionarioCreateSerializer, 
     FuncionarioCompletoSerializer, FuncionarioUpdateSerializer
 )
-from apps.users.permissions import GestaoWriteFuncionarioReadMixin
+
 from apps.users.models import User
 from apps.users.utils import send_credentials_email
 
 
-class FuncionarioViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+class FuncionarioViewSet(viewsets.ModelViewSet):
     """
     ViewSet para Funcionario.
     Leitura: Gestão, Secretaria, Professor, Monitor | Escrita: Gestão

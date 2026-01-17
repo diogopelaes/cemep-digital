@@ -1,0 +1,19 @@
+{
+    "description": "Definição dos Tipos de Usuário e Conceitos de Permissão aceitos no views_permissions.json",
+    "roles": {
+        "GESTAO": "Usuários com perfil de Gestão Escolar (Diretoria, Coordenação)",
+        "SECRETARIA": "Funcionários da Secretaria Acadêmica",
+        "PROFESSOR": "Professores da instituição",
+        "MONITOR": "Monitores de apoio pedagógico",
+        "ESTUDANTE": "Alunos matriculados",
+        "RESPONSAVEL": "Responsáveis financeiros/pedagógicos pelos alunos"
+    },
+    "groups": {
+        "FUNCIONARIO": "Grupo agrupador que inclui: GESTAO, SECRETARIA, PROFESSOR, MONITOR"
+    },
+    "concepts": {
+        "AUTHENTICATED": "Qualquer usuário que esteja logado, independente do tipo",
+        "OWNER": "O dono do registro (validado pelo método is_owner do modelo)",
+        "NONE": "Bloqueio explícito. Ninguém tem permissão (nem mesmo admin via API)"
+    }
+}

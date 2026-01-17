@@ -23,7 +23,8 @@ from apps.pedagogical.serializers.aula_faltas import (
 )
 from apps.academic.models import MatriculaTurma
 from apps.core.models import ProfessorDisciplinaTurma
-from apps.users.permissions import IsOwnerProfessorStrict, AnoLetivoFilterMixin
+from apps.core.mixins import AnoLetivoFilterMixin
+
 from apps.pedagogical.validators import verificar_data_registro_aula, obter_datas_liberadas_cached
 from apps.pedagogical.services.faltas_service import FaltasService
 
@@ -38,7 +39,7 @@ class AulaFaltasViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         'professor_disciplina_turma__disciplina_turma__turma__curso'
     ).prefetch_related('faltas__estudante__usuario')
     
-    permission_classes = [IsOwnerProfessorStrict]
+
     filter_backends = [DjangoFilterBackend]
     
     # Filtros

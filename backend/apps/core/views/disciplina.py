@@ -13,10 +13,10 @@ import pandas as pd
 
 from apps.core.models import Disciplina
 from apps.core.serializers import DisciplinaSerializer
-from apps.users.permissions import GestaoWritePublicReadMixin
 
 
-class DisciplinaViewSet(GestaoWritePublicReadMixin, viewsets.ModelViewSet):
+
+class DisciplinaViewSet(viewsets.ModelViewSet):
     """
     ViewSet para Disciplina.
     Leitura: Público (Autenticado) | Escrita: Gestão

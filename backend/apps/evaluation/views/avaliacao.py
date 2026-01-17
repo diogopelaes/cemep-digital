@@ -17,7 +17,8 @@ from apps.evaluation.serializers import (
     AvaliacaoConfigDisciplinaTurmaSerializer
 )
 from apps.core.models import ProfessorDisciplinaTurma
-from apps.users.permissions import IsCreatorOrReadOnly, AnoLetivoFilterMixin
+from apps.core.mixins import AnoLetivoFilterMixin
+
 from django.utils import timezone
 from apps.evaluation.config import get_config_from_ano_letivo
 
@@ -41,7 +42,7 @@ class AvaliacaoViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
         'habilidades'
     )
     
-    permission_classes = [IsCreatorOrReadOnly]
+
     filter_backends = [DjangoFilterBackend]
     
     # Filtros

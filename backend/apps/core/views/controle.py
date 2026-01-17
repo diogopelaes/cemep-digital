@@ -3,10 +3,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from apps.core.models import ControleRegistrosVisualizacao
 from apps.core.serializers import ControleRegistrosVisualizacaoSerializer
-from apps.users.permissions import GestaoOnlyMixin
 
 
-class ControleRegistrosVisualizacaoViewSet(GestaoOnlyMixin, viewsets.ModelViewSet):
+
+class ControleRegistrosVisualizacaoViewSet(viewsets.ModelViewSet):
     """
     ViewSet para ControleRegistrosVisualizacao.
     Apenas GESTÃO pode CRUD.

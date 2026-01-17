@@ -12,10 +12,11 @@ import pandas as pd
 
 from apps.core.models import DisciplinaTurma, Turma, Disciplina
 from apps.core.serializers import DisciplinaTurmaSerializer
-from apps.users.permissions import GestaoSecretariaMixin, AnoLetivoFilterMixin
+from apps.core.mixins import AnoLetivoFilterMixin
 
 
-class DisciplinaTurmaViewSet(AnoLetivoFilterMixin, GestaoSecretariaMixin, viewsets.ModelViewSet):
+
+class DisciplinaTurmaViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
     """
     ViewSet para DisciplinaTurma.
     Leitura: Gestão / Secretaria | Escrita: Gestão / Secretaria

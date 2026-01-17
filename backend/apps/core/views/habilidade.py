@@ -6,10 +6,10 @@ from rest_framework.filters import SearchFilter
 
 from apps.core.models import Habilidade
 from apps.core.serializers import HabilidadeSerializer
-from apps.users.permissions import GestaoSecretariaWritePublicReadMixin
 
 
-class HabilidadeViewSet(GestaoSecretariaWritePublicReadMixin, viewsets.ModelViewSet):
+
+class HabilidadeViewSet(viewsets.ModelViewSet):
     """
     ViewSet para Habilidade.
     Leitura: Qualquer autenticado | Escrita: Gestão e Secretaria

@@ -5,10 +5,11 @@ from rest_framework.filters import OrderingFilter
 
 from apps.core.models import HorarioAula
 from apps.core.serializers import HorarioAulaSerializer
-from apps.users.permissions import GestaoWritePublicReadMixin, AnoLetivoFilterMixin
+from apps.core.mixins import AnoLetivoFilterMixin
 
 
-class HorarioAulaViewSet(AnoLetivoFilterMixin, GestaoWritePublicReadMixin, viewsets.ModelViewSet):
+
+class HorarioAulaViewSet(AnoLetivoFilterMixin, viewsets.ModelViewSet):
     """
     ViewSet para HorarioAula.
     Leitura: Público (Autenticado) | Escrita: Gestão

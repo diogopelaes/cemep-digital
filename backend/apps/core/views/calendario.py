@@ -3,9 +3,9 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from apps.core.models import AnoLetivo, DiaLetivoExtra, DiaNaoLetivo
 from apps.core.serializers import AnoLetivoSerializer, DiaLetivoExtraSerializer, DiaNaoLetivoSerializer
-from apps.users.permissions import GestaoWritePublicReadMixin
 
-class AnoLetivoViewSet(GestaoWritePublicReadMixin, viewsets.ModelViewSet):
+
+class AnoLetivoViewSet(viewsets.ModelViewSet):
     """
     ViewSet para AnoLetivo.
     Leitura: Público (Autenticado) | Escrita: Gestão

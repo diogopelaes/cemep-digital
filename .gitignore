@@ -4,7 +4,6 @@ venv/
 ENV/
 
 # Project Specific
-Documentation/Frameworks/
 media/
 
 # Python
@@ -44,3 +43,6 @@ backend/db.sqlite3
 
 # Migrations
 # backend/apps/*/migrations/
+
+# Documentation
+dev_work/Documentation/Frameworks

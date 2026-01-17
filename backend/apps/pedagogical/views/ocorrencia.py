@@ -16,12 +16,10 @@ from apps.pedagogical.serializers import (
     DescritorOcorrenciaPedagogicaSerializer, OcorrenciaPedagogicaSerializer,
     OcorrenciaResponsavelCienteSerializer
 )
-from apps.users.permissions import (
-    GestaoWriteFuncionarioReadMixin, GestaoSecretariaWritePublicReadMixin
-)
 
 
-class DescritorOcorrenciaPedagogicaViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+
+class DescritorOcorrenciaPedagogicaViewSet(viewsets.ModelViewSet):
     """ViewSet de Tipos de Ocorrência. Leitura: Funcionários | Escrita: Gestão"""
     queryset = DescritorOcorrenciaPedagogica.objects.select_related('gestor__usuario')
     serializer_class = DescritorOcorrenciaPedagogicaSerializer
@@ -32,7 +30,7 @@ class DescritorOcorrenciaPedagogicaViewSet(GestaoWriteFuncionarioReadMixin, view
         serializer.save(gestor=self.request.user.funcionario)
 
 
-class OcorrenciaPedagogicaViewSet(GestaoSecretariaWritePublicReadMixin, viewsets.ModelViewSet):
+class OcorrenciaPedagogicaViewSet(viewsets.ModelViewSet):
     """ViewSet de Ocorrências. Leitura: Todos autenticados | Escrita: Gestão/Secretaria"""
     queryset = OcorrenciaPedagogica.objects.select_related(
         'estudante__usuario', 

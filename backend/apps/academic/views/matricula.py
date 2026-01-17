@@ -10,10 +10,10 @@ from django.db import transaction
 from apps.academic.models import MatriculaCEMEP, MatriculaTurma
 from apps.academic.serializers import MatriculaCEMEPSerializer, MatriculaTurmaSerializer
 from apps.core.models import Turma
-from apps.users.permissions import GestaoSecretariaWriteFuncionarioReadMixin
 
 
-class MatriculaCEMEPViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+
+class MatriculaCEMEPViewSet(viewsets.ModelViewSet):
     """ViewSet de Matrículas CEMEP. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
     queryset = MatriculaCEMEP.objects.select_related('estudante__usuario', 'curso').all()
     serializer_class = MatriculaCEMEPSerializer
@@ -25,7 +25,7 @@ class MatriculaCEMEPViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.
         return Response({'detail': 'A exclusão de registros não é permitida.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class MatriculaTurmaViewSet(GestaoSecretariaWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+class MatriculaTurmaViewSet(viewsets.ModelViewSet):
     """ViewSet de Matrículas Turma. Leitura: Funcionários | Escrita: Gestão/Secretaria"""
     queryset = MatriculaTurma.objects.select_related(
         'matricula_cemep__estudante__usuario', 'turma__curso'

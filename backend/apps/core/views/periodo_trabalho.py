@@ -6,10 +6,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from apps.core.models import PeriodoTrabalho
 from apps.core.serializers import PeriodoTrabalhoSerializer
-from apps.users.permissions import GestaoWriteFuncionarioReadMixin
 
 
-class PeriodoTrabalhoViewSet(GestaoWriteFuncionarioReadMixin, viewsets.ModelViewSet):
+
+class PeriodoTrabalhoViewSet(viewsets.ModelViewSet):
     """
     ViewSet para PeriodoTrabalho.
     Leitura: Gestão, Secretaria, Professor, Monitor | Escrita: Gestão

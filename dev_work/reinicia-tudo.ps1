@@ -1,0 +1,5 @@
+$ROOT = "C:\Projects\cemep-digital"
+& "$ROOT\dev_work\clear-media.ps1"
+& "$ROOT\dev_work\reset-db.ps1"
+python "$ROOT\dev_work\importacoes\import_tudo.py"
+& "$ROOT\dev_work\start-dev.ps1"
