@@ -357,46 +357,74 @@ export default function IndicadoresTab() {
     }
 
     // Render do header do grupo
-    const renderGroupHeader = (group, groupIndex) => (
-        <div className="flex items-center gap-2">
-            <span className="w-6 h-6 flex items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-sm font-bold">
-                {groupIndex + 1}
-            </span>
-            <span className="font-semibold text-slate-800 dark:text-white">
-                {group.name}
-            </span>
-            <span className="text-sm text-slate-400">
-                ({group.items.length} {group.items.length === 1 ? 'indicador' : 'indicadores'})
-            </span>
-        </div>
-    )
+    const renderGroupHeader = (group, groupIndex) => {
+        const primeiroItemOriginal = indicadoresAnoLetivo.find(it => it.indicador_categoria === group.name)
+        const mudouPosicao = primeiroItemOriginal && primeiroItemOriginal.posicao_categoria !== (groupIndex + 1)
+
+        return (
+            <div className={`flex items-center gap-2 transition-all p-1 rounded-lg border-2 ${mudouPosicao
+                    ? 'border-blue-500/50 dark:border-blue-400/50'
+                    : 'border-transparent'
+                }`}>
+                <span className={`w-6 h-6 flex items-center justify-center rounded-lg text-sm font-bold ${mudouPosicao
+                        ? 'bg-blue-500 dark:bg-blue-600 text-white'
+                        : 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+                    }`}>
+                    {groupIndex + 1}
+                </span>
+                <span className={`font-semibold ${mudouPosicao ? 'text-blue-600 dark:text-blue-400' : 'text-slate-800 dark:text-white'
+                    }`}>
+                    {group.name}
+                </span>
+                <span className="text-sm text-slate-400">
+                    ({group.items.length} {group.items.length === 1 ? 'indicador' : 'indicadores'})
+                </span>
+            </div>
+        )
+    }
 
     // Render do item
-    const renderItem = (item, itemIndex, group, groupIndex) => (
-        <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-                <span className="text-xs font-medium text-slate-400 w-8">
-                    {groupIndex + 1}.{itemIndex + 1}
-                </span>
-                <span className={`text-sm truncate ${item.isActive === false ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-200'}`}>
-                    {item.nome}
-                </span>
-                {item.isNew && (
-                    <span className="px-1.5 py-0.5 text-xs rounded bg-success-100 dark:bg-success-900/30 text-success-700 dark:text-success-300">
-                        novo
+    const renderItem = (item, itemIndex, group, groupIndex) => {
+        const originalItem = indicadoresAnoLetivo.find(it => it.id === item.id)
+        const mudouPosicao = !item.isNew && originalItem && (
+            originalItem.posicao !== (itemIndex + 1) ||
+            originalItem.posicao_categoria !== (groupIndex + 1) ||
+            originalItem.indicador_categoria !== group.name
+        )
+
+        return (
+            <div className={`flex items-center justify-between gap-2 w-full p-1 rounded-lg border-2 transition-all ${mudouPosicao
+                    ? 'border-blue-500/40 dark:border-blue-400/40'
+                    : 'border-transparent'
+                }`}>
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className={`text-xs font-medium w-8 ${mudouPosicao ? 'text-blue-500 dark:text-blue-400' : 'text-slate-400'
+                        }`}>
+                        {groupIndex + 1}.{itemIndex + 1}
                     </span>
-                )}
+                    <span className={`text-sm truncate ${item.isActive === false
+                            ? 'text-slate-400 line-through'
+                            : (mudouPosicao ? 'text-blue-700 dark:text-blue-300' : 'text-slate-700 dark:text-slate-200')
+                        }`}>
+                        {item.nome}
+                    </span>
+                    {item.isNew && (
+                        <span className="px-1.5 py-0.5 text-xs rounded bg-success-100 dark:bg-success-900/30 text-success-700 dark:text-success-300">
+                            novo
+                        </span>
+                    )}
+                </div>
+                <button
+                    type="button"
+                    onClick={() => handleRemover(group.id, item.id)}
+                    className="p-1 rounded-lg hover:bg-danger-100 dark:hover:bg-danger-900/30 text-slate-400 hover:text-danger-600 transition-colors"
+                    title="Remover"
+                >
+                    <HiX className="w-4 h-4" />
+                </button>
             </div>
-            <button
-                type="button"
-                onClick={() => handleRemover(group.id, item.id)}
-                className="p-1 rounded-lg hover:bg-danger-100 dark:hover:bg-danger-900/30 text-slate-400 hover:text-danger-600 transition-colors"
-                title="Remover"
-            >
-                <HiX className="w-4 h-4" />
-            </button>
-        </div>
-    )
+        )
+    }
 
     if (loading) return <Loading />
 

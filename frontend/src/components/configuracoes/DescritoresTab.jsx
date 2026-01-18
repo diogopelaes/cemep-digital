@@ -263,38 +263,47 @@ export default function DescritoresTab() {
                     onReorder={handleReorder}
                     itemClassName="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4"
                     showDragHandle={true}
-                    renderItem={(item, index) => (
-                        <div className="flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                                <span className="text-sm font-mono font-bold text-slate-400 dark:text-slate-500 min-w-[28px]">
-                                    {String(index + 1).padStart(2, '0')}.
-                                </span>
-                                <div className="flex items-center gap-2">
-                                    <span className="font-medium text-slate-700 dark:text-slate-200">
-                                        {item.texto}
-                                    </span>
-                                    {item.isNew && (
-                                        <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800">
-                                            Novo
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
+                    renderItem={(item, index) => {
+                        const originalItem = descritoresAnoLetivo.find(d => d.id === item.id)
+                        const mudouPosicao = !item.isNew && originalItem && originalItem.posicao !== (index + 1)
 
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleRemover(item.id)
-                                }}
-                                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                                title="Remover (será desativado)"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-                    )}
+                        return (
+                            <div className={`flex items-center justify-between gap-4 w-full p-1 rounded-lg border-2 transition-all ${mudouPosicao
+                                    ? 'border-blue-500/50 dark:border-blue-400/50'
+                                    : 'border-transparent'
+                                }`}>
+                                <div className="flex items-center gap-3">
+                                    <span className={`text-sm font-mono font-bold min-w-[28px] ${mudouPosicao ? 'text-blue-500 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'
+                                        }`}>
+                                        {String(index + 1).padStart(2, '0')}.
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-medium text-slate-700 dark:text-slate-200">
+                                            {item.texto}
+                                        </span>
+                                        {item.isNew && (
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800">
+                                                Novo
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleRemover(item.id)
+                                    }}
+                                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                    title="Remover (será desativado)"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        )
+                    }}
                 />
 
                 {hasChanges && listaDescritores.length > 0 && (
