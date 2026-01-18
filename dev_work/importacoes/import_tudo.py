@@ -42,6 +42,7 @@ def import_tudo():
         "import_controles.py",
         "import_horario_aula.py",
         "import_indicadores.py",
+        "import_descritores.py",
         
         # 2. Cadastros de Infraestrutura Acadêmica
         "import_cursos.py",

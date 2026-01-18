@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { HiMenuAlt4 } from 'react-icons/hi'
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
 /**
  * Componente de lista com drag and drop usando HTML5 Drag API.
@@ -95,7 +95,7 @@ export default function DragDropList({
                 >
                     {showDragHandle && (
                         <div className={`flex-shrink-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-grab active:cursor-grabbing ${dragHandleClassName}`}>
-                            <HiMenuAlt4 className="w-5 h-5 rotate-90" />
+                            <HiOutlineDotsHorizontal className="w-5 h-5 rotate-90" />
                         </div>
                     )}
                     <div className="flex-1">
@@ -244,7 +244,7 @@ export function DragDropGroups({
                 >
                     {/* Header do grupo */}
                     <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-t-xl cursor-grab active:cursor-grabbing border-b border-slate-200 dark:border-slate-700">
-                        <HiMenuAlt4 className="w-5 h-5 text-slate-400 rotate-90 flex-shrink-0" />
+                        <HiOutlineDotsHorizontal className="w-5 h-5 text-slate-400 rotate-90 flex-shrink-0" />
                         <div className="flex-1">
                             {renderGroupHeader(group, groupIndex)}
                         </div>
@@ -287,7 +287,7 @@ export function DragDropGroups({
                                         ${itemClassName}
                                     `}
                                 >
-                                    <HiMenuAlt4 className="w-4 h-4 text-slate-300 rotate-90 flex-shrink-0" />
+                                    <HiOutlineDotsHorizontal className="w-4 h-4 text-slate-300 rotate-90 flex-shrink-0" />
                                     <div className="flex-1">
                                         {renderItem(item, itemIndex, group, groupIndex)}
                                     </div>

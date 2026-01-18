@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { HiCalendar, HiClock, HiAdjustments, HiAcademicCap, HiClipboardList } from 'react-icons/hi'
+import { HiCalendar, HiClock, HiAdjustments, HiAcademicCap, HiClipboardList, HiExclamationCircle } from 'react-icons/hi'
 import CalendarioTab from '../../components/configuracoes/CalendarioTab'
 import HorarioAulaTab from '../../components/configuracoes/HorarioAulaTab'
 import ControleTab from '../../components/configuracoes/ControleTab'
 import HabilidadesTab from '../../components/configuracoes/HabilidadesTab'
 import IndicadoresTab from '../../components/configuracoes/IndicadoresTab'
+import DescritoresTab from '../../components/configuracoes/DescritoresTab'
 import { useReferences } from '../../contexts/ReferenceContext'
 
 
@@ -25,6 +26,7 @@ export default function Configuracoes() {
         ...(hasActiveCalendar ? [{ id: 'horarios', label: 'Horários de Aula', icon: HiClock }] : []),
         ...(hasActiveCalendar ? [{ id: 'controle', label: 'Controle', icon: HiAdjustments }] : []),
         ...(hasActiveCalendar ? [{ id: 'indicadores', label: 'Indicadores', icon: HiClipboardList }] : []),
+        ...(hasActiveCalendar ? [{ id: 'descritores', label: 'Ocorrências', icon: HiExclamationCircle }] : []),
         { id: 'habilidades', label: 'Habilidades BNCC', icon: HiAcademicCap },
     ]
 
@@ -62,6 +64,7 @@ export default function Configuracoes() {
                 {activeTab === 'horarios' && hasActiveCalendar && <HorarioAulaTab />}
                 {activeTab === 'controle' && hasActiveCalendar && <ControleTab />}
                 {activeTab === 'indicadores' && hasActiveCalendar && <IndicadoresTab />}
+                {activeTab === 'descritores' && hasActiveCalendar && <DescritoresTab />}
                 {activeTab === 'habilidades' && <HabilidadesTab />}
             </div>
         </div>

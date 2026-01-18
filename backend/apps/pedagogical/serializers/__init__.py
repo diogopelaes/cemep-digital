@@ -14,6 +14,11 @@ from .minhas_turmas import (
     MinhasTurmasSerializer,
     MinhaTurmaDetalhesSerializer
 )
+from .descritor_ocorrencia import (
+    DescritorOcorrenciaPedagogicaSerializer,
+    DescritorOcorrenciaPedagogicaAnoLetivoSerializer,
+    SalvarLoteDescritoresSerializer
+)
 
 
 __all__ = [
@@ -24,4 +29,7 @@ __all__ = [
     'AtualizarFaltasSerializer',
     'MinhasTurmasSerializer',
     'MinhaTurmaDetalhesSerializer',
+    'DescritorOcorrenciaPedagogicaSerializer',
+    'DescritorOcorrenciaPedagogicaAnoLetivoSerializer',
+    'SalvarLoteDescritoresSerializer',
 ]

@@ -1,0 +1,45 @@
+{
+    "ano_letivo": 2026,
+    "descritores": [
+        {
+            "texto": "Uso de Celular durante a aula sem autorização do(a) professor(a).",
+            "posicao": 1
+        },
+        {
+            "texto": "Excesso de conversa em sala atrapalhando professor e alunos.",
+            "posicao": 2
+        },
+        {
+            "texto": "Chegou atrasado(a).",
+            "posicao": 3
+        },
+        {
+            "texto": "Brincadeiras inadequadas em sala de aula.",
+            "posicao": 4
+        },
+        {
+            "texto": "Uso inadequado dos equipamentos do laboratório - Acesso a sites ou jogos indevidos.",
+            "posicao": 5
+        },
+        {
+            "texto": "Deixou de realizar atividade para nota.",
+            "posicao": 6
+        },
+        {
+            "texto": "Pede para se ausentar da aula com muita frequência.",
+            "posicao": 7
+        },
+        {
+            "texto": "Práticas de Bullying com colegas.",
+            "posicao": 8
+        },
+        {
+            "texto": "Dormiu em sala de aula.",
+            "posicao": 9
+        },
+        {
+            "texto": "Faltou na aula de recuperação.",
+            "posicao": 10
+        }
+    ]
+}

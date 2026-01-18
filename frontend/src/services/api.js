@@ -323,6 +323,16 @@ export const pedagogicalAPI = {
     list: (params) => api.get('/pedagogical/ocorrencias/', { params }),
     create: (data) => api.post('/pedagogical/ocorrencias/', data),
   },
+  // Ocorrências Pedagógicas
+  descritoresOcorrencia: {
+    list: (params) => api.get('/pedagogical/descritores-ocorrencia/', { params }),
+    get: (id) => api.get(`/pedagogical/descritores-ocorrencia/${id}/`),
+  },
+  descritoresOcorrenciaAno: {
+    list: (params) => api.get('/pedagogical/descritores-ocorrencia-ano/', { params }),
+    salvarLote: (data) => api.post('/pedagogical/descritores-ocorrencia-ano/salvar_lote/', data),
+  },
+
   // Planos de Aula
   planosAula: {
     list: (params) => api.get('/pedagogical/planos-aula/', { params }),
