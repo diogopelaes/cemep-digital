@@ -244,6 +244,15 @@ export const coreAPI = {
     }),
     delete: (id) => api.delete(`/core/arquivos/${id}/`),
   },
+  // Indicadores Bimestre
+  indicadoresBimestre: {
+    list: (params) => api.get('/core/indicadores-bimestre/', { params }),
+    get: (id) => api.get(`/core/indicadores-bimestre/${id}/`),
+  },
+  indicadoresBimestreAnoLetivo: {
+    list: (params) => api.get('/core/indicadores-bimestre-ano-letivo/', { params }),
+    salvarLote: (data) => api.post('/core/indicadores-bimestre-ano-letivo/salvar_lote/', data),
+  },
 }
 
 export const academicAPI = {

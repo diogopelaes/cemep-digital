@@ -41,6 +41,7 @@ def import_tudo():
         "import_ano_letivo.py",
         "import_controles.py",
         "import_horario_aula.py",
+        "import_indicadores.py",
         
         # 2. Cadastros de Infraestrutura Acadêmica
         "import_cursos.py",

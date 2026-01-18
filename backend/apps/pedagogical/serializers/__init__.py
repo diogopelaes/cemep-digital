@@ -10,10 +10,9 @@ from .aula_faltas import (
     ContextoAulaSerializer,
     AtualizarFaltasSerializer
 )
-from .ocorrencia import (
-    DescritorOcorrenciaPedagogicaSerializer,
-    OcorrenciaPedagogicaSerializer,
-    OcorrenciaResponsavelCienteSerializer
+from .minhas_turmas import (
+    MinhasTurmasSerializer,
+    MinhaTurmaDetalhesSerializer
 )
 
 
@@ -23,7 +22,6 @@ __all__ = [
     'AulaFaltasListSerializer',
     'ContextoAulaSerializer',
     'AtualizarFaltasSerializer',
-    'DescritorOcorrenciaPedagogicaSerializer',
-    'OcorrenciaPedagogicaSerializer',
-    'OcorrenciaResponsavelCienteSerializer',
+    'MinhasTurmasSerializer',
+    'MinhaTurmaDetalhesSerializer',
 ]

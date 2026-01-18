@@ -9,7 +9,8 @@ from .models import (
     DiaLetivoExtra, DiaNaoLetivo, AnoLetivo, ControleRegistrosVisualizacao,
     HorarioAula, GradeHorariaValidade, GradeHoraria,
     AnoLetivoSelecionado,
-    Arquivo
+    Arquivo,
+    IndicadorBimestre, IndicadorBimestreAnoLetivo
 )
 
 @admin.register(Funcionario)
@@ -155,6 +156,19 @@ class AnoLetivoSelecionadoAdmin(admin.ModelAdmin):
     search_fields = ('usuario__first_name', 'usuario__last_name', 'usuario__username')
     list_filter = ('ano_letivo',)
     autocomplete_fields = ('usuario', 'ano_letivo')
+
+@admin.register(IndicadorBimestre)
+class IndicadorBimestreAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'categoria')
+    search_fields = ('nome', 'categoria')
+    list_filter = ('categoria',)
+
+@admin.register(IndicadorBimestreAnoLetivo)
+class IndicadorBimestreAnoLetivoAdmin(admin.ModelAdmin):
+    list_display = ('indicador', 'ano_letivo', 'posicao_categoria', 'posicao', 'is_active')
+    search_fields = ('indicador__nome', 'ano_letivo__ano')
+    list_filter = ('ano_letivo', 'is_active')
+    autocomplete_fields = ('indicador', 'ano_letivo')
 
 @admin.register(Arquivo)
 class ArquivoAdmin(admin.ModelAdmin):

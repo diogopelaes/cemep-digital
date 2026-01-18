@@ -27,6 +27,11 @@ from .horario_aula import HorarioAulaSerializer
 from .grade_horaria import GradeHorariaSerializer
 from .ano_letivo_selecionado import AnoLetivoSelecionadoSerializer
 from .controle import ControleRegistrosVisualizacaoSerializer
+from .indicador_bimestre import (
+    IndicadorBimestreSerializer,
+    IndicadorBimestreAnoLetivoSerializer,
+    SalvarLoteIndicadoresSerializer
+)
 
 
 __all__ = [
@@ -48,6 +53,9 @@ __all__ = [
     'GradeHorariaSerializer',
     'AnoLetivoSelecionadoSerializer',
     'ControleRegistrosVisualizacaoSerializer',
+    'IndicadorBimestreSerializer',
+    'IndicadorBimestreAnoLetivoSerializer',
+    'SalvarLoteIndicadoresSerializer',
 ]
 
 

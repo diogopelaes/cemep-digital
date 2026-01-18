@@ -68,6 +68,11 @@ class User(AbstractUser):
     @property
     def is_responsavel(self):
         return self.tipo_usuario == self.TipoUsuario.RESPONSAVEL
+    
+    @property
+    def is_monitor(self):
+        return self.tipo_usuario == self.TipoUsuario.MONITOR
+
 
     def get_ano_letivo_selecionado(self):
         """

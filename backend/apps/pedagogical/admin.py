@@ -1,54 +1,51 @@
 from django.contrib import admin
 from .models import (
-    PlanoAula, Aula, Faltas,
-    DescritorOcorrenciaPedagogica, OcorrenciaPedagogica, OcorrenciaResponsavelCiente,
+    PlanoAula,
+    Aula,
+    Faltas,
+    DescritorOcorrenciaPedagogica,
+    DescritorOcorrenciaPedagogicaAnoLetivo,
     Atividade
 )
 
 @admin.register(PlanoAula)
 class PlanoAulaAdmin(admin.ModelAdmin):
-    list_display = ('professor', 'disciplina', 'titulo', 'data_inicio', 'data_fim', 'ano_letivo', 'bimestre')
-    list_filter = ('ano_letivo', 'bimestre', 'disciplina')
-    search_fields = ('titulo', 'professor__usuario__first_name', 'disciplina__nome')
+    list_display = ('titulo', 'professor', 'disciplina', 'data_inicio', 'data_fim', 'bimestre', 'ano_letivo')
+    list_filter = ('professor', 'disciplina', 'bimestre', 'ano_letivo')
+    search_fields = ('titulo', 'conteudo')
     filter_horizontal = ('turmas', 'habilidades')
-    raw_id_fields = ('professor', 'disciplina', 'ano_letivo')
+
+class FaltaInline(admin.TabularInline):
+    model = Faltas
+    extra = 1
 
 @admin.register(Aula)
 class AulaAdmin(admin.ModelAdmin):
     list_display = ('professor_disciplina_turma', 'data', 'numero_aulas', 'bimestre')
-    list_filter = ('bimestre', 'data')
-    search_fields = ('professor_disciplina_turma__professor__usuario__first_name',)
-    raw_id_fields = ('professor_disciplina_turma',)
+    list_filter = ('data', 'bimestre', 'professor_disciplina_turma__disciplina_turma__turma__ano_letivo')
+    search_fields = ('conteudo',)
+    inlines = [FaltaInline]
 
 @admin.register(Faltas)
 class FaltasAdmin(admin.ModelAdmin):
-    list_display = ('aula', 'estudante', 'qtd_faltas')
-    search_fields = ('estudante__nome_social', 'estudante__matricula_cemep__matricula')
-    raw_id_fields = ('aula', 'estudante')
+    list_display = ('estudante', 'aula', 'qtd_faltas')
+    list_filter = ('aula__data', 'aula__bimestre')
+    search_fields = ('estudante__nome',)
 
 @admin.register(DescritorOcorrenciaPedagogica)
 class DescritorOcorrenciaPedagogicaAdmin(admin.ModelAdmin):
-    list_display = ('texto', 'ativo')
-    list_filter = ('ativo',)
+    list_display = ('texto',)
     search_fields = ('texto',)
 
-@admin.register(OcorrenciaPedagogica)
-class OcorrenciaPedagogicaAdmin(admin.ModelAdmin):
-    list_display = ('estudante', 'tipo', 'autor', 'data', 'bimestre')
-    list_filter = ('tipo', 'bimestre', 'data')
-    search_fields = ('estudante__nome_social', 'autor__usuario__first_name', 'tipo__texto')
-    raw_id_fields = ('estudante', 'autor', 'tipo')
-
-@admin.register(OcorrenciaResponsavelCiente)
-class OcorrenciaResponsavelCienteAdmin(admin.ModelAdmin):
-    list_display = ('responsavel', 'ocorrencia', 'ciente', 'data_ciencia')
-    list_filter = ('ciente', 'data_ciencia')
-    raw_id_fields = ('responsavel', 'ocorrencia')
+@admin.register(DescritorOcorrenciaPedagogicaAnoLetivo)
+class DescritorOcorrenciaPedagogicaAnoLetivoAdmin(admin.ModelAdmin):
+    list_display = ('descritor', 'ano_letivo', 'posicao', 'is_active')
+    list_filter = ('ano_letivo', 'is_active')
+    ordering = ('ano_letivo', 'posicao')
 
 @admin.register(Atividade)
 class AtividadeAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'data_inicio', 'data_fim', 'com_visto', 'criado_por')
-    list_filter = ('com_visto', 'data_inicio')
+    list_display = ('titulo', 'data_inicio', 'data_fim', 'criado_por')
+    list_filter = ('criado_por', 'data_inicio', 'data_fim')
     search_fields = ('titulo', 'descricao')
     filter_horizontal = ('turmas_professores', 'arquivos', 'habilidades')
-    raw_id_fields = ('criado_por',)

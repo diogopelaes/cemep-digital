@@ -1,0 +1,73 @@
+{
+  "ano_letivo": 2026,
+  "indicadores": [
+    {
+      "categoria": "Participação e Assiduidade",
+      "posicao_categoria": 1,
+      "itens": [
+        {
+          "nome": "Apresentou baixa assiduidade ao longo do bimestre.",
+          "posicao": 1
+        },
+        {
+          "nome": "Demonstrou baixa participação durante as aulas.",
+          "posicao": 2
+        },
+        {
+          "nome": "Apresentou dificuldades de concentração durante as aulas.",
+          "posicao": 3
+        }
+      ]
+    },
+    {
+      "categoria": "Realização de Atividades",
+      "posicao_categoria": 2,
+      "itens": [
+        {
+          "nome": "Não realizou as atividades propostas em sala de aula.",
+          "posicao": 1
+        },
+        {
+          "nome": "Não realizou as tarefas e atividades propostas para casa.",
+          "posicao": 2
+        },
+        {
+          "nome": "Realizou parcialmente as atividades de sala e/ou de casa.",
+          "posicao": 3
+        },
+        {
+          "nome": "Não entregou trabalhos e atividades avaliativas.",
+          "posicao": 4
+        }
+      ]
+    },
+    {
+      "categoria": "Avaliações",
+      "posicao_categoria": 3,
+      "itens": [
+        {
+          "nome": "Esteve ausente em momentos de avaliação.",
+          "posicao": 1
+        },
+        {
+          "nome": "Não se preparou adequadamente para os momentos de avaliação.",
+          "posicao": 2
+        }
+      ]
+    },
+    {
+      "categoria": "Aprendizagem e Desempenho",
+      "posicao_categoria": 4,
+      "itens": [
+        {
+          "nome": "Apresenta dificuldades na disciplina/conteúdos trabalhados, devendo continuar se empenhando.",
+          "posicao": 1
+        },
+        {
+          "nome": "Apresentou ótimo desempenho no bimestre, demonstrando dedicação e compromisso com os estudos.",
+          "posicao": 2
+        }
+      ]
+    }
+  ]
+}

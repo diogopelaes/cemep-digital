@@ -18,6 +18,7 @@ from .ano_letivo_selecionado import AnoLetivoSelecionadoViewSet
 from .media import ProtectedMediaView
 from .controle import ControleRegistrosVisualizacaoViewSet
 from .arquivo import ArquivoViewSet
+from .indicador_bimestre import IndicadorBimestreViewSet, IndicadorBimestreAnoLetivoViewSet
 
 
 __all__ = [
@@ -36,6 +37,8 @@ __all__ = [
     'ProtectedMediaView',
     'ControleRegistrosVisualizacaoViewSet',
     'ArquivoViewSet',
+    'IndicadorBimestreViewSet',
+    'IndicadorBimestreAnoLetivoViewSet',
 ]
 
 

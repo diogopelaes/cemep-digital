@@ -8,11 +8,12 @@ from .calendario import DiaLetivoExtra, DiaNaoLetivo, AnoLetivo, ControleRegistr
 from .grade_horaria import HorarioAula, GradeHorariaValidade, GradeHoraria
 from .selecoes import AnoLetivoSelecionado
 from .files import Arquivo
+from .indicadores_bimestre import IndicadorBimestre, IndicadorBimestreAnoLetivo
 
 __all__ = [
     'UUIDModel', 'Funcionario', 'PeriodoTrabalho', 'Disciplina', 
     'Curso', 'Turma', 'DisciplinaTurma', 'ProfessorDisciplinaTurma', 'Habilidade', 
     'DiaLetivoExtra', 'DiaNaoLetivo', 'AnoLetivo', 'ControleRegistrosVisualizacao',
     'HorarioAula', 'GradeHorariaValidade', 'GradeHoraria', 'AnoLetivoSelecionado',
-    'Arquivo'
+    'Arquivo', 'IndicadorBimestre', 'IndicadorBimestreAnoLetivo'
 ]

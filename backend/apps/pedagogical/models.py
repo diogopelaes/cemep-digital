@@ -3,7 +3,7 @@ App Pedagogical - Diário de Classe, Planos de Aula, Faltas, Ocorrências
 """
 from django.db import models
 from django.contrib.auth import get_user_model
-from apps.core.models import Funcionario, Disciplina, Turma, Habilidade, ProfessorDisciplinaTurma, UUIDModel, Arquivo
+from apps.core.models import Funcionario, Disciplina, Turma, Habilidade, ProfessorDisciplinaTurma, UUIDModel, Arquivo, AnoLetivo
 from apps.academic.models import Estudante, Responsavel
 from ckeditor.fields import RichTextField
 
@@ -207,8 +207,7 @@ class Faltas(UUIDModel):
 
 class DescritorOcorrenciaPedagogica(UUIDModel):
     """Tipos de ocorrências pedagógicas cadastradas pelo gestor."""
-    texto = models.CharField(max_length=100, verbose_name='Descrição do Tipo')
-    ativo = models.BooleanField(default=True)
+    texto = models.CharField(max_length=100, verbose_name='Descrição do Tipo', unique=True)
     
     class Meta:
         verbose_name = 'Tipo de Ocorrência'
@@ -218,65 +217,85 @@ class DescritorOcorrenciaPedagogica(UUIDModel):
     def __str__(self):
         return self.texto
 
-
-class OcorrenciaPedagogica(UUIDModel):
-    """Ocorrência pedagógica de um estudante (não permanente)."""
+class DescritorOcorrenciaPedagogicaAnoLetivo(UUIDModel):
+    """ Descritor de ocorrência pedagógica por ano letivo. """
     
-    estudante = models.ForeignKey(
-        Estudante,
+    ano_letivo = models.ForeignKey(
+        AnoLetivo,
         on_delete=models.CASCADE,
-        related_name='ocorrencias_pedagogicas'
+        related_name='descritores_ocorrencias_pedagogicas'
     )
-    autor = models.ForeignKey(
-        Funcionario,
-        on_delete=models.CASCADE,
-        related_name='ocorrencias_criadas'
-    )
-    tipo = models.ForeignKey(
+    descritor = models.ForeignKey(
         DescritorOcorrenciaPedagogica,
-        on_delete=models.PROTECT,
-        related_name='ocorrencias'
+        on_delete=models.CASCADE,
+        related_name='descritores_ocorrencias_pedagogicas'
     )
-    data = models.DateTimeField(auto_now_add=True)
-    bimestre = models.PositiveSmallIntegerField(
-        choices=[(0, 'Anual'), (1, '1º Bimestre'), (2, '2º Bimestre'), (3, '3º Bimestre'), (4, '4º Bimestre')],
-        default=0,
-        verbose_name='Bimestre'
-    )
+    posicao = models.PositiveSmallIntegerField(default=0, verbose_name='Posição')
+    is_active = models.BooleanField(default=True, verbose_name='Ativo')
     
     class Meta:
-        verbose_name = 'Ocorrência Pedagógica'
-        verbose_name_plural = 'Ocorrências Pedagógicas'
-        ordering = ['-data', 'estudante']
+        verbose_name = 'Descritor de Ocorrência Pedagógica por Ano Letivo'
+        verbose_name_plural = 'Descritores de Ocorrências Pedagógicas por Ano Letivo'
+        unique_together = ('ano_letivo', 'descritor')
+        ordering = ['posicao']
     
     def __str__(self):
-        return f"{self.estudante} - {self.tipo} ({self.data.strftime('%d/%m/%Y')})"
+        return f"{self.descritor} - {self.ano_letivo}"
 
+    def save(self, *args, **kwargs):
+        """Override save para reordenar quando o status ativo mudar ou se for novo."""
+        is_new = self._state.adding
+        mudou_status = False
+        
+        if not is_new:
+            try:
+                old = type(self).objects.get(pk=self.pk)
+                mudou_status = old.is_active != self.is_active
+            except type(self).DoesNotExist:
+                pass
+        
+        # Se for novo e não tiver posição definida (0), coloca no fim dos ativos
+        if is_new and self.posicao == 0:
+            last = type(self).objects.filter(ano_letivo=self.ano_letivo, is_active=True).order_by('-posicao').first()
+            self.posicao = (last.posicao + 1) if last else 1
 
-class OcorrenciaResponsavelCiente(UUIDModel):
-    """Registro de ciência do responsável sobre uma ocorrência."""
-    
-    responsavel = models.ForeignKey(
-        Responsavel,
-        on_delete=models.CASCADE,
-        related_name='ciencias_ocorrencias'
-    )
-    ocorrencia = models.ForeignKey(
-        OcorrenciaPedagogica,
-        on_delete=models.CASCADE,
-        related_name='ciencias'
-    )
-    ciente = models.BooleanField(default=False)
-    data_ciencia = models.DateTimeField(null=True, blank=True)
-    
-    class Meta:
-        verbose_name = 'Ciência de Ocorrência'
-        verbose_name_plural = 'Ciências de Ocorrências'
-        unique_together = ['responsavel', 'ocorrencia']
-    
-    def __str__(self):
-        status = 'Ciente' if self.ciente else 'Pendente'
-        return f"{self.responsavel} - {self.ocorrencia} ({status})"
+        super().save(*args, **kwargs)
+        
+        if mudou_status:
+            self.reordenar_por_ano_letivo(self.ano_letivo)
+
+    @classmethod
+    def reordenar_por_ano_letivo(cls, ano_letivo):
+        """
+        Reordena descritores usando bulk_update para performance.
+        Ativos: 1, 2, 3...
+        Inativos: 9001, 9002...
+        """
+        from django.db import transaction
+        
+        with transaction.atomic():
+            # Busca todos ordenados por status e posição atual
+            descritores = list(cls.objects.filter(ano_letivo=ano_letivo).order_by('-is_active', 'posicao'))
+            
+            to_update = []
+            pos_ativa = 1
+            pos_inativa = 9001
+            
+            for d in descritores:
+                nova_pos = 0
+                if d.is_active:
+                    nova_pos = pos_ativa
+                    pos_ativa += 1
+                else:
+                    nova_pos = pos_inativa
+                    pos_inativa += 1
+                
+                if d.posicao != nova_pos:
+                    d.posicao = nova_pos
+                    to_update.append(d)
+            
+            if to_update:
+                cls.objects.bulk_update(to_update, ['posicao'])
 
 
 # =============================================================================
